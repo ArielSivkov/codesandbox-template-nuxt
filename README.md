@@ -1,14 +1,5 @@
-# Nuxt
+# ESH27 games
 
-This is a [Nuxt](https://nuxtjs.org/) project bootstrapped by [`create-nuxt-app`](https://github.com/nuxt/create-nuxt-app).
-
-[Configuration](https://codesandbox.io/docs/projects/learn/setting-up/tasks) has been added to optimize it for [CodeSandbox Projects](https://codesandbox.io/p/dashboard).
-
-[![Edit in CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/github/codesandbox/codesandbox-template-nuxt/main)
-
-## Resources
-
-- [CodeSandbox Projects — Docs](https://docs.codesandbox.io)
-- [CodeSandbox — Discord](https://discord.gg/Ggarp3pX5H)
-- [Nuxt — GitHub](https://github.com/nuxt/framework)
-- [Nuxt — Docs](https://nuxtjs.org/docs)
+אש 5 – אלפא ציבורית 0.25 (esh5/), דף הסטודיו (studio/).
+נכסים: Quaternius ‏(CC0), Three.js ‏(MIT).
+המאגר מוחזר מתבנית קודמת (codesandbox-template-nuxt); התבנית נשארת בהיסטוריה.
