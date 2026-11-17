@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>לוח היזם – מחשבון הצעות מחיר</title>
+<style>
+:root{color-scheme:light;--bg:#eceae4;--paper:#fbfaf7;--ink:#1d2329;--muted:#566069;--line:#d3d0c7;--field:#b6b1a4;--accent:#d98a00;--blue:#235a8f;--chip:#e2dfd6;--bad:#a4301f;--warnbg:#fdf0cf}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Assistant","Heebo","Segoe UI","Arial Hebrew","Noto Sans Hebrew",Arial,sans-serif;font-size:16px;line-height:1.45;padding:12px 12px 92px}
+.wrap{max-width:1100px;margin:0 auto;display:grid;gap:12px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px;border-bottom:3px solid var(--ink);padding-bottom:8px}
+h1{font-size:1.9rem;line-height:1.1;margin:0;font-weight:800}
+h1 span{color:var(--accent)}
+.tag{margin:4px 0 0;color:var(--muted);max-width:52ch}
+.stage{font-size:.8rem;font-weight:700;border:1.5px solid var(--ink);border-radius:4px;padding:2px 8px}
+.cols{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.cols{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
+h2{font-size:1.2rem;margin:0 0 8px}
+h3{font-size:1rem;margin:14px 0 6px}
+label{display:block;font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:2px}
+input,select,textarea,button{font:inherit}
+input[type=text],input[type=search],input[type=number],select,textarea{color:var(--ink);background:#fff;border:1px solid var(--field);border-radius:6px;padding:9px 10px;width:100%;min-height:44px}
+textarea{line-height:1.4}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+.fields{display:grid;gap:8px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:560px){.fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:6px}
+.req{color:var(--bad)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px}
+.chip{flex:0 0 auto;background:var(--chip);color:var(--ink);border:0;border-radius:18px;padding:8px 12px;min-height:40px;font-size:.9rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff}
+.count{font-size:.8rem;color:var(--muted);margin-bottom:4px}
+.items{max-height:46vh;overflow-y:auto;border-top:1px solid var(--line)}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto 44px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.nm{font-weight:700}
+.meta{font-size:.8rem;color:var(--muted)}
+.pr{text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pr b{display:block}
+.pr small{display:block;font-size:.72rem;color:var(--blue);font-weight:700}
+.add{width:44px;height:44px;border:0;border-radius:8px;background:var(--accent);color:var(--ink);font-size:1.5rem;font-weight:800;line-height:1;cursor:pointer}
+.note{font-size:.82rem;color:var(--muted);margin:10px 0 0}
+.empty{color:var(--muted);text-align:center;padding:18px 8px;margin:0}
+.line{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.line.isopt{border-style:dashed;background:#f4f2ec}
+.line-head{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
+.line-name{font-weight:700;min-width:0}
+.lid{font-weight:400;font-size:.75rem;color:var(--muted);white-space:nowrap}
+.cust{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;flex:1;min-width:0}
+.cust .cunit{max-width:60%}
+.cust textarea,#notIncluded{resize:vertical}
+.del{flex:0 0 auto;width:42px;height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--bad);font-size:1.1rem;cursor:pointer}
+.line-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px;align-items:end}
+.line-grid label{font-size:.78rem}
+.line-total{text-align:left}
+.line-total span{display:block;font-size:.78rem;color:var(--muted);font-weight:600}
+.line-total b{display:block;min-height:44px;line-height:44px;font-size:1.05rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.line-foot{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between;margin-top:6px;font-size:.8rem;color:var(--muted)}
+.optl{display:flex;align-items:center;gap:6px;margin:0;font-size:.85rem;color:var(--ink);font-weight:600;min-height:40px;cursor:pointer}
+.optl input{width:22px;height:22px;margin:0}
+.reset{border:0;background:none;color:var(--blue);text-decoration:underline;padding:8px 6px;min-height:40px;cursor:pointer;font-size:.85rem}
+.lwarn{margin-top:6px;background:var(--warnbg);border:1px solid var(--accent);border-radius:6px;padding:6px 8px;font-size:.85rem}
+.btn{border:1.5px solid var(--ink);border-radius:8px;background:transparent;color:var(--ink);font-weight:700;padding:10px 14px;min-height:46px;cursor:pointer}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.wide{width:100%}
+.totals{margin-top:14px;border-top:2px solid var(--ink);padding-top:8px;font-variant-numeric:tabular-nums}
+.totals>div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.totals .grand{border-top:3px double var(--ink);margin-top:4px;padding-top:8px;font-size:1.25rem;font-weight:800}
+.totals .optrow{color:var(--muted);font-size:.9rem;border-top:1px dashed var(--line);margin-top:6px;padding-top:6px}
+.status{margin-top:10px;background:var(--warnbg);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:.92rem}
+.status ul{margin:4px 0 0;padding-inline-start:18px}
+.status.attn{outline:3px solid var(--bad)}
+.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.actions .primary{grid-column:1/-1}
+#preview{min-height:240px;direction:rtl}
+.bar{position:fixed;inset:auto 0 0 0;z-index:5;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));font-variant-numeric:tabular-nums}
+.bar a{flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;color:var(--ink);background:var(--accent);border-radius:8px;padding:8px 14px;font-weight:800;text-decoration:none}
+.toast{position:fixed;inset:auto 12px 76px 12px;z-index:6;pointer-events:none;background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:8px;padding:10px 12px;text-align:center;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+[hidden]{display:none!important}
+#sheet{display:none}
+@media print{
+  body{background:#fff;padding:0;font-size:11pt}
+  .wrap,.bar,.toast{display:none!important}
+  #sheet{display:block}
+  #sheet h1{font-size:20pt;margin:0 0 6pt}
+  #sheet .sm{margin:0 0 10pt}
+  #sheet .sm div{margin:1pt 0}
+  #sheet table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+  #sheet th{text-align:right;border-bottom:1.5pt solid #000;padding:4pt 3pt;font-size:9.5pt}
+  #sheet td{border-bottom:.5pt solid #999;padding:4pt 3pt;vertical-align:top}
+  #sheet td.n,#sheet th.n{text-align:left;white-space:nowrap}
+  #sheet tr.ch td{font-weight:700;background:#eee;border-bottom:1pt solid #000}
+  #sheet tr{break-inside:avoid}
+  #sheet .st{width:62%;margin-top:10pt;margin-inline-start:auto}
+  #sheet .st div{display:flex;justify-content:space-between;padding:2pt 0}
+  #sheet .st .g{border-top:2pt double #000;font-weight:800;font-size:13pt;margin-top:3pt;padding-top:4pt}
+  #sheet .ex{margin-top:10pt;font-size:10pt}
+  #sheet .ex ul{margin:2pt 0;padding-inline-start:14pt}
+  #sheet .no{border:1.5pt solid #000;padding:10pt;font-weight:700}
+}
+.basis{margin-top:8px;padding:8px 10px;border-radius:10px;background:#fff7e0;border:1px solid #f0d58a;font-size:.88em;line-height:1.5}.basis button{margin-inline-start:6px;font-size:.85em}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>לוח <span>היזם</span></h1>
+      <p class="tag">מחשבון הצעות מחיר לשיפוץ ובנייה. בוחרים סעיפים, מזינים כמויות, ומקבלים הצעה מסודרת לשליחה.</p>
+    </div>
+    <span class="stage" id="stage"></span> <a href="/map/" style="display:inline-block;margin-top:6px;font-weight:700">🗺️ מפת אשדוד בתלת־ממד – כמויות מעטפת מכל בניין</a>
+  </header>
+
+  <div class="cols">
+    <section class="card" aria-labelledby="hList">
+      <h2 id="hList">מחירון</h2>
+      <label for="search">חיפוש סעיף</label>
+      <input id="search" type="search" placeholder="למשל: גבס, איטום, נקודת חשמל" autocomplete="off">
+      <div class="chips" id="chips" role="group" aria-label="סינון לפי פרק"></div>
+      <div class="count" id="count"></div>
+      <div class="items" id="items"></div>
+      <p class="note">המחירים לפני מע"מ. אלה מחירי פתיחה מהצעות מחיר של קבלן אחד (אוקטובר 2026), לא מחירון שוק – שנה כל מחיר למחיר שלך. סעיף שמסומן "עלות" הוא עלות ישירה; הכלי מוסיף לו את אחוז התוספת שקבעת בהצעה.</p>
+    </section>
+
+    <section class="card" aria-labelledby="hQuote">
+      <h2 id="hQuote">הצעת מחיר</h2>
+      <div class="fields">
+        <div><label for="client">שם הלקוח</label><input id="client" type="text" autocomplete="off"></div>
+        <div><label for="address">כתובת הנכס <span class="req">(חובה)</span></label><input id="address" type="text" placeholder="רחוב, מספר, עיר" autocomplete="off"></div>
+        <div><label for="business">שם העסק שלך</label><input id="business" type="text" autocomplete="off"></div>
+      </div>
+
+      <h3>שורות ההצעה</h3>
+      <div id="lines"></div>
+      <button type="button" class="btn wide" id="addCustom">+ סעיף חופשי (לא מהמחירון)</button>
+
+      <h3>תנאים</h3>
+      <div class="fields">
+        <div><label for="markup">תוספת על סעיפי עלות (%)</label><input id="markup" type="number" inputmode="decimal" min="0" step="any"></div>
+        <div><label for="discValue">הנחה</label>
+          <div class="pair"><input id="discValue" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><select id="discType" aria-label="סוג ההנחה"><option value="amount">₪</option><option value="percent">%</option></select></div>
+        </div>
+        <div><label for="validity">תוקף ההצעה (ימים)</label><input id="validity" type="number" inputmode="numeric" min="0" step="1"></div>
+        <div><label for="notIncluded">לא כלול בהצעה</label><textarea id="notIncluded" rows="2" placeholder="למשל: אריחים, ארונות מטבח"></textarea></div>
+      </div>
+
+      <div class="totals" id="totals">
+        <div id="rowSub"><span>סה"כ לפני הנחה</span><span id="tSub"></span></div>
+        <div id="rowDisc"><span>הנחה</span><span id="tDisc"></span></div>
+        <div><span>סה"כ לפני מע"מ</span><span id="tNet"></span></div>
+        <div><span id="vatLabel"></span><span id="tVat"></span></div>
+        <div class="grand"><span>סה"כ לתשלום</span><span id="tTotal"></span></div>
+        <div class="optrow" id="rowOpt"><span>אופציות – לא בסה"כ (לפני מע"מ)</span><span id="tOpt"></span></div>
+      </div>
+
+      <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+
+      <div class="actions">
+        <button type="button" class="btn primary" id="copyBtn">העתק כטקסט</button>
+        <button type="button" class="btn" id="printBtn">הדפסה</button>
+        <button type="button" class="btn" id="newBtn">הצעה חדשה</button>
+      </div>
+
+      <h3><label for="preview" style="font-size:1rem;color:inherit;font-weight:700">הטקסט שיועתק</label></h3>
+      <textarea id="preview" readonly rows="10" placeholder="הטקסט יופיע כאן כשיש כתובת נכס ושורה אחת לפחות."></textarea>
+      <p class="note">הכלי מחשב לפי מה שהזנת: הוא לא מודד, לא מזהה תמונות ולא בודק מחירים. כל שורה והמע"מ מעוגלים לשקל שלם. בדוק כל שורה לפני שליחה. ההצעה נשמרת רק בדפדפן הזה ולא נשלחת לשום מקום.</p>
+    </section>
+  </div>
+</div>
+<div class="bar"><span id="barText"></span><a href="#totals">לסיכום</a></div>
+<div class="toast" id="toast" role="status" hidden></div>
+<div id="sheet"></div>
+
+<!-- ===== BEGIN PRICE DATA ===== בלוק המחירים. כדי להחליף מחירון מחליפים רק את מה שבין BEGIN ל-END (ידנית, או עם tools/make_price_block.py). ===== -->
+<script id="price-data">
+/* כל המחירים בשקלים, לפני מע"מ. שום מחיר כאן לא הומצא: כולם מעמודת הסה"כ ליחידה של מאגר 89 המחירים, גרסה 1 (05.11.2026), לשונית "מאגר מחירים".
+   מבנה שורה: [מזהה, פרק, סעיף, יחידה, מחיר, סוג, תאריך המחיר, הערה].
+   סוג: c = מחיר שהופיע בהצעה ללקוח · d = עלות ישירה (הכלי מוסיף את אחוז התוספת) · e = עלות ישירה משוערת. */
+var LUACH_DATA = {
+  meta: {"source": "מאגר 89 המחירים, גרסה 1 (05.11.2026), לשונית \"מאגר מחירים\"", "pricesAsOf": "10.2026", "itemCount": 89},
+  config: {
+    vatPercent: 18,            /* אחוז מע"מ, כפי שכתוב בקבצים */
+    costMarkupPercent: 28,     /* ברירת המחדל לתוספת על סעיפי עלות; הקבלן משנה בעמוד */
+    costRounding: "tiered",    /* tiered = עיגול ל-5 ש"ח עד 1,000 ש"ח ול-10 ש"ח מעל; כל ערך אחר = בלי עיגול */
+    validityDays: 30,          /* ברירת המחדל לתוקף ההצעה; הקבלן משנה או מרוקן */
+    stageLabel: "גרסת השקה (בטא) – כל מחיר ניתן לשינוי"
+  },
+  flags: {"P006": "מחיר חריג: נלקח מעבודה בשטח קטן, וביקורת התמחור מצאה שהוא גבוה בהרבה מהמקובל. הזן מחיר משלך."},
+  items: [
+    ["P001", "הכנה ופירוק", "התארגנות אתר, גידור, שילוט ושירותים כימיים", "קומפלט", 8000, "c", "14.10.2026", ""],
+    ["P002", "הכנה ופירוק", "פיגום זקפים תקני בחזית כולל אישור בונה פיגומים", "מ\"ר חזית", 90, "c", "14.10.2026", ""],
+    ["P003", "הכנה ופירוק", "פירוק מעקות, ריצוף ושיפועים במרפסת", "מוקד", 1600, "c", "14.10.2026", ""],
+    ["P004", "הכנה ופירוק", "קידוח כוס ושתילת קוץ ברזל באפוקסי כולל בדיקת שליפה", "יח'", 65, "c", "14.10.2026", ""],
+    ["P005", "הכנה ופירוק", "ניסור יהלום פתח בקיר בטון/בלוק כולל פינוי", "פתח", 1700, "c", "14.10.2026", ""],
+    ["P006", "הכנה ופירוק", "פירוק ריצוף כולל פינוי ויישור תשתית", "מ\"ר", 500, "c", "14.10.2026", ""],
+    ["P007", "הכנה ופירוק", "ניקוי וחשיפת סלע", "מ\"ר", 25, "d", "21.10.2026", ""],
+    ["P008", "הכנה ופירוק", "חפירה, יישור ופינוי לבית פרטי", "קומפלט", 15000, "d", "21.10.2026", ""],
+    ["P009", "הכנה ופירוק", "בדיקות מעבדה לבית פרטי", "קומפלט", 4500, "d", "21.10.2026", ""],
+    ["P010", "שלד ובטון", "בטון רזה 5 ס\"מ", "מ\"ק", 650, "d", "21.10.2026", ""],
+    ["P011", "שלד ובטון", "רפסודה 30 ס\"מ ב-30", "מ\"ק", 2000, "d", "21.10.2026", ""],
+    ["P012", "שלד ובטון", "קורות יסוד 70/40 עם ראשי כלונסאות", "מ\"ק", 2800, "d", "21.10.2026", ""],
+    ["P013", "שלד ובטון", "רצפה תלויה 15 ס\"מ על פוליביד + בטון רזה", "מ\"ר", 480, "d", "21.10.2026", ""],
+    ["P014", "שלד ובטון", "קירות מעטפת יצוקים (נטו אחרי פתחים)", "מ\"ר", 650, "d", "21.10.2026", ""],
+    ["P015", "שלד ובטון", "תקרת בטון 25 ס\"מ", "מ\"ר", 550, "d", "21.10.2026", ""],
+    ["P016", "שלד ובטון", "תוספת ממ\"ד", "קומפלט", 35000, "d", "21.10.2026", ""],
+    ["P017", "שלד ובטון", "קורות, משקופים ועמודים", "מ\"ק", 3500, "d", "21.10.2026", "הערכה"],
+    ["P018", "שלד ובטון", "מעקה גג בטון 110 ס\"מ", "מ\"א", 450, "d", "21.10.2026", ""],
+    ["P019", "שלד ובטון", "מדרגות פנים בטון (18 מדרגות)", "קומפלט", 12000, "d", "21.10.2026", ""],
+    ["P020", "שלד ובטון", "בטון ב-30 לרצפת ביסוס כולל שאיבה", "מ\"ק", 1650, "c", "14.10.2026", ""],
+    ["P021", "שלד ובטון", "עמודים וקורות בטון ב-30 כולל משאבה", "מ\"ק", 1800, "c", "14.10.2026", ""],
+    ["P022", "שלד ובטון", "תקרת בטון 20-22 ס\"מ כולל טפסנות", "מ\"ק", 1850, "c", "14.10.2026", ""],
+    ["P023", "שלד ובטון", "מעקות גג וחגורות בטון", "מ\"ק", 1750, "c", "14.10.2026", ""],
+    ["P024", "שלד ובטון", "ברזל זיון – אספקה, כיפוף וקשירה", "טון", 6800, "c", "14.10.2026", ""],
+    ["P025", "שלד ובטון", "מרפסת זיז בטון 8-10 מ\"ר כולל טפסנות", "מרפסת", 13500, "c", "14.10.2026", ""],
+    ["P026", "בנייה", "קירות חוץ בלוק פומיס/איטונג 20-22 ס\"מ", "מ\"ר", 260, "c", "14.10.2026", ""],
+    ["P027", "בנייה", "קירות פנים בלוק 10", "מ\"ר", 140, "d", "21.10.2026", ""],
+    ["P028", "בנייה", "מעקה מרפסת בנוי", "מ\"א", 500, "c", "14.10.2026", ""],
+    ["P029", "איטום", "בטון שיפועים לגג", "מ\"ר", 60, "d", "21.10.2026", ""],
+    ["P030", "איטום", "איטום גג – 2 שכבות ביטומניות", "מ\"ר", 110, "d", "21.10.2026", ""],
+    ["P031", "איטום", "שיפועים + איטום גג ביטומני 5 מ\"מ", "מ\"ר", 220, "c", "14.10.2026", ""],
+    ["P032", "איטום", "איטום מרפסות במערכת דו-רכיבית", "מ\"ר", 180, "c", "14.10.2026", ""],
+    ["P033", "איטום", "איטום קיר מרתף + שרשורי", "מ\"ר", 200, "d", "21.10.2026", ""],
+    ["P034", "איטום", "איטום חדר רטוב", "יח'", 1500, "d", "21.10.2026", ""],
+    ["P035", "איטום", "ניקוז מי גשמים 4 צול מגג ומרפסות", "קומפלט", 5480, "c", "14.10.2026", ""],
+    ["P036", "טיח וגמר חוץ", "הרבצה וטיח חוץ מיישר", "מ\"ר", 140, "c", "14.10.2026", ""],
+    ["P037", "טיח וגמר חוץ", "שליכט אקרילי חוץ", "מ\"ר", 140, "d", "21.10.2026", ""],
+    ["P038", "טיח וגמר חוץ", "חיפוי אבן ירושלמית כולל עיגון לפי תקן", "מ\"ר", 420, "c", "14.10.2026", ""],
+    ["P039", "טיח וגמר חוץ", "ספי חלונות וקופינג אבן/שיש", "מ\"א", 250, "c", "14.10.2026", ""],
+    ["P040", "טיח וגמר חוץ", "טיח פנים", "מ\"ר", 110, "c", "14.10.2026", ""],
+    ["P041", "גבס", "מחיצה/עיבוי קיר גבס", "מ\"ר", 270, "c", "14.10.2026", ""],
+    ["P042", "גבס", "קיר גבס בגובה (עד 5 מ')", "מ\"ר", 350, "c", "14.10.2026", ""],
+    ["P043", "גבס", "קשת גבס מעוגלת", "יח'", 2000, "c", "14.10.2026", ""],
+    ["P044", "גבס", "נישת גבס מלבנית", "יח'", 531, "c", "14.10.2026", ""],
+    ["P045", "גבס", "תקרת גבס מונמכת/צפה", "מ\"ר", 400, "c", "14.10.2026", ""],
+    ["P046", "גבס", "סינר גבס היקפי עם מדרגת תאורה", "מ\"א", 400, "c", "14.10.2026", ""],
+    ["P047", "גבס", "ניתוק גבס לווילון/תאורה נסתרת", "מ\"א", 400, "c", "14.10.2026", ""],
+    ["P048", "גבס", "ארגז גבס ירוק להסתרת צנרת", "קומפלט", 1500, "c", "14.10.2026", ""],
+    ["P049", "גבס", "מחיצות לחדר רחצה כולל איטום", "חדר רחצה", 4500, "c", "14.10.2026", ""],
+    ["P050", "גבס", "קרניז תקרה פוליאוריתן 12 ס\"מ", "מ\"א", 190, "c", "14.10.2026", ""],
+    ["P051", "גבס", "קרניז לתאורה נסתרת 4 ס\"מ", "מ\"א", 150, "c", "14.10.2026", ""],
+    ["P052", "גבס", "פרופיל מסגרת קיר 2.5 ס\"מ", "מ\"א", 135, "c", "14.10.2026", ""],
+    ["P053", "גבס", "פרופיל גמיש לקשתות", "מ\"א", 380, "c", "14.10.2026", ""],
+    ["P054", "גבס", "פנל פולימר רצפתי 10 ס\"מ", "מ\"א", 162, "c", "14.10.2026", ""],
+    ["P055", "צבע", "שפכטל אמריקאי מלא Q4", "מ\"ר", 100, "c", "14.10.2026", ""],
+    ["P056", "צבע", "צביעת פרימיום (פריימר + 3 שכבות)", "מ\"ר", 60, "c", "14.10.2026", ""],
+    ["P057", "צבע", "צביעת חדר מלאה (שפכטל, פריימר, 3 שכבות)", "חדר", 3000, "c", "14.10.2026", ""],
+    ["P058", "צבע", "הכנה וצביעת דלת עץ", "יח'", 533, "c", "14.10.2026", ""],
+    ["P059", "ריצוף וחיפוי", "שומשום + ריצוף גרניט פורצלן 60/80", "מ\"ר", 240, "c", "14.10.2026", ""],
+    ["P060", "ריצוף וחיפוי", "ריצוף פנים (חומר עד 60 ₪/מ\"ר)", "מ\"ר", 160, "d", "21.10.2026", ""],
+    ["P061", "ריצוף וחיפוי", "ריצוף חוץ/פיתוח", "מ\"ר", 170, "d", "21.10.2026", ""],
+    ["P062", "ריצוף וחיפוי", "חיפוי קירות קרמיקה", "מ\"ר", 180, "d", "21.10.2026", ""],
+    ["P063", "ריצוף וחיפוי", "פנלים", "מ\"א", 35, "d", "21.10.2026", "הערכה"],
+    ["P064", "ריצוף וחיפוי", "מדרגת שיש", "מדרגה", 350, "d", "21.10.2026", ""],
+    ["P065", "ריצוף וחיפוי", "חדר רחצה: חיפוי קרמיקה + כלים סניטריים", "חדר רחצה", 6400, "c", "14.10.2026", ""],
+    ["P066", "אינסטלציה", "אינסטלציה וביוב לחדר רחצה (אסלה, מקלחת, כיור)", "מערכת", 6500, "c", "14.10.2026", ""],
+    ["P067", "אינסטלציה", "אינסטלציה לבית 150 מ\"ר (3 מקלחות, 6 כיורים)", "קומפלט", 42200, "d", "21.10.2026", ""],
+    ["P068", "אינסטלציה", "וונטה שקטה לשירותים כולל חיבור", "יח'", 1500, "c", "14.10.2026", ""],
+    ["P069", "חשמל ותאורה", "נקודת חשמל/שקע כולל אביזר", "נק'", 400, "c", "14.10.2026", ""],
+    ["P070", "חשמל ותאורה", "נקודת תקשורת", "נק'", 375, "c", "14.10.2026", ""],
+    ["P071", "חשמל ותאורה", "נקודת מתג הדלקה", "נק'", 350, "c", "14.10.2026", ""],
+    ["P072", "חשמל ותאורה", "חשמל לבית 150 מ\"ר (50 מאור, 75 שקעים, לוח)", "קומפלט", 41600, "d", "21.10.2026", ""],
+    ["P073", "חשמל ותאורה", "סרט לד נסתר כולל פרופיל ושנאי", "מ\"א", 200, "c", "14.10.2026", ""],
+    ["P074", "חשמל ותאורה", "פס צבירה מגנטי כולל שנאי", "מ\"א", 700, "c", "14.10.2026", ""],
+    ["P075", "חשמל ותאורה", "חיווט והתקנת גוף תאורה", "יח'", 124, "c", "14.10.2026", ""],
+    ["P076", "מיזוג", "הזזת מזגן קיים כולל גז, צנרת וניקוז", "קומפלט", 4800, "c", "14.10.2026", ""],
+    ["P077", "אלומיניום", "חלון עם תריס גלילה (סדרה 7000)", "מ\"ר", 1500, "e", "21.10.2026", ""],
+    ["P078", "אלומיניום", "חלון/הזזה עם תריס (סדרה 7300)", "מ\"ר", 1700, "e", "21.10.2026", ""],
+    ["P079", "אלומיניום", "ויטרינה עם תריס חשמלי", "מ\"ר", 1900, "e", "21.10.2026", ""],
+    ["P080", "אלומיניום", "חלון קיפ לשירותים (סדרה 5500)", "מ\"ר", 1300, "e", "21.10.2026", ""],
+    ["P081", "אלומיניום", "חלון ממ\"ד דור חדש", "יח'", 3500, "e", "21.10.2026", ""],
+    ["P082", "אלומיניום", "חלון אלומיניום עם תריס חשמלי – ממוצע למפתח", "מפתח", 3176, "c", "14.10.2026", ""],
+    ["P083", "נגרות ומסגרות", "מעקות מתכת", "מ\"א", 650, "d", "21.10.2026", ""],
+    ["P084", "נגרות ומסגרות", "דלתות לבית 150 מ\"ר (כניסה, משנית, ממ\"ד, 8 פנים, הזזה)", "קומפלט", 31200, "d", "21.10.2026", ""],
+    ["P085", "פיתוח", "שבילים ומרפסות בטון 10 ס\"מ", "מ\"ר", 150, "d", "21.10.2026", ""],
+    ["P086", "פיתוח", "קיר פיתוח בטון", "מ\"ק", 2800, "d", "21.10.2026", "לאמת"],
+    ["P087", "ניהול והיתרים", "חתימת קבלן רשום ג1, בדיקות ופיקוח", "קומפלט", 18000, "c", "14.10.2026", ""],
+    ["P088", "ניהול והיתרים", "ניהול ביצוע, פיגום פנים ותיאום מתקינים", "קומפלט", 2500, "c", "14.10.2026", ""],
+    ["P089", "ניהול והיתרים", "הגנה, פינוי פסולת וניקיון מסירה", "קומפלט", 1500, "c", "14.10.2026", ""]
+  ]
+};
+</script>
+<!-- ===== END PRICE DATA ===== -->
+
+<!-- ===== BEGIN CALC CORE ===== החישוב. אותו קוד בדיוק רץ בעמוד וב-run_tests.js (הבדיקה שולפת את הבלוק הזה מהקובץ). בלי DOM. ===== -->
+<script id="calc-core">
+var LuachCalc = (function () {
+  'use strict';
+  var MAX_INT = 9007199254740991;
+  var MAX_PRICE_AG = 100000000;   /* עד 1,000,000 ש"ח ליחידה */
+  var MAX_QTY_CENTI = 10000000;   /* עד 100,000 יחידות */
+  var OTHER = 'סעיפים נוספים';
+
+  /* מספר עשרוני -> מספר שלם מוכפל ב-10^digits, בלי שגיאות נקודה צפה. "248.63",2 -> 24863.
+     ספרה עודפת מעוגלת חצי-כלפי-מעלה. מחזיר null אם זה לא מספר עשרוני פשוט ולא-שלילי. */
+  function scaled(value, digits) {
+    if (value === null || value === undefined) return null;
+    var s = String(value).trim();
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return null;
+    var parts = s.split('.');
+    var whole = parts[0] || '0';
+    var frac = parts[1] || '';
+    var keep = (frac + '0000000000').slice(0, digits);
+    var next = frac.length > digits ? Number(frac.charAt(digits)) : 0;
+    var n = Number(whole + keep);
+    if (next >= 5) n += 1;
+    return n <= MAX_INT ? n : null;
+  }
+
+  /* חילוק שלמים עם עיגול חצי-כלפי-מעלה (למספרים לא-שליליים) */
+  function roundDiv(n, d) {
+    var r = n % d;
+    var q = (n - r) / d;
+    return (r * 2 >= d) ? q + 1 : q;
+  }
+
+  /* שלם מוכפל ב-10^digits -> טקסט בלי אפסים מיותרים: 24863,2 -> "248.63" */
+  function plain(n, digits) {
+    var base = Math.pow(10, digits);
+    var f = n % base;
+    var w = (n - f) / base;
+    if (!f) return String(w);
+    var fs = String(f);
+    while (fs.length < digits) fs = '0' + fs;
+    return w + '.' + fs.replace(/0+$/, '');
+  }
+  function group(s) {
+    var p = String(s).split('.');
+    p[0] = p[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return p.join('.');
+  }
+  function money(shekels) { return group(String(shekels)); }      /* שקלים שלמים */
+  function moneyAg(agorot) { return group(plain(agorot, 2)); }    /* מחיר ליחידה, באגורות */
+  function qtyText(centi) { return plain(centi, 2); }
+
+  /* מחיר ליחידה מהמחירון, באגורות.
+     סוג c = מחיר ללקוח, כמו שהוא. סוג d/e = עלות ישירה: עלות × (1 + תוספת%), ואז עיגול לפי config.costRounding:
+     'tiered' = ל-5 ש"ח עד 1,000 ש"ח ול-10 ש"ח מעל 1,000 ש"ח; כל ערך אחר = לאגורה. */
+  function listPriceAgorot(item, markupPercent, cfg) {
+    var base = scaled(item[4], 2);
+    if (base === null || base > MAX_PRICE_AG) return null;
+    if (item[5] === 'c') return base;
+    var mk = scaled(markupPercent, 2);
+    if (mk === null || mk > 100000) return null;
+    var n = base * (10000 + mk);
+    if (cfg.costRounding === 'tiered') {
+      var step = n > 1000000000 ? 1000 : 500;
+      return roundDiv(n, 10000 * step) * step;
+    }
+    return roundDiv(n, 10000);
+  }
+
+  function search(data, query, category) {
+    var q = String(query || '').trim();
+    return data.items.filter(function (it) {
+      if (category && it[1] !== category) return false;
+      return !q || it[2].indexOf(q) >= 0 || it[1].indexOf(q) >= 0 || it[0].toLowerCase() === q.toLowerCase();
+    });
+  }
+
+  /* החישוב כולו.
+     input = { address, markupPercent, discount:{type:'amount'|'percent', value}, lines:[
+               { id, qty, price (null = מחיר המחירון), optional } |
+               { custom:true, name, unit, price, qty, optional } ] }
+     כללים: סה"כ שורה = מחיר × כמות, מעוגל לשקל שלם. סה"כ לפני הנחה = סכום השורות שאינן אופציה.
+            הנחה לפני מע"מ. מע"מ = אחוז מהסכום אחרי הנחה, מעוגל לשקל שלם. סה"כ לתשלום = אחרי הנחה + מע"מ. */
+  function quote(input, data) {
+    var cfg = data.config, errors = [], lines = [], byId = {};
+    function err(code) { if (errors.indexOf(code) < 0) errors.push(code); }
+    data.items.forEach(function (it) { byId[it[0]] = it; });
+
+    var mkRaw = (input.markupPercent === undefined || input.markupPercent === null) ? cfg.costMarkupPercent : input.markupPercent;
+    var mk = scaled(mkRaw, 2);
+    var mkBad = (mk === null || mk > 100000);   /* שדה ריק או לא תקין: לא מנחשים אחוז. סעיף עלות יישאר בלי מחיר וההצעה לא תופק */
+    var vatCenti = scaled(cfg.vatPercent, 2);
+    var subtotal = 0, optionsTotal = 0, counted = 0;
+
+    (input.lines || []).forEach(function (ln, idx) {
+      var out = { index: idx, id: null, custom: !!ln.custom, category: null, name: '', unit: '', type: null,
+                  optional: !!ln.optional, warnings: [], errors: [], priceSource: null,
+                  baseAg: null, listPriceAg: null, priceAg: null, qtyCenti: null, total: 0 };
+      if (ln.custom) {
+        out.name = String(ln.name || '').trim();
+        out.unit = String(ln.unit || '').trim();
+        out.priceSource = 'custom';
+        out.priceAg = scaled(ln.price, 2);
+        if (!out.name) out.errors.push('missing_name');
+      } else {
+        var it = byId[ln.id];
+        if (!it) {
+          out.name = String(ln.id);
+          out.errors.push('unknown_item');
+        } else {
+          out.id = it[0]; out.category = it[1]; out.name = it[2]; out.unit = it[3]; out.type = it[5];
+          out.baseAg = scaled(it[4], 2);
+          out.listPriceAg = listPriceAgorot(it, mkRaw, cfg);
+          if (ln.price !== undefined && ln.price !== null) {
+            out.priceSource = 'manual';
+            out.priceAg = scaled(ln.price, 2);
+          } else {
+            out.priceSource = it[5] === 'c' ? 'list' : 'list+markup';
+            out.priceAg = out.listPriceAg;
+            if (out.priceAg === null && it[5] !== 'c' && mkBad) out.errors.push('bad_markup');
+            if (data.flags && data.flags[it[0]]) out.warnings.push({ code: 'flagged_price', text: data.flags[it[0]] });
+          }
+        }
+      }
+      out.qtyCenti = scaled(ln.qty, 2);
+      if (out.qtyCenti === null || out.qtyCenti <= 0 || out.qtyCenti > MAX_QTY_CENTI) out.errors.push('bad_qty');
+      if (out.errors.indexOf('unknown_item') < 0 && out.errors.indexOf('bad_markup') < 0 && (out.priceAg === null || out.priceAg > MAX_PRICE_AG)) out.errors.push('bad_price');
+      if (out.errors.length) {
+        out.errors.forEach(err);
+      } else {
+        out.total = roundDiv(out.priceAg * out.qtyCenti, 10000);
+        if (out.optional) optionsTotal += out.total; else { subtotal += out.total; counted += 1; }
+      }
+      lines.push(out);
+    });
+    if (!counted) err('no_lines');
+
+    var discount = 0, d = input.discount;
+    if (d && d.value !== undefined && d.value !== null && String(d.value).trim() !== '') {
+      if (d.type === 'percent') {
+        var pc = scaled(d.value, 2);
+        if (pc === null || pc > 10000) err('bad_discount'); else discount = roundDiv(subtotal * pc, 10000);
+      } else {
+        var da = scaled(d.value, 0);
+        if (da === null) err('bad_discount'); else discount = da;
+      }
+      if (discount > subtotal) { if (counted) err('discount_too_big'); discount = subtotal; }
+    }
+    var net = subtotal - discount;
+    var vat = roundDiv(net * vatCenti, 10000);
+    if (!String(input.address === undefined || input.address === null ? '' : input.address).trim()) err('missing_address');
+
+    return { lines: lines, subtotal: subtotal, discount: discount, net: net, vat: vat, total: net + vat,
+             optionsTotal: optionsTotal, vatPercentText: plain(vatCenti, 2), markupPercentText: String(mkRaw),
+             errors: errors, canIssue: errors.length === 0 };
+  }
+
+  /* סדר ההצגה: לפי סדר הפרקים במחירון, ובתוך פרק לפי סדר ההוספה. סעיפים חופשיים בסוף. */
+  function ordered(result, data) {
+    var order = [], main = [], options = [], seen = {}, chapters = 0;
+    data.items.forEach(function (it) { if (order.indexOf(it[1]) < 0) order.push(it[1]); });
+    function rank(ln) { var i = ln.category ? order.indexOf(ln.category) : -1; return i < 0 ? order.length : i; }
+    function cmp(a, b) { return (rank(a) - rank(b)) || (a.index - b.index); }
+    result.lines.forEach(function (ln) { (ln.optional ? options : main).push(ln); });
+    main.sort(cmp); options.sort(cmp);
+    main.forEach(function (ln) { var c = ln.category || OTHER; if (!seen[c]) { seen[c] = 1; chapters += 1; } });
+    return { main: main, options: options, chapters: chapters };
+  }
+
+  function lineMath(ln) {
+    return qtyText(ln.qtyCenti) + (ln.unit ? ' ' + ln.unit : '') + ' × ' + moneyAg(ln.priceAg) + ' ₪ = ' + money(ln.total) + ' ₪';
+  }
+
+  /* הטקסט להעתקה. מחזיר null כשאי אפשר להפיק הצעה (למשל בלי כתובת נכס).
+     meta = { business, client, address, dateText, validityDays, notIncluded } */
+  function text(result, meta, data) {
+    if (!result.canIssue) return null;
+    var o = ordered(result, data), L = [], n = 0, last = null;
+    L.push('*הצעת מחיר*' + (meta.business ? ' – ' + meta.business : ''));
+    L.push('תאריך: ' + meta.dateText);
+    if (meta.client) L.push('לכבוד: ' + meta.client);
+    L.push('כתובת הנכס: ' + String(meta.address).trim());
+    if (o.chapters <= 1) L.push('');
+    o.main.forEach(function (ln) {
+      var ch = ln.category || OTHER;
+      if (o.chapters > 1 && ch !== last) { L.push(''); L.push('— ' + ch + ' —'); }
+      last = ch; n += 1;
+      L.push(n + '. ' + ln.name);
+      L.push('   ' + lineMath(ln));
+    });
+    L.push('');
+    if (result.discount > 0) {
+      L.push('סה"כ לפני הנחה: ' + money(result.subtotal) + ' ₪');
+      L.push('הנחה: ' + money(result.discount) + ' ₪');
+    }
+    L.push('סה"כ לפני מע"מ: ' + money(result.net) + ' ₪');
+    L.push('מע"מ ' + result.vatPercentText + '%: ' + money(result.vat) + ' ₪');
+    L.push('*סה"כ לתשלום כולל מע"מ: ' + money(result.total) + ' ₪*');
+    if (o.options.length) {
+      L.push('');
+      L.push('אופציות – לא כלולות בסה"כ (לפני מע"מ):');
+      o.options.forEach(function (ln) { L.push('• ' + ln.name + ': ' + lineMath(ln)); });
+    }
+    if (meta.basis) { L.push(''); L.push('בסיס הכמויות: ' + meta.basis); }
+    if (meta.notIncluded) { L.push(''); L.push('לא כלול בהצעה: ' + meta.notIncluded); }
+    L.push('');
+    var vd = scaled(meta.validityDays, 0);
+    if (vd) L.push('ההצעה בתוקף ל-' + vd + ' יום.');
+    L.push('הופק בלוח היזם');
+    return L.join('\n');
+  }
+
+  return { scaled: scaled, roundDiv: roundDiv, plain: plain, money: money, moneyAg: moneyAg, qtyText: qtyText,
+           listPriceAgorot: listPriceAgorot, search: search, quote: quote, ordered: ordered, lineMath: lineMath,
+           text: text, OTHER: OTHER };
+})();
+</script>
+<!-- ===== END CALC CORE ===== -->
+
+<script id="ui">
+(function () {
+  'use strict';
+  var D = LUACH_DATA, C = LuachCalc, KEY = 'luach_quote_v2';
+  function $(s) { return document.querySelector(s); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  var ERR = {
+    missing_address: 'חסרה כתובת נכס. בלי כתובת הכלי לא מפיק הצעה.',
+    no_lines: 'אין בהצעה אף שורה שנכללת בסה"כ.',
+    bad_qty: 'יש שורה בלי כמות תקינה (מספר גדול מאפס).',
+    bad_price: 'יש שורה בלי מחיר תקין.',
+    missing_name: 'יש סעיף חופשי בלי תיאור.',
+    unknown_item: 'יש שורה עם סעיף שלא קיים במחירון.',
+    bad_markup: 'אחוז התוספת על סעיפי עלות לא תקין.',
+    bad_discount: 'ההנחה לא תקינה.',
+    discount_too_big: 'ההנחה גדולה מסכום ההצעה.'
+  };
+  var cats = [], byId = {}, cat = '', byIdPre = {};
+  D.items.forEach(function (it) { byIdPre[it[0]] = 1; });
+  D.items.forEach(function (it) { byId[it[0]] = it; if (cats.indexOf(it[1]) < 0) cats.push(it[1]); });
+
+  function blank() {
+    return { client: '', address: '', business: '', markup: String(D.config.costMarkupPercent), discType: 'amount', discValue: '',
+             validity: String(D.config.validityDays), notIncluded: '', lines: [], seq: 1 };
+  }
+  function load() {
+    try {
+      var s = localStorage.getItem(KEY);
+      if (s) { var o = JSON.parse(s); if (o && Array.isArray(o.lines)) return Object.assign(blank(), o); }
+    } catch (e) {}
+    return blank();
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+  var st = load();
+  /* מילוי מוקדם ממפת לוח היזם: #pre=<JSON מקודד>. רק סעיפים קיימים, כמויות חיוביות, טקסט קצר. */
+  (function () {
+    var m = /[#&]pre=([^&]+)/.exec(location.hash || ''); if (!m) return;
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    var p; try { p = JSON.parse(decodeURIComponent(m[1])); } catch (e) { return; }
+    if (!p || !Array.isArray(p.lines)) return;
+    var lines = [];
+    p.lines.slice(0, 20).forEach(function (l) {
+      var q = Number(l && l.qty);
+      if (l && byIdPre[l.id] && isFinite(q) && q > 0 && q < 1e6) lines.push({ id: String(l.id), qty: C.plain(Math.round(q * 100), 2) });
+    });
+    if (!lines.length) return;
+    try { localStorage.setItem(KEY + '_prev', JSON.stringify(st)); } catch (e) {}
+    st.lines = lines.map(function (l) { return { k: st.seq++, id: l.id, qty: l.qty, price: null, opt: false }; });
+    st.basis = typeof p.basis === 'string' ? p.basis.slice(0, 400) : '';
+    st.addrHint = typeof p.hint === 'string' ? p.hint.slice(0, 80) : '';
+    st.fromMap = true;
+  })();
+
+  function today() {
+    var d = new Date();
+    function p(n) { return (n < 10 ? '0' : '') + n; }
+    return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear();
+  }
+  function compute() {
+    return C.quote({
+      address: st.address, markupPercent: st.markup, discount: { type: st.discType, value: st.discValue },
+      lines: st.lines.map(function (l) {
+        return l.custom ? { custom: true, name: l.name, unit: l.unit, price: l.price, qty: l.qty, optional: l.opt }
+                        : { id: l.id, qty: l.qty, price: l.price, optional: l.opt };
+      })
+    }, D);
+  }
+  function meta() {
+    return { business: st.business.trim(), client: st.client.trim(), address: st.address.trim(), dateText: today(),
+             validityDays: st.validity, notIncluded: st.notIncluded.trim(), basis: String(st.basis || '').trim() };
+  }
+  function toast(m) {
+    var t = $('#toast');
+    t.textContent = m; t.hidden = false;
+    clearTimeout(toast.h); toast.h = setTimeout(function () { t.hidden = true; }, 2600);
+  }
+
+  function renderChips() {
+    $('#chips').innerHTML = [''].concat(cats).map(function (c) {
+      return '<button type="button" class="chip" aria-pressed="' + (c === cat) + '" data-c="' + esc(c) + '">' + esc(c || 'הכול') + '</button>';
+    }).join('');
+  }
+  function renderItems() {
+    var list = C.search(D, $('#search').value, cat);
+    $('#count').textContent = list.length + ' מתוך ' + D.items.length + ' סעיפים';
+    $('#items').innerHTML = list.length ? list.map(function (it) {
+      var ag = C.listPriceAgorot(it, st.markup, D.config);
+      var sub = it[5] === 'c' ? '' : '<small>' + (it[5] === 'e' ? 'עלות (הערכה) ' : 'עלות ') + C.moneyAg(C.scaled(it[4], 2)) + ' + ' + esc(st.markup) + '%</small>';
+      return '<div class="item"><div><div class="nm">' + esc(it[2]) + '</div><div class="meta">' + esc(it[1]) + ' · ' + esc(it[3]) + (it[7] ? ' · ' + esc(it[7]) : '') + '</div></div>' +
+        '<div class="pr"><b>' + (ag === null ? '—' : C.moneyAg(ag) + ' ₪') + '</b>' + sub + '</div>' +
+        '<button type="button" class="add" data-id="' + esc(it[0]) + '" aria-label="הוסף להצעה: ' + esc(it[2]) + '">+</button></div>';
+    }).join('') : '<p class="empty">אין סעיף כזה במחירון. אפשר להוסיף אותו כ"סעיף חופשי" עם מחיר משלך.</p>';
+  }
+
+  function renderLines() {
+    var r = compute(), box = $('#lines');
+    if (!st.lines.length) {
+      box.innerHTML = '<p class="empty">עדיין אין שורות. בחר סעיפים מהמחירון, או הוסף סעיף חופשי.</p>';
+    } else {
+      box.innerHTML = st.lines.map(function (l, i) {
+        var o = r.lines[i];
+        var head = l.custom
+          ? '<div class="cust"><textarea class="cname" rows="2" aria-label="תיאור הסעיף" placeholder="תיאור הסעיף, למשל: פירוק חדר רחצה קיים">' + esc(l.name) + '</textarea>' +
+            '<input class="cunit" type="text" aria-label="יחידה" value="' + esc(l.unit) + '" placeholder="יחידה: יח&#39;, מ&quot;ר" autocomplete="off"></div>'
+          : '<div class="line-name">' + esc(o.name) + ' <span class="lid">' + esc(l.id) + '</span></div>';
+        var pv = l.custom ? l.price : (l.price !== null ? l.price : (o.listPriceAg === null ? '' : C.plain(o.listPriceAg, 2)));
+        return '<div class="line' + (l.custom ? ' custom' : '') + (l.opt ? ' isopt' : '') + '" data-k="' + l.k + '"' + (l.custom ? '' : ' data-id="' + esc(l.id) + '"') + '>' +
+          '<div class="line-head">' + head + '<button type="button" class="del" aria-label="הסר שורה">✕</button></div>' +
+          '<div class="line-grid">' +
+            '<div><label>כמות' + (!l.custom && o.unit ? ' (' + esc(o.unit) + ')' : '') + '</label><input class="qty" type="number" inputmode="decimal" min="0" step="any" value="' + esc(l.qty) + '"></div>' +
+            '<div><label>מחיר ליח&#39; (₪)</label><input class="price" type="number" inputmode="decimal" min="0" step="any" value="' + esc(pv === null || pv === undefined ? '' : pv) + '"></div>' +
+            '<div class="line-total"><span>סה"כ שורה</span><b class="lt"></b></div>' +
+          '</div>' +
+          '<div class="line-foot"><label class="optl"><input type="checkbox" class="opt"' + (l.opt ? ' checked' : '') + '> אופציה – לא בסה"כ</label><span class="src"></span></div>' +
+          '<div class="lwarn" hidden></div></div>';
+      }).join('');
+    }
+    refresh(r);
+  }
+
+  function refresh(r) {
+    r = r || compute();
+    var nodes = $('#lines').querySelectorAll('.line');
+    for (var i = 0; i < nodes.length; i++) {
+      var o = r.lines[i], l = st.lines[i], n = nodes[i];
+      if (!o || !l) continue;
+      n.querySelector('.lt').textContent = o.errors.length ? '—' : C.money(o.total) + ' ₪';
+      var src = n.querySelector('.src');
+      if (l.custom) src.textContent = 'סעיף חופשי – מחיר שהזנת';
+      else if (o.priceSource === 'manual') src.innerHTML = 'מחיר שהזנת' + (o.listPriceAg === null ? '' : ' (במחירון: ' + C.moneyAg(o.listPriceAg) + ' ₪)') + ' <button type="button" class="reset">חזרה למחירון</button>';
+      else if (o.priceSource === 'list+markup') src.textContent = (o.type === 'e' ? 'עלות (הערכה) ' : 'עלות ') + C.moneyAg(o.baseAg) + ' ₪ + ' + r.markupPercentText + '% תוספת';
+      else src.textContent = 'מחיר מהמחירון';
+      var msgs = o.warnings.map(function (w) { return w.text; }).concat(o.errors.map(function (e) { return ERR[e] || e; }));
+      var w = n.querySelector('.lwarn');
+      w.hidden = !msgs.length; w.textContent = msgs.join(' ');
+      if (!l.custom && l.price === null) {
+        var pi = n.querySelector('.price');
+        if (document.activeElement !== pi) pi.value = o.listPriceAg === null ? '' : C.plain(o.listPriceAg, 2);
+      }
+    }
+    $('#tSub').textContent = C.money(r.subtotal) + ' ₪';
+    $('#rowSub').hidden = !r.discount;
+    $('#rowDisc').hidden = !r.discount;
+    $('#tDisc').textContent = C.money(r.discount) + ' ₪' + (r.subtotal ? ' (' + (r.discount / r.subtotal * 100).toFixed(1) + '%)' : '');
+    $('#tNet').textContent = C.money(r.net) + ' ₪';
+    $('#vatLabel').textContent = 'מע"מ ' + r.vatPercentText + '%';
+    $('#tVat').textContent = C.money(r.vat) + ' ₪';
+    $('#tTotal').textContent = C.money(r.total) + ' ₪';
+    $('#rowOpt').hidden = !r.optionsTotal;
+    $('#tOpt').textContent = C.money(r.optionsTotal) + ' ₪';
+    var s = $('#status');
+    s.hidden = r.canIssue;
+    s.innerHTML = r.canIssue ? '' : '<b>כדי להפיק הצעה חסר:</b><ul>' + r.errors.map(function (e) { return '<li>' + esc(ERR[e] || e) + '</li>'; }).join('') + '</ul>';
+    $('#preview').value = r.canIssue ? C.text(r, meta(), D) : '';
+    $('#barText').textContent = (st.lines.length === 1 ? 'שורה אחת' : st.lines.length + ' שורות') + ' · סה"כ כולל מע"מ: ' + C.money(r.total) + ' ₪';
+    renderSheet(r);
+  }
+
+  function renderSheet(r) {
+    var el = $('#sheet');
+    if (!r.canIssue) {
+      el.innerHTML = '<div class="no">ההצעה לא הופקה. ' + r.errors.map(function (e) { return esc(ERR[e] || e); }).join(' ') + '</div>';
+      return;
+    }
+    var m = meta(), o = C.ordered(r, D), n = 0, last = null, rows = '', h = '';
+    o.main.forEach(function (ln) {
+      var ch = ln.category || C.OTHER;
+      if (o.chapters > 1 && ch !== last) rows += '<tr class="ch"><td colspan="6">' + esc(ch) + '</td></tr>';
+      last = ch; n += 1;
+      rows += '<tr><td>' + n + '</td><td>' + esc(ln.name) + '</td><td class="n">' + C.qtyText(ln.qtyCenti) + '</td><td>' + esc(ln.unit) + '</td><td class="n">' + C.moneyAg(ln.priceAg) + '</td><td class="n">' + C.money(ln.total) + '</td></tr>';
+    });
+    h += '<h1>הצעת מחיר' + (m.business ? ' – ' + esc(m.business) : '') + '</h1>';
+    h += '<div class="sm"><div>תאריך: ' + esc(m.dateText) + '</div>' + (m.client ? '<div>לכבוד: ' + esc(m.client) + '</div>' : '') + '<div>כתובת הנכס: ' + esc(m.address) + '</div></div>';
+    h += '<table><thead><tr><th>#</th><th>סעיף</th><th class="n">כמות</th><th>יחידה</th><th class="n">מחיר ליח&#39; (₪)</th><th class="n">סה"כ (₪)</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    h += '<div class="st">';
+    if (r.discount > 0) h += '<div><span>סה"כ לפני הנחה</span><span>' + C.money(r.subtotal) + ' ₪</span></div><div><span>הנחה</span><span>' + C.money(r.discount) + ' ₪</span></div>';
+    h += '<div><span>סה"כ לפני מע"מ</span><span>' + C.money(r.net) + ' ₪</span></div>';
+    h += '<div><span>מע"מ ' + r.vatPercentText + '%</span><span>' + C.money(r.vat) + ' ₪</span></div>';
+    h += '<div class="g"><span>סה"כ לתשלום כולל מע"מ</span><span>' + C.money(r.total) + ' ₪</span></div></div>';
+    if (o.options.length) {
+      h += '<div class="ex"><b>אופציות – לא כלולות בסה"כ (לפני מע"מ):</b><ul>' + o.options.map(function (ln) { return '<li>' + esc(ln.name) + ': ' + esc(C.lineMath(ln)) + '</li>'; }).join('') + '</ul></div>';
+    }
+    if (m.basis) h += '<div class="ex"><b>בסיס הכמויות:</b> ' + esc(m.basis) + '</div>';
+    if (m.notIncluded) h += '<div class="ex"><b>לא כלול בהצעה:</b> ' + esc(m.notIncluded) + '</div>';
+    var vd = C.scaled(m.validityDays, 0);
+    if (vd) h += '<div class="ex">ההצעה בתוקף ל-' + vd + ' יום.</div>';
+    el.innerHTML = h;
+  }
+
+  function lineOf(e) {
+    var n = e.target.closest('.line');
+    if (!n) return null;
+    var k = Number(n.getAttribute('data-k'));
+    for (var i = 0; i < st.lines.length; i++) if (st.lines[i].k === k) return { node: n, line: st.lines[i], index: i };
+    return null;
+  }
+  function flagErrors(r) {
+    var s = $('#status');
+    s.classList.add('attn');
+    setTimeout(function () { s.classList.remove('attn'); }, 1800);
+    if (r.errors.indexOf('missing_address') >= 0) $('#address').focus(); else s.scrollIntoView({ block: 'center' });
+    toast('ההצעה לא הופקה. ' + (ERR[r.errors[0]] || ''));
+  }
+
+  $('#chips').addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    cat = b.getAttribute('data-c'); renderChips(); renderItems();
+  });
+  $('#search').addEventListener('input', renderItems);
+  $('#items').addEventListener('click', function (e) {
+    var b = e.target.closest('.add'); if (!b) return;
+    var id = b.getAttribute('data-id'), ex = null;
+    st.lines.forEach(function (l) { if (!l.custom && l.id === id) ex = l; });
+    if (ex) { var c = C.scaled(ex.qty, 2); ex.qty = C.plain((c === null ? 0 : c) + 100, 2); }
+    else st.lines.push({ k: st.seq++, id: id, qty: '1', price: null, opt: false });
+    save(); renderLines(); toast('נוסף להצעה: ' + byId[id][2]);
+  });
+  $('#addCustom').addEventListener('click', function () {
+    st.lines.push({ k: st.seq++, custom: true, name: '', unit: '', price: '', qty: '1', opt: false });
+    save(); renderLines();
+    var f = $('#lines').querySelector('.line:last-child .cname'); if (f) f.focus();
+  });
+  $('#lines').addEventListener('input', function (e) {
+    var x = lineOf(e); if (!x) return;
+    var c = e.target.classList;
+    if (c.contains('qty')) x.line.qty = e.target.value;
+    else if (c.contains('price')) x.line.price = e.target.value;
+    else if (c.contains('cname')) x.line.name = e.target.value;
+    else if (c.contains('cunit')) x.line.unit = e.target.value;
+    else return;
+    save(); refresh();
+  });
+  $('#lines').addEventListener('change', function (e) {
+    if (!e.target.classList.contains('opt')) return;
+    var x = lineOf(e); if (!x) return;
+    x.line.opt = e.target.checked; x.node.classList.toggle('isopt', x.line.opt);
+    save(); refresh();
+  });
+  $('#lines').addEventListener('click', function (e) {
+    var x;
+    if (e.target.closest('.del')) { x = lineOf(e); if (!x) return; st.lines.splice(x.index, 1); save(); renderLines(); }
+    else if (e.target.closest('.reset')) { x = lineOf(e); if (!x) return; x.line.price = null; save(); renderLines(); }
+  });
+  var FIELDS = { client: 'client', address: 'address', business: 'business', markup: 'markup', discValue: 'discValue', discType: 'discType', validity: 'validity', notIncluded: 'notIncluded' };
+  Object.keys(FIELDS).forEach(function (id) {
+    var el = $('#' + id);
+    el.value = st[FIELDS[id]];
+    el.addEventListener(id === 'discType' ? 'change' : 'input', function () {
+      st[FIELDS[id]] = el.value; save();
+      if (id === 'markup') renderItems();
+      refresh();
+    });
+  });
+  $('#copyBtn').addEventListener('click', function () {
+    var r = compute();
+    if (!r.canIssue) { flagErrors(r); return; }
+    var t = C.text(r, meta(), D);
+    function ok() { toast('ההצעה הועתקה. אפשר להדביק בוואטסאפ או בכל מקום אחר.'); }
+    function manual() { toast('ההעתקה לא הצליחה. סמן את הטקסט למטה והעתק ידנית.'); }
+    function fallback() {
+      var p = $('#preview');
+      p.focus(); p.select();
+      try { if (document.execCommand('copy')) ok(); else manual(); } catch (e) { manual(); }
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(ok, fallback); else fallback();
+  });
+  $('#printBtn').addEventListener('click', function () {
+    var r = compute();
+    if (!r.canIssue) { flagErrors(r); return; }
+    window.print();
+  });
+  $('#newBtn').addEventListener('click', function () {
+    if (st.lines.length && !window.confirm('למחוק את ההצעה הנוכחית ולהתחיל הצעה חדשה?')) return;
+    var keep = { business: st.business, markup: st.markup, validity: st.validity };
+    st = Object.assign(blank(), keep);
+    save();
+    Object.keys(FIELDS).forEach(function (id) { $('#' + id).value = st[FIELDS[id]]; });
+    renderItems(); renderLines(); toast('נפתחה הצעה חדשה');
+  });
+
+  $('#stage').textContent = D.config.stageLabel || '';
+  $('#stage').hidden = !D.config.stageLabel;
+  renderChips(); renderItems(); renderLines();
+  (function () {
+    var box = document.createElement('div'); box.id = 'basisBox'; box.className = 'basis';
+    var addr = $('#address'); addr.parentNode.appendChild(box);
+    function show() {
+      if (!st.basis) { box.hidden = true; return; }
+      box.hidden = false;
+      box.innerHTML = '<b>בסיס הכמויות (מהמפה – משוער):</b> ' + esc(st.basis) + ' <button type="button" id="basisX">הסרה</button>';
+      $('#basisX').onclick = function () { st.basis = ''; save(); show(); };
+    }
+    if (st.addrHint && !st.address) addr.placeholder = 'סמוך ל: ' + st.addrHint + ' – השלימו כתובת מדויקת';
+    if (st.fromMap) { delete st.fromMap; save(); renderLines(); toast('נטענו כמויות מהמפה. בדקו כל שורה ומדדו בשטח לפני שליחה.'); }
+    show();
+  })();
+})();
+</script>
+</body>
+</html>
