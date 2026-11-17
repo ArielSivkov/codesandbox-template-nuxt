@@ -26,7 +26,7 @@ header button{pointer-events:auto}
 #layers h3{margin:6px 4px 2px;font-size:12px;color:var(--mut);font-weight:600}
 #layers label{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:4px;border-radius:8px;cursor:pointer;user-select:none}
 #layers label small{color:var(--mut);font-size:10.5px;display:block}
-#layers input{width:18px;height:18px;accent-color:var(--acc);margin:0;flex:none}
+#layers input{width:22px;height:22px;accent-color:var(--acc);margin:0;flex:none}
 #layers .row2{display:flex;gap:6px;flex-wrap:wrap;padding:2px 4px}
 #layers .row2 .btn{font-size:12px;min-height:32px;padding:4px 8px}
 #search{position:fixed;top:calc(env(safe-area-inset-top) + 52px);right:10px;left:10px;max-width:440px;z-index:10;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;display:none}
@@ -127,13 +127,15 @@ footer button{font-size:11px;min-height:28px;padding:3px 8px}
   #card{right:auto;left:10px;bottom:90px;max-width:400px;max-height:calc(100vh - 140px)}
   #sres{max-height:calc(100vh - 140px)}
 }
+#calc input{font-size:16px!important;min-height:40px}
+.qshort{display:none}@media (max-width:430px){.qlong{display:none}.qshort{display:inline}}
 </style>
 </head>
 <body>
 <div id="loading">טוען שטח ובניינים…</div>
 <canvas id="cv" aria-label="מפה תלת־ממדית"></canvas>
 <header>
-  <h1>לוח היזם · תלת־ממד</h1><span class="demo">בטא</span><a class="btn pri" id="toQuote" href="/" style="margin-inline-start:8px;text-decoration:none">🧾 הצעת מחיר</a>
+  <h1>לוח היזם · תלת־ממד</h1><span class="demo">בטא</span><a class="btn pri" id="toQuote" href="/" style="margin-inline-start:8px;text-decoration:none;white-space:nowrap">🧾 <span class="qlong">הצעת מחיר</span><span class="qshort">הצעה</span></a>
   <span class="sp"></span>
   <button class="btn" id="bSearch" aria-expanded="false">חיפוש</button>
   <button class="btn" id="bLayers" aria-expanded="true">שכבות</button>
@@ -4831,7 +4833,7 @@ function fieldSection(k) {
   <div id="photoStat" class="note"></div>`;
 }
 function showBuilding(k) {
-  setSelected(k); current = { kind: 'building', k };
+  $('search').style.display = 'none'; setSelected(k); current = { kind: 'building', k };
   const b = B[k], dist = Math.hypot(CEN[k][0], CEN[k][1]), ci = cellIdx(CEN[k][0], CEN[k][1]), pt = potOf(k);
   const F = floorsOf(k);
   $('card').innerHTML = `<h2>בניין${b.n ? ' · ' + esc(b.n) : ''}<button class="btn x" id="cClose" aria-label="סגירה">✕</button></h2><table>` +
