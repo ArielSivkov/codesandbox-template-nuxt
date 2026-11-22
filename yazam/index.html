@@ -2,89 +2,163 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#f3f1ec">
 <title>לוח היזם – מחשבון הצעות מחיר</title>
 <style>
-:root{color-scheme:light;--bg:#eceae4;--paper:#fbfaf7;--ink:#1d2329;--muted:#566069;--line:#d3d0c7;--field:#b6b1a4;--accent:#d98a00;--blue:#235a8f;--chip:#e2dfd6;--bad:#a4301f;--warnbg:#fdf0cf}
+:root{color-scheme:light;--bg:#f3f1ec;--paper:#fffefb;--ink:#1b2127;--muted:#545e67;--line:#dcd8cd;--field:#aaa597;--accent:#e09100;--accentd:#b87400;--blue:#1f5689;--chip:#e6e2d8;--bad:#a4301f;--warnbg:#fdf0cf;--okbg:#e6f2e6;--ok:#22652e;--wa:#1c7f45}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Assistant","Heebo","Segoe UI","Arial Hebrew","Noto Sans Hebrew",Arial,sans-serif;font-size:16px;line-height:1.45;padding:12px 12px 92px}
-.wrap{max-width:1100px;margin:0 auto;display:grid;gap:12px}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:8px;border-bottom:3px solid var(--ink);padding-bottom:8px}
-h1{font-size:1.9rem;line-height:1.1;margin:0;font-weight:800}
-h1 span{color:var(--accent)}
-.tag{margin:4px 0 0;color:var(--muted);max-width:52ch}
-.stage{font-size:.8rem;font-weight:700;border:1.5px solid var(--ink);border-radius:4px;padding:2px 8px}
-.cols{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
-@media (min-width:900px){.cols{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}}
-.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:12px;min-width:0}
-h2{font-size:1.2rem;margin:0 0 8px}
-h3{font-size:1rem;margin:14px 0 6px}
-label{display:block;font-size:.85rem;color:var(--muted);font-weight:600;margin-bottom:2px}
-input,select,textarea,button{font:inherit}
-input[type=text],input[type=search],input[type=number],select,textarea{color:var(--ink);background:#fff;border:1px solid var(--field);border-radius:6px;padding:9px 10px;width:100%;min-height:44px}
-textarea{line-height:1.4}
-input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
-.fields{display:grid;gap:8px;grid-template-columns:minmax(0,1fr)}
-@media (min-width:560px){.fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.pair{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:6px}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:96px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Assistant","Heebo","Rubik","Segoe UI","Arial Hebrew","Noto Sans Hebrew",Arial,sans-serif;font-size:16px;line-height:1.5;-webkit-tap-highlight-color:transparent}
+.app{max-width:760px;margin:0 auto;padding:0 12px calc(24px + env(safe-area-inset-bottom,0px))}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+
+/* כותרת */
+.hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0 6px}
+h1{font-size:1.45rem;line-height:1.1;margin:0;font-weight:800;letter-spacing:-.01em}
+h1 span{color:var(--accentd)}
+.stage{font-size:.72rem;font-weight:700;border:1.5px solid var(--ink);border-radius:12px;padding:2px 8px;max-width:62%;line-height:1.3;text-align:center}
+
+/* סרגל לשוניות דביק */
+.top{position:sticky;top:0;z-index:20;background:var(--bg);margin:0 -12px;padding:0 12px;border-bottom:1px solid var(--line);box-shadow:0 2px 8px rgba(27,33,39,.06)}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px}
+.tab{min-height:50px;border:0;border-bottom:3px solid transparent;background:none;font-weight:700;font-size:1.02rem;color:var(--muted);padding:4px 2px;display:flex;align-items:center;justify-content:center;gap:6px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.badge{display:inline-block;min-width:1.75em;padding:0 .45em;border-radius:1em;background:var(--ink);color:#fff;font-size:.82rem;line-height:1.55;text-align:center;font-variant-numeric:tabular-nums}
+.badge.zero{background:var(--chip);color:var(--muted)}
+.badge.pulse{animation:pulse .55s ease-out}
+@keyframes pulse{0%{transform:scale(1)}40%{transform:scale(1.45);background:var(--accent);color:var(--ink)}100%{transform:scale(1)}}
+.sum{height:30px;line-height:30px;font-size:.86rem;color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;border-top:1px solid var(--line)}
+.sum b{color:var(--ink)}
+
+/* כללי */
+.panel{padding-top:12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 12px;margin-bottom:12px;min-width:0}
+h2{font-size:1.18rem;margin:0 0 10px;line-height:1.25}
+h3{font-size:1rem;margin:16px 0 8px}
+label{display:block;font-size:.86rem;color:var(--muted);font-weight:600;margin-bottom:3px}
+input[type=text],input[type=search],input[type=number],input[type=tel],select,textarea{color:var(--ink);background:#fff;border:1px solid var(--field);border-radius:8px;padding:10px 11px;width:100%;min-height:46px;font-size:16px}
+textarea{line-height:1.45;resize:vertical}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:1px}
+.fields{display:grid;gap:10px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:560px){.fields.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 80px;gap:6px}
 .req{color:var(--bad)}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:8px 0 6px}
-.chip{flex:0 0 auto;background:var(--chip);color:var(--ink);border:0;border-radius:18px;padding:8px 12px;min-height:40px;font-size:.9rem;cursor:pointer}
+.note{font-size:.84rem;color:var(--muted);margin:12px 0 0}
+.hint{font-size:.84rem;color:var(--muted);margin:4px 0 0;min-height:1.3em}
+.hint.bad{color:var(--bad);font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--ink);border-radius:9px;background:#fff;color:var(--ink);font-weight:700;padding:10px 14px;min-height:48px;text-decoration:none;text-align:center;line-height:1.2}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.wide{width:100%}
+.btn.off{opacity:.55}
+.btn.wa{background:var(--wa);border-color:var(--wa);color:#fff;font-size:1.08rem;min-height:54px;width:100%}
+.linkbtn{border:0;background:none;color:var(--blue);text-decoration:underline;font-weight:600;padding:10px 4px;min-height:44px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.empty{color:var(--muted);text-align:center;padding:22px 10px;margin:0}
+.empty p{margin:0 0 12px}
+.empty .btn{margin:4px}
+
+/* מחירון */
+.search{position:relative}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 8px;margin:0 -12px;padding-inline:12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;background:var(--chip);color:var(--ink);border:0;border-radius:22px;padding:8px 14px;min-height:44px;font-size:.92rem;font-weight:600}
 .chip[aria-pressed="true"]{background:var(--ink);color:#fff}
-.count{font-size:.8rem;color:var(--muted);margin-bottom:4px}
-.items{max-height:46vh;overflow-y:auto;border-top:1px solid var(--line)}
-.item{display:grid;grid-template-columns:minmax(0,1fr) auto 44px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
-.nm{font-weight:700}
-.meta{font-size:.8rem;color:var(--muted)}
-.pr{text-align:left;white-space:nowrap;font-variant-numeric:tabular-nums}
-.pr b{display:block}
-.pr small{display:block;font-size:.72rem;color:var(--blue);font-weight:700}
-.add{width:44px;height:44px;border:0;border-radius:8px;background:var(--accent);color:var(--ink);font-size:1.5rem;font-weight:800;line-height:1;cursor:pointer}
-.note{font-size:.82rem;color:var(--muted);margin:10px 0 0}
-.empty{color:var(--muted);text-align:center;padding:18px 8px;margin:0}
-.line{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
-.line.isopt{border-style:dashed;background:#f4f2ec}
+.count{font-size:.82rem;color:var(--muted);min-height:1.4em}
+.chh{margin:18px 0 0;padding:6px 0 4px;font-size:.98rem;font-weight:800;border-bottom:2px solid var(--ink)}
+.chh:first-child{margin-top:6px}
+.item{padding:10px 8px 10px 0;border-bottom:1px solid var(--line);border-inline-start:4px solid transparent;padding-inline-start:8px;margin-inline-start:-12px}
+.item.in{border-inline-start-color:var(--accent);background:#fffaf0}
+.item.flash{animation:flash 1.1s ease-out}
+@keyframes flash{0%{background:#ffd98a}100%{background:#fffaf0}}
+.nm{font-weight:700;line-height:1.35}
+.r2{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:10px;align-items:center;margin-top:6px}
+.pr{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.un{color:var(--muted);font-size:.88rem}
+.sub{font-size:.78rem;color:var(--muted);line-height:1.35}
+.sub .cost{color:var(--blue);font-weight:700}
+.sub .flag{color:var(--bad);font-weight:700}
+.ctl{height:46px}
+.add{width:140px;height:46px;border:0;border-radius:9px;background:var(--accent);color:var(--ink);font-size:1.02rem;font-weight:800}
+.add:active{background:var(--accentd)}
+.step{display:grid;grid-template-columns:46px minmax(0,1fr) 46px;height:46px;border:1.5px solid var(--ink);border-radius:9px;overflow:hidden;background:#fff}
+.step button{border:0;background:#fff;font-size:1.45rem;font-weight:800;line-height:1;padding:0}
+.step button:active{background:var(--chip)}
+.step .q{background:var(--ink);color:#fff;font-size:1rem;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* שורות ההצעה */
+.qtop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px;font-size:.88rem;color:var(--muted)}
+.line{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px}
+.line.isopt{border-style:dashed;background:#f6f4ee}
+.line.hl{animation:flash 1.4s ease-out}
 .line-head{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}
 .line-name{font-weight:700;min-width:0}
 .lid{font-weight:400;font-size:.75rem;color:var(--muted);white-space:nowrap}
 .cust{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;flex:1;min-width:0}
 .cust .cunit{max-width:60%}
-.cust textarea,#notIncluded{resize:vertical}
-.del{flex:0 0 auto;width:42px;height:42px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--bad);font-size:1.1rem;cursor:pointer}
+.del{flex:0 0 auto;width:44px;height:44px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--bad);font-size:1.1rem}
 .line-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px;align-items:end}
 .line-grid label{font-size:.78rem}
 .line-total{text-align:left}
 .line-total span{display:block;font-size:.78rem;color:var(--muted);font-weight:600}
-.line-total b{display:block;min-height:44px;line-height:44px;font-size:1.05rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.line-total b{display:block;min-height:46px;line-height:46px;font-size:1.05rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .line-foot{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between;margin-top:6px;font-size:.8rem;color:var(--muted)}
-.optl{display:flex;align-items:center;gap:6px;margin:0;font-size:.85rem;color:var(--ink);font-weight:600;min-height:40px;cursor:pointer}
+.optl{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.88rem;color:var(--ink);font-weight:600;min-height:44px;cursor:pointer}
 .optl input{width:22px;height:22px;margin:0}
-.reset{border:0;background:none;color:var(--blue);text-decoration:underline;padding:8px 6px;min-height:40px;cursor:pointer;font-size:.85rem}
-.lwarn{margin-top:6px;background:var(--warnbg);border:1px solid var(--accent);border-radius:6px;padding:6px 8px;font-size:.85rem}
-.btn{border:1.5px solid var(--ink);border-radius:8px;background:transparent;color:var(--ink);font-weight:700;padding:10px 14px;min-height:46px;cursor:pointer}
-.btn.primary{background:var(--ink);color:#fff}
-.btn.wide{width:100%}
-.totals{margin-top:14px;border-top:2px solid var(--ink);padding-top:8px;font-variant-numeric:tabular-nums}
-.totals>div{display:flex;justify-content:space-between;gap:12px;padding:3px 0}
+.reset{border:0;background:none;color:var(--blue);text-decoration:underline;padding:8px 6px;min-height:44px;font-size:.85rem}
+.lwarn{margin-top:6px;background:var(--warnbg);border:1px solid var(--accent);border-radius:8px;padding:6px 8px;font-size:.86rem}
+.basis{margin-top:8px;padding:8px 10px;border-radius:10px;background:#fff7e0;border:1px solid #f0d58a;font-size:.88em;line-height:1.5}
+.basis button{margin-inline-start:6px;min-height:36px}
+.totals{margin-top:6px;font-variant-numeric:tabular-nums}
+.totals>div{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
 .totals .grand{border-top:3px double var(--ink);margin-top:4px;padding-top:8px;font-size:1.25rem;font-weight:800}
 .totals .optrow{color:var(--muted);font-size:.9rem;border-top:1px dashed var(--line);margin-top:6px;padding-top:6px}
-.status{margin-top:10px;background:var(--warnbg);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:.92rem}
+.status{margin-top:10px;background:var(--warnbg);border:1px solid var(--accent);border-radius:10px;padding:10px 12px;font-size:.93rem}
 .status ul{margin:4px 0 0;padding-inline-start:18px}
 .status.attn{outline:3px solid var(--bad)}
-.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
-.actions .primary{grid-column:1/-1}
-#preview{min-height:240px;direction:rtl}
-.bar{position:fixed;inset:auto 0 0 0;z-index:5;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));font-variant-numeric:tabular-nums}
-.bar a{flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;color:var(--ink);background:var(--accent);border-radius:8px;padding:8px 14px;font-weight:800;text-decoration:none}
-.toast{position:fixed;inset:auto 12px 76px 12px;z-index:6;pointer-events:none;background:#fff;color:var(--ink);border:2px solid var(--ink);border-radius:8px;padding:10px 12px;text-align:center;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25)}
-[hidden]{display:none!important}
+.status .btn{margin-top:8px}
+.okbox{background:var(--okbg);border:1px solid #9cc79f;color:var(--ok);border-radius:10px;padding:10px 12px;font-weight:700;margin-bottom:12px}
+
+/* שליחה */
+#preview{min-height:220px;direction:rtl;font-size:.92rem}
+details{margin-top:12px}
+summary{cursor:pointer;font-weight:700;min-height:44px;padding:10px 0;color:var(--blue)}
+.logo-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:4px}
+.logo-prev{width:72px;height:72px;border:1px dashed var(--field);border-radius:8px;display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden;color:var(--muted);font-size:.75rem;text-align:center}
+.logo-prev img{max-width:100%;max-height:100%;display:block}
+.file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.sv{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;background:#fff}
+.sv.cur{border:2px solid var(--accent)}
+.svh{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.svh b{min-width:0;overflow-wrap:anywhere}
+.svt{font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums}
+.svm{font-size:.84rem;color:var(--muted);margin-top:2px;overflow-wrap:anywhere}
+.sva{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:8px}
+.sva .btn{min-height:44px;padding:6px 8px;font-size:.92rem}
+.sva .btn.danger{color:var(--bad);border-color:#d9a79f}
+.savestate{font-size:.86rem;color:var(--muted);margin-top:8px}
+
+/* תחתית */
+.foot{margin-top:18px;padding:14px 0 6px;border-top:1px solid var(--line);font-size:.84rem;color:var(--muted);text-align:center}
+.foot a{color:var(--blue);display:inline-flex;align-items:center;min-height:44px;padding:0 6px}
+
+.toast{position:fixed;inset:auto 10px calc(12px + env(safe-area-inset-bottom,0px)) 10px;z-index:30;max-width:560px;margin:0 auto;background:var(--ink);color:#fff;border-radius:10px;padding:8px 8px 8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.28);font-size:.95rem}
+.toast span{padding:6px 4px}
+.toast button{flex:0 0 auto;border:0;border-radius:8px;background:var(--accent);color:var(--ink);font-weight:800;min-height:44px;padding:0 14px}
+@media (prefers-reduced-motion:reduce){.badge.pulse,.item.flash,.line.hl{animation:none}}
+
 #sheet{display:none}
 @media print{
-  body{background:#fff;padding:0;font-size:11pt}
-  .wrap,.bar,.toast{display:none!important}
+  body{background:#fff;font-size:11pt}
+  body>*:not(#sheet){display:none!important}
   #sheet{display:block}
+  #sheet .bh{display:flex;align-items:center;gap:12pt;border-bottom:1.5pt solid #000;padding-bottom:6pt;margin-bottom:8pt}
+  #sheet .bh img{max-height:60pt;max-width:150pt;object-fit:contain}
+  #sheet .bh b{font-size:14pt;display:block}
+  #sheet .bh div div{font-size:10pt}
   #sheet h1{font-size:20pt;margin:0 0 6pt}
   #sheet .sm{margin:0 0 10pt}
   #sheet .sm div{margin:1pt 0}
@@ -101,47 +175,57 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
   #sheet .ex ul{margin:2pt 0;padding-inline-start:14pt}
   #sheet .no{border:1.5pt solid #000;padding:10pt;font-weight:700}
 }
-.basis{margin-top:8px;padding:8px 10px;border-radius:10px;background:#fff7e0;border:1px solid #f0d58a;font-size:.88em;line-height:1.5}.basis button{margin-inline-start:6px;font-size:.85em}
-.line input:not([type=checkbox]),.line select,.line textarea{font-size:16px}
-.optl{display:inline-flex;align-items:center;gap:8px;min-height:36px;cursor:pointer}.optl input{width:22px;height:22px}
-.maplink{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;margin-top:8px;border-radius:10px;background:#1d2733;color:#fff!important;text-decoration:none;font-weight:700}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div>
-      <h1>לוח <span>היזם</span></h1>
-      <p class="tag">מחשבון הצעות מחיר לשיפוץ ובנייה. בוחרים סעיפים, מזינים כמויות, ומקבלים הצעה מסודרת לשליחה.</p>
-    </div>
-    <span class="stage" id="stage"></span> <a href="/map/" class="maplink">🗺️ מפת אשדוד בתלת־ממד – כמויות מעטפת מכל בניין</a>
+<div class="app">
+  <header class="hd">
+    <h1>לוח <span>היזם</span></h1>
+    <span class="stage" id="stage"></span>
   </header>
 
-  <div class="cols">
-    <section class="card" aria-labelledby="hList">
-      <h2 id="hList">מחירון</h2>
+  <div class="top">
+    <nav class="tabs" role="tablist" aria-label="מסכי הכלי">
+      <button type="button" class="tab" role="tab" id="tab-list" data-tab="list" aria-controls="p-list" aria-selected="true">מחירון</button>
+      <button type="button" class="tab" role="tab" id="tab-quote" data-tab="quote" aria-controls="p-quote" aria-selected="false">ההצעה <span class="badge zero" id="badge" aria-hidden="true">0</span></button>
+      <button type="button" class="tab" role="tab" id="tab-send" data-tab="send" aria-controls="p-send" aria-selected="false">שליחה</button>
+    </nav>
+    <div class="sum" id="sum" aria-live="polite"></div>
+  </div>
+
+  <!-- ===== מחירון ===== -->
+  <section class="panel" id="p-list" role="tabpanel" aria-labelledby="tab-list">
+    <div class="search">
       <label for="search">חיפוש סעיף</label>
-      <input id="search" type="search" placeholder="למשל: גבס, איטום, נקודת חשמל" autocomplete="off">
-      <div class="chips" id="chips" role="group" aria-label="סינון לפי פרק"></div>
-      <div class="count" id="count"></div>
-      <div class="items" id="items"></div>
-      <p class="note">המחירים לפני מע"מ. אלה מחירי פתיחה מהצעות מחיר של קבלן אחד (אוקטובר 2026), לא מחירון שוק – שנה כל מחיר למחיר שלך. סעיף שמסומן "עלות" הוא עלות ישירה; הכלי מוסיף לו את אחוז התוספת שקבעת בהצעה.</p>
-    </section>
+      <input id="search" type="search" placeholder="למשל: גבס, איטום, נקודת חשמל" autocomplete="off" enterkeyhint="search">
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="סינון לפי פרק"></div>
+    <div class="count" id="count"></div>
+    <div id="items"></div>
+    <button type="button" class="btn wide" id="addCustomList" style="margin-top:14px">+ סעיף חופשי (לא מהמחירון)</button>
+    <p class="note">המחירים לפני מע"מ. אלה מחירי פתיחה מהצעות מחיר של קבלן אחד (אוקטובר 2026), לא מחירון שוק – שנה כל מחיר למחיר שלך. סעיף שמסומן "עלות" הוא עלות ישירה; הכלי מוסיף לו את אחוז התוספת שקבעת בהצעה.</p>
+  </section>
 
-    <section class="card" aria-labelledby="hQuote">
-      <h2 id="hQuote">הצעת מחיר</h2>
-      <div class="fields">
+  <!-- ===== ההצעה ===== -->
+  <section class="panel" id="p-quote" role="tabpanel" aria-labelledby="tab-quote" hidden>
+    <div class="qtop"><span id="qState"></span><button type="button" class="linkbtn" id="toSaved">ההצעות שלי</button></div>
+    <div class="card">
+      <h2>פרטי ההצעה</h2>
+      <div class="fields two">
         <div><label for="client">שם הלקוח</label><input id="client" type="text" autocomplete="off"></div>
-        <div><label for="address">כתובת הנכס <span class="req">(חובה)</span></label><input id="address" type="text" placeholder="רחוב, מספר, עיר" autocomplete="off"></div>
-        <div><label for="business">שם העסק שלך</label><input id="business" type="text" autocomplete="off"></div>
+        <div><label for="address">כתובת הנכס <span class="req">(חובה)</span></label><input id="address" type="text" placeholder="רחוב, מספר, עיר" autocomplete="off"><div id="basisBox" class="basis" hidden></div></div>
       </div>
+    </div>
 
-      <h3>שורות ההצעה</h3>
+    <div class="card">
+      <h2>שורות ההצעה</h2>
       <div id="lines"></div>
       <button type="button" class="btn wide" id="addCustom">+ סעיף חופשי (לא מהמחירון)</button>
+    </div>
 
-      <h3>תנאים</h3>
-      <div class="fields">
+    <div class="card">
+      <h2>תנאים</h2>
+      <div class="fields two">
         <div><label for="markup">תוספת על סעיפי עלות (%)</label><input id="markup" type="number" inputmode="decimal" min="0" step="any"></div>
         <div><label for="discValue">הנחה</label>
           <div class="pair"><input id="discValue" type="number" inputmode="decimal" min="0" step="any" placeholder="0"><select id="discType" aria-label="סוג ההנחה"><option value="amount">₪</option><option value="percent">%</option></select></div>
@@ -149,7 +233,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
         <div><label for="validity">תוקף ההצעה (ימים)</label><input id="validity" type="number" inputmode="numeric" min="0" step="1"></div>
         <div><label for="notIncluded">לא כלול בהצעה</label><textarea id="notIncluded" rows="2" placeholder="למשל: אריחים, ארונות מטבח"></textarea></div>
       </div>
+    </div>
 
+    <div class="card">
+      <h2>סיכום</h2>
       <div class="totals" id="totals">
         <div id="rowSub"><span>סה"כ לפני הנחה</span><span id="tSub"></span></div>
         <div id="rowDisc"><span>הנחה</span><span id="tDisc"></span></div>
@@ -158,23 +245,68 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
         <div class="grand"><span>סה"כ לתשלום</span><span id="tTotal"></span></div>
         <div class="optrow" id="rowOpt"><span>אופציות – לא בסה"כ (לפני מע"מ)</span><span id="tOpt"></span></div>
       </div>
-
       <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+      <button type="button" class="btn primary wide" id="toSend" style="margin-top:12px">המשך לשליחה</button>
+      <p class="note">הכלי מחשב לפי מה שהזנת: הוא לא מודד, לא מזהה תמונות ולא בודק מחירים. כל שורה והמע"מ מעוגלים לשקל שלם. בדוק כל שורה לפני שליחה. ההצעה נשמרת רק בדפדפן הזה ולא נשלחת לשום מקום.</p>
+    </div>
+  </section>
 
-      <div class="actions">
-        <button type="button" class="btn primary" id="copyBtn">העתק כטקסט</button>
-        <button type="button" class="btn" id="printBtn">הדפסה</button>
+  <!-- ===== שליחה ===== -->
+  <section class="panel" id="p-send" role="tabpanel" aria-labelledby="tab-send" hidden>
+    <div class="card">
+      <h2>שליחת ההצעה</h2>
+      <div class="status" id="ready" hidden></div>
+      <div class="okbox" id="readyOk" hidden></div>
+      <label for="clientPhone">טלפון הלקוח לוואטסאפ (לא חובה)</label>
+      <input id="clientPhone" type="tel" inputmode="tel" placeholder="050-1234567" autocomplete="off">
+      <p class="hint" id="phoneHint"></p>
+      <a class="btn wa" id="waBtn" href="#" target="_blank" rel="noopener">שלח בוואטסאפ</a>
+      <div class="row">
+        <button type="button" class="btn" id="copyBtn">העתק כטקסט</button>
+        <button type="button" class="btn" id="printBtn">הדפסה / PDF</button>
+      </div>
+      <details id="prevBox">
+        <summary>הטקסט שיישלח</summary>
+        <textarea id="preview" readonly rows="12" aria-label="הטקסט שיישלח" placeholder="הטקסט יופיע כאן כשיש כתובת נכס ושורה אחת לפחות."></textarea>
+      </details>
+      <p class="note">"שלח בוואטסאפ" פותח את וואטסאפ עם הטקסט – ההודעה נשלחת רק כשתלחץ שם על שליחה. להפקת PDF: "הדפסה / PDF" ואז "שמור כ-PDF".</p>
+    </div>
+
+    <div class="card" id="bizCard">
+      <h2>פרטי העסק שלך</h2>
+      <div class="fields two">
+        <div><label for="bizName">שם העסק</label><input id="bizName" type="text" autocomplete="organization"></div>
+        <div><label for="bizPhone">טלפון העסק</label><input id="bizPhone" type="tel" inputmode="tel" autocomplete="tel"></div>
+        <div><label for="bizTax">מספר עוסק מורשה / ח.פ.</label><input id="bizTax" type="text" inputmode="numeric" autocomplete="off"></div>
+        <div><label>לוגו (לא חובה)</label>
+          <div class="logo-row">
+            <div class="logo-prev" id="logoPrev">אין לוגו</div>
+            <label class="btn" for="logoFile" style="margin:0;color:var(--ink);font-size:.95rem">בחר תמונה</label>
+            <input class="file" id="logoFile" type="file" accept="image/*">
+            <button type="button" class="linkbtn" id="logoDel" hidden>הסר לוגו</button>
+          </div>
+        </div>
+      </div>
+      <p class="note">הפרטים מופיעים בראש ההדפסה, והטלפון ומספר העוסק נוספים לסוף הטקסט. הלוגו מוקטן ונשמר רק בדפדפן הזה.</p>
+    </div>
+
+    <div class="card" id="savedCard">
+      <h2>ההצעות שלי <span class="badge zero" id="savedCount">0</span></h2>
+      <div class="row" style="margin-top:0">
+        <button type="button" class="btn primary" id="saveBtn">שמור הצעה</button>
         <button type="button" class="btn" id="newBtn">הצעה חדשה</button>
       </div>
+      <div class="savestate" id="saveState"></div>
+      <div id="saved"></div>
+    </div>
+  </section>
 
-      <h3><label for="preview" style="font-size:1rem;color:inherit;font-weight:700">הטקסט שיועתק</label></h3>
-      <textarea id="preview" readonly rows="10" placeholder="הטקסט יופיע כאן כשיש כתובת נכס ושורה אחת לפחות."></textarea>
-      <p class="note">הכלי מחשב לפי מה שהזנת: הוא לא מודד, לא מזהה תמונות ולא בודק מחירים. כל שורה והמע"מ מעוגלים לשקל שלם. בדוק כל שורה לפני שליחה. ההצעה נשמרת רק בדפדפן הזה ולא נשלחת לשום מקום.</p>
-    </section>
-  </div>
+  <footer class="foot">
+    <div>ההצעות ופרטי העסק נשמרים רק בדפדפן הזה ולא נשלחים לשום מקום.</div>
+    <a href="/map/">מפת אשדוד בתלת־ממד – כמויות מעטפת מכל בניין</a>
+  </footer>
 </div>
-<div class="bar"><span id="barText"></span><a href="#totals">לסיכום</a></div>
-<div class="toast" id="toast" role="status" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden><span id="toastMsg"></span><button type="button" id="toastAct" hidden></button></div>
 <div id="sheet"></div>
 
 <!-- ===== BEGIN PRICE DATA ===== בלוק המחירים. כדי להחליף מחירון מחליפים רק את מה שבין BEGIN ל-END (ידנית, או עם tools/make_price_block.py). ===== -->
@@ -504,11 +636,19 @@ var LuachCalc = (function () {
 })();
 </script>
 <!-- ===== END CALC CORE ===== -->
-
 <script id="ui">
 (function () {
   'use strict';
-  var D = LUACH_DATA, C = LuachCalc, KEY = 'luach_quote_v2';
+  var D = LUACH_DATA, C = LuachCalc;
+  /* הגדרות תצוגה בלבד (לא משפיעות על החישוב). סדר הפרקים במחירון: שיפוץ קודם. פרק שלא מופיע כאן – בסוף, לפי סדר המחירון. */
+  var UI_CONFIG = {
+    chapterOrder: ['צבע', 'גבס', 'ריצוף וחיפוי', 'חשמל ותאורה', 'אינסטלציה', 'איטום', 'טיח וגמר חוץ', 'אלומיניום',
+                   'נגרות ומסגרות', 'מיזוג', 'הכנה ופירוק', 'בנייה', 'שלד ובטון', 'פיתוח', 'ניהול והיתרים'],
+    logoMaxChars: 150 * 1024   /* גודל מרבי ללוגו השמור (dataURL) */
+  };
+  var KEY_OLD = 'luach_quote_v2', KEY = 'luach_current_v3', KEY_LIST = 'luach_quotes_v3', KEY_BIZ = 'luach_biz_v3', KEY_MIG = 'luach_migrated_v3';
+  var DONE = 'הופק בלוח היזם';
+
   function $(s) { return document.querySelector(s); }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   var ERR = {
@@ -522,24 +662,104 @@ var LuachCalc = (function () {
     bad_discount: 'ההנחה לא תקינה.',
     discount_too_big: 'ההנחה גדולה מסכום ההצעה.'
   };
-  var cats = [], byId = {}, cat = '', byIdPre = {};
-  D.items.forEach(function (it) { byIdPre[it[0]] = 1; });
-  D.items.forEach(function (it) { byId[it[0]] = it; if (cats.indexOf(it[1]) < 0) cats.push(it[1]); });
 
+  /* ---------- מחירון: פרקים וסדר ---------- */
+  var byId = {}, byIdPre = {}, dataCats = [], pos = {};
+  D.items.forEach(function (it) { byIdPre[it[0]] = 1; });
+  D.items.forEach(function (it, i) { byId[it[0]] = it; pos[it[0]] = i; if (dataCats.indexOf(it[1]) < 0) dataCats.push(it[1]); });
+  function chRank(c) { var i = UI_CONFIG.chapterOrder.indexOf(c); return i >= 0 ? i : UI_CONFIG.chapterOrder.length + dataCats.indexOf(c); }
+  var cats = dataCats.slice().sort(function (a, b) { return chRank(a) - chRank(b); });
+  var itemsSorted = D.items.slice().sort(function (a, b) { return (chRank(a[1]) - chRank(b[1])) || (pos[a[0]] - pos[b[0]]); });
+  var cat = '';
+
+  /* חיפוש שמתעלם מגרש/גרשיים ומרכאות: "מר" מוצא "מ"ר". כל מילה בשאילתה צריכה להופיע (בשם הסעיף או בפרק). */
+  function norm(s) { return String(s || '').replace(/["'`׳״‘’“”„]/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  var normIdx = {};
+  D.items.forEach(function (it) { normIdx[it[0]] = norm(it[2] + ' ' + it[1]); });
+  function find(query, category) {
+    var raw = String(query || '').trim(), words = norm(raw).split(' ').filter(Boolean);
+    return itemsSorted.filter(function (it) {
+      if (category && it[1] !== category) return false;
+      if (!words.length) return true;
+      if (it[0].toLowerCase() === raw.toLowerCase()) return true;
+      var h = normIdx[it[0]];
+      return words.every(function (w) { return h.indexOf(w) >= 0; });
+    });
+  }
+
+  /* ---------- אחסון ---------- */
+  function getJSON(k) { try { var s = localStorage.getItem(k); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+  var warnedFull = false;
+  function setJSON(k, v) {
+    try { localStorage.setItem(k, JSON.stringify(v)); return true; }
+    catch (e) { if (!warnedFull) { warnedFull = true; toast('השמירה בדפדפן נכשלה (ייתכן שהאחסון מלא).'); } return false; }
+  }
   function blank() {
-    return { client: '', address: '', business: '', markup: String(D.config.costMarkupPercent), discType: 'amount', discValue: '',
-             validity: String(D.config.validityDays), notIncluded: '', lines: [], seq: 1 };
+    return { client: '', address: '', clientPhone: '', markup: String(D.config.costMarkupPercent), discType: 'amount', discValue: '',
+             validity: String(D.config.validityDays), notIncluded: '', lines: [], seq: 1, basis: '', addrHint: '', qid: null };
   }
-  function load() {
-    try {
-      var s = localStorage.getItem(KEY);
-      if (s) { var o = JSON.parse(s); if (o && Array.isArray(o.lines)) return Object.assign(blank(), o); }
-    } catch (e) {}
-    return blank();
+  function clean(o) {
+    var q = Object.assign(blank(), o || {});
+    ['client', 'address', 'clientPhone', 'markup', 'discValue', 'validity', 'notIncluded', 'basis', 'addrHint'].forEach(function (f) {
+      q[f] = (q[f] === null || q[f] === undefined) ? '' : String(q[f]);
+    });
+    if (q.discType !== 'percent') q.discType = 'amount';
+    if (!Array.isArray(q.lines)) q.lines = [];
+    q.lines = q.lines.filter(function (l) { return l && typeof l === 'object'; });
+    var mx = 0;
+    q.lines.forEach(function (l) { if (typeof l.k === 'number' && l.k > mx) mx = l.k; });
+    q.lines.forEach(function (l) { if (typeof l.k !== 'number') l.k = ++mx; });
+    q.seq = Math.max(Number(q.seq) || 1, mx + 1);
+    delete q.business; delete q.fromMap;
+    return q;
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
-  var st = load();
+  function snap(q) { var c = JSON.parse(JSON.stringify(q)); delete c.qid; return c; }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+  function hasContent(q) { return q.lines.length > 0 || !!q.client.trim() || !!q.address.trim(); }
+
+  var list = getJSON(KEY_LIST); if (!Array.isArray(list)) list = [];
+  list = list.filter(function (e) { return e && e.id && e.q; });
+  var biz = Object.assign({ name: '', phone: '', taxId: '', logo: '' }, getJSON(KEY_BIZ) || {});
+  ['name', 'phone', 'taxId', 'logo'].forEach(function (f) { biz[f] = biz[f] ? String(biz[f]) : ''; });
+  if (biz.logo && !/^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/.test(biz.logo)) biz.logo = '';
+
+  var st, cur = getJSON(KEY);
+  if (cur && Array.isArray(cur.lines)) {
+    st = clean(cur);
+    if (cur.qid && list.some(function (e) { return e.id === cur.qid; })) st.qid = cur.qid; else st.qid = null;
+  } else {
+    st = blank();
+    var migrated = false; try { migrated = !!localStorage.getItem(KEY_MIG); } catch (e) {}
+    if (!migrated) {
+      /* מעבר חד-פעמי מהגרסה הקודמת: ההצעה השמורה (luach_quote_v2) נפתחת ונכנסת ל"ההצעות שלי"; שם העסק עובר לפרטי העסק. המפתח הישן לא נמחק. */
+      var old = getJSON(KEY_OLD);
+      if (old && Array.isArray(old.lines)) {
+        if (old.business && !biz.name) biz.name = String(old.business);
+        st = clean(old);
+        if (hasContent(st)) { var me = { id: uid(), created: Date.now(), updated: Date.now(), q: snap(st) }; list.unshift(me); st.qid = me.id; }
+      }
+      try { localStorage.setItem(KEY_MIG, '1'); } catch (e) {}
+    }
+    setJSON(KEY_LIST, list); setJSON(KEY_BIZ, biz); setJSON(KEY, st);
+  }
+  function entry(id) { for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i]; return null; }
+  function save() {
+    setJSON(KEY, st);
+    if (st.qid) {
+      var e = entry(st.qid);
+      if (e) { e.q = snap(st); e.updated = Date.now(); setJSON(KEY_LIST, list); } else st.qid = null;
+    }
+  }
+  function saveBiz() { setJSON(KEY_BIZ, biz); }
+  function storeCurrent() {   /* מכניס את ההצעה הנוכחית ל"ההצעות שלי" (אם עוד לא שם) */
+    if (st.qid && entry(st.qid)) { save(); return false; }
+    var e = { id: uid(), created: Date.now(), updated: Date.now(), q: snap(st) };
+    list.unshift(e); st.qid = e.id; setJSON(KEY_LIST, list); setJSON(KEY, st);
+    return true;
+  }
+
   /* מילוי מוקדם ממפת לוח היזם: #pre=<JSON מקודד>. רק סעיפים קיימים, כמויות חיוביות, טקסט קצר. */
+  var fromMap = false;
   (function () {
     var m = /[#&]pre=([^&]+)/.exec(location.hash || ''); if (!m) return;
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
@@ -552,57 +772,186 @@ var LuachCalc = (function () {
     });
     if (!lines.length) return;
     try { localStorage.setItem(KEY + '_prev', JSON.stringify(st)); } catch (e) {}
+    if (hasContent(st)) storeCurrent();   /* ההצעה הקודמת לא הולכת לאיבוד: היא נשמרת ב"ההצעות שלי" */
+    var keep = { markup: st.markup, validity: st.validity };
+    st = Object.assign(blank(), keep);
     st.lines = lines.map(function (l) { return { k: st.seq++, id: l.id, qty: l.qty, price: null, opt: false }; });
     st.basis = typeof p.basis === 'string' ? p.basis.slice(0, 400) : '';
     st.addrHint = typeof p.hint === 'string' ? p.hint.slice(0, 80) : '';
-    st.fromMap = true;
+    fromMap = true;
+    save();
   })();
 
-  function today() {
-    var d = new Date();
-    function p(n) { return (n < 10 ? '0' : '') + n; }
-    return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear();
-  }
-  function compute() {
+  /* ---------- חישוב וטקסט ---------- */
+  function today() { return dmy(new Date()); }
+  function dmy(d) { function p(n) { return (n < 10 ? '0' : '') + n; } return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear(); }
+  function computeFor(q) {
     return C.quote({
-      address: st.address, markupPercent: st.markup, discount: { type: st.discType, value: st.discValue },
-      lines: st.lines.map(function (l) {
+      address: q.address, markupPercent: q.markup, discount: { type: q.discType, value: q.discValue },
+      lines: q.lines.map(function (l) {
         return l.custom ? { custom: true, name: l.name, unit: l.unit, price: l.price, qty: l.qty, optional: l.opt }
                         : { id: l.id, qty: l.qty, price: l.price, optional: l.opt };
       })
     }, D);
   }
+  function compute() { return computeFor(st); }
   function meta() {
-    return { business: st.business.trim(), client: st.client.trim(), address: st.address.trim(), dateText: today(),
+    return { business: biz.name.trim(), client: st.client.trim(), address: st.address.trim(), dateText: today(),
              validityDays: st.validity, notIncluded: st.notIncluded.trim(), basis: String(st.basis || '').trim() };
   }
-  function toast(m) {
-    var t = $('#toast');
-    t.textContent = m; t.hidden = false;
-    clearTimeout(toast.h); toast.h = setTimeout(function () { t.hidden = true; }, 2600);
+  /* הטקסט של calc-core כמו שהוא, ובשכבת התצוגה מוסיפים לפני השורה האחרונה את טלפון העסק ומספר העוסק */
+  function fullText(r) {
+    var t = C.text(r, meta(), D);
+    if (t === null) return null;
+    var extra = [];
+    if (biz.phone.trim()) extra.push('טלפון: ' + biz.phone.trim());
+    if (biz.taxId.trim()) extra.push('עוסק מורשה / ח.פ.: ' + biz.taxId.trim());
+    if (!extra.length) return t;
+    var L = t.split('\n');
+    if (L[L.length - 1] === DONE) { L.pop(); return L.concat(extra, [DONE]).join('\n'); }
+    return L.concat(extra).join('\n');
+  }
+  /* טלפון ישראלי -> 972XXXXXXXXX. '' = לא הוזן, null = לא תקין */
+  function waPhone(s) {
+    var d = String(s || '').replace(/\D/g, '');
+    if (!d) return '';
+    if (d.indexOf('00') === 0) d = d.slice(2);
+    if (d.indexOf('972') === 0) d = d.slice(3);
+    if (d.charAt(0) === '0') d = d.slice(1);
+    return /^[2-9]\d{7,8}$/.test(d) ? '972' + d : null;
   }
 
+  /* ---------- הודעה קופצת ---------- */
+  function hideToast() { $('#toast').hidden = true; }
+  function toast(m, label, fn) {
+    var t = $('#toast'), b = $('#toastAct');
+    $('#toastMsg').textContent = m;
+    if (label && fn) { b.hidden = false; b.textContent = label; b.onclick = function () { hideToast(); fn(); }; }
+    else { b.hidden = true; b.onclick = null; }
+    t.hidden = false;
+    clearTimeout(toast.h); toast.h = setTimeout(hideToast, label ? 4500 : 2800);
+  }
+
+  /* ---------- לשוניות ---------- */
+  var tab = 'list', scrollPos = {}, listDirty = false;
+  function show(name, noScroll) {
+    if (name !== tab) scrollPos[tab] = window.scrollY;
+    tab = name;
+    ['list', 'quote', 'send'].forEach(function (t) {
+      $('#tab-' + t).setAttribute('aria-selected', String(t === name));
+      $('#p-' + t).hidden = t !== name;
+    });
+    if (name === 'list' && listDirty) renderItems();
+    if (!noScroll) window.scrollTo(0, scrollPos[name] || 0);
+  }
+  $('.tabs').addEventListener('click', function (e) { var b = e.target.closest('.tab'); if (b) show(b.getAttribute('data-tab')); });
+
+  /* ---------- מחירון ---------- */
+  function lineFor(id) { var ex = null; st.lines.forEach(function (l) { if (!l.custom && l.id === id) ex = l; }); return ex; }
+  function qtyShort(q) { var s = String(q === null || q === undefined ? '' : q).trim(); return s ? (s.length > 7 ? s.slice(0, 7) + '…' : s) : '?'; }
+  function ctlHTML(it) {
+    var l = lineFor(it[0]);
+    if (!l) return '<button type="button" class="add" data-act="add" aria-label="הוסף להצעה: ' + esc(it[2]) + '">+ הוסף</button>';
+    var c = C.scaled(l.qty, 2), last = c === null || c <= 100;
+    return '<div class="step">' +
+      '<button type="button" data-act="dec" aria-label="' + (last ? 'הסר מההצעה' : 'הפחת 1') + '">−</button>' +
+      '<button type="button" class="q" data-act="edit" aria-label="כמות בהצעה ' + esc(l.qty) + ' – לעריכה">' + esc(qtyShort(l.qty)) + '</button>' +
+      '<button type="button" data-act="inc" aria-label="הוסף 1">+</button></div>';
+  }
+  function itemHTML(it) {
+    var ag = C.listPriceAgorot(it, st.markup, D.config), sub = [];
+    if (it[5] !== 'c') sub.push('<span class="cost">' + (it[5] === 'e' ? 'עלות (הערכה) ' : 'עלות ') + C.moneyAg(C.scaled(it[4], 2)) + ' + ' + esc(st.markup) + '%</span>');
+    if (it[7]) sub.push(esc(it[7]));
+    if (D.flags && D.flags[it[0]]) sub.push('<span class="flag">מחיר חריג – הזן מחיר משלך</span>');
+    return '<div class="item' + (lineFor(it[0]) ? ' in' : '') + '" data-id="' + esc(it[0]) + '"><div class="nm">' + esc(it[2]) + '</div>' +
+      '<div class="r2"><div><span class="pr">' + (ag === null ? '—' : C.moneyAg(ag) + ' ₪') + '</span><span class="un"> / ' + esc(it[3]) + '</span>' +
+      (sub.length ? '<div class="sub">' + sub.join(' · ') + '</div>' : '') + '</div>' +
+      '<div class="ctl">' + ctlHTML(it) + '</div></div></div>';
+  }
   function renderChips() {
     $('#chips').innerHTML = [''].concat(cats).map(function (c) {
       return '<button type="button" class="chip" aria-pressed="' + (c === cat) + '" data-c="' + esc(c) + '">' + esc(c || 'הכול') + '</button>';
     }).join('');
   }
   function renderItems() {
-    var list = C.search(D, $('#search').value, cat);
-    $('#count').textContent = list.length + ' מתוך ' + D.items.length + ' סעיפים';
-    $('#items').innerHTML = list.length ? list.map(function (it) {
-      var ag = C.listPriceAgorot(it, st.markup, D.config);
-      var sub = it[5] === 'c' ? '' : '<small>' + (it[5] === 'e' ? 'עלות (הערכה) ' : 'עלות ') + C.moneyAg(C.scaled(it[4], 2)) + ' + ' + esc(st.markup) + '%</small>';
-      return '<div class="item"><div><div class="nm">' + esc(it[2]) + '</div><div class="meta">' + esc(it[1]) + ' · ' + esc(it[3]) + (it[7] ? ' · ' + esc(it[7]) : '') + '</div></div>' +
-        '<div class="pr"><b>' + (ag === null ? '—' : C.moneyAg(ag) + ' ₪') + '</b>' + sub + '</div>' +
-        '<button type="button" class="add" data-id="' + esc(it[0]) + '" aria-label="הוסף להצעה: ' + esc(it[2]) + '">+</button></div>';
-    }).join('') : '<p class="empty">אין סעיף כזה במחירון. אפשר להוסיף אותו כ"סעיף חופשי" עם מחיר משלך.</p>';
+    listDirty = false;
+    var q = $('#search').value, res = find(q, cat), html = '', last = null;
+    $('#count').textContent = res.length === D.items.length ? D.items.length + ' סעיפים' : res.length + ' מתוך ' + D.items.length + ' סעיפים';
+    res.forEach(function (it) {
+      if (it[1] !== last) { html += '<h3 class="chh">' + esc(it[1]) + '</h3>'; last = it[1]; }
+      html += itemHTML(it);
+    });
+    if (!res.length) {
+      var qq = q.trim();
+      html = '<div class="empty"><p>' + (qq ? 'לא נמצא במחירון סעיף עבור "' + esc(qq) + '"' + (cat ? ' בפרק ' + esc(cat) : '') + '.' : 'אין סעיפים בפרק הזה.') + '</p>' +
+        (qq ? '<button type="button" class="btn" data-act="custom">+ הוסף "' + esc(qq.slice(0, 40)) + '" כסעיף חופשי</button>' : '') +
+        '<button type="button" class="btn" data-act="clear">הצג את כל המחירון</button></div>';
+    }
+    $('#items').innerHTML = html;
+  }
+  function updateRow(id, flash, focusAct) {
+    var n = $('#items').querySelector('.item[data-id="' + id + '"]');
+    if (!n) return;
+    n.classList.toggle('in', !!lineFor(id));
+    n.querySelector('.ctl').innerHTML = ctlHTML(byId[id]);
+    if (flash) { n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); }
+    if (focusAct) { var f = n.querySelector('[data-act="' + focusAct + '"]') || n.querySelector('[data-act]'); if (f) try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); } }
+  }
+  function pulseBadge() { var b = $('#badge'); b.classList.remove('pulse'); void b.offsetWidth; b.classList.add('pulse'); }
+  function goToLine(k, focusSel) {
+    show('quote', true);
+    var n = $('#lines').querySelector('.line[data-k="' + k + '"]');
+    if (!n) { window.scrollTo(0, 0); return; }
+    n.scrollIntoView({ block: 'center' });
+    n.classList.remove('hl'); void n.offsetWidth; n.classList.add('hl');
+    var f = focusSel && n.querySelector(focusSel); if (f) try { f.focus({ preventScroll: true }); } catch (e) { f.focus(); }
+  }
+  function addCustom(name) {
+    var l = { k: st.seq++, custom: true, name: name || '', unit: '', price: '', qty: '1', opt: false };
+    st.lines.push(l); save(); renderLines(); pulseBadge();
+    goToLine(l.k, name ? '.price' : '.cname');
   }
 
+  $('#chips').addEventListener('click', function (e) {
+    var b = e.target.closest('.chip'); if (!b) return;
+    cat = b.getAttribute('data-c'); renderChips(); renderItems();
+  });
+  $('#search').addEventListener('input', renderItems);
+  $('#search').addEventListener('keydown', function (e) { if (e.key === 'Enter') this.blur(); });
+  $('#items').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'clear') { $('#search').value = ''; cat = ''; renderChips(); renderItems(); return; }
+    if (act === 'custom') { var nm = $('#search').value.trim().slice(0, 120); $('#search').value = ''; renderItems(); addCustom(nm); return; }
+    var row = b.closest('.item'); if (!row) return;
+    var id = row.getAttribute('data-id'), it = byId[id], l = lineFor(id), c;
+    if (act === 'add' || act === 'inc') {
+      if (l) { c = C.scaled(l.qty, 2); l.qty = C.plain((c === null ? 0 : c) + 100, 2); }
+      else { l = { k: st.seq++, id: id, qty: '1', price: null, opt: false }; st.lines.push(l); }
+      save(); renderLines(); updateRow(id, true, 'inc'); pulseBadge();
+      toast((act === 'add' ? 'נוסף להצעה: ' : 'כמות ' + l.qty + ': ') + it[2], 'להצעה', function () { goToLine(l.k); });
+    } else if (act === 'dec') {
+      c = C.scaled(l.qty, 2);
+      if (c === null || c <= 100) {
+        var idx = st.lines.indexOf(l);
+        st.lines.splice(idx, 1); save(); renderLines(); updateRow(id, false, 'add');
+        toast('הוסר מההצעה: ' + it[2], 'ביטול', function () {
+          st.lines.splice(Math.min(idx, st.lines.length), 0, l); save(); renderLines(); updateRow(id, true);
+        });
+      } else {
+        l.qty = C.plain(c - 100, 2); save(); renderLines(); updateRow(id, false, 'dec');
+      }
+    } else if (act === 'edit') {
+      goToLine(l.k, '.qty');
+    }
+  });
+  $('#addCustomList').addEventListener('click', function () { addCustom(''); });
+
+  /* ---------- שורות ההצעה ---------- */
   function renderLines() {
     var r = compute(), box = $('#lines');
     if (!st.lines.length) {
-      box.innerHTML = '<p class="empty">עדיין אין שורות. בחר סעיפים מהמחירון, או הוסף סעיף חופשי.</p>';
+      box.innerHTML = '<div class="empty"><p>עדיין אין שורות בהצעה.<br>בחרו סעיפים מהמחירון (כפתור "+ הוסף"), או הוסיפו סעיף חופשי.</p><button type="button" class="btn primary" data-go="list">למחירון</button></div>';
     } else {
       box.innerHTML = st.lines.map(function (l, i) {
         var o = r.lines[i];
@@ -655,12 +1004,33 @@ var LuachCalc = (function () {
     $('#tTotal').textContent = C.money(r.total) + ' ₪';
     $('#rowOpt').hidden = !r.optionsTotal;
     $('#tOpt').textContent = C.money(r.optionsTotal) + ' ₪';
+    var errHtml = r.canIssue ? '' : '<ul>' + r.errors.map(function (e) { return '<li>' + esc(ERR[e] || e) + '</li>'; }).join('') + '</ul>';
     var s = $('#status');
     s.hidden = r.canIssue;
-    s.innerHTML = r.canIssue ? '' : '<b>כדי להפיק הצעה חסר:</b><ul>' + r.errors.map(function (e) { return '<li>' + esc(ERR[e] || e) + '</li>'; }).join('') + '</ul>';
-    $('#preview').value = r.canIssue ? C.text(r, meta(), D) : '';
-    $('#barText').textContent = (st.lines.length === 1 ? 'שורה אחת' : st.lines.length + ' שורות') + ' · סה"כ כולל מע"מ: ' + C.money(r.total) + ' ₪';
+    s.innerHTML = r.canIssue ? '' : '<b>כדי להפיק הצעה חסר:</b>' + errHtml;
+
+    /* מונה, שורת סיכום, לשונית שליחה */
+    var n0 = st.lines.length, badge = $('#badge');
+    badge.textContent = n0; badge.classList.toggle('zero', !n0);
+    $('#tab-quote').setAttribute('aria-label', 'ההצעה, ' + (n0 === 1 ? 'שורה אחת' : n0 + ' שורות'));
+    $('#sum').innerHTML = n0 ? (n0 === 1 ? 'שורה אחת' : n0 + ' שורות') + ' · סה"כ כולל מע"מ: <b>' + C.money(r.total) + ' ₪</b>'
+                             : 'ההצעה ריקה – בחרו סעיפים מהמחירון';
+    var t = r.canIssue ? fullText(r) : null;
+    $('#preview').value = t || '';
+    var rd = $('#ready'), ok = $('#readyOk');
+    rd.hidden = r.canIssue; ok.hidden = !r.canIssue;
+    rd.innerHTML = r.canIssue ? '' : '<b>ההצעה עוד לא מוכנה לשליחה. חסר:</b>' + errHtml + '<button type="button" class="btn" data-go="fix">לתיקון בהצעה</button>';
+    if (r.canIssue) ok.textContent = 'ההצעה מוכנה: ' + (n0 === 1 ? 'שורה אחת' : n0 + ' שורות') + ' · ' + C.money(r.total) + ' ₪ כולל מע"מ';
+    var ph = waPhone(st.clientPhone), hint = $('#phoneHint');
+    hint.classList.toggle('bad', ph === null);
+    hint.textContent = ph === null ? 'המספר לא נראה כמו טלפון ישראלי – וואטסאפ ייפתח בלי נמען ותבחר למי לשלוח.'
+                     : ph ? 'יישלח ישירות למספר ' + st.clientPhone.trim() + '.' : 'בלי מספר – וואטסאפ ייפתח ותבחר למי לשלוח.';
+    var wa = $('#waBtn');
+    wa.href = t ? 'https://wa.me/' + (ph || '') + '?text=' + encodeURIComponent(t) : '#';
+    ['#waBtn', '#copyBtn', '#printBtn'].forEach(function (sel) { $(sel).classList.toggle('off', !r.canIssue); });
+    $('#qState').textContent = st.qid ? 'שמורה ב"ההצעות שלי" – כל שינוי נשמר' : 'הצעה לא שמורה ברשימה';
     renderSheet(r);
+    renderSaved();
   }
 
   function renderSheet(r) {
@@ -676,7 +1046,14 @@ var LuachCalc = (function () {
       last = ch; n += 1;
       rows += '<tr><td>' + n + '</td><td>' + esc(ln.name) + '</td><td class="n">' + C.qtyText(ln.qtyCenti) + '</td><td>' + esc(ln.unit) + '</td><td class="n">' + C.moneyAg(ln.priceAg) + '</td><td class="n">' + C.money(ln.total) + '</td></tr>';
     });
-    h += '<h1>הצעת מחיר' + (m.business ? ' – ' + esc(m.business) : '') + '</h1>';
+    var bp = biz.phone.trim(), bt = biz.taxId.trim();
+    if (biz.logo || bp || bt) {
+      h += '<div class="bh">' + (biz.logo ? '<img src="' + esc(biz.logo) + '" alt="">' : '') + '<div>' + (m.business ? '<b>' + esc(m.business) + '</b>' : '') +
+        (bp ? '<div>טלפון: ' + esc(bp) + '</div>' : '') + (bt ? '<div>עוסק מורשה / ח.פ.: ' + esc(bt) + '</div>' : '') + '</div></div>';
+      h += '<h1>הצעת מחיר</h1>';
+    } else {
+      h += '<h1>הצעת מחיר' + (m.business ? ' – ' + esc(m.business) : '') + '</h1>';
+    }
     h += '<div class="sm"><div>תאריך: ' + esc(m.dateText) + '</div>' + (m.client ? '<div>לכבוד: ' + esc(m.client) + '</div>' : '') + '<div>כתובת הנכס: ' + esc(m.address) + '</div></div>';
     h += '<table><thead><tr><th>#</th><th>סעיף</th><th class="n">כמות</th><th>יחידה</th><th class="n">מחיר ליח&#39; (₪)</th><th class="n">סה"כ (₪)</th></tr></thead><tbody>' + rows + '</tbody></table>';
     h += '<div class="st">';
@@ -702,31 +1079,15 @@ var LuachCalc = (function () {
     return null;
   }
   function flagErrors(r) {
+    show('quote', true);
     var s = $('#status');
     s.classList.add('attn');
     setTimeout(function () { s.classList.remove('attn'); }, 1800);
-    if (r.errors.indexOf('missing_address') >= 0) $('#address').focus(); else s.scrollIntoView({ block: 'center' });
+    if (r.errors.indexOf('missing_address') >= 0) { var a = $('#address'); a.scrollIntoView({ block: 'center' }); try { a.focus({ preventScroll: true }); } catch (e) { a.focus(); } }
+    else s.scrollIntoView({ block: 'center' });
     toast('ההצעה לא הופקה. ' + (ERR[r.errors[0]] || ''));
   }
 
-  $('#chips').addEventListener('click', function (e) {
-    var b = e.target.closest('.chip'); if (!b) return;
-    cat = b.getAttribute('data-c'); renderChips(); renderItems();
-  });
-  $('#search').addEventListener('input', renderItems);
-  $('#items').addEventListener('click', function (e) {
-    var b = e.target.closest('.add'); if (!b) return;
-    var id = b.getAttribute('data-id'), ex = null;
-    st.lines.forEach(function (l) { if (!l.custom && l.id === id) ex = l; });
-    if (ex) { var c = C.scaled(ex.qty, 2); ex.qty = C.plain((c === null ? 0 : c) + 100, 2); }
-    else st.lines.push({ k: st.seq++, id: id, qty: '1', price: null, opt: false });
-    save(); renderLines(); toast('נוסף להצעה: ' + byId[id][2]);
-  });
-  $('#addCustom').addEventListener('click', function () {
-    st.lines.push({ k: st.seq++, custom: true, name: '', unit: '', price: '', qty: '1', opt: false });
-    save(); renderLines();
-    var f = $('#lines').querySelector('.line:last-child .cname'); if (f) f.focus();
-  });
   $('#lines').addEventListener('input', function (e) {
     var x = lineOf(e); if (!x) return;
     var c = e.target.classList;
@@ -735,7 +1096,7 @@ var LuachCalc = (function () {
     else if (c.contains('cname')) x.line.name = e.target.value;
     else if (c.contains('cunit')) x.line.unit = e.target.value;
     else return;
-    save(); refresh();
+    listDirty = true; save(); refresh();
   });
   $('#lines').addEventListener('change', function (e) {
     if (!e.target.classList.contains('opt')) return;
@@ -745,26 +1106,58 @@ var LuachCalc = (function () {
   });
   $('#lines').addEventListener('click', function (e) {
     var x;
-    if (e.target.closest('.del')) { x = lineOf(e); if (!x) return; st.lines.splice(x.index, 1); save(); renderLines(); }
+    if (e.target.closest('.del')) {
+      x = lineOf(e); if (!x) return;
+      var gone = x.line, at = x.index;
+      st.lines.splice(at, 1); listDirty = true; save(); renderLines();
+      toast('השורה הוסרה', 'ביטול', function () { st.lines.splice(Math.min(at, st.lines.length), 0, gone); listDirty = true; save(); renderLines(); });
+    }
     else if (e.target.closest('.reset')) { x = lineOf(e); if (!x) return; x.line.price = null; save(); renderLines(); }
   });
-  var FIELDS = { client: 'client', address: 'address', business: 'business', markup: 'markup', discValue: 'discValue', discType: 'discType', validity: 'validity', notIncluded: 'notIncluded' };
-  Object.keys(FIELDS).forEach(function (id) {
+  $('#addCustom').addEventListener('click', function () { addCustom(''); });
+  document.addEventListener('click', function (e) {
+    var g = e.target.closest('[data-go]'); if (!g) return;
+    var to = g.getAttribute('data-go');
+    if (to === 'fix') flagErrors(compute()); else show(to);
+  });
+  $('#toSend').addEventListener('click', function () { show('send'); });
+  $('#toSaved').addEventListener('click', function () { show('send', true); $('#savedCard').scrollIntoView({ block: 'start' }); });
+
+  var FIELDS = ['client', 'address', 'clientPhone', 'markup', 'discValue', 'discType', 'validity', 'notIncluded'];
+  function setFields() {
+    FIELDS.forEach(function (id) { $('#' + id).value = st[id]; });
+    $('#address').placeholder = (st.addrHint && !st.address) ? 'סמוך ל: ' + st.addrHint + ' – השלימו כתובת מדויקת' : 'רחוב, מספר, עיר';
+    showBasis();
+  }
+  FIELDS.forEach(function (id) {
     var el = $('#' + id);
-    el.value = st[FIELDS[id]];
     el.addEventListener(id === 'discType' ? 'change' : 'input', function () {
-      st[FIELDS[id]] = el.value; save();
-      if (id === 'markup') renderItems();
+      st[id] = el.value; save();
+      if (id === 'markup') listDirty = true;
       refresh();
     });
+  });
+  function showBasis() {
+    var box = $('#basisBox');
+    if (!st.basis) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    box.innerHTML = '<b>בסיס הכמויות (מהמפה – משוער):</b> ' + esc(st.basis) + ' <button type="button" class="btn" id="basisX">הסרה</button>';
+    $('#basisX').onclick = function () { st.basis = ''; save(); showBasis(); refresh(); };
+  }
+
+  /* ---------- שליחה ---------- */
+  $('#waBtn').addEventListener('click', function (e) {
+    var r = compute();
+    if (!r.canIssue) { e.preventDefault(); flagErrors(r); }
   });
   $('#copyBtn').addEventListener('click', function () {
     var r = compute();
     if (!r.canIssue) { flagErrors(r); return; }
-    var t = C.text(r, meta(), D);
+    var t = fullText(r);
     function ok() { toast('ההצעה הועתקה. אפשר להדביק בוואטסאפ או בכל מקום אחר.'); }
-    function manual() { toast('ההעתקה לא הצליחה. סמן את הטקסט למטה והעתק ידנית.'); }
+    function manual() { toast('ההעתקה לא הצליחה. סמן את הטקסט והעתק ידנית.'); }
     function fallback() {
+      $('#prevBox').open = true;
       var p = $('#preview');
       p.focus(); p.select();
       try { if (document.execCommand('copy')) ok(); else manual(); } catch (e) { manual(); }
@@ -774,33 +1167,115 @@ var LuachCalc = (function () {
   $('#printBtn').addEventListener('click', function () {
     var r = compute();
     if (!r.canIssue) { flagErrors(r); return; }
+    renderSheet(r);
     window.print();
   });
+
+  /* ---------- פרטי העסק ---------- */
+  var BIZ = { bizName: 'name', bizPhone: 'phone', bizTax: 'taxId' };
+  Object.keys(BIZ).forEach(function (id) {
+    var el = $('#' + id);
+    el.value = biz[BIZ[id]];
+    el.addEventListener('input', function () { biz[BIZ[id]] = el.value; saveBiz(); refresh(); });
+  });
+  function renderLogo() {
+    $('#logoPrev').innerHTML = biz.logo ? '<img src="' + esc(biz.logo) + '" alt="הלוגו שלך">' : 'אין לוגו';
+    $('#logoDel').hidden = !biz.logo;
+  }
+  function shrink(img) {
+    var w0 = img.naturalWidth || img.width, h0 = img.naturalHeight || img.height;
+    if (!w0 || !h0) return null;
+    var sizes = [480, 360, 260, 180, 120], qs = [0.85, 0.7, 0.55, 0.4];
+    for (var i = 0; i < sizes.length; i++) {
+      var k = Math.min(1, sizes[i] / Math.max(w0, h0)), w = Math.max(1, Math.round(w0 * k)), h = Math.max(1, Math.round(h0 * k));
+      var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+      var g = cv.getContext('2d'); g.drawImage(img, 0, 0, w, h);
+      var png = cv.toDataURL('image/png');
+      if (png.length <= UI_CONFIG.logoMaxChars) return png;
+      g.globalCompositeOperation = 'destination-over'; g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+      for (var j = 0; j < qs.length; j++) { var jp = cv.toDataURL('image/jpeg', qs[j]); if (jp.length <= UI_CONFIG.logoMaxChars && /^data:image\/jpeg/.test(jp)) return jp; }
+    }
+    return null;
+  }
+  $('#logoFile').addEventListener('change', function () {
+    var f = this.files && this.files[0], inp = this;
+    if (!f) return;
+    if (!/^image\//.test(f.type)) { toast('הקובץ שנבחר אינו תמונה.'); inp.value = ''; return; }
+    var url = (window.URL || window.webkitURL).createObjectURL(f), img = new Image();
+    img.onload = function () {
+      var out = null; try { out = shrink(img); } catch (e) {}
+      (window.URL || window.webkitURL).revokeObjectURL(url); inp.value = '';
+      if (!out) { toast('לא הצלחתי להקטין את התמונה. נסה תמונה אחרת.'); return; }
+      var prev = biz.logo; biz.logo = out;
+      if (!setJSON(KEY_BIZ, biz)) { biz.logo = prev; return; }
+      renderLogo(); refresh(); toast('הלוגו נשמר (' + Math.round(out.length / 1024) + 'KB). הוא יופיע בראש ההדפסה.');
+    };
+    img.onerror = function () { (window.URL || window.webkitURL).revokeObjectURL(url); inp.value = ''; toast('לא הצלחתי לקרוא את התמונה.'); };
+    img.src = url;
+  });
+  $('#logoDel').addEventListener('click', function () { biz.logo = ''; saveBiz(); renderLogo(); refresh(); });
+
+  /* ---------- ההצעות שלי ---------- */
+  function renderSaved() {
+    var box = $('#saved'), cnt = $('#savedCount');
+    cnt.textContent = list.length; cnt.classList.toggle('zero', !list.length);
+    $('#saveBtn').textContent = st.qid ? 'נשמרה ✓' : 'שמור הצעה';
+    $('#saveState').textContent = st.qid ? 'ההצעה הפתוחה שמורה ברשימה, וכל שינוי בה נשמר אוטומטית.' : 'ההצעה הפתוחה עוד לא שמורה ברשימה.';
+    if (!list.length) { box.innerHTML = '<p class="empty">עדיין אין הצעות שמורות. "שמור הצעה" מוסיף את ההצעה הפתוחה לכאן.</p>'; return; }
+    box.innerHTML = list.slice().sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); }).map(function (e) {
+      var q = clean(e.q), r = computeFor(q), on = e.id === st.qid, nl = q.lines.length;
+      return '<div class="sv' + (on ? ' cur' : '') + '" data-id="' + esc(e.id) + '">' +
+        '<div class="svh"><b>' + esc(q.client.trim() || 'ללא שם לקוח') + '</b><span class="svt">' + (nl ? C.money(r.total) + ' ₪' : '—') + '</span></div>' +
+        '<div class="svm">' + esc(q.address.trim() || 'ללא כתובת') + ' · ' + dmy(new Date(e.updated || e.created || Date.now())) + ' · ' + (nl === 1 ? 'שורה אחת' : nl + ' שורות') + (on ? ' · <b>פתוחה עכשיו</b>' : '') + '</div>' +
+        '<div class="sva"><button type="button" class="btn" data-act="open">' + (on ? 'לעריכה' : 'פתח') + '</button><button type="button" class="btn" data-act="dup">שכפל</button><button type="button" class="btn danger" data-act="del">מחק</button></div></div>';
+    }).join('');
+  }
+  function loadQuote(q, qid) {
+    st = clean(JSON.parse(JSON.stringify(q))); st.qid = qid || null;
+    save(); setFields(); listDirty = true; renderItems(); renderLines();
+  }
+  $('#saved').addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-act]'); if (!b) return;
+    var id = b.closest('.sv').getAttribute('data-id'), e = entry(id); if (!e) return;
+    var act = b.getAttribute('data-act'), who = clean(e.q).client.trim() || 'ללא שם לקוח';
+    if (act === 'open') {
+      if (id !== st.qid) {
+        var stored = hasContent(st) && storeCurrent();
+        loadQuote(e.q, id);
+        toast('נפתחה ההצעה: ' + who + (stored ? ' (הקודמת נשמרה ברשימה)' : ''));
+      }
+      show('quote'); window.scrollTo(0, 0);
+    } else if (act === 'dup') {
+      var c = { id: uid(), created: Date.now(), updated: Date.now(), q: JSON.parse(JSON.stringify(e.q)) };
+      list.unshift(c); setJSON(KEY_LIST, list); renderSaved();
+      toast('נוצר עותק של ההצעה: ' + who, 'פתח', function () {
+        if (hasContent(st)) storeCurrent();
+        loadQuote(c.q, c.id); show('quote'); window.scrollTo(0, 0);
+      });
+    } else if (act === 'del') {
+      if (!window.confirm('למחוק את ההצעה של "' + who + '" מהרשימה?')) return;
+      list = list.filter(function (x) { return x.id !== id; });
+      if (st.qid === id) st.qid = null;
+      setJSON(KEY_LIST, list); save(); refresh(); toast('ההצעה נמחקה מהרשימה');
+    }
+  });
+  $('#saveBtn').addEventListener('click', function () {
+    if (!hasContent(st)) { toast('אין עדיין מה לשמור – הוסיפו שורה, לקוח או כתובת.'); return; }
+    storeCurrent(); refresh(); toast('ההצעה נשמרה ב"ההצעות שלי"');
+  });
   $('#newBtn').addEventListener('click', function () {
-    if (st.lines.length && !window.confirm('למחוק את ההצעה הנוכחית ולהתחיל הצעה חדשה?')) return;
-    var keep = { business: st.business, markup: st.markup, validity: st.validity };
+    var stored = hasContent(st) && storeCurrent();
+    var keep = { markup: st.markup, validity: st.validity };
     st = Object.assign(blank(), keep);
-    save();
-    Object.keys(FIELDS).forEach(function (id) { $('#' + id).value = st[FIELDS[id]]; });
-    renderItems(); renderLines(); toast('נפתחה הצעה חדשה');
+    save(); setFields(); listDirty = true; renderItems(); renderLines(); show('list'); window.scrollTo(0, 0);
+    toast('נפתחה הצעה חדשה' + (stored ? '. הקודמת נשמרה ב"ההצעות שלי".' : ''));
   });
 
+  /* ---------- הפעלה ---------- */
   $('#stage').textContent = D.config.stageLabel || '';
   $('#stage').hidden = !D.config.stageLabel;
-  renderChips(); renderItems(); renderLines();
-  (function () {
-    var box = document.createElement('div'); box.id = 'basisBox'; box.className = 'basis';
-    var addr = $('#address'); addr.parentNode.appendChild(box);
-    function show() {
-      if (!st.basis) { box.hidden = true; return; }
-      box.hidden = false;
-      box.innerHTML = '<b>בסיס הכמויות (מהמפה – משוער):</b> ' + esc(st.basis) + ' <button type="button" id="basisX">הסרה</button>';
-      $('#basisX').onclick = function () { st.basis = ''; save(); show(); };
-    }
-    if (st.addrHint && !st.address) addr.placeholder = 'סמוך ל: ' + st.addrHint + ' – השלימו כתובת מדויקת';
-    if (st.fromMap) { delete st.fromMap; save(); renderLines(); toast('נטענו כמויות מהמפה. בדקו כל שורה ומדדו בשטח לפני שליחה.'); }
-    show();
-  })();
+  setFields(); renderLogo(); renderChips(); renderItems(); renderLines();
+  if (fromMap) { show('quote'); toast('נטענו כמויות מהמפה. בדקו כל שורה ומדדו בשטח לפני שליחה.'); }
 })();
 </script>
 </body>
