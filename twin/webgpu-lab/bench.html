@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>בדיקת מהירות – WebGPU מול WebGL · לוח היזם</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;background:#0f172a;color:#e2e8f0;font-family:system-ui,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+  main{max-width:560px;margin:0 auto;padding:14px}
+  h1{font-size:20px;margin:6px 0 4px}
+  .card{background:#1e293b;border-radius:14px;padding:12px;margin:10px 0}
+  button{font:inherit;font-size:16px;border:0;border-radius:12px;padding:12px 14px;margin:4px 0;width:100%;background:#2563eb;color:#fff;font-weight:700}
+  button.sec{background:#334155;font-weight:500}
+  button:disabled{opacity:.5}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{padding:5px 3px;border-bottom:1px solid #334155;text-align:center}
+  .ltr{direction:ltr;unicode-bidi:isolate}
+  .ok{color:#4ade80}.bad{color:#f87171}.mid{color:#fbbf24}
+  #stage{position:fixed;inset:0;display:none;background:#000;z-index:5}
+  #stage iframe{width:100%;height:100%;border:0}
+  #prog{position:fixed;top:8px;left:8px;z-index:6;background:#000b;padding:6px 10px;border-radius:10px;display:none;font-size:14px}
+  #stop{position:fixed;bottom:12px;left:12px;z-index:6;width:auto;display:none;background:#b91c1c}
+  pre{white-space:pre-wrap;font-size:12px;background:#0b1220;padding:8px;border-radius:10px;direction:ltr;text-align:left}
+  .verdict{font-size:18px;font-weight:800}
+</style>
+</head>
+<body>
+<main>
+  <h1>בדיקת מהירות: WebGPU מול WebGL</h1>
+  <div>לוח היזם · עולם תאום של אשדוד · מעבדת WebGPU</div>
+  <div class="card" id="dev">בודק את המכשיר…</div>
+  <div class="card">
+    <b>מה הבדיקה עושה:</b> מציגה את אשדוד בתלת-ממד בשלוש דרכים – <span class="ltr">WebGPU</span> החדש, אותו קוד דרך <span class="ltr">WebGL2</span>, והמנוע הקלאסי של היום – ומודדת כמה פריימים בשנייה כל אחת מצליחה.
+    ארבעה תרחישים: עיר בלבד · 20,000 הולכי רגל ו-20,000 עצים · 200,000 טיפות גשם · הכול יחד.
+    <br>כ-3 דקות. כדאי: טלפון מחובר לחשמל, בהירות רגילה, בלי אפליקציות פתוחות ברקע, לא לגעת במסך בזמן הבדיקה.
+    <button id="go">התחל בדיקה</button>
+    <button id="quick" class="sec">בדיקה מהירה (רק "הכול", כדקה)</button>
+    <button id="soak" class="sec">מבחן יציבות: 10 דקות <span class="ltr">WebGPU</span></button>
+  </div>
+  <div class="card" id="res" style="display:none"></div>
+  <div class="card" id="txt" style="display:none">
+    <b>תוצאות כטקסט (לשלוח לקלוד):</b>
+    <pre id="out"></pre>
+    <button id="copy">העתק תוצאות</button>
+    <button id="share" class="sec">שתף…</button>
+  </div>
+</main>
+<div id="stage"></div><div id="prog"></div><button id="stop">עצור</button>
+<script type="module">
+const $ = id => document.getElementById(id), qs = new URLSearchParams(location.search);
+const DEMOS = [['city', 'עיר'], ['crowd', 'אנשים ועצים'], ['rain', 'גשם'], ['all', 'הכול']];
+const MODES = [['webgpu', 'WebGPU'], ['webgl2', 'WebGL2 (אותו קוד)'], ['classic', 'קלאסי (היום)']];
+const DEV = {};
+const DPR = +(qs.get('dpr') || Math.min(devicePixelRatio || 1, 1.5));
+// ---------- זיהוי מכשיר ----------
+async function detect() {
+  const ua = navigator.userAgent; DEV.chrome = (ua.match(/Chrome\/([\d.]+)/) || [])[1] || '?'; DEV.android = (ua.match(/Android ([\d.]+)/) || [])[1] || '-';
+  DEV.model = (ua.match(/Android [\d.]+; ([^)]+)\)/) || [])[1] || '';
+  try { if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) { const h = await navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']); if (h.model) DEV.model = h.model; } } catch (e) {}
+  try { const c = document.createElement('canvas'), gl = c.getContext('webgl2'); DEV.webgl2 = !!gl; if (gl) { const e = gl.getExtension('WEBGL_debug_renderer_info'); DEV.glRenderer = e ? gl.getParameter(e.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER); } } catch (e) {}
+  DEV.webgpu = false;
+  try { if (navigator.gpu) { const a = await navigator.gpu.requestAdapter(); if (a) { DEV.webgpu = true; const i = a.info || {}; DEV.gpu = { vendor: i.vendor, arch: i.architecture, desc: i.description, fallback: !!i.isFallbackAdapter }; DEV.maxBuf = a.limits.maxStorageBufferBindingSize; DEV.f16 = a.features.has('shader-f16'); } } } catch (e) { DEV.gpuErr = String(e.message || e); }
+  DEV.dpr = devicePixelRatio; DEV.screen = `${screen.width}×${screen.height}`; DEV.cores = navigator.hardwareConcurrency; DEV.mem = navigator.deviceMemory;
+  $('dev').innerHTML = `<b>המכשיר:</b> <span class="ltr">${DEV.model || '?'}</span> · אנדרואיד <span class="ltr">${DEV.android}</span> · כרום <span class="ltr">${DEV.chrome}</span><br>
+    <b>מעבד גרפי:</b> <span class="ltr">${DEV.glRenderer || '?'}</span><br>
+    <b>WebGPU:</b> ${DEV.webgpu ? `<span class="ok">זמין ✔</span> <span class="ltr">(${[DEV.gpu.vendor, DEV.gpu.arch].filter(Boolean).join(' / ') || '—'})</span>` : `<span class="bad">לא זמין בדפדפן הזה ✘</span> – הבדיקה תריץ רק את מסלולי ה-WebGL`}<br>
+    מסך <span class="ltr">${DEV.screen}</span> · יחס פיקסלים <span class="ltr">${DEV.dpr}</span> (בבדיקה: <span class="ltr">${DPR}</span>) · ליבות <span class="ltr">${DEV.cores || '?'}</span>`;
+}
+// ---------- נתוני אשדוד: ליד הדף או מהמאגר הציבורי; אחרת עיר פרוצדורלית ----------
+async function findData() {
+  const c = [qs.get('data'), 'data/', '../pipeline/sample-out-ashdod/', 'https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/pipeline/sample-out-ashdod/'].filter(Boolean);
+  for (const b of c) { try { const r = await fetch(b + 'index.json', { cache: 'no-store' }); if (r.ok && (await r.json()).cities) return new URL(b, location.href).href; } catch (e) {} }
+  return 'none';
+}
+// ---------- ריצה אחת בתוך iframe ----------
+let stopFlag = false, curFrame = null;
+function runOne(params, label, timeoutS) {
+  return new Promise(res => {
+    const id = Math.random().toString(36).slice(2), u = new URLSearchParams({ ...params, run: id, dpr: DPR });
+    for (const k of ['walkers', 'trees', 'rain']) if (qs.get(k)) u.set(k, qs.get(k));   // לבדיקות בלבד
+    const f = document.createElement('iframe'); f.src = 'run.html?' + u; f.allow = 'fullscreen';
+    $('stage').innerHTML = ''; $('stage').appendChild(f); curFrame = f; $('prog').textContent = label;
+    const done = r => { removeEventListener('message', on); clearTimeout(to); $('stage').innerHTML = ''; curFrame = null; setTimeout(() => res(r), 600); };
+    const on = e => { const m = e.data; if (!m || m.run !== id) return;
+      if (m.type === 'soak') { $('prog').textContent = `${label} · דקה ${m.minute}: ${m.fps} FPS`; SOAK.push(m); return; }
+      if (m.type === 'result' || m.type === 'soakdone' || m.type === 'error') done(m); };
+    addEventListener('message', on);
+    const to = setTimeout(() => done({ type: 'error', msg: 'timeout' }), timeoutS * 1000);
+  });
+}
+const SOAK = [];
+let R = [];
+async function runSuite(kind) {
+  stopFlag = false; R = []; SOAK.length = 0;
+  ['go', 'quick', 'soak'].forEach(k => $(k).disabled = true);
+  document.body.style.overflow = 'hidden'; scrollTo(0, 0); $('prog').style.display = 'block'; $('stage').style.display = 'block'; $('stop').style.display = 'block';
+  $('prog').textContent = 'מחפש נתוני אשדוד…'; const data = await findData(); DEV.data = data === 'none' ? 'פרוצדורלי' : 'אשדוד';
+  try { await document.documentElement.requestFullscreen(); } catch (e) {}
+  const modes = MODES.filter(([m]) => m !== 'webgpu' || DEV.webgpu);
+  if (kind === 'soak') {
+    if (!DEV.webgpu) { alert('WebGPU לא זמין במכשיר הזה'); finish(); return; }
+    const r = await runOne({ mode: 'webgpu', demo: 'all', data, warm: 3, soak: 600 }, 'יציבות 10 דקות · WebGPU', 700); R.push(r); finish('soak'); return;
+  }
+  const demos = kind === 'quick' ? DEMOS.filter(d => d[0] === 'all') : DEMOS;
+  const total = demos.length * modes.length; let k = 0;
+  for (const [d, dn] of demos) for (const [m, mn] of modes) { if (stopFlag) break; k++;
+    const r = await runOne({ mode: m, demo: d, data, warm: 3, secs: kind === 'quick' ? 10 : 8 }, `בדיקה ${k}/${total} · ${dn} · ${mn}`, 120); r.mode = r.mode || m; r.demo = r.demo || d; R.push(r); render(); }
+  finish(kind);
+}
+function finish(kind) {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  document.body.style.overflow = ''; $('prog').style.display = 'none'; $('stage').style.display = 'none'; $('stop').style.display = 'none'; ['go', 'quick', 'soak'].forEach(k => $(k).disabled = false);
+  render(kind);
+}
+$('stop').onclick = () => { stopFlag = true; if (curFrame) { $('stage').innerHTML = ''; } };
+const f1 = v => v == null || isNaN(v) ? '—' : (+v).toFixed(1);
+function get(m, d) { return R.find(r => r.mode === m && r.demo === d && r.type === 'result' && r.stats && r.stats.n >= 10); }   // פחות מ-10 פריימים = לא מספיק למדידה
+function render(kind) {
+  const lines = [], esc = s => String(s).replace(/[<&]/g, c => c === '<' ? '&lt;' : '&amp;');
+  lines.push(`ESH27 WebGPU bench v1 · ${new Date().toLocaleString('he-IL')}`);
+  lines.push(`device: ${DEV.model || '?'} · Android ${DEV.android} · Chrome ${DEV.chrome} · GL: ${DEV.glRenderer || '?'}`);
+  lines.push(`WebGPU: ${DEV.webgpu ? 'yes ' + JSON.stringify(DEV.gpu) : 'no'} · dpr ${DPR}/${DEV.dpr} · screen ${DEV.screen} · cores ${DEV.cores} · data ${DEV.data}`);
+  let html = '';
+  if (R.some(r => r.type === 'soakdone' || r.type === 'error' && SOAK.length)) {
+    const s = R[0] || {}, per = s.per || SOAK.map(x => ({ min: x.minute, fps: x.fps, p95: x.p95, long: x.long }));
+    const first = per[0] ? per[0].fps : 0, last = per.length ? per[per.length - 1].fps : 0, errs = (s.errors || []).length + (s.type === 'error' ? 1 : 0);
+    const ok = per.length >= 10 && errs === 0;
+    html += `<div class="verdict ${ok ? 'ok' : 'bad'}">${ok ? 'יציב ✔ – 10 דקות בלי קריסה' : 'לא יציב / לא הושלם ✘'}</div>
+      <div>דקה ראשונה ${f1(first)} FPS · דקה אחרונה ${f1(last)} FPS (${first ? Math.round((last / first - 1) * 100) : 0}% – ירידה = התחממות)</div>
+      <table><tr><th>דקה</th><th>FPS</th><th>p95 מ"ש</th><th>קפיצות</th></tr>${per.map(p => `<tr><td>${p.min}</td><td>${f1(p.fps)}</td><td>${f1(p.p95)}</td><td>${p.long}</td></tr>`).join('')}</table>`;
+    lines.push(`SOAK 10min WebGPU all: ${per.map(p => p.fps).join(',')} fps/min · errors ${errs} ${(s.errors || []).join(' | ')} ${s.msg || ''}`);
+  } else {
+    html += `<table><tr><th>תרחיש</th><th>מסלול</th><th>FPS</th><th>פריים מ"ש</th><th>p95</th><th>קפיצות</th><th>טעינה שנ'</th></tr>`;
+    lines.push('demo | mode | backend | fps | p50ms | p95ms | long>50ms | cpu ms | load s | first s | calls | errors');
+    for (const [d, dn] of DEMOS) for (const [m, mn] of MODES) { const r = R.find(x => x.mode === m && x.demo === d); if (!r) continue;
+      if (r.type !== 'result') { html += `<tr><td>${dn}</td><td>${mn}</td><td colspan=5 class="bad">שגיאה: ${esc(r.msg || '').slice(0, 60)}</td></tr>`; lines.push(`${d} | ${m} | ERROR ${r.msg}`); continue; }
+      const s = r.stats, cls = s.fps >= 50 ? 'ok' : s.fps >= 25 ? 'mid' : 'bad', fell = m === 'webgpu' && r.backend !== 'WebGPU';
+      html += `<tr><td>${dn}</td><td>${mn}${fell ? ' <span class="bad">(נפל ל-WebGL2)</span>' : ''}</td><td class="${cls}">${f1(s.fps)}</td><td>${f1(s.p50)}</td><td>${f1(s.p95)}</td><td>${s.long}</td><td>${(r.firstMs / 1000).toFixed(1)}</td></tr>`;
+      lines.push(`${d} | ${m} | ${r.backend} | ${f1(s.fps)} | ${f1(s.p50)} | ${f1(s.p95)} | ${s.long} | ${s.cpu50.toFixed(2)} | ${(r.loadMs / 1000).toFixed(1)} | ${(r.firstMs / 1000).toFixed(1)} | ${s.calls} | ${(r.errors || []).length}${(r.errors || []).length ? ' ' + r.errors.join(' | ') : ''}`); }
+    html += '</table>';
+    // השוואה + החלטה
+    const cmp = []; let allRatio = null, sat = false;
+    for (const [d, dn] of DEMOS) { const a = get('webgpu', d), b = get('classic', d), c = get('webgl2', d); if (!a || !b) continue;
+      const ra = b.stats.mean / a.stats.mean; cmp.push(`${dn}: <b class="ltr">${ra.toFixed(2)}×</b>`); lines.push(`ratio classic/webgpu frame time ${d}: ${ra.toFixed(2)}x` + (c ? ` · webgl2/webgpu ${(c.stats.mean / a.stats.mean).toFixed(2)}x` : ''));
+      if (d === 'all') { allRatio = ra; sat = a.stats.fps > 57 && b.stats.fps > 57; } }
+    if (cmp.length) html += `<div style="margin-top:8px">פי כמה WebGPU מהיר מהמנוע של היום (זמן פריים): ${cmp.join(' · ')}</div>`;
+    const a = get('webgpu', 'all'), errs = R.reduce((s, r) => s + (r.errors || []).length + (r.type === 'error' ? 1 : 0), 0);
+    let v, c;
+    if (!DEV.webgpu) { v = 'WebGPU לא זמין במכשיר – נשארים עם WebGL (לא עוברים)'; c = 'bad'; }
+    else if (allRatio == null) { v = 'אין מספיק פריימים להחלטה (המכשיר איטי מדי או שהבדיקה נעצרה)'; c = 'mid'; }
+    else if (sat) { v = 'שני המסלולים ב-60 FPS מלאים – המכשיר חזק מדי לבדיקה הזו; צריך תרחיש כבד יותר'; c = 'mid'; }
+    else if (allRatio >= 1.5 && errs === 0 && a.backend === 'WebGPU') { v = `עובר ✔ – WebGPU מהיר פי ${allRatio.toFixed(2)} בתרחיש המלא (נדרש 1.5). שלב הבא: מבחן יציבות 10 דקות`; c = 'ok'; }
+    else if (allRatio >= 0.95) { v = `לא מספיק עדיין – פי ${allRatio.toFixed(2)} בלבד (נדרש 1.5)${errs ? ', והיו שגיאות' : ''}`; c = 'mid'; }
+    else { v = `לא עובר ✘ – WebGPU איטי יותר (זמן פריים פי ${(1 / allRatio).toFixed(2)} מהמנוע של היום)`; c = 'bad'; }
+    html = `<div class="verdict ${c}">${v}</div>` + html; lines.push('verdict: ' + v.replace(/[✔✘]/g, ''));
+  }
+  $('res').style.display = 'block'; $('res').innerHTML = html;
+  $('txt').style.display = 'block'; $('out').textContent = lines.join('\n');
+}
+$('go').onclick = () => runSuite('full'); $('quick').onclick = () => runSuite('quick'); $('soak').onclick = () => runSuite('soak');
+$('copy').onclick = async () => { try { await navigator.clipboard.writeText($('out').textContent); $('copy').textContent = 'הועתק ✔'; } catch (e) { const r = document.createRange(); r.selectNodeContents($('out')); getSelection().removeAllRanges(); getSelection().addRange(r); $('copy').textContent = 'סמנתי – לחץ "העתק"'; } };
+$('share').onclick = () => { if (navigator.share) navigator.share({ title: 'בדיקת WebGPU', text: $('out').textContent }).catch(() => {}); else $('copy').click(); };
+detect();
+if (qs.get('auto')) setTimeout(() => runSuite(qs.get('auto')), 800);
+window.__bench = { get R() { return R; }, get text() { return $('out').textContent; }, DEV };
+</script>
+</body>
+</html>

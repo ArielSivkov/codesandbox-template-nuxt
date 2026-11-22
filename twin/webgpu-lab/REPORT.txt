@@ -1,0 +1,40 @@
+מעבדת WebGPU · לוח היזם – עולם תאום של ישראל · 23.11.2026
+================================================================
+
+קבצים (בתיקייה /home/claude/swarm/webgpu/)
+  lab.html        – המעבדה האינטראקטיבית: ?mode=webgpu|webgl2|classic  ?demo=city|crowd|rain|all  ?view=street|city  ?data=none (עיר פרוצדורלית)
+  run.html        – ריצת מדידה בודדת (נטענת בתוך iframe של bench.html, אפשר גם ישירות)
+  bench.html      – דף הבדיקה לטלפון של אריאל (עברית, תוצאה על המסך + "העתק תוצאות")
+  js/lab.js       – כל הסצנה: רנדרר, חומרי TSL ו-GLSL תואמים, 20K הולכי רגל, 20K עצים, 200K גשם, מדידה
+  js/tileworker.js– עותק של ה-Worker של גדוד 6 (שינוי יחיד: module worker שמייבא earcut מ-three.core.js)
+  vendor/three/   – three@0.187.0 מ-npm (latest, עודכן 30.10.2026): three.core/module/webgpu/tsl + LICENSE
+  tools/          – shot.mjs, measure.mjs, bench.mjs, x.sh (Playwright דרך Xvfb), probe.mjs
+  shots/          – צילומי 360×800 + measure_full.jsonl, measure_lowres.jsonl
+  data → קישור סימבולי ל-twin/pipeline/sample-out-ashdod (לא להעתיק לריפו; הדפים מוצאים לבד ../pipeline/sample-out-ashdod/ או את העותק הציבורי ב-githack)
+
+ממצאים טכניים שגיליתי בדרך (חשוב להעברה)
+  1. WebGPU בכרום ללא-ראש (headless) בארגז החול: ה-device נהרס ברגע שמחברים קנבס ("Device was destroyed"). עובד רק בדפדפן "עם חלון" בתוך Xvfb
+     עם --use-vulkan=swiftshader --disable-vulkan-surface (tools/x.sh). רלוונטי לצוות הבדיקות/CI.
+  2. ב-r187 ה-positionNode רץ *אחרי* ה-instancing → ב-InstancedMesh צריך להוסיף ל-positionLocal ולא להחזיר positionGeometry (אחרת כל העצים בראשית).
+  3. WebGPU אין פורמט קודקוד של 3×8 ביט; three מרחיב Int16 לא-מנורמל ל-Int32. ריפדתי נורמלים/צבעים ל-4 רכיבים ו-afl ל-Float32.
+  4. WGSL: fwidth/dFdx אסור בתוך תנאי תלוי-פיקסל → חומרי TSL נכתבו בלי If (מסכות step/mix).
+  5. מסלול ה-WebGL2 של WebGPURenderer: compute שקורא אינדקס שרירותי (segA[seg]) לא עובד (הולכי הרגל נעלמו) → במסלול הזה הסימולציה רצה במעבד ונכתבת לאותו storage.
+     compute "עצמי" (גשם: כל טיפה כותבת רק את עצמה) עובד גם ב-WebGL2. indirect draw ו-atomics – WebGPU בלבד (תואם לתשובת המתחזק בפורום three.js, 7.11.2025).
+  6. onBeforeCompile/ShaderMaterial פשוט מתעלמים מהם ב-WebGPURenderer (אין שגיאה) → רגרסיה ויזואלית שקטה. צריך בדיקת עשן.
+
+תוצאות בארגז החול (SwiftShader – רינדור תוכנה על 2 ליבות משותפות, עומס 30; זה לא טלפון!)
+  360×800, יחס פיקסלים 1, 12 שנ' מדידה (FPS / זמן פריים חציוני / זמן מעבד לפריים):
+    עיר   : WebGPU 4.1 / 217ms / 1.3ms · WebGL2 1.8 / 500ms / 2.7ms · קלאסי 3.6 / 167ms / 1.6ms
+    אנשים : WebGPU 1.03 / 967ms / 3.3ms · WebGL2 0.41 / 1883ms / 10.8ms · קלאסי 0.50 / 1850ms / 23ms
+    גשם   : WebGPU 0.33 / 4067ms / 3.6ms · WebGL2 0.16 / 12383ms / 8ms · קלאסי 0.20 / 5017ms / 374ms
+    הכול  : WebGPU 0.18 · WebGL2 0.24 · קלאסי 0.16 (2 פריימים בלבד – רעש)
+  רזולוציה נמוכה (יחס 0.25):
+    עיר   : WebGPU 9.3 · WebGL2 4.9 · קלאסי 7.1 FPS
+    אנשים : WebGPU 1.07 (מעבד 3.8ms) · WebGL2 0.51 (12.2ms) · קלאסי 0.51 (13.1ms)
+    גשם   : WebGPU 0.23 (9.4ms) · WebGL2 0.19 (7ms) · קלאסי 0.17 (185ms)
+  חיתוך ב-GPU: מתוך 20,000 הולכי רגל צוירו בפועל ~2,050 (כ-10%) במבט הרחוב.
+  מה כן אפשר ללמוד: עבודת המעבד לפריים יורדת דרמטית עם compute (גשם 185–374ms → 4–9ms; אנשים 13–23ms → 3–4ms);
+  בעיר בלבד WebGPU ≈ קלאסי; מסלול ה-WebGL2 של WebGPURenderer איטי בערך פי 2 מהקלאסי בעיר.
+  מה אי אפשר ללמוד: יחס מהירות על Adreno/Mali אמיתי. לשם כך bench.html.
+
+תוכנית מעבר – ראו התשובה הסופית (מקור אחד לאמת). קריטריון החלטה מובנה ב-bench.html.
