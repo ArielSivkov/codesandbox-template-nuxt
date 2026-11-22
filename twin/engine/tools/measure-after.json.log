@@ -1,0 +1,107 @@
+{
+ "label": "after",
+ "transfer_bytes_total": 2113907,
+ "transfer_bytes_home": 2065369,
+ "requests": 153,
+ "external_requests": [],
+ "t_load_s": 0.14,
+ "t_ready_s": 0.3,
+ "t_home_complete_s": 4.5,
+ "home": {
+  "calls": 117,
+  "tris": 104112,
+  "geoms": 117,
+  "textures": 0,
+  "tiles": 79,
+  "tilesLoaded": 67,
+  "lod": [
+   67,
+   0,
+   0
+  ],
+  "gpuVerts": 198871,
+  "heap": 11.8,
+  "bytes": 459476,
+  "firstFrameMs": 206,
+  "allVisibleMs": 3457,
+  "tilesBuilt": 67,
+  "workerBuildMs": 3154,
+  "dpr": 1.5,
+  "worker": true
+ },
+ "near": {
+  "calls": 27,
+  "tris": 59952,
+  "geoms": 117,
+  "textures": 0,
+  "tiles": 79,
+  "tilesLoaded": 68,
+  "lod": [
+   63,
+   2,
+   3
+  ],
+  "gpuVerts": 242979,
+  "heap": 16.6,
+  "bytes": 459993,
+  "firstFrameMs": 206,
+  "allVisibleMs": 3457,
+  "tilesBuilt": 73,
+  "workerBuildMs": 3259,
+  "dpr": 1.5,
+  "worker": true
+ },
+ "close": {
+  "calls": 18,
+  "tris": 51348,
+  "geoms": 117,
+  "textures": 0,
+  "tiles": 79,
+  "tilesLoaded": 68,
+  "lod": [
+   60,
+   4,
+   4
+  ],
+  "gpuVerts": 254196,
+  "heap": 14.8,
+  "bytes": 459993,
+  "firstFrameMs": 206,
+  "allVisibleMs": 3457,
+  "tilesBuilt": 77,
+  "workerBuildMs": 3268,
+  "dpr": 1.5,
+  "worker": true
+ },
+ "end": {
+  "calls": 19,
+  "tris": 36186,
+  "geoms": 118,
+  "textures": 0,
+  "tiles": 79,
+  "tilesLoaded": 68,
+  "lod": [
+   59,
+   7,
+   2
+  ],
+  "gpuVerts": 234144,
+  "heap": 17.8,
+  "bytes": 459993,
+  "firstFrameMs": 206,
+  "allVisibleMs": 3457,
+  "tilesBuilt": 90,
+  "workerBuildMs": 3368,
+  "dpr": 1.5,
+  "worker": true
+ },
+ "heap_end_mb": 16.9,
+ "ms_per_frame_home_swiftshader_synced": 208.4,
+ "ms_per_frame_near_swiftshader_synced": 89.0,
+ "errors": [
+  "warning: [.WebGL-0x16940188cc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+  "warning: [.WebGL-0x16940188cc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+  "warning: [.WebGL-0x16940188cc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+  "warning: [.WebGL-0x16940188cc00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+ ]
+}

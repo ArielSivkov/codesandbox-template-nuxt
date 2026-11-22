@@ -1,0 +1,29 @@
+{
+ "_note": "bbox = approximate WGS84 search hint only (padded at run time). The real study area is the OSM admin_level=8 boundary found by name. Order = proposed priority (see report). priority can be recomputed from the official declared-renewal-complexes CSV with run_queue.py --renewal-csv.",
+ "cities": [
+  {"slug":"ashdod","name_he":"אשדוד","osm_name":"אשדוד","bbox":[34.60,31.73,34.72,31.87],"wave":1},
+  {"slug":"ashkelon","name_he":"אשקלון","osm_name":"אשקלון","bbox":[34.50,31.60,34.63,31.72],"wave":1},
+  {"slug":"ramla","name_he":"רמלה","osm_name":"רמלה","bbox":[34.84,31.90,34.90,31.95],"wave":1},
+  {"slug":"lod","name_he":"לוד","osm_name":"לוד","bbox":[34.86,31.93,34.92,31.97],"wave":1},
+  {"slug":"bat-yam","name_he":"בת ים","osm_name":"בת ים","bbox":[34.73,32.00,34.78,32.04],"wave":1},
+  {"slug":"holon","name_he":"חולון","osm_name":"חולון","bbox":[34.75,31.99,34.82,32.04],"wave":1},
+  {"slug":"yavne","name_he":"יבנה","osm_name":"יבנה","bbox":[34.72,31.85,34.77,31.89],"wave":2},
+  {"slug":"kiryat-malakhi","name_he":"קריית מלאכי","osm_name":"קריית מלאכי","bbox":[34.73,31.72,34.77,31.75],"wave":2},
+  {"slug":"kiryat-gat","name_he":"קריית גת","osm_name":"קריית גת","bbox":[34.74,31.58,34.79,31.63],"wave":2},
+  {"slug":"rishon-lezion","name_he":"ראשון לציון","osm_name":"ראשון לציון","bbox":[34.73,31.93,34.84,32.00],"wave":2},
+  {"slug":"rehovot","name_he":"רחובות","osm_name":"רחובות","bbox":[34.78,31.87,34.85,31.92],"wave":2},
+  {"slug":"ness-ziona","name_he":"נס ציונה","osm_name":"נס ציונה","bbox":[34.78,31.91,34.82,31.94],"wave":2},
+  {"slug":"ramat-gan","name_he":"רמת גן","osm_name":"רמת גן","bbox":[34.80,32.05,34.85,32.10],"wave":3},
+  {"slug":"givatayim","name_he":"גבעתיים","osm_name":"גבעתיים","bbox":[34.80,32.06,34.82,32.08],"wave":3},
+  {"slug":"bnei-brak","name_he":"בני ברק","osm_name":"בני ברק","bbox":[34.82,32.07,34.85,32.10],"wave":3},
+  {"slug":"petah-tikva","name_he":"פתח תקווה","osm_name":"פתח תקווה","bbox":[34.85,32.06,34.93,32.12],"wave":3},
+  {"slug":"tel-aviv","name_he":"תל אביב-יפו","osm_name":"תל אביב-יפו","bbox":[34.74,32.03,34.85,32.15],"wave":3},
+  {"slug":"netanya","name_he":"נתניה","osm_name":"נתניה","bbox":[34.83,32.27,34.89,32.36],"wave":4},
+  {"slug":"hadera","name_he":"חדרה","osm_name":"חדרה","bbox":[34.88,32.41,34.96,32.47],"wave":4},
+  {"slug":"herzliya","name_he":"הרצליה","osm_name":"הרצליה","bbox":[34.78,32.15,34.86,32.19],"wave":4},
+  {"slug":"kfar-saba","name_he":"כפר סבא","osm_name":"כפר סבא","bbox":[34.89,32.16,34.93,32.19],"wave":4},
+  {"slug":"beer-sheva","name_he":"באר שבע","osm_name":"באר שבע","bbox":[34.75,31.21,34.84,31.29],"wave":4},
+  {"slug":"haifa","name_he":"חיפה","osm_name":"חיפה","bbox":[34.95,32.74,35.07,32.84],"wave":5},
+  {"slug":"jerusalem","name_he":"ירושלים","osm_name":"ירושלים","bbox":[35.10,31.70,35.27,31.85],"wave":5}
+ ]
+}

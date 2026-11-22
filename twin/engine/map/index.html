@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1420">
+<title>לוח היזם · מפת אשדוד בתלת־ממד · בטא</title>
+<style>
+:root{--bg:#0d1420;--panel:rgba(14,22,34,.94);--line:rgba(255,255,255,.12);--fg:#e9eef5;--mut:#9fb0c3;--acc:#f2b84b;--ok:#5cc8a0;--warn:#ff8a65;--ai:#8ec9ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;overflow:hidden;overscroll-behavior:none}
+#cv{position:fixed;inset:0;width:100vw;height:100vh;touch-action:none;display:block}
+header{position:fixed;top:0;right:0;left:0;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px;display:flex;align-items:center;gap:6px;background:linear-gradient(#0d1420ee,#0d142000);pointer-events:none;z-index:9}
+header h1{margin:0;font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+header .demo{font-size:10.5px;padding:2px 6px;border-radius:9px;background:var(--acc);color:#1b1300;font-weight:700;white-space:nowrap}
+header .sp{flex:1}
+header button{pointer-events:auto}
+.btn{font:inherit;font-size:13px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer;min-height:36px;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.on{border-color:var(--acc);color:var(--acc)}
+.btn.pri{background:var(--acc);color:#1b1300;border-color:var(--acc);font-weight:700}
+.btn.ai{border-color:var(--ai);color:var(--ai)}
+.btn[disabled]{opacity:.5}
+.hidden{display:none!important}
+#layers{position:fixed;top:calc(env(safe-area-inset-top) + 52px);right:10px;z-index:8;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:4px;width:232px;max-height:calc(100vh - 230px);overflow:auto}
+#layers.hide{display:none}
+#layers h3{margin:6px 4px 2px;font-size:12px;color:var(--mut);font-weight:600}
+#layers label{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:4px;border-radius:8px;cursor:pointer;user-select:none}
+#layers label small{color:var(--mut);font-size:10.5px;display:block}
+#layers input{width:22px;height:22px;accent-color:var(--acc);margin:0;flex:none}
+#layers .row2{display:flex;gap:6px;flex-wrap:wrap;padding:2px 4px}
+#layers .row2 .btn{font-size:12px;min-height:32px;padding:4px 8px}
+#search{position:fixed;top:calc(env(safe-area-inset-top) + 52px);right:10px;left:10px;max-width:440px;z-index:10;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;display:none}
+#search input{width:100%;font:inherit;font-size:16px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:#0a111b;color:var(--fg)}
+#sres{max-height:min(52vh,360px);overflow:auto;margin-top:6px}
+#sres button{display:flex;width:100%;text-align:right;gap:8px;align-items:baseline;font:inherit;font-size:14px;background:none;border:0;border-top:1px solid var(--line);color:var(--fg);padding:8px 4px;cursor:pointer}
+#sres button small{color:var(--mut);font-size:11px;margin-inline-start:auto}
+#sres .none{color:var(--mut);font-size:13px;padding:8px 4px}
+#search .hint{font-size:11px;color:var(--mut);margin-top:4px}
+#nav{position:fixed;left:10px;bottom:calc(env(safe-area-inset-bottom) + 46px);z-index:6;display:flex;flex-direction:column;gap:6px}
+#nav .btn{width:44px;height:44px;padding:0;font-size:18px;display:flex;align-items:center;justify-content:center}
+#rtools{position:fixed;right:10px;bottom:calc(env(safe-area-inset-bottom) + 46px);z-index:6;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+#rtools .btn{font-weight:700}
+#legend{position:fixed;right:10px;bottom:calc(env(safe-area-inset-bottom) + 140px);z-index:5;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:11px;color:var(--mut);display:none;max-width:220px}
+#legend .bar{height:8px;border-radius:4px;margin:4px 0 2px;width:180px}
+#legend .row{display:flex;justify-content:space-between}
+#legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:4px;vertical-align:middle}
+#drawbar{position:fixed;top:calc(env(safe-area-inset-top) + 52px);right:10px;left:10px;margin:auto;max-width:520px;z-index:9;background:var(--panel);border:1px solid var(--acc);border-radius:12px;padding:8px;display:none;font-size:13px}
+#drawbar .t{margin-bottom:6px}
+#drawbar .b{display:flex;gap:6px;flex-wrap:wrap}
+#prog{position:fixed;top:calc(env(safe-area-inset-top) + 50px);left:50%;transform:translateX(-50%);z-index:5;font-size:11.5px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:3px 9px;display:none;white-space:nowrap}
+#toast{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 100px);left:50%;transform:translateX(-50%);z-index:30;background:#1d2a3d;border:1px solid var(--acc);border-radius:10px;padding:7px 12px;font-size:13px;display:none;max-width:90vw}
+#card{position:fixed;z-index:8;right:10px;left:10px;bottom:calc(env(safe-area-inset-bottom) + 44px);max-width:440px;margin-inline-start:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 12px 12px;box-shadow:0 10px 30px #0008;display:none;max-height:60vh;overflow:auto}
+#card h2{margin:0 0 6px;font-size:15px;display:flex;gap:8px;align-items:center}
+#card h2 .x{margin-inline-start:auto}
+#card h3{font-size:13.5px;margin:12px 0 4px;color:var(--acc)}
+#card table{width:100%;border-collapse:collapse;font-size:13px}
+#card td{padding:4px 2px;border-top:1px solid var(--line);vertical-align:top}
+#card td:first-child{color:var(--mut);width:44%}
+#card .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#card .note{font-size:11.5px;color:var(--mut);line-height:1.45;margin:4px 0}
+#card .disc{font-size:12px;line-height:1.45;margin:6px 0;padding:6px 8px;border-radius:8px;background:#ff8a6522;border:1px solid #ff8a6566;color:#ffd2c4}
+#card .priv{font-size:11.5px;line-height:1.45;margin:4px 0;padding:5px 8px;border-radius:8px;background:#5cc8a01a;border:1px solid #5cc8a055;color:#c5f0e0}
+.calc{display:grid;grid-template-columns:1fr 92px;gap:4px 8px;align-items:center;font-size:12.5px}
+.calc label{color:var(--mut)}
+.calc input{font:inherit;font-size:14px;width:92px;padding:4px 6px;border-radius:7px;border:1px solid var(--line);background:#0a111b;color:var(--fg);direction:ltr;text-align:right}
+.out{width:100%;border-collapse:collapse;margin-top:6px}
+.out td{font-size:13px}
+.out td b{font-size:14px;color:var(--fg)}
+.formulas{font-size:11.5px;color:var(--mut);background:#0a111b;border-radius:8px;padding:6px 8px;margin-top:6px;line-height:1.6}
+.formulas code{font-family:inherit;color:#d7e3f0}
+#aiout{white-space:pre-wrap;font-size:13px;line-height:1.55;background:#0a111b;border:1px solid #8ec9ff44;border-radius:8px;padding:8px;margin-top:6px;display:none}
+.tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:7px;background:#ff8a6533;color:var(--warn);margin-inline-start:4px}
+.tag.ok{background:#5cc8a033;color:var(--ok)}
+.tag.ai{background:#8ec9ff2a;color:var(--ai)}
+.soon{color:#7f93aa;font-style:italic}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+footer{position:fixed;bottom:0;right:0;left:0;z-index:7;background:var(--panel);border-top:1px solid var(--line);font-size:11px;color:var(--mut);padding:6px 12px calc(env(safe-area-inset-bottom) + 6px);display:flex;gap:8px;align-items:center}
+footer .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+footer button{font-size:11px;min-height:28px;padding:3px 8px}
+.modal{position:fixed;inset:0;z-index:20;background:#0009;display:none;align-items:center;justify-content:center;padding:12px}
+.modal .in{background:#111b29;border:1px solid var(--line);border-radius:14px;max-width:680px;width:100%;max-height:88vh;overflow:auto;padding:14px 16px;font-size:13px;line-height:1.55}
+.modal h2{font-size:16px;margin:0 0 8px}.modal h3{font-size:14px;margin:14px 0 4px;color:var(--acc)}
+.modal ul{margin:4px 0;padding-inline-start:18px}
+.modal a{color:#8ec9ff}
+.modal textarea{width:100%;min-height:140px;font:12px ui-monospace,monospace;background:#0a111b;color:var(--fg);border:1px solid var(--line);border-radius:8px;direction:ltr}
+.modal .bar{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#mtab{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}
+#mtab th,#mtab td{border-top:1px solid var(--line);padding:5px 3px;text-align:right;vertical-align:top}
+#mtab th{color:var(--mut);font-weight:600;position:sticky;top:0;background:#111b29}
+#mtab button{font-size:11.5px;min-height:28px;padding:2px 7px}
+.stats{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.stats div{background:#0a111b;border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-size:12px;color:var(--mut)}
+.stats b{display:block;font-size:18px;color:var(--fg)}
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:40;background:var(--bg);font-size:15px;color:var(--mut)}
+#fps{position:fixed;top:calc(env(safe-area-inset-top) + 52px);left:10px;z-index:5;font:11px ui-monospace,monospace;color:#9fb0c3;display:none}
+/* דו"ח להדפסה */
+#report{position:fixed;inset:0;z-index:50;background:#e9edf2;display:none;overflow:auto;padding:12px}
+#report .bar{position:sticky;top:0;display:flex;gap:8px;justify-content:center;padding:6px 0 10px;background:#e9edf2;z-index:2}
+#report .page{background:#fff;color:#111;max-width:800px;margin:0 auto;padding:22px 26px;border-radius:6px;box-shadow:0 2px 12px #0003;font-size:13px;line-height:1.55}
+#report h1{font-size:20px;margin:0 0 2px}#report h2{font-size:15px;margin:16px 0 4px;border-bottom:2px solid #f2b84b;padding-bottom:2px}
+#report table{width:100%;border-collapse:collapse}#report td,#report th{border:1px solid #ccd;padding:4px 6px;text-align:right;vertical-align:top}
+#report td:first-child{background:#f5f6f8;width:40%}
+#report .disc{border:2px solid #c0392b;color:#7b1d12;background:#fdecea;padding:8px 10px;border-radius:6px;font-weight:700;margin:10px 0}
+#report img{max-width:100%;border:1px solid #ccd;border-radius:4px}
+#report .mut{color:#555;font-size:12px}
+#report pre{white-space:pre-wrap;font-family:inherit;margin:0}
+@media print{
+  @page{size:A4;margin:12mm}
+  html,body{overflow:visible!important;height:auto!important;background:#fff!important}
+  body>*:not(#report){display:none!important}
+  #report{position:static!important;display:block!important;padding:0!important;background:#fff!important;overflow:visible!important}
+  #report .bar{display:none!important}
+  #report .page{box-shadow:none!important;max-width:none!important;padding:0!important}
+  #report h2{break-after:avoid}#report table,#report img{break-inside:avoid}
+}
+@media (orientation:landscape) and (max-height:500px){
+  header{padding-top:calc(env(safe-area-inset-top) + 4px);padding-bottom:4px}
+  header h1{font-size:14px}
+  #layers,#search,#drawbar{top:44px}
+  #layers{max-height:calc(100vh - 90px)}
+  #layers label{padding:2px 4px;font-size:12.5px}
+  #nav{flex-direction:row;bottom:40px}
+  #nav .btn{width:40px;height:40px}
+  #rtools{bottom:40px;flex-direction:row}
+  #legend{bottom:86px}
+  #prog{top:44px}
+  #card{right:auto;left:10px;bottom:90px;max-width:400px;max-height:calc(100vh - 140px)}
+  #sres{max-height:calc(100vh - 140px)}
+}
+#calc input{font-size:16px!important;min-height:40px}
+.qshort{display:none}@media (max-width:430px){.qlong{display:none}.qshort{display:inline}}
+/* --- גדוד 6: כותרת שלא נחתכת ב-360px, כרטיס מדידות, מצב טעינה --- */
+header{gap:5px;padding-inline:8px}
+header h1{font-size:15px;flex:0 1 auto}
+header h1 .sub{font-weight:500;color:var(--mut)}
+@media (max-width:480px){header h1 .sub{display:none}}
+header .ico{min-width:40px;padding:6px 8px}
+@media (max-width:380px){header .btn{padding:6px 8px;font-size:12.5px}header .demo{display:none}}
+#card .sides{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:6px 0}
+#card .sides div{background:#0a111b;border:1px solid var(--line);border-radius:8px;padding:4px;text-align:center;font-size:11.5px;color:var(--mut)}
+#card .sides b{display:block;font-size:13.5px;color:var(--fg)}
+.conf{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-inline-end:4px}
+#loading{flex-direction:column;gap:8px}
+#loading small{font-size:12px;color:#6f8399}
+#loupe{position:fixed;z-index:12;width:120px;height:120px;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 14px #0007;display:none;pointer-events:none}
+#drawbar .t{line-height:1.45}
+#stats{position:fixed;top:calc(env(safe-area-inset-top) + 52px);left:10px;z-index:5;font:10.5px/1.4 ui-monospace,monospace;color:#22313f;background:#ffffffcc;border-radius:6px;padding:3px 6px;display:none;direction:ltr;white-space:pre}
+</style>
+</head>
+<body>
+<div id="loading">טוען את המפה…<small id="loadTxt">מנוע תלת־ממד</small></div>
+<canvas id="cv" aria-label="מפה תלת־ממדית"></canvas>
+<header>
+  <h1>לוח היזם<span class="sub"> · תלת־ממד</span></h1><span class="demo">בטא</span>
+  <span class="sp"></span>
+  <a class="btn pri" id="toQuote" href="../" style="text-decoration:none">🧾 הצעה</a>
+  <button class="btn ico" id="bSearch" aria-expanded="false" aria-label="חיפוש">🔍</button>
+  <button class="btn" id="bLayers" aria-expanded="true">שכבות</button>
+</header>
+<div id="search" role="search">
+  <input id="q" type="search" placeholder="שם רחוב או שם מקום (מתוך OSM)" autocomplete="off" aria-label="חיפוש">
+  <div id="sres"></div>
+  <div class="hint">החיפוש לפי שמות רחובות ושמות מבנים שקיימים בנתוני OSM. אין מספרי בתים.</div>
+</div>
+<div id="layers" role="group" aria-label="שכבות">
+  <h3>שכבות</h3>
+  <label><input type="checkbox" id="lB" checked><span>בניינים<small>טביעות OSM · גובה משוער ± אי־ודאות</small></span></label>
+  <label><input type="checkbox" id="lR" checked><span>כבישים<small>OSM</small></span></label>
+  <label style="display:none"><input type="checkbox" id="lP"><span>פוטנציאל התחדשות<small>מפת חום · הדגמה בלבד</small></span></label>
+  <h3>צביעת בניינים</h3>
+  <label><input type="radio" name="paint" value="base" checked><span>רגיל</span></label>
+  <label><input type="radio" name="paint" value="height"><span>לפי גובה<small>משוער או נמדד</small></span></label>
+  <label><input type="radio" name="paint" value="conf"><span>ביטחון בגובה<small>ירוק = מאומת · אדום = ניחוש (כלל אצבע)</small></span></label>
+  <label><input type="radio" name="paint" value="source"><span>מקור הגובה<small>משוער / נמדד מתמונה / ידני</small></span></label>
+  <h3>כלים · מדידות שמורות: <span id="mCount">0</span></h3>
+  <div class="row2"><button class="btn" id="bStats">נתוני ביצועים</button></div>
+</div>
+<div id="legend"></div>
+<div id="prog"></div>
+<div id="drawbar" role="region" aria-label="שרטוט מגרש">
+  <div class="t" id="drawTxt">הקישו נקודות על הקרקע כדי לסמן את פינות המגרש.</div>
+  <div class="b"><button class="btn" id="dUndo">ביטול נקודה</button><button class="btn" id="dSort">סדר נקודות</button><button class="btn pri" id="dDone">סיום</button><button class="btn" id="dCancel">יציאה</button></div>
+</div>
+<div id="nav">
+  <button class="btn" id="zIn" aria-label="קירוב">+</button>
+  <button class="btn" id="zOut" aria-label="הרחקה">−</button>
+  <button class="btn" id="rL" aria-label="סיבוב שמאלה">⟲</button>
+  <button class="btn" id="rR" aria-label="סיבוב ימינה">⟳</button>
+  <button class="btn" id="tilt" aria-label="הטיה">⤢</button>
+</div>
+<div id="rtools">
+  <button class="btn" id="bDraw">✏️ שרטוט מגרש</button>
+  <button class="btn" id="home">מרכז העיר</button>
+</div>
+<div id="card" role="dialog" aria-live="polite"></div>
+<div id="toast" role="status"></div>
+<div id="stats"></div>
+<footer><span class="t"><span class="ltr">© OpenStreetMap contributors</span> ‏(ODbL) · גובה: ראו קרדיטים · Three.js (MIT)</span><button class="btn" id="bAbout">קרדיטים והערות דיוק</button></footer>
+
+<div id="about" class="modal" role="dialog" aria-modal="true"><div class="in">
+  <h2>לוח היזם · מפת אשדוד בתלת־ממד · בטא</h2>
+  <p>דמו של מודיעין עסקי לנדל"ן והתחדשות עירונית באשדוד: שטח אמיתי וטביעות בניינים אמיתיות. כל מה שמסומן "משוער", "הדגמה" או "בקרוב" אינו נתון אמיתי.</p>
+  <h3>מקורות נתונים ורישיונות</h3>
+  <ul>
+    <li><b>בניינים, כבישים ושמות רחובות:</b> © תורמי OpenStreetMap ‏(<span class="ltr">© OpenStreetMap contributors</span>), ברישיון <span class="ltr">ODbL 1.0</span>. חילוץ Geofabrik כפי שנארז בפרויקט <span class="ltr">TAMA_QGIS_Project</span>. הנתונים כאן הם עבודה נגזרת (חיתוך, המרה לקואורדינטות מקומיות, אריחים בינאריים) ונשארים תחת ODbL.</li>
+    <li><b>גובה פני השטח:</b> בדמו הזה – <span class="ltr">SRTM 1 arc-second</span>, ‏NASA/USGS (נחלת הכלל). בגרסה הארצית של הצנרת: <span class="ltr">Copernicus DEM GLO-30 © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA</span>. המקורות בפועל של כל עיר מופיעים למטה ב"הערות דיוק".</li>
+    <li><b>פורמט האריחים והצנרת:</b> גדוד 5 (אריחי ITM של 1 ק"מ, מודל גובה עם ±σ וביטחון).</li>
+    <li><b>מנוע תלת־ממד:</b> <span class="ltr">Three.js r186</span>, רישיון MIT (נטען מקובץ מקומי).</li>
+  </ul>
+  <h3>גובה ואי־ודאות</h3>
+  <ul>
+    <li>באשדוד לאף בניין אין עדיין מקור גובה אמיתי: כל הגבהים מ"כלל אצבע" של צנרת גדוד 5, ולכל בניין יש <b>טווח אי־ודאות (±σ)</b>, טווח קומות ורמת ביטחון. מצב הצביעה "ביטחון בגובה" מראה את זה, והמעטפת הכתומה סביב בניין נבחר מראה את הטווח.</li>
+    <li>קווי הקומות על החזיתות מחולקים לפי גובה ÷ מספר קומות — הם המחשה, לא סקר.</li>
+    <li>גג: ברירת המחדל היא גג שטוח עם מעקה 1.0 מ' (הנחת הצנרת; ת"י 1142 דורש לפחות 1.05 מ'). גג רעפים (גמלון / ארבעה שיפועים) מצויר רק כשהוא מתויג בנתונים — כרגע אין תיוג כזה בנתוני אשדוד.</li>
+  </ul>
+  <h3>ביצועים</h3>
+  <ul><li>הנתונים מחולקים לאריחי ITM של 1×1 ק"מ, דחוסים (gzip) ונטענים רק כשהם בשדה הראייה. רחוק: טביעה מפושטת עד 8 פינות ורק דרכים ראשיות. בינוני: טביעה מלאה. קרוב: מעקה גג וקווי קומות. אריחים שיצאו מהמסך משתחררים מהזיכרון הגרפי כשמגיעים לתקרה. הפענוח ובניית הגאומטריה רצים ב-Web Worker, והציור מתבצע רק כשמשהו זז.</li></ul>
+  <h3>הערות דיוק</h3>
+  <ul id="acc"></ul>
+  <p style="text-align:center;margin-top:14px"><button class="btn" id="bAboutClose">סגירה</button></p>
+</div></div>
+<script src="vendor/three.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

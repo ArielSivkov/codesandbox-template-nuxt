@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1420">
+<title>לוח היזם · מפת אשדוד בתלת־ממד · בטא</title>
+<style>
+/*ORIG_CSS*/
+/* --- גדוד 6: כותרת שלא נחתכת ב-360px, כרטיס מדידות, מצב טעינה --- */
+header{gap:5px;padding-inline:8px}
+header h1{font-size:15px;flex:0 1 auto}
+header h1 .sub{font-weight:500;color:var(--mut)}
+@media (max-width:480px){header h1 .sub{display:none}}
+header .ico{min-width:40px;padding:6px 8px}
+@media (max-width:380px){header .btn{padding:6px 8px;font-size:12.5px}header .demo{display:none}}
+#card .sides{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:6px 0}
+#card .sides div{background:#0a111b;border:1px solid var(--line);border-radius:8px;padding:4px;text-align:center;font-size:11.5px;color:var(--mut)}
+#card .sides b{display:block;font-size:13.5px;color:var(--fg)}
+.conf{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:middle;margin-inline-end:4px}
+#loading{flex-direction:column;gap:8px}
+#loading small{font-size:12px;color:#6f8399}
+#loupe{position:fixed;z-index:12;width:120px;height:120px;border-radius:50%;border:3px solid #fff;box-shadow:0 4px 14px #0007;display:none;pointer-events:none}
+#drawbar .t{line-height:1.45}
+#stats{position:fixed;top:calc(env(safe-area-inset-top) + 52px);left:10px;z-index:5;font:10.5px/1.4 ui-monospace,monospace;color:#22313f;background:#ffffffcc;border-radius:6px;padding:3px 6px;display:none;direction:ltr;white-space:pre}
+</style>
+</head>
+<body>
+<div id="loading">טוען את המפה…<small id="loadTxt">מנוע תלת־ממד</small></div>
+<canvas id="cv" aria-label="מפה תלת־ממדית"></canvas>
+<header>
+  <h1>לוח היזם<span class="sub"> · תלת־ממד</span></h1><span class="demo">בטא</span>
+  <span class="sp"></span>
+  <a class="btn pri" id="toQuote" href="../" style="text-decoration:none">🧾 הצעה</a>
+  <button class="btn ico" id="bSearch" aria-expanded="false" aria-label="חיפוש">🔍</button>
+  <button class="btn" id="bLayers" aria-expanded="true">שכבות</button>
+</header>
+<div id="search" role="search">
+  <input id="q" type="search" placeholder="שם רחוב או שם מקום (מתוך OSM)" autocomplete="off" aria-label="חיפוש">
+  <div id="sres"></div>
+  <div class="hint">החיפוש לפי שמות רחובות ושמות מבנים שקיימים בנתוני OSM. אין מספרי בתים.</div>
+</div>
+<div id="layers" role="group" aria-label="שכבות">
+  <h3>שכבות</h3>
+  <label><input type="checkbox" id="lB" checked><span>בניינים<small>טביעות OSM · גובה משוער ± אי־ודאות</small></span></label>
+  <label><input type="checkbox" id="lR" checked><span>כבישים<small>OSM</small></span></label>
+  <label style="display:none"><input type="checkbox" id="lP"><span>פוטנציאל התחדשות<small>מפת חום · הדגמה בלבד</small></span></label>
+  <h3>צביעת בניינים</h3>
+  <label><input type="radio" name="paint" value="base" checked><span>רגיל</span></label>
+  <label><input type="radio" name="paint" value="height"><span>לפי גובה<small>משוער או נמדד</small></span></label>
+  <label><input type="radio" name="paint" value="conf"><span>ביטחון בגובה<small>ירוק = מאומת · אדום = ניחוש (כלל אצבע)</small></span></label>
+  <label><input type="radio" name="paint" value="source"><span>מקור הגובה<small>משוער / נמדד מתמונה / ידני</small></span></label>
+  <h3>כלים · מדידות שמורות: <span id="mCount">0</span></h3>
+  <div class="row2"><button class="btn" id="bStats">נתוני ביצועים</button></div>
+</div>
+<div id="legend"></div>
+<div id="prog"></div>
+<div id="drawbar" role="region" aria-label="שרטוט מגרש">
+  <div class="t" id="drawTxt">הקישו נקודות על הקרקע כדי לסמן את פינות המגרש.</div>
+  <div class="b"><button class="btn" id="dUndo">ביטול נקודה</button><button class="btn" id="dSort">סדר נקודות</button><button class="btn pri" id="dDone">סיום</button><button class="btn" id="dCancel">יציאה</button></div>
+</div>
+<div id="nav">
+  <button class="btn" id="zIn" aria-label="קירוב">+</button>
+  <button class="btn" id="zOut" aria-label="הרחקה">−</button>
+  <button class="btn" id="rL" aria-label="סיבוב שמאלה">⟲</button>
+  <button class="btn" id="rR" aria-label="סיבוב ימינה">⟳</button>
+  <button class="btn" id="tilt" aria-label="הטיה">⤢</button>
+</div>
+<div id="rtools">
+  <button class="btn" id="bDraw">✏️ שרטוט מגרש</button>
+  <button class="btn" id="home">מרכז העיר</button>
+</div>
+<div id="card" role="dialog" aria-live="polite"></div>
+<div id="toast" role="status"></div>
+<div id="stats"></div>
+<footer><span class="t"><span class="ltr">© OpenStreetMap contributors</span> ‏(ODbL) · גובה: ראו קרדיטים · Three.js (MIT)</span><button class="btn" id="bAbout">קרדיטים והערות דיוק</button></footer>
+
+<div id="about" class="modal" role="dialog" aria-modal="true"><div class="in">
+  <h2>לוח היזם · מפת אשדוד בתלת־ממד · בטא</h2>
+  <p>דמו של מודיעין עסקי לנדל"ן והתחדשות עירונית באשדוד: שטח אמיתי וטביעות בניינים אמיתיות. כל מה שמסומן "משוער", "הדגמה" או "בקרוב" אינו נתון אמיתי.</p>
+  <h3>מקורות נתונים ורישיונות</h3>
+  <ul>
+    <li><b>בניינים, כבישים ושמות רחובות:</b> © תורמי OpenStreetMap ‏(<span class="ltr">© OpenStreetMap contributors</span>), ברישיון <span class="ltr">ODbL 1.0</span>. חילוץ Geofabrik כפי שנארז בפרויקט <span class="ltr">TAMA_QGIS_Project</span>. הנתונים כאן הם עבודה נגזרת (חיתוך, המרה לקואורדינטות מקומיות, אריחים בינאריים) ונשארים תחת ODbL.</li>
+    <li><b>גובה פני השטח:</b> בדמו הזה – <span class="ltr">SRTM 1 arc-second</span>, ‏NASA/USGS (נחלת הכלל). בגרסה הארצית של הצנרת: <span class="ltr">Copernicus DEM GLO-30 © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA</span>. המקורות בפועל של כל עיר מופיעים למטה ב"הערות דיוק".</li>
+    <li><b>פורמט האריחים והצנרת:</b> גדוד 5 (אריחי ITM של 1 ק"מ, מודל גובה עם ±σ וביטחון).</li>
+    <li><b>מנוע תלת־ממד:</b> <span class="ltr">Three.js r186</span>, רישיון MIT (נטען מקובץ מקומי).</li>
+  </ul>
+  <h3>גובה ואי־ודאות</h3>
+  <ul>
+    <li>באשדוד לאף בניין אין עדיין מקור גובה אמיתי: כל הגבהים מ"כלל אצבע" של צנרת גדוד 5, ולכל בניין יש <b>טווח אי־ודאות (±σ)</b>, טווח קומות ורמת ביטחון. מצב הצביעה "ביטחון בגובה" מראה את זה, והמעטפת הכתומה סביב בניין נבחר מראה את הטווח.</li>
+    <li>קווי הקומות על החזיתות מחולקים לפי גובה ÷ מספר קומות — הם המחשה, לא סקר.</li>
+    <li>גג: ברירת המחדל היא גג שטוח עם מעקה 1.0 מ' (הנחת הצנרת; ת"י 1142 דורש לפחות 1.05 מ'). גג רעפים (גמלון / ארבעה שיפועים) מצויר רק כשהוא מתויג בנתונים — כרגע אין תיוג כזה בנתוני אשדוד.</li>
+  </ul>
+  <h3>ביצועים</h3>
+  <ul><li>הנתונים מחולקים לאריחי ITM של 1×1 ק"מ, דחוסים (gzip) ונטענים רק כשהם בשדה הראייה. רחוק: טביעה מפושטת עד 8 פינות ורק דרכים ראשיות. בינוני: טביעה מלאה. קרוב: מעקה גג וקווי קומות. אריחים שיצאו מהמסך משתחררים מהזיכרון הגרפי כשמגיעים לתקרה. הפענוח ובניית הגאומטריה רצים ב-Web Worker, והציור מתבצע רק כשמשהו זז.</li></ul>
+  <h3>הערות דיוק</h3>
+  <ul id="acc"></ul>
+  <p style="text-align:center;margin-top:14px"><button class="btn" id="bAboutClose">סגירה</button></p>
+</div></div>
+<script src="vendor/three.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+ "label": "before",
+ "transfer_bytes": 2408899,
+ "requests": 1,
+ "external_requests": [],
+ "t_load_s": 1.73,
+ "t_ready_s": 3.62,
+ "t_all_tiles_s": 5.11,
+ "nav": {
+  "domInteractive": 1714.6000000000931,
+  "domContentLoaded": 1714.6000000000931,
+  "loadEvent": 1717.1000000000931,
+  "resources": 1
+ },
+ "home": {
+  "calls": 169,
+  "tris": 304694,
+  "buildings": 7427,
+  "roads": 4857,
+  "tiles": {
+   "tiles": 179,
+   "built": 179,
+   "hi": 0,
+   "lo": 179
+  },
+  "triHi": 0,
+  "triLo": 95273,
+  "heap": 34.8,
+  "geomMem": {
+   "geometries": 169,
+   "textures": 0
+  }
+ },
+ "near": {
+  "calls": 22,
+  "tris": 234217,
+  "buildings": 7427,
+  "roads": 4857,
+  "tiles": {
+   "tiles": 179,
+   "built": 179,
+   "hi": 10,
+   "lo": 169
+  },
+  "triHi": 10005,
+  "triLo": 95273,
+  "heap": 44.3,
+  "geomMem": {
+   "geometries": 176,
+   "textures": 0
+  }
+ },
+ "end": {
+  "calls": 12,
+  "tris": 218547,
+  "buildings": 7427,
+  "roads": 4857,
+  "tiles": {
+   "tiles": 179,
+   "built": 179,
+   "hi": 29,
+   "lo": 150
+  },
+  "triHi": 28503,
+  "triLo": 95273,
+  "heap": 55.4,
+  "geomMem": {
+   "geometries": 187,
+   "textures": 0
+  }
+ },
+ "ms_per_frame_home_swiftshader_synced": 516.4,
+ "ms_per_frame_near_swiftshader_synced": 239.0,
+ "errors": []
+}

@@ -1,0 +1,13 @@
+# Cloudflare Worker in front of the R2 bucket that holds the tiles.
+name = "yazam-tiles"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+routes = [{ pattern = "yazam.esh27.com/map-data/*", zone_name = "esh27.com" }]
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "yazam-map"
+
+# secrets (wrangler secret put ...):
+#   CONTRACTOR_KEYS  comma-separated keys given to registered contractors (trust=contractor)
+#   EXPORT_TOKEN     token the pipeline uses to download corrections

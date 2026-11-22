@@ -1,0 +1,20 @@
+{
+ "v": 1,
+ "crs": "EPSG:2039",
+ "cities": {
+  "ashdod": {
+   "name_he": "אשדוד",
+   "bbox_itm": [
+    161860,
+    629338,
+    170669,
+    639473
+   ],
+   "tiles": 79,
+   "buildings": 7427,
+   "built_at": "2026-11-22T22:07:59Z",
+   "manifest": "cities/ashdod/manifest.json"
+  }
+ },
+ "updated_at": "2026-11-22T22:07:59Z"
+}

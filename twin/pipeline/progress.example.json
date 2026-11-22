@@ -1,0 +1,251 @@
+{
+ "v": 1,
+ "cities": {
+  "ashdod": {
+   "status": "built",
+   "attempts": 0,
+   "last_built": "2026-11-22T22:00:24Z",
+   "error": null,
+   "name_he": "אשדוד",
+   "wave": 1,
+   "priority": 1,
+   "stats": {
+    "buildings": 7427,
+    "tiles": 79,
+    "area_km2": 20.83,
+    "confidence": {
+     "נמוך": 6312,
+     "בינוני": 1115
+    },
+    "height_primary_source": {
+     "R": 7427
+    },
+    "land_qa": {
+     "sea_components": 1,
+     "buildings_in_sea": 8,
+     "sea_km2": 38.63
+    }
+   },
+   "boundary_kind": "estimated_from_buildings",
+   "sources": {
+    "osm": "sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+    "dem": "SRTM grid embedded in current map (DSM, 2000)"
+   }
+  },
+  "ashkelon": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "אשקלון",
+   "wave": 1,
+   "priority": 2
+  },
+  "ramla": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "רמלה",
+   "wave": 1,
+   "priority": 3
+  },
+  "lod": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "לוד",
+   "wave": 1,
+   "priority": 4
+  },
+  "bat-yam": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "בת ים",
+   "wave": 1,
+   "priority": 5
+  },
+  "holon": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "חולון",
+   "wave": 1,
+   "priority": 6
+  },
+  "yavne": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "יבנה",
+   "wave": 2,
+   "priority": 7
+  },
+  "kiryat-malakhi": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "קריית מלאכי",
+   "wave": 2,
+   "priority": 8
+  },
+  "kiryat-gat": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "קריית גת",
+   "wave": 2,
+   "priority": 9
+  },
+  "rishon-lezion": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "ראשון לציון",
+   "wave": 2,
+   "priority": 10
+  },
+  "rehovot": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "רחובות",
+   "wave": 2,
+   "priority": 11
+  },
+  "ness-ziona": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "נס ציונה",
+   "wave": 2,
+   "priority": 12
+  },
+  "ramat-gan": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "רמת גן",
+   "wave": 3,
+   "priority": 13
+  },
+  "givatayim": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "גבעתיים",
+   "wave": 3,
+   "priority": 14
+  },
+  "bnei-brak": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "בני ברק",
+   "wave": 3,
+   "priority": 15
+  },
+  "petah-tikva": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "פתח תקווה",
+   "wave": 3,
+   "priority": 16
+  },
+  "tel-aviv": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "תל אביב-יפו",
+   "wave": 3,
+   "priority": 17
+  },
+  "netanya": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "נתניה",
+   "wave": 4,
+   "priority": 18
+  },
+  "hadera": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "חדרה",
+   "wave": 4,
+   "priority": 19
+  },
+  "herzliya": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "הרצליה",
+   "wave": 4,
+   "priority": 20
+  },
+  "kfar-saba": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "כפר סבא",
+   "wave": 4,
+   "priority": 21
+  },
+  "beer-sheva": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "באר שבע",
+   "wave": 4,
+   "priority": 22
+  },
+  "haifa": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "חיפה",
+   "wave": 5,
+   "priority": 23
+  },
+  "jerusalem": {
+   "status": "queued",
+   "attempts": 0,
+   "last_built": null,
+   "error": null,
+   "name_he": "ירושלים",
+   "wave": 5,
+   "priority": 24
+  }
+ },
+ "updated_at": "2026-11-22T22:00:24Z",
+ "pipeline": "0.1.0",
+ "totals": {
+  "cities_built": 1,
+  "cities_total": 24,
+  "buildings": 7427,
+  "share_conf_high_or_better": 0.0
+ }
+}

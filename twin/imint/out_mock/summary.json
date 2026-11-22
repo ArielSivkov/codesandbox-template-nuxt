@@ -1,0 +1,12 @@
+{
+ "images": 17,
+ "images_inside_footprint_skipped": 0,
+ "buildings": 13,
+ "facades": 52,
+ "facade_m": 688,
+ "facade_seen_m": 276,
+ "facade_cov": 0.401,
+ "buildings_any_photo": 13,
+ "missions": 2,
+ "license": "Mapillary imagery CC-BY-SA; buildings per source (OSM ODbL)"
+}

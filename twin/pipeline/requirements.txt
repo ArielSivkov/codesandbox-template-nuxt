@@ -1,0 +1,10 @@
+# core (required)
+numpy>=1.26
+shapely>=2.0
+pyproj>=3.6
+requests>=2.31
+# optional sources
+duckdb>=1.0        # Overture Maps buildings (GeoParquet on S3/Azure)
+osmium>=4.0        # Geofabrik .osm.pbf extracts (preferred in CI over Overpass)
+tifffile>=2024.1   # Copernicus GLO-30 COG tiles
+imagecodecs>=2024.1
