@@ -6,7 +6,15 @@
 //   POST /map-data/api/corrections                 {osm_id, floors?, height_m?, method, note?}
 //   GET  /map-data/api/corrections/export?since=YYYY-MM-DD   (Bearer EXPORT_TOKEN) -> JSON array
 const PREFIX = '/map-data/';
+// Tiles are public open data (ODbL) -> any origin may GET them. Writes are accepted only from our site.
 const CORS = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'content-type,x-contractor-key,authorization' };
+const WRITE_ORIGINS = ['https://yazam.esh27.com'];
+function safeEqual(a, b) {               // constant-time string compare
+  a = String(a); b = String(b);
+  let d = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) d |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return d === 0;
+}
 
 export default {
   async fetch(req, env, ctx) {
@@ -15,7 +23,11 @@ export default {
     if (!url.pathname.startsWith(PREFIX)) return new Response('not found', { status: 404 });
     const key = url.pathname.slice(PREFIX.length);
 
-    if (key === 'api/corrections' && req.method === 'POST') return saveCorrection(req, env);
+    if (key === 'api/corrections' && req.method === 'POST') {
+      const o = req.headers.get('origin');
+      if (o && !WRITE_ORIGINS.includes(o)) return json({ ok: false, error: 'origin' }, 403);
+      return saveCorrection(req, env);
+    }
     if (key === 'api/corrections/export' && req.method === 'GET') return exportCorrections(req, env, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') return new Response('method', { status: 405, headers: CORS });
     if (!/^(index\.json|cities\/[a-z0-9-]+\/manifest\.json|tiles\/[vt]\/-?\d+_-?\d+\.(json|bin)\.gz)$/.test(key))
@@ -53,7 +65,15 @@ async function saveCorrection(req, env) {
   if (floors == null && hm == null) return json({ ok: false, error: 'empty' }, 400);
   const keys = String(env.CONTRACTOR_KEYS || '').split(',').filter(Boolean);
   const ck = req.headers.get('x-contractor-key') || '';
-  const trust = keys.includes(ck) ? 'contractor' : 'anon';
+  const trust = keys.some(k => safeEqual(k, ck)) ? 'contractor' : 'anon';
+  if (trust === 'anon') {                // at most one anonymous correction per IP per building per day
+    const ip = req.headers.get('cf-connecting-ip') || '';
+    const day0 = new Date().toISOString().slice(0, 10);
+    const hb = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip + '|' + id + '|' + day0));
+    const rl = new Request('https://rl.yazam.invalid/' + [...new Uint8Array(hb)].map(x => x.toString(16).padStart(2, '0')).join(''));
+    if (await caches.default.match(rl)) return json({ ok: false, error: 'rate' }, 429);
+    await caches.default.put(rl, new Response('1', { headers: { 'Cache-Control': 'max-age=86400' } }));
+  }
   const method = ['manual', 'laser', 'lidar', 'photo_ai', 'plan'].includes(j.method) ? j.method : 'manual';
   const rec = { osm_id: id, floors, height_m: hm, method, trust, note: String(j.note || '').slice(0, 300),
     date: new Date().toISOString(), contractor: trust === 'contractor' ? ck.slice(0, 6) : null };
@@ -64,7 +84,7 @@ async function saveCorrection(req, env) {
 }
 
 async function exportCorrections(req, env, url) {
-  if ((req.headers.get('authorization') || '') !== `Bearer ${env.EXPORT_TOKEN}`) return json({ ok: false }, 401);
+  if (!env.EXPORT_TOKEN || !safeEqual(req.headers.get('authorization') || '', `Bearer ${env.EXPORT_TOKEN}`)) return json({ ok: false }, 401);
   const since = url.searchParams.get('since') || '2000-01-01';
   const out = [];
   let cursor;

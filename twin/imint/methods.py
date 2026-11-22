@@ -242,6 +242,8 @@ def patch_b5(heights_module) -> None:
         for r in b.get("imint", []): est.append((r["method"], r["h"], r["sigma"]))
     """
     register_with_b5(heights_module)
+    if getattr(heights_module, "IMINT_NATIVE", False):   # fusion reads b["imint"] itself now
+        return
     if getattr(heights_module.direct_estimates, "_b7", False):
         return
     orig = heights_module.direct_estimates

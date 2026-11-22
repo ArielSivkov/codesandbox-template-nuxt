@@ -51,6 +51,14 @@ SRC_CODE = {"M_laser": "M", "M_lidar": "M", "M_floors": "M", "O_3d": "O", "H_osm
 SRC_HE = {"M": "נמדד/אושר בשטח", "O": "מודל תלת־ממד רשמי", "H": "גובה מ-OSM", "L": "קומות מ-OSM",
           "V": "Overture", "S": "צילום חזית + AI", "P": "תב\"ע מאושרת", "G": "GlobalBuildingAtlas",
           "F": "3D-GloBFP", "D": "מודל פני שטח פחות קרקע", "B": "GHSL", "N": "בניינים שכנים", "R": "כלל אצבע"}
+# Native support for twin/imint methods (sigma comes per estimate).
+IMINT_KEYS = {"I_stereo": "T", "I_relief": "E", "I_floors": "K", "I_svm": "W", "I_shadow": "C"}
+IMINT_NATIVE = True
+for _k, _c in IMINT_KEYS.items():
+    SIGMA.setdefault(_k, None)
+    SRC_CODE.setdefault(_k, _c)
+SRC_HE.update({"T": "סטריאו מתצלומי אוויר", "E": "העתק תבליט בתצלום אנכי", "K": "ספירת קומות בצילום חזית",
+               "W": "מדידה מתמונה אחת (נקודות מגוז)", "C": "אורך צל ומיקום השמש"})
 CONF = [(1.0, "מאומת"), (2.5, "גבוה"), (5.0, "בינוני"), (math.inf, "נמוך")]
 
 LOW = {"house", "detached", "semidetached_house", "bungalow", "roof", "garage", "garages", "shed",
@@ -89,11 +97,11 @@ def direct_estimates(b):
     """b: normalised building dict. Returns list of (source_key, h, sigma). Neighbour/rule
     priors are added later because they need the whole city."""
     tags, grp, est = b.get("tags", {}), tgroup(b.get("type")), []
+    anon_floors = []
     for m in b.get("measurements", []):                       # data flywheel – highest value
         if m.get("trust") == "anon":                          # unauthenticated web correction
             if m.get("floors"):
-                f = int(m["floors"])
-                est.append(("S_ai", floors_to_m(f, grp), math.hypot(1.0 * FLOOR_H[grp], 0.15 * f)))
+                anon_floors.append(int(m["floors"]))
             continue
         if m.get("height_m"):
             k = "M_laser" if m.get("method") == "laser" else "M_lidar"
@@ -101,6 +109,12 @@ def direct_estimates(b):
         elif m.get("floors"):
             f = int(m["floors"])
             est.append(("M_floors", floors_to_m(f, grp), f * 0.15 + 0.5))
+    if anon_floors:
+        # Anonymous corrections are untrusted: N identical anonymous votes must not shrink the
+        # uncertainty N-fold (that would let one person spamming the same value override real data).
+        # Collapse them into ONE estimate at the median, with the single-vote sigma.
+        f = int(np.median(anon_floors) + 0.5)
+        est.append(("S_ai", floors_to_m(f, grp), math.hypot(1.0 * FLOOR_H[grp], 0.15 * f)))
     if b.get("official_h"):
         est.append(("O_3d", float(b["official_h"]), SIGMA["O_3d"]))
     h = _num(tags.get("height"))
@@ -134,6 +148,12 @@ def direct_estimates(b):
     nd = b.get("ndsm_h")
     if nd is not None and nd >= 9 and b.get("area", 0) >= 900 and not b.get("newer_than_dsm"):
         est.append(("D_ndsm", float(nd), SIGMA["D_ndsm"]))
+    # Classic photogrammetry / image-interpretation results from twin/imint/methods.py
+    # (stereo parallax, relief displacement, floor count, single-view metrology, shadow).
+    for r in b.get("imint", []) or []:
+        k, hv, sv = r.get("method"), r.get("h"), r.get("sigma")
+        if k in IMINT_KEYS and sv and sv > 0 and hv and 1.5 <= hv <= 400:
+            est.append((k, float(hv), float(sv)))
     return est
 
 

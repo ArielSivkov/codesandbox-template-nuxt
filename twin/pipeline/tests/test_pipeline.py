@@ -119,3 +119,27 @@ if __name__ == "__main__":
         if k.startswith("test_"):
             f(); n += 1; print("ok", k)
     print(n, "tests passed")
+
+
+def test_anonymous_votes_cannot_spam_height():
+    # one real OSM height (12 m) vs 20 identical anonymous "30 floors" votes
+    b = {"type": "apartments", "tags": {"height": "12"},
+         "measurements": [{"trust": "anon", "floors": 30}] * 20}
+    est = heights.direct_estimates(b)
+    assert sum(1 for e in est if e[0] == "S_ai") == 1          # collapsed into one vote
+    r = heights.fuse(est)
+    assert abs(r["h"] - 12) < 1.0 and "S_ai" in r["rejected"]  # spam rejected as outlier
+
+
+def test_imint_estimates_enter_fusion_natively():
+    b = {"type": "apartments", "tags": {},
+         "imint": [{"method": "I_stereo", "h": 24.6, "sigma": 0.8},
+                   {"method": "I_floors", "h": 25.0, "sigma": 2.0},
+                   {"method": "I_bogus", "h": 99, "sigma": 0.1},     # unknown method ignored
+                   {"method": "I_relief", "h": 900, "sigma": 1.0}]}  # out of range ignored
+    est = heights.direct_estimates(b)
+    keys = sorted(e[0] for e in est)
+    assert keys == ["I_floors", "I_stereo"]
+    r = heights.fuse(est)
+    assert r["primary"] == "I_stereo" and abs(r["h"] - 24.66) < 0.1
+    assert heights.SRC_CODE["I_stereo"] == "T"
