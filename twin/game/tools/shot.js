@@ -1,7 +1,7 @@
 // בדיקת עשן + צילומים: node tools/shot.js [url]
 const { chromium } = require(process.env.PW || '/tmp/pw/node_modules/playwright');
 (async () => {
-  const url = process.argv[2] || 'http://localhost:8765/index.html?auto';
+  const url = process.argv[2] || 'http://localhost:8931/index.html?auto';
   const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const ctx = await b.newContext({ viewport: { width: 800, height: 360 }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 });
   const p = await ctx.newPage(); const errs = [];

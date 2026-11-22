@@ -124,14 +124,32 @@ function playAnim(name, fade) {
   a.reset().setEffectiveWeight(1).fadeIn(fade || 0.2).play(); if (prev) prev.fadeOut(fade || 0.2); AN.cur = name;
 }
 function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = () => no(new Error(src)); document.head.appendChild(s); }); }
+// בגדים: הגוף הבסיסי של Quaternius הוא בבגד ים – צובעים מכנסי ג'ינס, חולצת עבודה ונעליים לפי גובה במרחב ה-bind
+function clothes(mesh) {
+  // צירים מהשלד (כמו באש 5): מעלה = אגן→ראש, צד = ירך ימין→שמאל, במרחב ה-bind של הגוף
+  const B = {}; for (const b of mesh.skeleton.bones) B[b.name] = b; const loc = b => new T.Vector3().setFromMatrixPosition(b.matrixWorld).applyMatrix4(mesh.bindMatrixInverse);
+  const pel = loc(B.pelvis), up = loc(B.Head).sub(pel).normalize(), side = loc(B.thigh_l).sub(loc(B.thigh_r)); side.addScaledVector(up, -side.dot(up)).normalize();
+  const pa = mesh.geometry.attributes.position, v = new T.Vector3(); let lo = 1e9, hi = -1e9; for (let i = 0; i < pa.count; i++) { v.fromBufferAttribute(pa, i); const h = v.dot(up); if (h < lo) lo = h; if (h > hi) hi = h; }
+  const m = mesh.material.clone(); const U = { uUp: { value: up }, uSide: { value: side }, uLo: { value: lo }, uH: { value: hi - lo }, uMid: { value: pel.dot(side) } };
+  m.onBeforeCompile = sh => { Object.assign(sh.uniforms, U);
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vB;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvB = position;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vB; uniform vec3 uUp, uSide; uniform float uLo, uH, uMid;')
+      .replace('#include <map_fragment>', `#include <map_fragment>
+{ float h = (dot(vB, uUp) - uLo) / uH; float s = abs(dot(vB, uSide) - uMid) / uH;
+  float L = dot(diffuseColor.rgb, vec3(0.3,0.59,0.11)); float n = 0.85 + 0.3 * L;
+  if (h < 0.045) diffuseColor.rgb = vec3(0.12,0.11,0.10);
+  else if (h < 0.475 && s < 0.2) diffuseColor.rgb = vec3(0.16,0.25,0.42) * n;
+  else if (h < 0.815 && (s < 0.125 || (h > 0.66 && s < 0.21))) diffuseColor.rgb = vec3(0.86,0.50,0.20) * n; }`); };
+  m.customProgramCacheKey = () => 'w27_clothes'; return m;
+}
 async function loadCharacter() {
   try {
     if (!window.ESH_GLTF) await loadScript('vendor/loaders.js');
     const G = window.ESH_GLTF; const L = new G.GLTFLoader(); L.setMeshoptDecoder(G.MeshoptDecoder);
     const [m, a] = await Promise.all([L.loadAsync('assets/ubc_male.glb'), L.loadAsync('assets/ual_anims.glb')]);
-    const root = m.scene; const box = new T.Box3().setFromObject(root); const h = box.max.y - box.min.y; const s = 1.78 / h;
+    const root = m.scene; root.updateMatrixWorld(true); const box = new T.Box3().setFromObject(root); const h = box.max.y - box.min.y; const s = 1.78 / h;
     root.scale.setScalar(s); root.position.y = -box.min.y * s;
-    root.traverse(o => { if (o.isMesh) { o.frustumCulled = false; if (o.material && /Superhero/i.test(o.material.name)) { o.material = o.material.clone(); o.material.color = new T.Color(0xd8e2ff); } } });
+    root.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = true; if (o.material && /Superhero/i.test(o.material.name)) o.material = clothes(o); } });
     AN.model = root; player.add(root); player.remove(ph);
     AN.mixer = new T.AnimationMixer(root);
     for (const c of a.animations) { // בלי תנועת שורש אופקית (המשחק מזיז את הדמות)
@@ -194,7 +212,8 @@ function setMode(m) {
   // יציאה מרכב/מסוק: הדמות לצד הרכב
   if (prev === 'car' || prev === 'heli') { const o = prev === 'car' ? S.car : S.heli, side = prev === 'car' ? 1.8 : 2.4;
     S.p.set(o.x + Math.cos(o.h) * side, o.y, o.z - Math.sin(o.h) * side); const c = W.collide(S.p.x, S.p.z, 0.35, S.p.y, S.p.y + 1.7); S.p.x = c.x; S.p.z = c.z; S.heading = o.h; }
-  if (m === 'car') { const c = S.car; c.x = p.x; c.z = p.z; c.h = S.heading; c.v = 0; c.y = W.H(c.x, c.z);
+  if (m === 'car' && car.visible && Math.hypot(S.car.x - p.x, S.car.z - p.z) < 15 && prev !== 'heli') { S.car.v = 0; toast('🚗 נכנסת לרכב החונה'); }
+  else if (m === 'car') { const c = S.car; c.x = p.x; c.z = p.z; c.h = S.heading; c.v = 0; c.y = W.H(c.x, c.z);
     if (p.y > W.H(p.x, p.z) + 3) { toast('הרכב הונח ברחוב שמתחת'); }
     const r = W.collide(c.x, c.z, 1.6, c.y, c.y + 1.6); c.x = r.x; c.z = r.z; }
   if (m === 'heli') { const h = S.heli; h.x = p.x; h.z = p.z; h.h = S.heading; h.v = 0; h.vy = 0; h.y = Math.max(p.y, W.floorAt(p.x, p.z, p.y + 0.5)); const r = W.collide(h.x, h.z, 3, h.y, h.y + 3.5); h.x = r.x; h.z = r.z; }
@@ -319,7 +338,7 @@ function renderMine() {
   el.querySelectorAll('[data-go]').forEach(bt => bt.onclick = () => { const o = mine.get(bt.dataset.go); el.style.display = 'none'; flyTo(o.cx, o.cz, o.top); });
   $('mClose').onclick = () => el.style.display = 'none';
 }
-$('bMine').onclick = () => { const el = $('mine'); $('menu').style.display = 'none'; if (el.style.display === 'block') { el.style.display = 'none'; return; } renderMine(); el.style.display = 'block'; };
+$('bMine').onclick = () => { const el = $('mine'); $('menu').style.display = $('env').style.display = 'none'; if (el.style.display === 'block') { el.style.display = 'none'; return; } renderMine(); el.style.display = 'block'; };
 function flyTo(x, z, top) { setMode('heli'); const h = S.heli; h.x = x + 30; h.z = z + 30; h.y = Math.max(top + 25, W.H(x, z) + 40); h.h = Math.atan2(x - h.x, z - h.z); h.v = 0; S.cam.yaw = h.h; toast('🚁 מעל הנכס – אפשר לנחות על הגג'); }
 
 // ---------- זוהר לנכסים שלי
@@ -412,16 +431,17 @@ function enterInterior(kind, b) {
   else { const q = qty(b); tex = screenTex('הנכס שלי · ' + (W.nearestStreet(b.cx, b.cz, 250) || b.id), [`${b.floors} קומות · גובה ${fmt(b.h, 1)} מ' ± ${fmt(b.sigma, 1)}`, `חזיתות ${fmt(q.gross)} מ"ר ברוטו · ${fmt(q.net)} נטו`, `גג ${fmt(q.roof)} מ"ר · היקף ${fmt(q.P)} מ'`, 'נתונים משוערים – לאימות במדידה'], 'לוח היזם ← "פתח הצעה"'); IN.link = preLink(b); $('inLink').textContent = '🧾 פתח הצעה בלוח היזם'; }
   if (IN.screen.material.map) IN.screen.material.map.dispose(); IN.screen.material.map = tex; IN.screen.material.needsUpdate = true;
   S.inside = kind; IN.scene.add(player); player.visible = true; jetpack.visible = false;
-  S.p.set(0, 0, 2.6); S.heading = Math.PI; S.vy = 0; S.cam.yaw = Math.PI; S.cam.pitch = 0.25; S.cam.dist = 3.6;
+  S.p.set(0.4, 0, 0.6); S.heading = Math.PI; S.vy = 0; S.cam.yaw = Math.PI; S.cam.pitch = 0.1; S.cam.dist = 3.2; document.body.classList.add('inside');
   $('inUI').style.display = 'flex'; $('prompt').style.display = 'none'; $('bE').classList.add('hidden');
 }
 function exitInterior() {
-  if (!S.inside) return; S.inside = null; scene.add(player); S.p.copy(IN.ret.p); S.heading = IN.ret.h + Math.PI; S.cam.yaw = S.heading; S.cam.dist = 5.2; $('inUI').style.display = 'none';
+  if (!S.inside) return; S.inside = null; scene.add(player); S.p.copy(IN.ret.p); S.heading = IN.ret.h + Math.PI; S.cam.yaw = S.heading; S.cam.dist = 5.2; $('inUI').style.display = 'none'; document.body.classList.remove('inside');
 }
 $('inExit').onclick = exitInterior; $('inLink').onclick = () => window.open(IN.link, '_blank', 'noopener');
 
 function interact() {
   if (S.inside) { exitInterior(); return; }
+  if (S.mode === 'drone') { S.drone.gps = !S.drone.gps; toast(S.drone.gps ? 'GPS: הרחפן מחזיק מיקום מול הרוח' : 'ATTI: המקל קובע זווית – הרוח תסחף את הרחפן', 2.5); proxT = 0; return; }
   if (S.nearBiz) { enterInterior('biz', bizObj.b); return; }
   if (S.nearOwned) { enterInterior('own', S.nearOwned); return; }
   if (S.near) showCard(S.near);
@@ -487,8 +507,8 @@ function moveCar(dt, inp) {
 }
 function moveHeli(dt, inp) {
   const h = S.heli, gnd = W.floorAt(h.x, h.z, h.y + 0.5), onG = h.y <= Math.max(gnd, 0) + 0.05;
-  h.rotor = Math.min(1, h.rotor + dt * 0.8);
-  const tvy = inp.up ? 9 : inp.down ? -7 : 0; h.vy = damp(h.vy, h.rotor > 0.6 ? tvy : -3, 3, dt);
+  h.rotor = Math.min(1, h.rotor + dt * 1.6);
+  const tvy = inp.up ? 9 : inp.down ? -7 : 0; h.vy = damp(h.vy, h.rotor > 0.45 ? tvy : -3, 3, dt);
   if (!onG || inp.up) { h.h -= inp.x * 1.3 * dt; h.v = damp(h.v, inp.y * 46, 1.1, dt); } else h.v = damp(h.v, 0, 4, dt);
   SIM.windAt(h.x, h.y, h.z, S.t, SIMW, windHere); const drift = onG ? 0 : 0.25; // קירוב: סחיפה חלקית ברוח (לא דינמיקת מסוק)
   let nx = h.x + (Math.sin(h.h) * h.v + windHere.x * drift) * dt, nz = h.z + (Math.cos(h.h) * h.v + windHere.z * drift) * dt, ny = clamp(h.y + h.vy * dt, -10, 650);
@@ -523,11 +543,14 @@ function updateCam(dt) {
   if (shake > 0) { camera.position.x += (Math.random() - 0.5) * shake; camera.position.y += (Math.random() - 0.5) * shake; shake = Math.max(0, shake - dt * 1.5); }
   camera.lookAt(camT);
   // טווח ראייה לפי גובה
-  const alt = camera.position.y; const far = alt > 120 ? 1700 : 1150;
+  const alt = camera.position.y; let far = clamp(1150 + Math.max(0, alt - 30) * 7, 1150, 3000);   // ככל שעולים רואים רחוק יותר (אופק פתוח במקום קיר ערפל) if (SIM.weather.rain > 0) far = Math.min(far, 1150 - SIM.weather.rain * 35); if (SIM.weather.cloud > 0.85) far *= 0.85;
   scene.fog.far = damp(scene.fog.far, Q.level >= 2 ? far * 0.8 : far, 1, dt); scene.fog.near = scene.fog.far * 0.3;
   W.radius = scene.fog.far + 50;
   camera.near = alt > 150 ? 2 : 0.3; camera.far = scene.fog.far + 600; camera.updateProjectionMatrix();
   sky.position.copy(camera.position);
+  // אור השמש והצל עוקבים אחרי המטרה (מוצמד לטקסל כדי למנוע ריצוד)
+  const tex = 170 / sun.shadow.mapSize.x, sx = Math.round(tx / tex) * tex, sz = Math.round(tz / tex) * tex;
+  sun.target.position.set(sx, ty, sz); sun.position.set(sx + sunDir.x * 400, ty + sunDir.y * 400, sz + sunDir.z * 400);
 }
 
 // ---------- מפה מוקטנת: קנבס מוכן לכל אריח (0.256 פיקסל למטר), מסובב לפי המצלמה
@@ -574,8 +597,12 @@ function toast(msg, sec) { const el = $('toast'); el.textContent = msg; el.style
 function updateHUD(dt) {
   const p = curPos(); $('hSpd').textContent = Math.round(S.speed * 3.6);
   const agl = p.y - Math.max(W.H(p.x, p.z), 0);
-  $('hAlt').textContent = (S.mode === 'heli' || S.mode === 'jet') ? Math.max(0, Math.round(agl)) : Math.round(p.y);
+  $('hAlt').textContent = (S.mode === 'heli' || S.mode === 'jet' || S.mode === 'drone') ? Math.max(0, Math.round(agl)) : Math.round(p.y);
   $('fuel').firstChild.style.width = Math.round(S.fuel * 100) + '%';
+  SIM.windAt(p.x, p.y + (S.mode === 'foot' ? 1.5 : 0.2), p.z, S.t, SIMW, windHere);
+  $('hWind').textContent = windHere.speed.toFixed(1); const wa = Math.atan2(windHere.x, -windHere.z) - (Math.PI - S.cam.yaw) * -1;
+  $('hWarr').style.transform = `rotate(${(Math.atan2(windHere.x, windHere.z) - S.cam.yaw) * -180 / Math.PI + 180}deg)`;
+  if (S.mode === 'drone') $('hSpd').textContent = Math.round(Math.hypot(S.drone.vx, S.drone.vz) * 3.6);
   if (toastT > 0) { toastT -= dt; if (toastT <= 0) $('toast').style.display = 'none'; }
 }
 let proxT = 0;
@@ -589,7 +616,8 @@ function proximity() {
     if (b && S.p.y < b.top) { S.near = b; if (mine.has(b.id)) S.nearOwned = b; }
   }
   let msg = '', btn = '';
-  if (S.nearBiz) { msg = `🏪 ${BIZ.name} — הכניסה כאן`; btn = '🚪 היכנס לעסק'; }
+  if (S.mode === 'drone') { const q = S.drone; msg = `🛸 ${q.gps ? 'GPS' : 'ATTI'} · אוויר ${q.air.toFixed(1)} מ'/ש' · רוח ${q.wind.speed.toFixed(1)} · דחף ${(q.thrust / (SIM.DRONE.mass * 9.81)).toFixed(2)}g`; btn = q.gps ? 'מעבר ל-ATTI (רוח מסיטה)' : 'מעבר ל-GPS (החזקת מיקום)'; }
+  else if (S.nearBiz) { msg = `🏪 ${BIZ.name} — הכניסה כאן`; btn = '🚪 היכנס לעסק'; }
   else if (S.nearOwned) { msg = '⭐ הנכס שלך'; btn = '🚪 היכנס לנכס'; }
   else if (S.near) { msg = `🏢 ${S.near.floors} קומות · ${fmt(S.near.area)} מ"ר`; btn = 'ℹ פרטי בניין'; }
   pr.style.display = msg ? 'block' : 'none'; pr.textContent = msg + (TOUCH ? '' : '  ·  E');
@@ -600,7 +628,7 @@ function proximity() {
 function renderMenu() {
   const el = $('menu');
   el.innerHTML = `<h3>27wrld · אשדוד · אב־טיפוס</h3>
-  <div>מקלדת: <kbd>W A S D</kbd> תנועה · <kbd>Space</kbd> קפיצה/למעלה/דחף/בלם · <kbd>Shift</kbd> ריצה/למטה · <kbd>C</kbd> למטה · <kbd>F</kbd> או <kbd>1-4</kbd> מצב · <kbd>E</kbd> פעולה · גרירה = מצלמה · גלגלת = זום · הקשה על בניין = כרטיס</div>
+  <div>מקלדת: <kbd>W A S D</kbd> תנועה · <kbd>Space</kbd> קפיצה/למעלה/דחף/בלם · <kbd>Shift</kbd> ריצה/למטה · <kbd>C</kbd> למטה · <kbd>F</kbd> או <kbd>1-5</kbd> מצב · <kbd>Q</kbd>/<kbd>R</kbd> סיבוב רחפן · <kbd>E</kbd> פעולה · גרירה = מצלמה · גלגלת = זום · הקשה על בניין = כרטיס</div>
   <div>מגע: ג'ויסטיק משמאל, כפתורים מימין, גרירה על המסך מסובבת מצלמה, הקשה על בניין פותחת כרטיס.</div>
   <h3 style="margin-top:10px">איכות</h3>
   <div class="row"><button class="btn ${Q.level === 0 ? 'on' : ''}" data-q="0">גבוהה</button><button class="btn ${Q.level === 1 ? 'on' : ''}" data-q="1">בינונית</button><button class="btn ${Q.level === 2 ? 'on' : ''}" data-q="2">חסכונית</button><button class="btn ${Q.auto ? 'on' : ''}" id="qAuto">אוטומטי</button></div>
@@ -618,12 +646,65 @@ function renderMenu() {
 }
 function statsText() { const s = $('stats'); if (!s) return; const mem = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(0) + ' MB' : 'n/a'; const i = renderer.info;
   s.textContent = `fps ${fpsAvg.toFixed(0)} · pr ${renderer.getPixelRatio().toFixed(2)} · draw ${i.render.calls} · tris ${(i.render.triangles / 1000).toFixed(0)}k\ntiles ${W.tiles.size} · heap ${mem} · build ${W.stats.buildMs.toFixed(0)}ms/${W.stats.builds}`; }
-$('bMenu').onclick = () => { const el = $('menu'); $('mine').style.display = 'none'; if (el.style.display === 'block') { el.style.display = 'none'; return; } renderMenu(); el.style.display = 'block'; };
+$('bMenu').onclick = () => { const el = $('menu'); $('mine').style.display = $('env').style.display = 'none'; if (el.style.display === 'block') { el.style.display = 'none'; return; } renderMenu(); el.style.display = 'block'; };
 function setQuality(l) {
   Q.level = l; const base = Math.min(window.devicePixelRatio || 1, TOUCH ? 1.25 : 1.5);
   Q.pr = [base, Math.min(base, 1.0), Math.min(base, 0.8)][l]; renderer.setPixelRatio(Q.pr); resize();
-  W.hiRadius = [650, 480, 320][l];
+  W.hiRadius = [650, 480, 320][l]; applyEnv();
 }
+
+// ---------- גשם (קווים סביב המצלמה, נוטים עם הרוח)
+const RAIN = { mesh: null, n: 0, pos: null };
+function rainSetup() {
+  const want = Math.round(Math.sqrt(clamp(SIM.weather.rain, 0, 20) / 20) * (TOUCH ? 1800 : 3000));
+  if (want === RAIN.n) return;
+  if (RAIN.mesh) { scene.remove(RAIN.mesh); RAIN.mesh.geometry.dispose(); RAIN.mesh = null; } RAIN.n = want; if (!want) return;
+  const pos = new Float32Array(want * 6); for (let i = 0; i < want; i++) { pos[i * 6] = (Math.random() - 0.5) * 60; pos[i * 6 + 1] = Math.random() * 40; pos[i * 6 + 2] = (Math.random() - 0.5) * 60; }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3));
+  RAIN.mesh = new T.LineSegments(g, new T.LineBasicMaterial({ color: 0xe8f0f8, transparent: true, opacity: 0.85, depthWrite: false, fog: false })); RAIN.mesh.frustumCulled = false; RAIN.pos = pos; scene.add(RAIN.mesh);
+}
+function rainUpdate(dt) {
+  if (!RAIN.mesh) return; const p = RAIN.pos, c = camera.position, vy = -9, wx = windHere.x, wz = windHere.z;
+  for (let i = 0; i < RAIN.n; i++) { const o = i * 6; let x = p[o] + wx * dt, y = p[o + 1] + vy * dt, z = p[o + 2] + wz * dt;
+    const wr = (v, cc) => cc + (((v - cc + 30) % 60) + 60) % 60 - 30; x = wr(x, c.x); z = wr(z, c.z); y = c.y - 20 + (((y - c.y + 20) % 40) + 40) % 40;
+    p[o] = x; p[o + 1] = y; p[o + 2] = z; p[o + 3] = x - wx * 0.09; p[o + 4] = y + 0.9; p[o + 5] = z - wz * 0.09; }
+  RAIN.mesh.geometry.attributes.position.needsUpdate = true;
+}
+// ---------- פאנל זמן ומזג אוויר
+const DIRS = ['צפון', 'צפון־מזרח', 'מזרח', 'דרום־מזרח', 'דרום', 'דרום־מערב', 'מערב', 'צפון־מערב'];
+const dirName = d => DIRS[Math.round(((d % 360) + 360) % 360 / 45) % 8];
+function ilParts(d) { const off = SIM.israelOffsetMin(d), l = new Date(d.getTime() + off * 60000); return { y: l.getUTCFullYear(), mo: l.getUTCMonth(), d: l.getUTCDate(), min: l.getUTCHours() * 60 + l.getUTCMinutes(), off }; }
+function setIL(y, mo, d, min) { const guess = new Date(Date.UTC(y, mo, d, 0, min)); const off = SIM.israelOffsetMin(guess); ENV.date = new Date(guess.getTime() - off * 60000); applyEnv(); }
+function renderEnv() {
+  const el = $('env'), w = SIM.weather, ip = ilParts(ENV.date), sp = ENV.sun;
+  const ds = `${ip.y}-${String(ip.mo + 1).padStart(2, '0')}-${String(ip.d).padStart(2, '0')}`, hh = `${String(ip.min / 60 | 0).padStart(2, '0')}:${String(ip.min % 60).padStart(2, '0')}`;
+  el.innerHTML = `<h3>☀ שמש · ${hh} <span class="tag">שעון ישראל</span></h3>
+  <div class="row"><input type="date" id="eDate" value="${ds}"><button class="btn" id="eNow">עכשיו</button></div>
+  <label>שעה <input type="range" id="eTime" min="0" max="1430" step="10" value="${ip.min}"></label>
+  <div class="ro">אזימוט ${sp.azimuth.toFixed(1)}° · גובה ${sp.elevation.toFixed(1)}° ${sp.elevation < 0 ? '(לילה)' : ''}<br><span class="mut">אשדוד ${LAT}°, ${LON}° · NOAA · צל מחושב סביב השחקן (±85 מ')</span></div>
+  <h3>🌬 מזג אוויר <span class="tag">${esc(w.source)}</span></h3>
+  <label>רוח ${w.windSpeed.toFixed(1)} מ'/ש' (${Math.round(w.windSpeed * 3.6)} קמ"ש) <input type="range" id="eWs" min="0" max="25" step="0.5" value="${w.windSpeed}"></label>
+  <label>נושבת מ${dirName(w.windFrom)} (${Math.round(w.windFrom)}°) <input type="range" id="eWd" min="0" max="359" step="5" value="${w.windFrom}"></label>
+  <label>משבים ×${w.gust.toFixed(1)} <input type="range" id="eWg" min="1" max="2.5" step="0.1" value="${w.gust}"></label>
+  <label>עננות ${Math.round(w.cloud * 100)}% <input type="range" id="eCl" min="0" max="1" step="0.05" value="${w.cloud}"></label>
+  <label>גשם ${w.rain.toFixed(1)} מ"מ/שעה <input type="range" id="eRn" min="0" max="20" step="0.5" value="${w.rain}"></label>
+  <div class="row"><button class="btn" id="eLive" ${ENV.live ? '' : 'disabled'}>📡 נתוני אמת (Open-Meteo)</button><button class="btn" id="eX">סגירה</button></div>
+  <div class="mut">${ENV.live ? 'מחובר לפי בקשה בלבד.' : 'כבוי בגרסה הלא־מקוונת. להפעלה: ‎?live=1‎ בכתובת.'}</div>`;
+  const rr = (id, f) => { $(id).oninput = e => { f(+e.target.value); applyEnv(); renderEnvSoft(); }; };
+  $('eTime').oninput = e => { const p2 = ilParts(ENV.date); setIL(p2.y, p2.mo, p2.d, +e.target.value); renderEnvSoft(); };
+  $('eDate').onchange = e => { const [y, mo, d] = e.target.value.split('-').map(Number); if (y) { setIL(y, mo - 1, d, ilParts(ENV.date).min); renderEnv(); } };
+  $('eNow').onclick = () => { ENV.date = new Date(); applyEnv(); renderEnv(); };
+  rr('eWs', v => w.windSpeed = v); rr('eWd', v => w.windFrom = v); rr('eWg', v => w.gust = v); rr('eCl', v => w.cloud = v); rr('eRn', v => w.rain = v);
+  $('eX').onclick = () => el.style.display = 'none';
+  $('eLive').onclick = async () => { try { Object.assign(SIM.weather, await SIM.fetchWeather(LAT, LON)); applyEnv(); renderEnv(); toast('מזג אוויר עודכן מ-Open-Meteo'); } catch (e) { toast('לא הצלחתי למשוך נתונים: ' + e.message); } };
+}
+let envSoftT = null;
+function renderEnvSoft() { clearTimeout(envSoftT); envSoftT = setTimeout(() => { // מעדכן טקסטים בלי לשבור גרירה של מחוון
+  const el = $('env'); const sp = ENV.sun, w = SIM.weather, ip = ilParts(ENV.date), hh = `${String(ip.min / 60 | 0).padStart(2, '0')}:${String(ip.min % 60).padStart(2, '0')}`;
+  const h3 = el.querySelector('h3'); if (h3) h3.firstChild.textContent = `☀ שמש · ${hh} `; const ro = el.querySelector('.ro'); if (ro) ro.firstChild.textContent = `אזימוט ${sp.azimuth.toFixed(1)}° · גובה ${sp.elevation.toFixed(1)}° ${sp.elevation < 0 ? '(לילה)' : ''}`;
+  const L = el.querySelectorAll('label'); const tx = [null, null, `רוח ${w.windSpeed.toFixed(1)} מ'/ש' (${Math.round(w.windSpeed * 3.6)} קמ"ש) `, `נושבת מ${dirName(w.windFrom)} (${Math.round(w.windFrom)}°) `, `משבים ×${w.gust.toFixed(1)} `, `עננות ${Math.round(w.cloud * 100)}% `, `גשם ${w.rain.toFixed(1)} מ"מ/שעה `];
+  L.forEach((l, i) => { const t = tx[i + 1]; if (t && l.firstChild.nodeType === 3) l.firstChild.textContent = t; }); }, 30); }
+$('bEnv').onclick = () => { const el = $('env'); $('menu').style.display = $('mine').style.display = 'none'; if (el.style.display === 'block') { el.style.display = 'none'; return; } renderEnv(); el.style.display = 'block'; };
 
 // ---------- לולאה
 let fpsAvg = 60, fpsLow = 0, last = performance.now(), mmT = 0;
@@ -634,7 +715,7 @@ function frame(now) {
   S.t += dt; fpsAvg = lerp(fpsAvg, 1 / dt, 0.05);
   if (!S.started) { renderer.render(scene, camera); return; }
   const k = readKeys(), o = input.override;
-  const inp = o || { x: clamp(input.x + k.x, -1, 1), y: clamp(input.y + k.y, -1, 1), up: input.up || k.up, down: input.down || k.down, sprint: k.sprint };
+  const inp = o || { x: clamp(input.x + k.x, -1, 1), y: clamp(input.y + k.y, -1, 1), up: input.up || k.up, down: input.down || k.down, sprint: k.sprint, yawL: k.yawL, yawR: k.yawR };
   if (S.inside) moveFoot(dt, inp, true);
   else if (S.mode === 'foot' || S.mode === 'jet') moveFoot(dt, inp, false);
   else if (S.mode === 'car') moveCar(dt, inp);
@@ -649,9 +730,9 @@ function frame(now) {
     if (S.mode === 'heli') heli.userData.rotor.rotation.y += dt * 28 * h.rotor; else h.rotor = Math.max(0, h.rotor - dt * 0.3), heli.userData.rotor.rotation.y += dt * 28 * h.rotor;
     heli.userData.tr.rotation.x += dt * 40 * h.rotor; heli.userData.disc.visible = h.rotor > 0.5;
     const g = Math.max(W.floorAt(h.x, h.z, h.y + 0.5), 0); heliShadow.position.set(h.x, g + 0.08, h.z); const s = clamp(1 - (h.y - g) / 150, 0.2, 1); heliShadow.scale.setScalar(s); heliShadow.material.opacity = 0.28 * s; }
-  if (!S.inside) { const g = W.floorAt(S.p.x, S.p.z, S.p.y + 0.3); blob.visible = player.visible; blob.position.set(S.p.x, Math.max(g, 0) + 0.05, S.p.z); const s = clamp(1 - (S.p.y - g) / 20, 0.2, 1); blob.scale.setScalar(s); } else blob.visible = false;
+  if (!S.inside) { const g = W.floorAt(S.p.x, S.p.z, S.p.y + 0.3); blob.visible = player.visible && !sun.castShadow; blob.position.set(S.p.x, Math.max(g, 0) + 0.05, S.p.z); const s = clamp(1 - (S.p.y - g) / 20, 0.2, 1); blob.scale.setScalar(s); } else blob.visible = false;
   if (jetpack.visible) { const on = inp.up && S.fuel > 0; for (const f of jetpack.userData.fl) { f.visible = on || !S.grounded; f.scale.y = on ? 0.8 + Math.random() * 0.6 : 0.3; } }
-  if (drone.visible) { const q = S.drone; drone.position.set(q.x, q.y, q.z); drone.rotation.set(0, 0, 0); drone.rotateY(q.yaw); drone.rotateX(-q.pitch); drone.rotateZ(-q.roll);
+  if (drone.visible) { const q = S.drone; drone.position.set(q.x, q.y, q.z); drone.rotation.set(0, 0, 0); drone.rotateY(q.yaw); drone.rotateX(-q.pitch); drone.rotateZ(q.roll);
     const spin = q.thrust > 0.1 ? 1 : 0; for (const pr of drone.userData.props) pr.visible = spin > 0; }
   // אנימציה
   if (AN.mixer) {
@@ -665,7 +746,7 @@ function frame(now) {
   // זוהר נכסים
   glowMat.opacity = 0.22 + 0.16 * Math.sin(S.t * 3); beamMat.opacity = 0.25 + 0.12 * Math.sin(S.t * 3 + 1);
   if (bizObj.pin) bizObj.pin.position.y = bizObj.b.top + 9 + Math.sin(S.t * 2) * 0.8;
-  W.MAT.sea.normalMap.offset.set(S.t * 0.012, S.t * 0.007);
+  W.MAT.sea.normalMap.offset.set(S.t * (0.006 + SIM.weather.windSpeed * 0.0015), S.t * 0.007); skyMat.uniforms.time.value = S.t * (1 + SIM.weather.windSpeed * 0.3); rainUpdate(dt);
   updateCam(dt);
   const p = curPos(); W.update(p.x, p.z, Q.level >= 2 ? 6 : 9);
   // אוטומטי: ירידה באיכות אם קצב הפריימים נמוך לאורך זמן
@@ -686,7 +767,7 @@ function spawn() {
   else { S.p.set(sp.x, W.H(sp.x, sp.z), sp.z); }
   S.p.y = W.floorAt(S.p.x, S.p.z, S.p.y + 1); S.cam.yaw = S.heading; S.vy = 0; S.grounded = true;
   // רכב ומסוק חונים ליד
-  S.car.x = S.p.x + Math.cos(S.heading) * 4; S.car.z = S.p.z - Math.sin(S.heading) * 4; S.car.h = S.heading + Math.PI / 2; S.car.y = W.H(S.car.x, S.car.z);
+  S.car.x = S.p.x + Math.cos(S.heading) * 4; S.car.z = S.p.z - Math.sin(S.heading) * 4; S.car.h = S.heading + Math.PI / 2; S.car.y = W.H(S.car.x, S.car.z); car.visible = true; const r = W.collide(S.car.x, S.car.z, 1.6, S.car.y, S.car.y + 1.5); S.car.x = r.x; S.car.z = r.z;
 }
 
 // ---------- אתחול
@@ -694,7 +775,7 @@ async function boot() {
   const bar = $('lbar').firstChild, msg = $('lmsg');
   try {
     msg.textContent = 'טוען מפת אשדוד…'; bar.style.width = '10%';
-    await W.init(scene, { base: 'data/' });
+    await W.init(scene, { base: 'data/' }); applyEnv();
     const sp = W.toScene(SPAWN_ITM.E, SPAWN_ITM.N); S.p.set(sp.x, 30, sp.z);
     camera.position.set(sp.x - 40, 60, sp.z + 40); camera.lookAt(sp.x, 0, sp.z);
     loadCharacter();
@@ -702,7 +783,7 @@ async function boot() {
     const t0 = performance.now();
     await new Promise(res => { const tick = () => { W.update(sp.x, sp.z, 40); const near = [...W.tiles.values()].filter(t => t.blds).length; bar.style.width = Math.min(95, 15 + near * 6) + '%'; msg.textContent = `טוען אריחים… ${near}`;
       if ((W.tiles.get(Math.floor(SPAWN_ITM.E / 1000) + '_' + Math.floor(SPAWN_ITM.N / 1000)) || {}).blds && W.pending() === 0 || performance.now() - t0 > 20000) res(); else setTimeout(tick, 60); }; tick(); });
-    spawn(); setMode('foot'); S.mode = 'foot'; bar.style.width = '100%'; msg.textContent = 'מוכן';
+    spawn(); S.mode = 'jet'; setMode('foot'); bar.style.width = '100%'; msg.textContent = 'מוכן';
     $('go').classList.remove('hidden'); $('go').onclick = start;
     if (/[?&]auto/.test(location.search)) start();
   } catch (e) { console.error(e); $('lerr').textContent = 'שגיאה בטעינה: ' + e.message + ' (צריך שרת קבצים, לא file://)'; }
@@ -711,5 +792,5 @@ function start() { $('load').style.display = 'none'; S.started = true; S.t = 0; 
 requestAnimationFrame(frame); boot();
 
 // ---------- ממשק לבדיקות אוטומטיות
-window.G27 = { S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
+window.G27 = { SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
 })();

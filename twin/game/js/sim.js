@@ -2,7 +2,7 @@
    1) מיקום השמש (אלגוריתם NOAA, דיוק ~0.01° בזווית; בלי שבירת אור אטמוספרית מתחת ל-0°).
    2) שדה רוח עירוני (קירוב! לא CFD): פרופיל חזקה לפי גובה, הסטת גובה אפס לפי בניינים, הצללה בתוך "חופת" הבניינים,
       תיעול לאורך קירות, משבים כתהליך אקראי חלק.
-   3) רחפן מרובע (quadcopter): מסה, דחף, גרר ריבועי ביחס לאוויר (כולל רוח), בקר זווית/מהירות אנכית, אינטגרציה בצעד קבוע 1/120 ש'.
+   3) רחפן מרובע (quadcopter): מסה, דחף, גרר ריבועי + גרר רוטור ליניארי ביחס לאוויר (כולל רוח), בקר זווית/מהירות אנכית, אינטגרציה בצעד קבוע 1/120 ש'.
    יחידות SI. מערכת צירים כמו בעולם: x = מזרח, y = מעלה, z = דרום (−צפון). */
 (function (G) {
 'use strict';
@@ -101,7 +101,7 @@ SIM.windAt = function (x, y, z, t, world, out) {
 };
 
 // ---------------- 3. רחפן
-SIM.DRONE = { mass: 0.9, tw: 2.2, cdaH: 0.018, cdaV: 0.035, rho: 1.225, maxTilt: 30 * D2R, tau: 0.12, yawRate: 120 * D2R, vUp: 5, vDn: 3.5, vMaxGPS: 14, kv: 0.09, kz: 4, r: 0.35 };
+SIM.DRONE = { mass: 0.9, tw: 2.2, cdaH: 0.018, cdaV: 0.035, rho: 1.225, maxTilt: 35 * D2R, tau: 0.12, yawRate: 120 * D2R, vUp: 5, vDn: 3.5, vMaxGPS: 14, kv: 0.09, kz: 4, r: 0.35, cRotor: 0.12, ki: 0.12 };   // cRotor: גרר רוטור ליניארי (blade flapping) נ'·ש'/מ' בריחוף
 SIM.newDrone = (x, y, z, yaw) => ({ x, y, z, vx: 0, vy: 0, vz: 0, yaw: yaw || 0, pitch: 0, roll: 0, thrust: 0, landed: true, gps: true, wind: { x: 0, y: 0, z: 0, speed: 0 }, air: 0, hit: 0, acc: 0 });
 /** צעד רחפן. inp: {x,y (−1..1 מקל), up, down, yawIn}. world כמו ב-windAt + collide(x,z,r,y0,y1), floor(x,z,y) */
 SIM.stepDrone = function (s, inp, dt, t, world) {
@@ -114,8 +114,11 @@ SIM.stepDrone = function (s, inp, dt, t, world) {
     let tp, tr;
     if (s.gps) { const vfT = inp.y * P.vMaxGPS, vrT = inp.x * P.vMaxGPS;   // מהירות יעד במסגרת הרחפן
       const vf = s.vx * sy + s.vz * cy, vr = -s.vx * cy + s.vz * sy;
-      tp = -Math.max(-P.maxTilt, Math.min(P.maxTilt, P.kv * (vfT - vf) * 3)); tr = Math.max(-P.maxTilt, Math.min(P.maxTilt, P.kv * (vrT - vr) * 3)); }
-    else { tp = -inp.y * P.maxTilt; tr = inp.x * P.maxTilt; }
+      const ef = vfT - vf, er = vrT - vr; if (!s.landed) { s.iF = Math.max(-3, Math.min(3, (s.iF || 0) + ef * h)); s.iR = Math.max(-3, Math.min(3, (s.iR || 0) + er * h)); }   // PI: מבטל סחיפה ברוח קבועה
+      tp = -Math.max(-P.maxTilt, Math.min(P.maxTilt, P.kv * ef * 3 + P.ki * (s.iF || 0))); tr = Math.max(-P.maxTilt, Math.min(P.maxTilt, P.kv * er * 3 + P.ki * (s.iR || 0))); }
+    else { s.iF = s.iR = 0; }
+    if (!s.gps) {
+      tp = -inp.y * P.maxTilt; tr = inp.x * P.maxTilt; }
     const a = 1 - Math.exp(-h / P.tau); s.pitch += (tp - s.pitch) * a; s.roll += (tr - s.roll) * a;   // תגובת זווית מסדר ראשון
     s.yaw -= (inp.yawIn || 0) * P.yawRate * h;
     // דחף: בקר מהירות אנכית, מוגבל ל-T/W
@@ -129,7 +132,8 @@ SIM.stepDrone = function (s, inp, dt, t, world) {
     const ux = -Math.sin(s.pitch) * fwdX + Math.sin(s.roll) * rtX, uz = -Math.sin(s.pitch) * fwdZ + Math.sin(s.roll) * rtZ, uy = cosT;
     // גרר ריבועי על המהירות היחסית לאוויר
     const rx = s.vx - s.wind.x, ry = s.vy - s.wind.y, rz = s.vz - s.wind.z, rh = Math.hypot(rx, rz);
-    const fdx = -0.5 * P.rho * P.cdaH * rh * rx, fdz = -0.5 * P.rho * P.cdaH * rh * rz, fdy = -0.5 * P.rho * P.cdaV * Math.abs(ry) * ry;
+    const kr = P.cRotor * T / (P.mass * g);   // גרר רוטור יחסי לדחף
+    const fdx = -0.5 * P.rho * P.cdaH * rh * rx - kr * rx, fdz = -0.5 * P.rho * P.cdaH * rh * rz - kr * rz, fdy = -0.5 * P.rho * P.cdaV * Math.abs(ry) * ry;
     s.air = Math.hypot(rx, ry, rz);
     if (!s.landed || T > P.mass * g) {
       s.vx += (T * ux + fdx) / P.mass * h; s.vz += (T * uz + fdz) / P.mass * h; s.vy += ((T * uy + fdy) / P.mass - g) * h;

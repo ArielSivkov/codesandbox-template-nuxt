@@ -76,7 +76,7 @@ function makeTextures() {
     x.fillStyle = '#f2f0e8'; x.fillRect(w / 2 - 2, 20, 4, 100); x.fillRect(w / 2 - 2, 148, 4, 100); // מקווקו
   });
   TEX.walk = canvasTex(64, 64, (x, w, h) => { x.fillStyle = '#cfc9bd'; x.fillRect(0, 0, w, h); x.fillStyle = 'rgba(0,0,0,0.12)'; for (let i = 0; i < w; i += 16) { x.fillRect(i, 0, 1, h); x.fillRect(0, i, w, 1); } noiseFill(x, w, h, 300, 0.12, 9, true); });
-  TEX.ground = canvasTex(128, 128, (x, w, h) => { x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); noiseFill(x, w, h, 5000, 0.13, 12, true); noiseFill(x, w, h, 1500, 0.25, 13, false); });
+  TEX.ground = canvasTex(128, 128, (x, w, h) => { x.fillStyle = '#e6e6e6'; x.fillRect(0, 0, w, h); noiseFill(x, w, h, 4000, 0.10, 12, true); noiseFill(x, w, h, 900, 0.12, 13, false); });
   TEX.waterN = canvasTex(128, 128, (x, w, h) => {
     const id = x.createImageData(w, h), d = id.data; const R = rng(21); const ph = [R() * 6, R() * 6, R() * 6, R() * 6];
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { const u = i / w * Math.PI * 2, v = j / h * Math.PI * 2;
@@ -271,7 +271,7 @@ function ribbon(t, road, width, lift, P, U, N, vScale) {
   }
   for (let i = 0; i < m - 1; i++) {
     const a = i * 4, b = (i + 1) * 4;
-    const q = [[L, a, 0], [R, a, 1], [R, b, 1], [L, a, 0], [R, b, 1], [L, b, 0]];
+    const q = [[L, a, 0], [R, b, 1], [R, a, 1], [L, a, 0], [L, b, 0], [R, b, 1]];
     for (const [S, o, u] of q) { P.push(S[o], S[o + 1], S[o + 2]); U.push(u, S[o + 3]); N.push(0, 1, 0); }
   }
 }
@@ -314,9 +314,9 @@ function terrainMesh(t) {
     const n = (hash32(((x | 0) * 73856093 ^ (z | 0) * 19349663) + '') % 1000) / 1000;
     let c;
     if (h < 0) c = [0.78, 0.72, 0.58];                 // קרקעית חול רטוב
-    else if (h < 3.5) c = [0.93, 0.87, 0.70];          // חוף
-    else if (t.wild && t.wild[i]) c = [0.86 - n * 0.06, 0.80 - n * 0.05, 0.62];   // חולות (מחוץ לאזור המחקר)
-    else c = n < 0.45 ? [0.74, 0.72, 0.62] : n < 0.8 ? [0.66, 0.68, 0.52] : [0.55, 0.62, 0.42]; // עירוני / צמחייה
+    else if (h < 3.5) c = [0.90, 0.83, 0.66];          // חוף
+    else if (t.wild && t.wild[i]) c = [0.80 - n * 0.06, 0.73 - n * 0.05, 0.55];   // חולות (מחוץ לאזור המחקר)
+    else c = n < 0.45 ? [0.60, 0.58, 0.52] : n < 0.8 ? [0.52, 0.56, 0.42] : [0.42, 0.52, 0.32]; // עירוני / צמחייה
     col[i * 3] = c[0]; col[i * 3 + 1] = c[1]; col[i * 3 + 2] = c[2];
   }
   const idx = [];
@@ -476,8 +476,8 @@ W.init = async function (sc, opts) {
   const [x0, y0, x1, y1] = m.bbox_itm; W.OX = Math.round((x0 + x1) / 2); W.OY = Math.round((y0 + y1) / 2);
   W.bounds = { minx: x0 - W.OX - 300, maxx: x1 - W.OX + 300, minz: -(y1 - W.OY) - 300, maxz: -(y0 - W.OY) + 300 };
   // ים: מישור אחד גדול בגובה 0 שעוקב אחרי השחקן (היבשה תמיד ≥ +0.6 מ', קרקעית הים −2.5 מ')
-  const sg = new T.PlaneGeometry(6000, 6000, 1, 1); sg.rotateX(-Math.PI / 2);
-  const uv = sg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 300, uv.getY(i) * 300);
+  const sg = new T.PlaneGeometry(16000, 16000, 1, 1); sg.rotateX(-Math.PI / 2);
+  const uv = sg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 800, uv.getY(i) * 800);
   W.sea = new T.Mesh(sg, MAT.sea); W.sea.position.y = -0.05; W.sea.renderOrder = 2; scene.add(W.sea);
   W.ready = true; return m;
 };

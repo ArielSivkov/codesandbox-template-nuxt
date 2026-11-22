@@ -56,9 +56,16 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:
 #menu h3{margin:2px 0 6px;font-size:14px;color:var(--acc)}
 #menu .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
 #menu kbd{background:#ffffff1a;border-radius:4px;padding:0 5px;font-family:ui-monospace,monospace;direction:ltr;display:inline-block}
+#env{position:fixed;z-index:21;top:calc(env(safe-area-inset-top) + 56px);right:8px;width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 140px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:none;font-size:13px}
+#env h3{margin:4px 0 6px;font-size:14px;color:var(--acc)}
+#env label{display:block;margin:6px 0}
+#env input[type=range]{width:100%;accent-color:var(--acc);height:26px}
+#env input[type=date]{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--line);background:#0a111b;color:var(--fg);color-scheme:dark}
+#env .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+#env .mut,#env .ro .mut{color:var(--mut);font-size:11px}
 #stats{font-family:ui-monospace,monospace;font-size:11px;direction:ltr;text-align:left;color:var(--mut);white-space:pre-wrap}
 #fps{position:fixed;left:8px;top:calc(env(safe-area-inset-top) + 138px);z-index:9;font:11px ui-monospace,monospace;color:#fff;text-shadow:0 1px 2px #000;direction:ltr}
-#inUI{position:fixed;z-index:12;top:calc(env(safe-area-inset-top) + 8px);left:50%;transform:translateX(-50%);display:none;gap:6px}
+#inUI{position:fixed;z-index:12;bottom:calc(env(safe-area-inset-bottom) + 96px);left:50%;transform:translateX(-50%);display:none;gap:6px}
 #load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 35%,#21364d,#0d1420 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px}
 #load h1{margin:0;font-size:30px;letter-spacing:1px}
 #load h1 em{font-style:normal;color:var(--acc)}
@@ -69,6 +76,8 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:
 #lerr{color:var(--warn);font-size:13px}
 @media (max-width:420px){ #top .lbl{display:none} #hud{font-size:12px;padding:4px 9px;gap:6px} #hud b{font-size:16px} }
 @media (max-height:420px){ #joy{width:116px;height:116px} #joy i{left:33px;top:33px} .ab{width:56px;height:56px} #card{max-height:86vh;max-width:380px} #mm{width:104px;height:104px} #fps{top:120px} }
+@media (max-aspect-ratio:1/1){ #hud{bottom:calc(env(safe-area-inset-bottom) + 170px)} #prompt{top:calc(env(safe-area-inset-top) + 150px)} }
+body.inside #mm,body.inside #mmN,body.inside #hud,body.inside #top{display:none!important}
 body.desk #joy,body.desk #acts .ab{display:none}
 </style>
 </head>
@@ -79,9 +88,10 @@ body.desk #joy,body.desk #acts .ab{display:none}
 <div id="top">
   <button class="btn" id="mode" aria-label="החלפת מצב"><span class="ic">🚶</span><span id="modeT">רגלי</span></button>
   <button class="btn" id="bMine">⭐<span class="lbl"> הנכסים שלי</span> <span id="nMine">0</span></button>
+  <button class="btn" id="bEnv" aria-label="זמן ומזג אוויר">☀<span class="lbl"> מזג אוויר</span></button>
   <button class="btn" id="bMenu" aria-label="תפריט">☰</button>
 </div>
-<div id="hud"><span><b id="hSpd">0</b> <span class="u">קמ״ש</span></span><span class="sep"></span><span><b id="hAlt">0</b> <span class="u" id="hAltU">מ׳ מעל הקרקע</span></span><span class="sep" id="fuelSep"></span><span id="fuelW"><span class="u">דלק</span> <span id="fuel"><i></i></span></span></div>
+<div id="hud"><span><b id="hSpd">0</b> <span class="u">קמ״ש</span></span><span class="sep"></span><span><b id="hAlt">0</b> <span class="u" id="hAltU">מ׳ מעל הקרקע</span></span><span class="sep"></span><span><i id="hWarr" style="display:inline-block;font-style:normal">↑</i> <b id="hWind">0</b> <span class="u">מ׳/ש׳ רוח</span></span><span class="sep" id="fuelSep"></span><span id="fuelW"><span class="u">דלק</span> <span id="fuel"><i></i></span></span></div>
 <div id="joy"><i></i></div>
 <div id="acts">
   <button class="ab" id="bB"><span>▼</span><b id="bBt">רוץ</b></button>
@@ -93,6 +103,7 @@ body.desk #joy,body.desk #acts .ab{display:none}
 <div id="card"></div>
 <div id="mine"></div>
 <div id="menu"></div>
+<div id="env"></div>
 <div id="inUI"><button class="btn pri" id="inLink">🌐 פתח את הדף</button><button class="btn" id="inExit">🚪 יציאה</button></div>
 <div id="load">
   <h1>27<em>wrld</em> · אשדוד</h1>
