@@ -1,0 +1,1059 @@
+{
+ "name": "ESH27 twin-world asset pack – Israeli city, mobile",
+ "generated": "2026-11-22T23:10:59.151Z",
+ "policy": "רק CC0 / OFL / MIT / Apache-2.0. אין נכסי CC-BY בחבילה.",
+ "files": [
+  {
+   "file": "LOADER-snippet.js",
+   "bytes": 4432,
+   "sha256": "93e0c19fb804ebde",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "note": "קוד דוגמה"
+  },
+  {
+   "file": "fonts/OFL-Heebo.txt",
+   "bytes": 4379,
+   "sha256": "50ac3e340fcd4822",
+   "license": "OFL-1.1",
+   "note": "קובץ הרישיון של הגופן"
+  },
+  {
+   "file": "fonts/OFL-NotoSansHebrew.txt",
+   "bytes": 4380,
+   "sha256": "7387750a626d005e",
+   "license": "OFL-1.1",
+   "note": "קובץ הרישיון של הגופן"
+  },
+  {
+   "file": "fonts/heebo-hebrew-400-normal.woff2",
+   "bytes": 5084,
+   "sha256": "2bc607f150e17d5e",
+   "license": "OFL-1.1",
+   "author": "The Heebo Project Authors (Oded Ezer)",
+   "source": "https://www.npmjs.com/package/@fontsource/heebo (v5.3.0)",
+   "upstream": "https://github.com/google/fonts/tree/main/ofl/heebo",
+   "license_file": "fonts/OFL-Heebo.txt"
+  },
+  {
+   "file": "fonts/heebo-hebrew-700-normal.woff2",
+   "bytes": 5116,
+   "sha256": "7dee88b8da46dc5b",
+   "license": "OFL-1.1",
+   "author": "The Heebo Project Authors (Oded Ezer)",
+   "source": "https://www.npmjs.com/package/@fontsource/heebo (v5.3.0)",
+   "upstream": "https://github.com/google/fonts/tree/main/ofl/heebo",
+   "license_file": "fonts/OFL-Heebo.txt"
+  },
+  {
+   "file": "fonts/noto-sans-hebrew-hebrew-400-normal.woff2",
+   "bytes": 7068,
+   "sha256": "330b5c315ebac6a1",
+   "license": "OFL-1.1",
+   "author": "Google / Noto project",
+   "source": "https://www.npmjs.com/package/@fontsource/noto-sans-hebrew (v5.3.0)",
+   "license_file": "fonts/OFL-NotoSansHebrew.txt"
+  },
+  {
+   "file": "models/ac_unit.glb",
+   "bytes": 8056,
+   "sha256": "aa238bfc008af21c",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/balcony_railing.glb",
+   "bytes": 3608,
+   "sha256": "41a265eab87facc4",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/balcony_railing_glass.glb",
+   "bytes": 3588,
+   "sha256": "18de0a97f2a87be5",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/bench.glb",
+   "bytes": 4656,
+   "sha256": "cf9a5b956c1cab6a",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/bus_stop.glb",
+   "bytes": 9976,
+   "sha256": "4658c613c912084b",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/car_hatch.glb",
+   "bytes": 10776,
+   "sha256": "27ccb9797cf9cc65",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/car_sedan.glb",
+   "bytes": 11648,
+   "sha256": "7642640ede2aa337",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/car_taxi.glb",
+   "bytes": 11640,
+   "sha256": "33ab32b0553e0e91",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/drone_quad.glb",
+   "bytes": 13408,
+   "sha256": "35875507db3d3c75",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/dumpster_frog.glb",
+   "bytes": 4456,
+   "sha256": "cb98aa4e0afe9d79",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/helicopter.glb",
+   "bytes": 13108,
+   "sha256": "d841e227f6d1f2bc",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/jetpack.glb",
+   "bytes": 8892,
+   "sha256": "f9de69b7c079c2f6",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/kenney_character_anim.glb",
+   "bytes": 28012,
+   "sha256": "883aa9c592de412b",
+   "license": "CC0-1.0",
+   "author": "Kenney (kenney.nl)",
+   "source": "https://github.com/KenneyNL/Starter-Kit-3D-Platformer/blob/main/models/character.glb",
+   "license_evidence": "https://github.com/KenneyNL/Starter-Kit-3D-Platformer/blob/main/README.md – \"Assets included in this package (2D sprites, 3D models and sound effects) are CC0 licensed\" (הקוד של הערכה MIT; הנכסים CC0)"
+  },
+  {
+   "file": "models/kenney_road_lightposts.glb",
+   "bytes": 6580,
+   "sha256": "e270751cd1aef2cd",
+   "license": "CC0-1.0",
+   "author": "Kenney (kenney.nl)",
+   "source": "https://github.com/KenneyNL/Starter-Kit-City-Builder/blob/main/models/road-straight-lightposts.glb",
+   "license_evidence": "https://github.com/KenneyNL/Starter-Kit-City-Builder/blob/main/README.md – \"Assets included in this package (2D sprites, 3D models and sound effects) are CC0 licensed\" (הקוד של הערכה MIT; הנכסים CC0)"
+  },
+  {
+   "file": "models/kenney_vehicle_motorcycle.glb",
+   "bytes": 15548,
+   "sha256": "f4ec8d8a9e28abcf",
+   "license": "CC0-1.0",
+   "author": "Kenney (kenney.nl)",
+   "source": "https://github.com/KenneyNL/Starter-Kit-Racing/blob/main/models/vehicle-motorcycle.glb",
+   "license_evidence": "https://github.com/KenneyNL/Starter-Kit-Racing/blob/main/README.md – \"Assets included in this package (2D sprites, 3D models and sound effects) are CC0 licensed\" (הקוד של הערכה MIT; הנכסים CC0)"
+  },
+  {
+   "file": "models/kenney_vehicle_truck_red.glb",
+   "bytes": 22212,
+   "sha256": "f613a4bcbb1aa143",
+   "license": "CC0-1.0",
+   "author": "Kenney (kenney.nl)",
+   "source": "https://github.com/KenneyNL/Starter-Kit-Racing/blob/main/models/vehicle-truck-red.glb",
+   "license_evidence": "https://github.com/KenneyNL/Starter-Kit-Racing/blob/main/README.md – \"Assets included in this package (2D sprites, 3D models and sound effects) are CC0 licensed\" (הקוד של הערכה MIT; הנכסים CC0)"
+  },
+  {
+   "file": "models/palm_date.glb",
+   "bytes": 15692,
+   "sha256": "30f9099ed9864dee",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/palm_washingtonia.glb",
+   "bytes": 10780,
+   "sha256": "3ee1553e2b232232",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/solar_water_heater.glb",
+   "bytes": 5804,
+   "sha256": "daa1d3a1a61151e7",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/street_light.glb",
+   "bytes": 5028,
+   "sha256": "980c3b096f961ca2",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/tree_ficus.glb",
+   "bytes": 7760,
+   "sha256": "8b33b45a0b0085ee",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "models/tree_olive.glb",
+   "bytes": 7048,
+   "sha256": "5933daaf50fe25d3",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_models.mjs",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "sky/quarry_01_512.hdr",
+   "bytes": 524337,
+   "sha256": "1117a2e966fe4651",
+   "license": "CC0-1.0",
+   "author": "Poly Haven (polyhaven.com)",
+   "source": "https://github.com/mrdoob/three.js/blob/master/examples/textures/equirectangular/quarry_01_1k.hdr",
+   "original": "https://polyhaven.com/a/quarry_01",
+   "license_evidence": "כל נכסי Poly Haven ב-CC0 (https://polyhaven.com/license). העותק נלקח ממאגר three.js; האתר polyhaven.com חסום מהסביבה – לא אומת ישירות מול דף הנכס.",
+   "modified": "הוקטן ל-512x256 (ממוצע ליניארי) ע\"י tools/hdr_resize.py"
+  },
+  {
+   "file": "sky/spruit_sunrise_512.hdr",
+   "bytes": 524337,
+   "sha256": "140528045d521255",
+   "license": "CC0-1.0",
+   "author": "Poly Haven (polyhaven.com)",
+   "source": "https://github.com/mrdoob/three.js/blob/master/examples/textures/equirectangular/spruit_sunrise_1k.hdr",
+   "original": "https://polyhaven.com/a/spruit_sunrise",
+   "license_evidence": "כל נכסי Poly Haven ב-CC0 (https://polyhaven.com/license). העותק נלקח ממאגר three.js; האתר polyhaven.com חסום מהסביבה – לא אומת ישירות מול דף הנכס.",
+   "modified": "הוקטן ל-512x256 (ממוצע ליניארי) ע\"י tools/hdr_resize.py"
+  },
+  {
+   "file": "sky/venice_sunset_512.hdr",
+   "bytes": 524337,
+   "sha256": "aec58ff125cc2b0b",
+   "license": "CC0-1.0",
+   "author": "Poly Haven (polyhaven.com)",
+   "source": "https://github.com/mrdoob/three.js/blob/master/examples/textures/equirectangular/venice_sunset_1k.hdr",
+   "original": "https://polyhaven.com/a/venice_sunset",
+   "license_evidence": "כל נכסי Poly Haven ב-CC0 (https://polyhaven.com/license). העותק נלקח ממאגר three.js; האתר polyhaven.com חסום מהסביבה – לא אומת ישירות מול דף הנכס.",
+   "modified": "הוקטן ל-512x256 (ממוצע ליניארי) ע\"י tools/hdr_resize.py"
+  },
+  {
+   "file": "textures/asphalt_albedo_1024.webp",
+   "bytes": 220036,
+   "sha256": "87ab9cb2922ef9fa",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_albedo_512.ktx2",
+   "bytes": 52013,
+   "sha256": "d2249ff5b0726ed7",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_albedo_512.webp",
+   "bytes": 31134,
+   "sha256": "a8f5d4eb5d6cef2c",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_normal_1024.webp",
+   "bytes": 691518,
+   "sha256": "25a160ef365c1937",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_normal_512.ktx2",
+   "bytes": 318858,
+   "sha256": "ba3d86ec3a9b2e25",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_normal_512.webp",
+   "bytes": 132510,
+   "sha256": "522e4450c64cb858",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_orm_1024.webp",
+   "bytes": 398330,
+   "sha256": "875df5c7b8e03b9b",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_orm_512.ktx2",
+   "bytes": 57090,
+   "sha256": "36af21413156e078",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/asphalt_orm_512.webp",
+   "bytes": 62048,
+   "sha256": "675195d7cfb5c70b",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_albedo_1024.webp",
+   "bytes": 133964,
+   "sha256": "bfa1660e7a938bba",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_albedo_512.ktx2",
+   "bytes": 50808,
+   "sha256": "2879c75dae40c954",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_albedo_512.webp",
+   "bytes": 20206,
+   "sha256": "7e666cf210239a6b",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_normal_1024.webp",
+   "bytes": 538830,
+   "sha256": "2c80ee82c1c75251",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_normal_512.ktx2",
+   "bytes": 293958,
+   "sha256": "d815a023b3b0988b",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_normal_512.webp",
+   "bytes": 97194,
+   "sha256": "8425980b203e3f7d",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_orm_1024.webp",
+   "bytes": 284234,
+   "sha256": "323083567f60c382",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_orm_512.ktx2",
+   "bytes": 54523,
+   "sha256": "de10486936a20a55",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/concrete_orm_512.webp",
+   "bytes": 31900,
+   "sha256": "7c4479620947f338",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_albedo_1024.webp",
+   "bytes": 2520,
+   "sha256": "d57fba2681796d16",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_albedo_512.ktx2",
+   "bytes": 3360,
+   "sha256": "0912475632431864",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_albedo_512.webp",
+   "bytes": 752,
+   "sha256": "d04bcb8c9a41e72d",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_normal_1024.webp",
+   "bytes": 1946,
+   "sha256": "62de64a571119da5",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_normal_512.ktx2",
+   "bytes": 685,
+   "sha256": "5fe9008334c3cfec",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_normal_512.webp",
+   "bytes": 548,
+   "sha256": "f7b568a3c1fd8300",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_orm_1024.webp",
+   "bytes": 1950,
+   "sha256": "b8b69648747a132a",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_orm_512.ktx2",
+   "bytes": 966,
+   "sha256": "613c6c41679bcd26",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/glass_orm_512.webp",
+   "bytes": 552,
+   "sha256": "323c14f4102ede1f",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_albedo_1024.webp",
+   "bytes": 63546,
+   "sha256": "a867e46b7a5d9056",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_albedo_512.ktx2",
+   "bytes": 46243,
+   "sha256": "0dbe835e000e3b32",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_albedo_512.webp",
+   "bytes": 7192,
+   "sha256": "006b9b7a1ed883db",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_normal_1024.webp",
+   "bytes": 145774,
+   "sha256": "0e9a6ee9cde203f3",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_normal_512.ktx2",
+   "bytes": 92608,
+   "sha256": "5c85ed77d9a9cb16",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_normal_512.webp",
+   "bytes": 9058,
+   "sha256": "809b1215d6953928",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_orm_1024.webp",
+   "bytes": 30880,
+   "sha256": "99ded89beda7eca8",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_orm_512.ktx2",
+   "bytes": 43607,
+   "sha256": "594a888656a95663",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/limestone_orm_512.webp",
+   "bytes": 5646,
+   "sha256": "8a3446e5a2c0d46f",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/materials.json",
+   "bytes": 1184,
+   "sha256": "4d320fdadd20eecc",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_albedo_1024.webp",
+   "bytes": 9440,
+   "sha256": "10307212fc6bd636",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_albedo_512.ktx2",
+   "bytes": 34265,
+   "sha256": "ebc1e62ef2304902",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_albedo_512.webp",
+   "bytes": 1404,
+   "sha256": "5358a4f9b50b9065",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_normal_1024.webp",
+   "bytes": 698546,
+   "sha256": "6c25e373bd7a3d9a",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_normal_512.ktx2",
+   "bytes": 321227,
+   "sha256": "2ef27cab9c1cc06a",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_normal_512.webp",
+   "bytes": 152092,
+   "sha256": "91332bf69b04f23b",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_orm_1024.webp",
+   "bytes": 415428,
+   "sha256": "73f653e2ebf3eec0",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_orm_512.ktx2",
+   "bytes": 53225,
+   "sha256": "84387806306ddc59",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/plaster_light_orm_512.webp",
+   "bytes": 85444,
+   "sha256": "9d2b53e5dca05dbb",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_albedo_1024.webp",
+   "bytes": 22130,
+   "sha256": "38d27aa27a8bb797",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_albedo_512.ktx2",
+   "bytes": 46266,
+   "sha256": "a42aa84dc2b8d15f",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_albedo_512.webp",
+   "bytes": 9624,
+   "sha256": "435ecdac476d35f4",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_normal_1024.webp",
+   "bytes": 225462,
+   "sha256": "292f3d7ea9e98608",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_normal_512.ktx2",
+   "bytes": 104368,
+   "sha256": "80245be197ebd979",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_normal_512.webp",
+   "bytes": 22620,
+   "sha256": "06d56b180a28e505",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_orm_1024.webp",
+   "bytes": 229486,
+   "sha256": "e723f8de330f24ac",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_orm_512.ktx2",
+   "bytes": 54914,
+   "sha256": "0a16736b472da8a8",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_flat_orm_512.webp",
+   "bytes": 30446,
+   "sha256": "dfe2092d61cd3c8c",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_albedo_1024.webp",
+   "bytes": 9458,
+   "sha256": "439f8add58be842d",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_albedo_512.ktx2",
+   "bytes": 30844,
+   "sha256": "6398543dbe45df98",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_albedo_512.webp",
+   "bytes": 3620,
+   "sha256": "ce7ae60a9ff4cc51",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_normal_1024.webp",
+   "bytes": 10106,
+   "sha256": "97331fe2e7bb878a",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_normal_512.ktx2",
+   "bytes": 14772,
+   "sha256": "1c3efd74a609efe4",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_normal_512.webp",
+   "bytes": 4416,
+   "sha256": "50852e5807b10c80",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_orm_1024.webp",
+   "bytes": 9000,
+   "sha256": "445b0e7bbe787e25",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_orm_512.ktx2",
+   "bytes": 19607,
+   "sha256": "7e048317529a0a40",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/roof_tiles_orm_512.webp",
+   "bytes": 2260,
+   "sha256": "0d410327e6a5bcf3",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_albedo_1024.webp",
+   "bytes": 44024,
+   "sha256": "bb2039846f45f92c",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_albedo_512.ktx2",
+   "bytes": 43179,
+   "sha256": "c642bf020e0bcc9d",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_albedo_512.webp",
+   "bytes": 4708,
+   "sha256": "aa88d53722470db9",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_normal_1024.webp",
+   "bytes": 479620,
+   "sha256": "ddbf8ec24c577847",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_normal_512.ktx2",
+   "bytes": 262992,
+   "sha256": "2ae24c905c8eba02",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_normal_512.webp",
+   "bytes": 76830,
+   "sha256": "bbcad7efbaeb9d26",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_orm_1024.webp",
+   "bytes": 238160,
+   "sha256": "a391f96211aa1f2e",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_orm_512.ktx2",
+   "bytes": 54352,
+   "sha256": "302cfc870920e7c4",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sand_orm_512.webp",
+   "bytes": 26896,
+   "sha256": "bbd0ea822e795baa",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_albedo_1024.webp",
+   "bytes": 22144,
+   "sha256": "529c4cc1dfc8b938",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_albedo_512.ktx2",
+   "bytes": 37024,
+   "sha256": "a5620fed61d59bc8",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_albedo_512.webp",
+   "bytes": 3856,
+   "sha256": "4da7a47fd2b502d2",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_normal_1024.webp",
+   "bytes": 168736,
+   "sha256": "4d9407870503f0de",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_normal_512.ktx2",
+   "bytes": 105505,
+   "sha256": "b5ca885f42516a6e",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_normal_512.webp",
+   "bytes": 15464,
+   "sha256": "c55e904383d1df3c",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_orm_1024.webp",
+   "bytes": 85400,
+   "sha256": "43200d21556ba699",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_orm_512.ktx2",
+   "bytes": 40005,
+   "sha256": "74e30d856453a916",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "textures/sidewalk_pavers_orm_512.webp",
+   "bytes": 9592,
+   "sha256": "334e93013da36912",
+   "license": "CC0-1.0",
+   "author": "ESH27 swarm",
+   "source": "tools/gen_textures.py",
+   "note": "נוצר בתוכנה ע\"י נחיל ESH27 (tools/gen_*.{py,mjs}) – משוחרר כ-CC0-1.0"
+  },
+  {
+   "file": "vendor/LICENSE-three.txt",
+   "bytes": 1081,
+   "sha256": "8b378ebe60e2fe50",
+   "license": "MIT",
+   "note": "רישיון three.js"
+  },
+  {
+   "file": "vendor/basis/basis_transcoder.js",
+   "bytes": 57529,
+   "sha256": "8478b5b6d6b74e7d",
+   "license": "Apache-2.0",
+   "author": "Binomial LLC (basis_universal) via three.js",
+   "source": "https://www.npmjs.com/package/three (0.186.1) examples/jsm/libs/basis/"
+  },
+  {
+   "file": "vendor/basis/basis_transcoder.wasm",
+   "bytes": 527333,
+   "sha256": "6cf17dc889352c42",
+   "license": "Apache-2.0",
+   "author": "Binomial LLC (basis_universal) via three.js",
+   "source": "https://www.npmjs.com/package/three (0.186.1) examples/jsm/libs/basis/"
+  },
+  {
+   "file": "vendor/esh-assets-loaders.js",
+   "bytes": 142716,
+   "sha256": "d92bf941d992b4a0",
+   "license": "MIT",
+   "author": "three.js authors; meshoptimizer – Arseny Kapoulkine",
+   "source": "tools/build-loaders.sh (bundle of three@0.186.1 addons)",
+   "license_file": "vendor/LICENSE-three.txt"
+  }
+ ]
+}

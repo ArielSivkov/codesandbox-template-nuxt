@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl"><head><meta charset="utf-8"><title>audio offline render harness</title></head>
+<body>
+<p>harness — מופעל ע"י test/render.mjs (Playwright)</p>
+<script type="module">
+import { createAudio, MODES } from '../audio.js';
+import { presetWeather } from '../../weather/weather.js';
+
+const SR = 48000, Q = 1024; // צעד עדכון = 1024 דגימות ≈ 21.3 מ"ש (כפולה של 128)
+
+function analyse(buf, from = 0) {
+  const chs = [buf.getChannelData(0), buf.getChannelData(1)], i0 = Math.floor(from * SR);
+  let peak = 0, ss = 0, n = 0, nan = 0, h = 2166136261 >>> 0;
+  const f = new Float32Array(1), u = new Uint32Array(f.buffer);
+  for (const c of chs) for (let i = 0; i < c.length; i++) {
+    const v = c[i]; if (!Number.isFinite(v)) { nan++; continue; }
+    if (i >= i0) { const a = Math.abs(v); if (a > peak) peak = a; ss += v * v; n++; }
+    f[0] = v; h = Math.imul(h ^ u[0], 16777619) >>> 0;
+  }
+  const rms = Math.sqrt(ss / Math.max(1, n));
+  return { peak, peakDb: 20 * Math.log10(peak || 1e-12), rmsDb: 20 * Math.log10(rms || 1e-12), nan, hash: h.toString(16) };
+}
+// קצב חציית אפס של אות מוחלק — מדד גס לגובה צליל / תוכן גבוהים בחלון זמן
+function zcr(buf, t0, t1) {
+  const c = buf.getChannelData(0), a = Math.floor(t0 * SR), b = Math.floor(t1 * SR); let z = 0, prev = 0, y = 0;
+  for (let i = a; i < b; i++) { y = 0.7 * y + 0.3 * c[i]; if ((y >= 0) !== (prev >= 0)) z++; prev = y; }
+  return z / (t1 - t0);
+}
+function bandRms(buf, t0, t1, hpHz) { // RMS אחרי high-pass מסדר 3 (שלושה מסננים חד-קוטביים בטור)
+  const c = buf.getChannelData(0), a = Math.floor(t0 * SR), b = Math.floor(t1 * SR), k = Math.exp(-2 * Math.PI * hpHz / SR);
+  const y = [0, 0, 0], px = [0, 0, 0]; let s = 0;
+  for (let i = a; i < b; i++) { let x = c[i]; for (let j = 0; j < 3; j++) { y[j] = k * (y[j] + x - px[j]); px[j] = x; x = y[j]; } s += x * x; }
+  return Math.sqrt(s / (b - a));
+}
+
+async function render(seconds, setup, { shabbat = false, maxVoices = 16, measureFrom = 0.5, stepQ = 1, hrtf = 4 } = {}) {
+  const ctx = new OfflineAudioContext(2, Math.round(seconds * SR), SR);
+  const audio = createAudio({ ctx, shabbat, maxVoices, seed: 27, hrtf });
+  await audio.unlock();
+  const tick = setup(audio) || (() => {});
+  let maxVoicesSeen = 0, t = 0; const dt = Q * stepQ / SR;
+  const stepAt = async (time) => {
+    ctx.suspend(time).then(() => { tick(t, dt); audio.update(dt); t += dt; maxVoicesSeen = Math.max(maxVoicesSeen, audio.stats().voices); if (time + dt < seconds) stepAt(time + dt); ctx.resume(); });
+  };
+  tick(0, dt); audio.update(dt); stepAt(dt);
+  const t0 = performance.now(); const buf = await ctx.startRendering(); const ms = performance.now() - t0;
+  const st = audio.stats();
+  return { buf, res: { ...analyse(buf, measureFrom), renderMs: ms, realtimeX: seconds * 1000 / ms, maxVoicesSeen, updateMsAvg: st.updateMsAvg, updateMsMax: st.updateMsMax, hrtf: st.hrtf } };
+}
+
+const L = { x: 0, y: 1.7, z: 0 };
+const vehicle = (mode, state, extra = {}) => a => { a.setEnvironment({ listener: L }); a.attachToVehicle(mode, () => state, extra); };
+const S = {};
+for (const m of MODES.filter(m => m !== 'walk')) {
+  const d = { car: 8, helicopter: 60, jetpack: 10, drone: 4, jet: 120, spaceship: 30, boat: 12 }[m];
+  S['v_' + m] = () => render(3, vehicle(m, { x: d, y: 1.7, z: 0, vx: 0, vy: 0, vz: 0, throttle: 0.7, speed: 12, thrust: 0.55, collective: 0.6, afterburner: m === 'jet' }));
+}
+S.v_car_player = () => render(3, a => { a.attachToVehicle('car', () => ({ x: 0, y: 1, z: 0, vx: 0, vy: 0, vz: 0, throttle: 1, speed: 25 }), { player: true }); a.setEnvironment({ listener: { x: 0, y: 2.5, z: 6 } }); });
+S.amb_storm = () => render(3, a => { a.setEnvironment({ weather: presetWeather('winter-storm').current, listener: L }); });
+S.amb_breeze = () => render(3, a => { a.setEnvironment({ weather: presetWeather('sea-breeze').current, listener: L }); });
+S.amb_waves_near = () => render(4, a => { a.setEnvironment({ weather: presetWeather('calm-clear').current, shoreDist: 15, listener: L }); });
+S.amb_waves_far = () => render(4, a => { a.setEnvironment({ weather: presetWeather('calm-clear').current, shoreDist: 400, listener: L }); });
+S.amb_city = () => render(4, a => { a.setEnvironment({ weather: presetWeather('calm-clear').current, area: { traffic: 1, park: 1, port: 0 }, listener: L }); });
+S.amb_port = () => render(6, a => { a.setEnvironment({ weather: presetWeather('calm-clear').current, area: { port: 1 }, listener: L }); });
+S.steps = () => render(3, a => { let z = 0; a.attachToVehicle('walk', () => ({ x: 0, y: 0, z: (z -= 1.6 * Q / SR), surface: 'concrete' }), { player: true }); });
+// דופלר: רחפן חולף ב-40 מ/ש, 5 מ' מהמאזין. מצפים לגובה גבוה יותר בהתקרבות
+S.doppler = async () => {
+  const { buf, res } = await render(4, a => { a.setEnvironment({ listener: L }); let x = -80; a.attachToVehicle('drone', () => ({ x: (x += 40 * Q / SR), y: 1.7, z: 5, vx: 40, vy: 0, vz: 0, thrust: 0.5 })); });
+  return { ...res, zcrApproach: zcr(buf, 0.6, 1.6), zcrRecede: zcr(buf, 2.6, 3.6) };
+};
+// הסתרה: אותה מכונית, עם/בלי בניין בין המקור למאזין
+S.occlusion = async () => {
+  const mk = withB => render(3, a => { a.setEnvironment({ listener: L, buildings: withB ? [{ minx: 10, maxx: 20, minz: -10, maxz: 10, top: 25 }] : [] }); a.attachToVehicle('car', () => ({ x: 40, y: 1, z: 0, vx: 0, vy: 0, vz: 0, throttle: 0.8, speed: 15 })); });
+  const o = await mk(false), b = await mk(true);
+  return { open: o.res, blocked: b.res, hfOpen: bandRms(o.buf, 0.5, 3, 2000), hfBlocked: bandRms(b.buf, 0.5, 3, 2000) };
+};
+// עומס מלא: 30 רכבים + סערה + עיר + נמל + ים + צעדים
+const fullMix = a => {
+  a.setEnvironment({ weather: presetWeather('winter-storm').current, area: { traffic: 1, park: 0.6, port: 0.8 }, shoreDist: 40, listener: L, buildings: [{ minx: 30, maxx: 60, minz: -30, maxz: 30, top: 40 }] });
+  for (let i = 0; i < 30; i++) { const m = MODES[1 + (i % 7)], ang = i * 0.7, r = 15 + i * 9; let ph = ang; a.attachToVehicle(m, () => { ph += 0.004; return { x: Math.cos(ph) * r, y: 3, z: Math.sin(ph) * r, throttle: 0.6 + 0.3 * Math.sin(ph * 3), speed: 18, thrust: 0.5, afterburner: i % 2 === 0 }; }); }
+  let z = 0; a.attachToVehicle('walk', () => ({ x: 0, y: 0, z: (z -= 1.5 * Q / SR) }), { player: true });
+};
+S.full = () => render(8, fullMix);
+S.full_shabbat = () => render(8, fullMix, { shabbat: true });
+S.full_8voices = () => render(8, fullMix, { maxVoices: 8 });
+
+// דטרמיניזם: אותו תרחיש פעמיים, הפרש מקסימלי בין דגימות
+S.determinism = async () => {
+  const a = await render(8, fullMix), b = await render(8, fullMix);
+  let d = 0; for (let ch = 0; ch < 2; ch++) { const x = a.buf.getChannelData(ch), y = b.buf.getChannelData(ch); for (let i = 0; i < x.length; i++) d = Math.max(d, Math.abs(x[i] - y[i])); }
+  return { maxAbsDiff: d, maxAbsDiffDb: 20 * Math.log10(d || 1e-15), bitExact: a.res.hash === b.res.hash, hashA: a.res.hash, hashB: b.res.hash };
+};
+// CPU: 10 ש' עומס מלא (16 ערוצים), עדכון כל ~1 ש' כדי למדוד את הגרף ולא את סבבי suspend; מול גרף ייחוס באותו רגע
+async function refGraph(seconds) { // ייחוס: 64 מתנדי sawtooth → biquad → gain (גרף "סטנדרטי" לכיול עומס המכונה)
+  const ctx = new OfflineAudioContext(2, seconds * SR, SR);
+  for (let i = 0; i < 64; i++) { const o = ctx.createOscillator(), f = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = 100 + i * 7; g.gain.value = 0.005; o.connect(f).connect(g).connect(ctx.destination); o.start(); }
+  const t0 = performance.now(); await ctx.startRendering(); return performance.now() - t0;
+}
+S.cpu = async () => {
+  const out = {};
+  for (const [k, h] of [['hrtf4', 4], ['hrtf2', 2], ['hrtf0', 0]]) {
+    const ref = await refGraph(10); const r = await render(10, fullMix, { stepQ: 47, hrtf: h }); const ref2 = await refGraph(10);
+    out[k] = { renderMs: r.res.renderMs, realtimeX: r.res.realtimeX, refMs: (ref + ref2) / 2, relToRef64osc: r.res.renderMs / ((ref + ref2) / 2) };
+  }
+  const ctx = new OfflineAudioContext(2, SR, SR), a = createAudio({ ctx }); await a.unlock();
+  out.prewarmMs = a.stats().prewarmMs; a.setEnvironment({ weather: presetWeather('winter-storm').current }); fullMix(a); a.update(1 / 60); out.nodes = a.stats().nodes; out.voices = a.stats().voices;
+  return out;
+};
+window.runScenario = async name => { const r = await S[name](); return r.res ? r.res : r; };
+window.render = render; window.fullMix = fullMix;
+window.scenarios = Object.keys(S);
+window.ready = true;
+</script>
+</body></html>

@@ -1,0 +1,832 @@
+{
+ "generated": "2026-11-22T22:59:21.775Z",
+ "budgets": {
+  "prop_tris": 2000,
+  "vehicle_tris": 5000,
+  "character_tris": 8000,
+  "tree_tris": 1500,
+  "glb_kb": 150,
+  "tex_px_mobile": 512,
+  "tex_px_high": 1024
+ },
+ "models": [
+  {
+   "file": "models/ac_unit.glb",
+   "before_kb": 20.5,
+   "after_kb": 7.9,
+   "tris": 252,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    0.8,
+    0.95,
+    0.66
+   ],
+   "materials": 4,
+   "draw_calls": 4
+  },
+  {
+   "file": "models/balcony_railing.glb",
+   "before_kb": 10.2,
+   "after_kb": 3.5,
+   "tris": 132,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    1,
+    1.03,
+    0.06
+   ],
+   "materials": 1,
+   "draw_calls": 1
+  },
+  {
+   "file": "models/balcony_railing_glass.glb",
+   "before_kb": 4.1,
+   "after_kb": 3.5,
+   "tris": 36,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    1,
+    1.06,
+    0.05
+   ],
+   "materials": 2,
+   "draw_calls": 2
+  },
+  {
+   "file": "models/bench.glb",
+   "before_kb": 10.8,
+   "after_kb": 4.5,
+   "tris": 132,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    1.8,
+    0.93,
+    0.58
+   ],
+   "materials": 2,
+   "draw_calls": 2
+  },
+  {
+   "file": "models/bus_stop.glb",
+   "before_kb": 16,
+   "after_kb": 9.7,
+   "tris": 156,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    4.95,
+    2.83,
+    1.6
+   ],
+   "materials": 8,
+   "draw_calls": 8
+  },
+  {
+   "file": "models/car_hatch.glb",
+   "before_kb": 38.3,
+   "after_kb": 10.5,
+   "tris": 440,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    1.83,
+    1.33,
+    4.05
+   ],
+   "materials": 6,
+   "draw_calls": 13
+  },
+  {
+   "file": "models/car_sedan.glb",
+   "before_kb": 38.6,
+   "after_kb": 11.4,
+   "tris": 440,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    1.88,
+    1.28,
+    4.65
+   ],
+   "materials": 7,
+   "draw_calls": 13
+  },
+  {
+   "file": "models/car_taxi.glb",
+   "before_kb": 38.6,
+   "after_kb": 11.4,
+   "tris": 440,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    1.88,
+    1.33,
+    4.75
+   ],
+   "materials": 7,
+   "draw_calls": 13
+  },
+  {
+   "file": "models/drone_quad.glb",
+   "before_kb": 31.9,
+   "after_kb": 13.1,
+   "tris": 372,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    0.46,
+    0.08,
+    0.45
+   ],
+   "materials": 6,
+   "draw_calls": 9
+  },
+  {
+   "file": "models/dumpster_frog.glb",
+   "before_kb": 12.2,
+   "after_kb": 4.4,
+   "tris": 152,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    1.62,
+    1.21,
+    1.15
+   ],
+   "materials": 2,
+   "draw_calls": 2
+  },
+  {
+   "file": "models/helicopter.glb",
+   "before_kb": 44.5,
+   "after_kb": 12.8,
+   "tris": 568,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    10.2,
+    2.91,
+    10.95
+   ],
+   "materials": 6,
+   "draw_calls": 7
+  },
+  {
+   "file": "models/jetpack.glb",
+   "before_kb": 36,
+   "after_kb": 8.7,
+   "tris": 464,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    0.48,
+    0.75,
+    0.59
+   ],
+   "materials": 4,
+   "draw_calls": 5
+  },
+  {
+   "file": "models/kenney_character_anim.glb",
+   "before_kb": 86,
+   "after_kb": 27.4,
+   "tris": 550,
+   "tri_budget": 8000,
+   "within_budget": true,
+   "size_m": [
+    1.2,
+    1.1,
+    0.64
+   ],
+   "materials": 1,
+   "draw_calls": 6
+  },
+  {
+   "file": "models/kenney_road_lightposts.glb",
+   "before_kb": 27.3,
+   "after_kb": 6.4,
+   "tris": 190,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    1,
+    0.55,
+    1
+   ],
+   "materials": 1,
+   "draw_calls": 1
+  },
+  {
+   "file": "models/kenney_vehicle_motorcycle.glb",
+   "before_kb": 103.3,
+   "after_kb": 15.2,
+   "tris": 960,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    1.09,
+    1.27,
+    2.44
+   ],
+   "materials": 1,
+   "draw_calls": 4
+  },
+  {
+   "file": "models/kenney_vehicle_truck_red.glb",
+   "before_kb": 98,
+   "after_kb": 21.7,
+   "tris": 946,
+   "tri_budget": 5000,
+   "within_budget": true,
+   "size_m": [
+    1.5,
+    1.3,
+    2.8
+   ],
+   "materials": 1,
+   "draw_calls": 6
+  },
+  {
+   "file": "models/palm_date.glb",
+   "before_kb": 56.7,
+   "after_kb": 15.3,
+   "tris": 784,
+   "tri_budget": 1500,
+   "within_budget": true,
+   "size_m": [
+    7.57,
+    8.19,
+    7.53
+   ],
+   "materials": 2,
+   "draw_calls": 2
+  },
+  {
+   "file": "models/palm_washingtonia.glb",
+   "before_kb": 36.5,
+   "after_kb": 10.5,
+   "tris": 488,
+   "tri_budget": 1500,
+   "within_budget": true,
+   "size_m": [
+    4.4,
+    12.37,
+    4.58
+   ],
+   "materials": 3,
+   "draw_calls": 3
+  },
+  {
+   "file": "models/solar_water_heater.glb",
+   "before_kb": 12.3,
+   "after_kb": 5.7,
+   "tris": 144,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    1.95,
+    1.73,
+    1.78
+   ],
+   "materials": 3,
+   "draw_calls": 3
+  },
+  {
+   "file": "models/street_light.glb",
+   "before_kb": 13.3,
+   "after_kb": 4.9,
+   "tris": 160,
+   "tri_budget": 2000,
+   "within_budget": true,
+   "size_m": [
+    3.55,
+    9,
+    0.44
+   ],
+   "materials": 3,
+   "draw_calls": 3
+  },
+  {
+   "file": "models/tree_ficus.glb",
+   "before_kb": 37.6,
+   "after_kb": 7.6,
+   "tris": 512,
+   "tri_budget": 1500,
+   "within_budget": true,
+   "size_m": [
+    6.18,
+    7.71,
+    5.53
+   ],
+   "materials": 2,
+   "draw_calls": 2
+  },
+  {
+   "file": "models/tree_olive.glb",
+   "before_kb": 29.7,
+   "after_kb": 6.9,
+   "tris": 400,
+   "tri_budget": 1500,
+   "within_budget": true,
+   "size_m": [
+    4.02,
+    4.97,
+    3.67
+   ],
+   "materials": 2,
+   "draw_calls": 2
+  }
+ ],
+ "textures": [
+  {
+   "file": "textures/asphalt_albedo_512",
+   "px": 512,
+   "source_png_kb": 1422.4,
+   "webp_kb": 30.4,
+   "ktx2_kb": 50.8,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/asphalt_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 1422.4,
+   "webp_kb": 214.9,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/asphalt_normal_512",
+   "px": 512,
+   "source_png_kb": 2833,
+   "webp_kb": 129.4,
+   "ktx2_kb": 311.4,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/asphalt_normal_1024",
+   "px": 1024,
+   "source_png_kb": 2833,
+   "webp_kb": 675.3,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/asphalt_orm_512",
+   "px": 512,
+   "source_png_kb": 1445.7,
+   "webp_kb": 60.6,
+   "ktx2_kb": 55.8,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/asphalt_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1445.7,
+   "webp_kb": 389,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/concrete_albedo_512",
+   "px": 512,
+   "source_png_kb": 1048,
+   "webp_kb": 19.7,
+   "ktx2_kb": 49.6,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/concrete_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 1048,
+   "webp_kb": 130.8,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/concrete_normal_512",
+   "px": 512,
+   "source_png_kb": 2297.2,
+   "webp_kb": 94.9,
+   "ktx2_kb": 287.1,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/concrete_normal_1024",
+   "px": 1024,
+   "source_png_kb": 2297.2,
+   "webp_kb": 526.2,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/concrete_orm_512",
+   "px": 512,
+   "source_png_kb": 1335.5,
+   "webp_kb": 31.2,
+   "ktx2_kb": 53.2,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/concrete_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1335.5,
+   "webp_kb": 277.6,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/glass_albedo_512",
+   "px": 512,
+   "source_png_kb": 31.9,
+   "webp_kb": 0.7,
+   "ktx2_kb": 3.3,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/glass_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 31.9,
+   "webp_kb": 2.5,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/glass_normal_512",
+   "px": 512,
+   "source_png_kb": 5.2,
+   "webp_kb": 0.5,
+   "ktx2_kb": 0.7,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/glass_normal_1024",
+   "px": 1024,
+   "source_png_kb": 5.2,
+   "webp_kb": 1.9,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/glass_orm_512",
+   "px": 512,
+   "source_png_kb": 5.2,
+   "webp_kb": 0.5,
+   "ktx2_kb": 0.9,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/glass_orm_1024",
+   "px": 1024,
+   "source_png_kb": 5.2,
+   "webp_kb": 1.9,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/limestone_albedo_512",
+   "px": 512,
+   "source_png_kb": 1106.2,
+   "webp_kb": 7,
+   "ktx2_kb": 45.2,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/limestone_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 1106.2,
+   "webp_kb": 62.1,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/limestone_normal_512",
+   "px": 512,
+   "source_png_kb": 1545.5,
+   "webp_kb": 8.8,
+   "ktx2_kb": 90.4,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/limestone_normal_1024",
+   "px": 1024,
+   "source_png_kb": 1545.5,
+   "webp_kb": 142.4,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/limestone_orm_512",
+   "px": 512,
+   "source_png_kb": 1041.4,
+   "webp_kb": 5.5,
+   "ktx2_kb": 42.6,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/limestone_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1041.4,
+   "webp_kb": 30.2,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/plaster_light_albedo_512",
+   "px": 512,
+   "source_png_kb": 1098.4,
+   "webp_kb": 1.4,
+   "ktx2_kb": 33.5,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/plaster_light_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 1098.4,
+   "webp_kb": 9.2,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/plaster_light_normal_512",
+   "px": 512,
+   "source_png_kb": 2798.6,
+   "webp_kb": 148.5,
+   "ktx2_kb": 313.7,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/plaster_light_normal_1024",
+   "px": 1024,
+   "source_png_kb": 2798.6,
+   "webp_kb": 682.2,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/plaster_light_orm_512",
+   "px": 512,
+   "source_png_kb": 1700.6,
+   "webp_kb": 83.4,
+   "ktx2_kb": 52,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/plaster_light_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1700.6,
+   "webp_kb": 405.7,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/roof_flat_albedo_512",
+   "px": 512,
+   "source_png_kb": 890.8,
+   "webp_kb": 9.4,
+   "ktx2_kb": 45.2,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/roof_flat_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 890.8,
+   "webp_kb": 21.6,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/roof_flat_normal_512",
+   "px": 512,
+   "source_png_kb": 1682.3,
+   "webp_kb": 22.1,
+   "ktx2_kb": 101.9,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/roof_flat_normal_1024",
+   "px": 1024,
+   "source_png_kb": 1682.3,
+   "webp_kb": 220.2,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/roof_flat_orm_512",
+   "px": 512,
+   "source_png_kb": 1470.6,
+   "webp_kb": 29.7,
+   "ktx2_kb": 53.6,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/roof_flat_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1470.6,
+   "webp_kb": 224.1,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/roof_tiles_albedo_512",
+   "px": 512,
+   "source_png_kb": 921.1,
+   "webp_kb": 3.5,
+   "ktx2_kb": 30.1,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/roof_tiles_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 921.1,
+   "webp_kb": 9.2,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/roof_tiles_normal_512",
+   "px": 512,
+   "source_png_kb": 12.2,
+   "webp_kb": 4.3,
+   "ktx2_kb": 14.4,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/roof_tiles_normal_1024",
+   "px": 1024,
+   "source_png_kb": 12.2,
+   "webp_kb": 9.9,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/roof_tiles_orm_512",
+   "px": 512,
+   "source_png_kb": 705.2,
+   "webp_kb": 2.2,
+   "ktx2_kb": 19.1,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/roof_tiles_orm_1024",
+   "px": 1024,
+   "source_png_kb": 705.2,
+   "webp_kb": 8.8,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/sand_albedo_512",
+   "px": 512,
+   "source_png_kb": 1150,
+   "webp_kb": 4.6,
+   "ktx2_kb": 42.2,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/sand_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 1150,
+   "webp_kb": 43,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/sand_normal_512",
+   "px": 512,
+   "source_png_kb": 2312,
+   "webp_kb": 75,
+   "ktx2_kb": 256.8,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/sand_normal_1024",
+   "px": 1024,
+   "source_png_kb": 2312,
+   "webp_kb": 468.4,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/sand_orm_512",
+   "px": 512,
+   "source_png_kb": 1234.6,
+   "webp_kb": 26.3,
+   "ktx2_kb": 53.1,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/sand_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1234.6,
+   "webp_kb": 232.6,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/sidewalk_pavers_albedo_512",
+   "px": 512,
+   "source_png_kb": 1158.2,
+   "webp_kb": 3.8,
+   "ktx2_kb": 36.2,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/sidewalk_pavers_albedo_1024",
+   "px": 1024,
+   "source_png_kb": 1158.2,
+   "webp_kb": 21.6,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  },
+  {
+   "file": "textures/sidewalk_pavers_normal_512",
+   "px": 512,
+   "source_png_kb": 1594,
+   "webp_kb": 15.1,
+   "ktx2_kb": 103,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.33
+  },
+  {
+   "file": "textures/sidewalk_pavers_normal_1024",
+   "px": 1024,
+   "source_png_kb": 1594,
+   "webp_kb": 164.8,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 1.33
+  },
+  {
+   "file": "textures/sidewalk_pavers_orm_512",
+   "px": 512,
+   "source_png_kb": 1229.4,
+   "webp_kb": 9.4,
+   "ktx2_kb": 39.1,
+   "gpu_mb_if_webp": 1.33,
+   "gpu_mb_if_ktx2": 0.17
+  },
+  {
+   "file": "textures/sidewalk_pavers_orm_1024",
+   "px": 1024,
+   "source_png_kb": 1229.4,
+   "webp_kb": 83.4,
+   "ktx2_kb": null,
+   "gpu_mb_if_webp": 5.33,
+   "gpu_mb_if_ktx2": 0.67
+  }
+ ]
+}

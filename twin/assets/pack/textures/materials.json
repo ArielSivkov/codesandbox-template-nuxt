@@ -1,0 +1,60 @@
+{
+ "concrete": {
+  "tile_m": 2.0,
+  "he": "בטון חשוף",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "plaster_light": {
+  "tile_m": 1.0,
+  "he": "שליכט / טיח בהיר",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "limestone": {
+  "tile_m": 1.2,
+  "he": "אבן גיר נסורה (בהשראת אבן ירושלמית)",
+  "roughness": 1,
+  "metalness": 0,
+  "note": "אבן 60x30 ס\"מ"
+ },
+ "asphalt": {
+  "tile_m": 4.0,
+  "he": "אספלט",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "sidewalk_pavers": {
+  "tile_m": 1.0,
+  "he": "מדרכה – אבן משתלבת",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "sand": {
+  "tile_m": 3.0,
+  "he": "חול",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "roof_flat": {
+  "tile_m": 3.0,
+  "he": "גג שטוח – איטום",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "roof_tiles": {
+  "tile_m": 1.0,
+  "he": "רעפי חרס",
+  "roughness": 1,
+  "metalness": 0
+ },
+ "glass": {
+  "tile_m": 2.0,
+  "he": "זכוכית",
+  "roughness": 1,
+  "metalness": 0.55,
+  "envMapIntensity": 1.6,
+  "transparent": false,
+  "note": "לטלפון: לא שקוף (opaque) עם השתקפות סביבה; שקיפות אמיתית יקרה במיון"
+ }
+}

@@ -1,0 +1,50 @@
+תקציב ביצועים למובייל – עולם תאום (לוח היזם) – גרסה 1, 23.11.2026
+מכשיר יעד: טלפון אנדרואיד בינוני (שיאומי רדמי), כרום, WebGL2. צוות "נחלת הכלל ואיכות מובייל".
+מקרא: [מקור] = מספר או כלל שמופיע במקור המצוטט. [שלנו] = מספר שקבענו, נגזר מהמקור או ממדידה שלנו – אפשר לשנות אחרי מדידה על הרדמי האמיתי (עוד לא נמדד על מכשיר אמיתי – רק על כרום עם רינדור תוכנה בארגז החול).
+
+== הטבלה ==
+נושא                          | יעד (רצפה / מטרה)                         | הערה
+------------------------------|-------------------------------------------|------------------------------------------
+קצב פריימים                    | 30 לפחות / 60 מטרה (33 / 16.7 מ"ש לפריים)  | [שלנו] המשחק כבר מוריד איכות אוטומטית מתחת ל-27
+טעינה ראשונה (עד פריים ראשון)   | עד 5MB דחוס ברשת; עד 3 ש' ב-4G            | [שלנו] JS עד 1MB (three.js מצומצמת), נכסים עד 3MB, אריחים ראשונים עד 1–2MB
+זיכרון טקסטורות ב-GPU           | עד 64MB סה"כ; טקסטורת חומר 512 במובייל    | [מקור] PNG/JPEG/WebP = רוחב×גובה×4×1.333 ב-GPU (McCurdy). KTX2: פי 4–8 פחות
+קריאות ציור (draw calls)        | עד 150 (רצפה 200)                         | [מקור] "100-200 draw calls is a rough target for low end mobile devices" (PlayCanvas)
+משולשים בתמונה                  | עד 250 אלף (שכבת איכות נמוכה: 150 אלף)    | [שלנו] נגזר: המפה של גדוד 6 ירדה ל-115 אלף והגיעה לפריים ראשון ב-131 מ"ש
+יחס פיקסלים (DPR)               | תקרה 1.5; ירידה ל-1.0 כשה-FPS נמוך        | [מקור] PlayCanvas מזהיר ש-DPR מלא "can cause a significant drop in frame rate". המשחק כבר משתמש ב-1.5
+מפת צל                          | שמש אחת: 1024² (נמוך 512², גבוה 2048²)    | [שלנו] מצלמת צל צמודה לשחקן, 60–80 מ'; צל מכל אור נקודתי = 6 רינדורים [מקור PlayCanvas] – לא להשתמש
+צללים מדורגים (CSM)             | רק בשכבה הגבוהה, 2 מדרגות לכל היותר        | [שלנו] כל מדרגה = רינדור נוסף של הסצנה
+ערימת JS (heap)                 | עד 150MB; כמעט 0 הקצאות לפריים            | [שלנו] המנוע כבר מודד performance.memory
+גודל מודל בודד (GLB)            | עד 150KB; אביזר 2,000 משולשים, רכב 5,000, דמות 8,000, עץ 1,500 | [שלנו] נבדק אוטומטית ב-tools/optimize.mjs
+אורות דינמיים                   | שמש + סביבה (HDRI/PMREM) בלבד; פנסי רחוב בלילה = אפקט זוהר, לא אור | [מקור] PlayCanvas: "Keep them to a minimum"
+
+== מה מדדנו על החבילה (כרום בארגז החול, רינדור תוכנה, 360x800, DPR 1.5) ==
+- 45 פריטים נטענו בלי שגיאות. משולשים בתמונה: 18–29 אלף. קריאות ציור: 206–320 – מעל התקציב! הסיבה: עמוד הבדיקה מציג כל מודל כמו שהוא (כמה חומרים לכל מודל), בלי מיזוג ובלי שכפול (instancing). בעולם האמיתי חובה להשתמש בטכניקות 1–2 למטה.
+- זיכרון טקסטורות של 9 חומרים × 3 מפות ב-512: WebP ≈ 36MB ב-GPU, KTX2 ≈ 4.6–9MB. זה ההבדל בין "נכנס" ל"קורס" על רדמי.
+- FPS בארגז החול לא אומר כלום (רינדור תוכנה). צריך מדידה על הרדמי עצמו.
+
+== 10 הטכניקות עם ההשפעה הגדולה ביותר (three.js, מובייל) ==
+1. מיזוג ושכפול גאומטריה – InstancedMesh לעצים, פנסים, מזגנים, מעקות, מכוניות חונות (קריאת ציור אחת לכל סוג); BatchedMesh לגאומטריות שונות עם אותו חומר; mergeGeometries לבניינים סטטיים באריח. זו הדרך היחידה לרדת מ-300 ל-150 קריאות.
+   מקורות: https://threejs.org/docs/pages/BatchedMesh.html ; https://threejs.org/examples/webgl_batch_lod_bvh.html ; https://discourse.threejs.org/t/optimizing-performance-with-imported-gltf-models/12425
+2. טקסטורות KTX2 (Basis) – צבע ב-ETC1S, נורמל (ומפות נתונים) ב-UASTC. נשארות דחוסות ב-GPU: פי 4–8 פחות זיכרון מ-PNG/WebP.
+   מקורות: https://www.donmccurdy.com/2024/02/11/web-texture-formats/ ; https://github.com/KhronosGroup/3D-Formats-Guidelines/blob/main/KTXArtistGuide.md ; https://threejs.org/docs/pages/KTX2Loader.html
+3. רמות פירוט (LOD) – בניין רחוק = קופסה עם טקסטורת חזית; עץ רחוק = כרטיס (impostor). three.js LOD או BatchedMesh עם LOD.
+   מקור: https://discourse.threejs.org/t/when-is-it-actually-beneficial-to-use-lod-in-three-js-for-performance/87697/11
+4. חיתוך לפי שדה ראייה (frustum culling) ברמת אריח/קבוצה – לא ברמת אובייקט קטן; ב-InstancedMesh לחשב boundingSphere לכל קבוצה (או InstancedMesh2 שמחתך לכל מופע).
+   מקור: https://discourse.threejs.org/t/instancedmesh2-easy-handling-and-frustum-culling/58622
+5. אטלס טקסטורות / חומר משותף – כל האביזרים בחבילה משתמשים בצבעים בלבד (בלי טקסטורה) או בטבלת צבעים אחת (Kenney colormap) → אפשר למזג אותם לקריאה אחת.
+   מקור: https://discourse.threejs.org/t/three-scene-optimization-texture-size-calculation-in-gpu-compression-merge-meshes-what-the-limits/23972
+6. תאורה אפויה מול בזמן אמת – AO אפוי בטקסטורה (ערוץ R של ORM בחבילה) + שמש אחת עם צל; בלי SSAO במובייל.
+   מקור: https://www.utsubo.com/blog/threejs-best-practices-100-tips
+7. מפת צל אחת קטנה וצמודה לשחקן במקום צללים מדורגים; לעדכן את הצל רק כשהשמש זזה או כל פריים שני (shadowMap.autoUpdate=false + needsUpdate).
+   מקור: https://developer.playcanvas.com/user-manual/optimization/guidelines/
+8. רינדור לפי דרישה – במצב "מפה/מצגת" (לא משחק) לצייר רק כשהמצלמה או הנתונים זזים. חוסך סוללה וחום.
+   מקור: https://threejs.org/manual/en/rendering-on-demand.html
+9. Workers – בניית אריחים, פענוח meshopt ו-Basis כבר רצים ב-Worker (KTX2Loader ו-MeshoptDecoder עושים זאת); אפשר גם OffscreenCanvas.
+   מקור: https://web.dev/articles/offscreen-canvas
+10. בלי זבל בלולאה (GC) – לא ליצור Vector3/מערכים בתוך הלולאה; להשתמש מחדש באובייקטים; dispose() לגאומטריה וטקסטורות של אריח שיוצא מהזיכרון.
+   מקור: https://discourse.threejs.org/t/problems-with-performance-on-mobile-devices/23734
+
+== שכבות איכות מומלצות ==
+נמוכה: DPR 1.0, צל 512 או כבוי, טקסטורות 256–512, 150 אלף משולשים, 100 קריאות.
+בינונית (ברירת מחדל ברדמי): DPR 1.25–1.5, צל 1024, טקסטורות 512 KTX2, 250 אלף משולשים, 150 קריאות.
+גבוהה (טלפון חזק/מחשב): DPR 2, צל 2048 או 2 מדרגות CSM, טקסטורות 1024, 500 אלף משולשים, 300 קריאות.

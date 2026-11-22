@@ -1,0 +1,84 @@
+ESH27 – דוח גדלים לפני/אחרי (נוצר אוטומטית ע"י tools/optimize.mjs)
+
+מודלים: קובץ | לפני KB | אחרי KB | משולשים / תקציב | קריאות ציור | בתקציב?
+models/ac_unit.glb | 20.5 | 7.9 | 252/2000 | 4 | כן
+models/balcony_railing.glb | 10.2 | 3.5 | 132/2000 | 1 | כן
+models/balcony_railing_glass.glb | 4.1 | 3.5 | 36/2000 | 2 | כן
+models/bench.glb | 10.8 | 4.5 | 132/2000 | 2 | כן
+models/bus_stop.glb | 16 | 9.7 | 156/2000 | 8 | כן
+models/car_hatch.glb | 38.3 | 10.5 | 440/5000 | 13 | כן
+models/car_sedan.glb | 38.6 | 11.4 | 440/5000 | 13 | כן
+models/car_taxi.glb | 38.6 | 11.4 | 440/5000 | 13 | כן
+models/drone_quad.glb | 31.9 | 13.1 | 372/5000 | 9 | כן
+models/dumpster_frog.glb | 12.2 | 4.4 | 152/2000 | 2 | כן
+models/helicopter.glb | 44.5 | 12.8 | 568/5000 | 7 | כן
+models/jetpack.glb | 36 | 8.7 | 464/5000 | 5 | כן
+models/kenney_character_anim.glb | 86 | 27.4 | 550/8000 | 6 | כן
+models/kenney_road_lightposts.glb | 27.3 | 6.4 | 190/2000 | 1 | כן
+models/kenney_vehicle_motorcycle.glb | 103.3 | 15.2 | 960/5000 | 4 | כן
+models/kenney_vehicle_truck_red.glb | 98 | 21.7 | 946/5000 | 6 | כן
+models/palm_date.glb | 56.7 | 15.3 | 784/1500 | 2 | כן
+models/palm_washingtonia.glb | 36.5 | 10.5 | 488/1500 | 3 | כן
+models/solar_water_heater.glb | 12.3 | 5.7 | 144/2000 | 3 | כן
+models/street_light.glb | 13.3 | 4.9 | 160/2000 | 3 | כן
+models/tree_ficus.glb | 37.6 | 7.6 | 512/1500 | 2 | כן
+models/tree_olive.glb | 29.7 | 6.9 | 400/1500 | 2 | כן
+סה"כ מודלים: לפני 802.4 KB, אחרי 223 KB
+
+טקסטורות: קובץ | PNG מקור KB | WebP KB | KTX2 KB | זיכרון GPU ב-WebP MB | ב-KTX2 MB
+textures/asphalt_albedo_512 | 1422.4 | 30.4 | 50.8 | 1.33 | 0.17
+textures/asphalt_albedo_1024 | 1422.4 | 214.9 | null | 5.33 | 0.67
+textures/asphalt_normal_512 | 2833 | 129.4 | 311.4 | 1.33 | 0.33
+textures/asphalt_normal_1024 | 2833 | 675.3 | null | 5.33 | 1.33
+textures/asphalt_orm_512 | 1445.7 | 60.6 | 55.8 | 1.33 | 0.17
+textures/asphalt_orm_1024 | 1445.7 | 389 | null | 5.33 | 0.67
+textures/concrete_albedo_512 | 1048 | 19.7 | 49.6 | 1.33 | 0.17
+textures/concrete_albedo_1024 | 1048 | 130.8 | null | 5.33 | 0.67
+textures/concrete_normal_512 | 2297.2 | 94.9 | 287.1 | 1.33 | 0.33
+textures/concrete_normal_1024 | 2297.2 | 526.2 | null | 5.33 | 1.33
+textures/concrete_orm_512 | 1335.5 | 31.2 | 53.2 | 1.33 | 0.17
+textures/concrete_orm_1024 | 1335.5 | 277.6 | null | 5.33 | 0.67
+textures/glass_albedo_512 | 31.9 | 0.7 | 3.3 | 1.33 | 0.17
+textures/glass_albedo_1024 | 31.9 | 2.5 | null | 5.33 | 0.67
+textures/glass_normal_512 | 5.2 | 0.5 | 0.7 | 1.33 | 0.33
+textures/glass_normal_1024 | 5.2 | 1.9 | null | 5.33 | 1.33
+textures/glass_orm_512 | 5.2 | 0.5 | 0.9 | 1.33 | 0.17
+textures/glass_orm_1024 | 5.2 | 1.9 | null | 5.33 | 0.67
+textures/limestone_albedo_512 | 1106.2 | 7 | 45.2 | 1.33 | 0.17
+textures/limestone_albedo_1024 | 1106.2 | 62.1 | null | 5.33 | 0.67
+textures/limestone_normal_512 | 1545.5 | 8.8 | 90.4 | 1.33 | 0.33
+textures/limestone_normal_1024 | 1545.5 | 142.4 | null | 5.33 | 1.33
+textures/limestone_orm_512 | 1041.4 | 5.5 | 42.6 | 1.33 | 0.17
+textures/limestone_orm_1024 | 1041.4 | 30.2 | null | 5.33 | 0.67
+textures/plaster_light_albedo_512 | 1098.4 | 1.4 | 33.5 | 1.33 | 0.17
+textures/plaster_light_albedo_1024 | 1098.4 | 9.2 | null | 5.33 | 0.67
+textures/plaster_light_normal_512 | 2798.6 | 148.5 | 313.7 | 1.33 | 0.33
+textures/plaster_light_normal_1024 | 2798.6 | 682.2 | null | 5.33 | 1.33
+textures/plaster_light_orm_512 | 1700.6 | 83.4 | 52 | 1.33 | 0.17
+textures/plaster_light_orm_1024 | 1700.6 | 405.7 | null | 5.33 | 0.67
+textures/roof_flat_albedo_512 | 890.8 | 9.4 | 45.2 | 1.33 | 0.17
+textures/roof_flat_albedo_1024 | 890.8 | 21.6 | null | 5.33 | 0.67
+textures/roof_flat_normal_512 | 1682.3 | 22.1 | 101.9 | 1.33 | 0.33
+textures/roof_flat_normal_1024 | 1682.3 | 220.2 | null | 5.33 | 1.33
+textures/roof_flat_orm_512 | 1470.6 | 29.7 | 53.6 | 1.33 | 0.17
+textures/roof_flat_orm_1024 | 1470.6 | 224.1 | null | 5.33 | 0.67
+textures/roof_tiles_albedo_512 | 921.1 | 3.5 | 30.1 | 1.33 | 0.17
+textures/roof_tiles_albedo_1024 | 921.1 | 9.2 | null | 5.33 | 0.67
+textures/roof_tiles_normal_512 | 12.2 | 4.3 | 14.4 | 1.33 | 0.33
+textures/roof_tiles_normal_1024 | 12.2 | 9.9 | null | 5.33 | 1.33
+textures/roof_tiles_orm_512 | 705.2 | 2.2 | 19.1 | 1.33 | 0.17
+textures/roof_tiles_orm_1024 | 705.2 | 8.8 | null | 5.33 | 0.67
+textures/sand_albedo_512 | 1150 | 4.6 | 42.2 | 1.33 | 0.17
+textures/sand_albedo_1024 | 1150 | 43 | null | 5.33 | 0.67
+textures/sand_normal_512 | 2312 | 75 | 256.8 | 1.33 | 0.33
+textures/sand_normal_1024 | 2312 | 468.4 | null | 5.33 | 1.33
+textures/sand_orm_512 | 1234.6 | 26.3 | 53.1 | 1.33 | 0.17
+textures/sand_orm_1024 | 1234.6 | 232.6 | null | 5.33 | 0.67
+textures/sidewalk_pavers_albedo_512 | 1158.2 | 3.8 | 36.2 | 1.33 | 0.17
+textures/sidewalk_pavers_albedo_1024 | 1158.2 | 21.6 | null | 5.33 | 0.67
+textures/sidewalk_pavers_normal_512 | 1594 | 15.1 | 103 | 1.33 | 0.33
+textures/sidewalk_pavers_normal_1024 | 1594 | 164.8 | null | 5.33 | 1.33
+textures/sidewalk_pavers_orm_512 | 1229.4 | 9.4 | 39.1 | 1.33 | 0.17
+textures/sidewalk_pavers_orm_1024 | 1229.4 | 83.4 | null | 5.33 | 0.67
+סה"כ 512: WebP 827.9 KB, KTX2 2184.9 KB, זיכרון GPU 35.9 MB (WebP) מול 6 MB (KTX2)
+סה"כ 1024: WebP 5059.5 KB, KTX2 0 KB, זיכרון GPU 143.9 MB (WebP) מול 24 MB (KTX2)

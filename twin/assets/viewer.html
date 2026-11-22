@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ESH27 – בודק חבילת נכסים (מובייל)</title>
+<style>
+@font-face{font-family:Heebo;src:url(pack/fonts/heebo-hebrew-400-normal.woff2) format('woff2');font-weight:400}
+@font-face{font-family:Heebo;src:url(pack/fonts/heebo-hebrew-700-normal.woff2) format('woff2');font-weight:700}
+html,body{margin:0;height:100%;background:#0d1420;color:#eef3f8;font-family:Heebo,system-ui,sans-serif;overflow:hidden}
+#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+#hud{position:fixed;top:8px;right:8px;left:8px;background:rgba(12,20,32,.82);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:6px 10px;font-size:12px;line-height:1.45}
+#hud b{font-size:14px}
+#hud .e{color:#ff8a65}
+#views{position:fixed;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+#views button{font:inherit;font-size:13px;color:#eef3f8;background:rgba(12,20,32,.85);border:1px solid rgba(255,255,255,.2);border-radius:10px;padding:6px 10px}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="hud"><b>חבילת נכסים ESH27 – בדיקת טעינה</b><div id="st">טוען…</div></div>
+<div id="views"><button data-v="street">רחוב</button><button data-v="air">אוויר</button><button data-v="mat">חומרים</button><button data-v="veh">כלים</button></div>
+<!-- engine stack used by twin/game: window.THREE r186 (classic) + our classic loader bundle -->
+<script src="../game/vendor/three.min.js"></script>
+<script src="pack/vendor/esh-assets-loaders.js"></script>
+<script>
+(async () => {
+const T = THREE, A = window.ESH_ASSETS, qs = new URLSearchParams(location.search);
+const V = window.__VIEWER = { ready: false, errors: [], loaded: [], t0: performance.now() };
+window.addEventListener('error', e => V.errors.push(String(e.message)));
+const st = document.getElementById('st');
+const DPR = Math.min(devicePixelRatio || 1, 1.5);                         // budget: pixel-ratio cap 1.5
+const renderer = new T.WebGLRenderer({ canvas: document.getElementById('cv'), antialias: false, powerPreference: 'high-performance', stencil: false });
+renderer.setPixelRatio(DPR); renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.9;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFShadowMap;
+const scene = new T.Scene();
+const camera = new T.PerspectiveCamera(55, innerWidth / innerHeight, 0.1, 1500);
+
+// ---- loaders (the exact snippet engine teams should copy) ----
+const ktx2 = new A.KTX2Loader().setTranscoderPath('pack/vendor/basis/').detectSupport(renderer);
+const gltf = new A.GLTFLoader().setMeshoptDecoder(A.MeshoptDecoder).setKTX2Loader(ktx2);
+const texL = new T.TextureLoader();
+const useKTX = qs.get('tex') !== 'webp';
+
+// ---- sky: Poly Haven quarry_01 (CC0) as environment, procedural-ish background colour from it ----
+const pmrem = new T.PMREMGenerator(renderer);
+const hdr = await new A.HDRLoader().loadAsync('pack/sky/' + (qs.get('sky') || 'quarry_01') + '_512.hdr');
+hdr.mapping = T.EquirectangularReflectionMapping;
+scene.environment = pmrem.fromEquirectangular(hdr).texture; scene.background = hdr; scene.backgroundBlurriness = 0.0;
+scene.environmentIntensity = 0.6; V.loaded.push('sky');
+// Ashdod, ~10:30 in spring: sun from SE, elevation ~55°
+const sun = new T.DirectionalLight(0xfff3e0, 2.6); sun.position.set(-25, 55, -40); sun.castShadow = true;
+sun.shadow.mapSize.set(1024, 1024); Object.assign(sun.shadow.camera, { left: -30, right: 30, top: 30, bottom: -30, near: 1, far: 140 }); sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.03;
+scene.add(sun);
+
+// ---- materials from pack/textures ----
+const MATS = await (await fetch('pack/textures/materials.json')).json();
+async function tex(name, srgb) {
+  const t = useKTX ? await ktx2.loadAsync(`pack/textures/${name}_512.ktx2`) : await texL.loadAsync(`pack/textures/${name}_512.webp`);
+  t.wrapS = t.wrapT = T.RepeatWrapping; t.anisotropy = 4; t.colorSpace = srgb ? T.SRGBColorSpace : T.NoColorSpace; return t;
+}
+async function pbr(name, repeatX = 1, repeatY = 1) {
+  const [map, normalMap, orm] = await Promise.all([tex(name + '_albedo', true), tex(name + '_normal'), tex(name + '_orm')]);
+  for (const t of [map, normalMap, orm]) t.repeat.set(repeatX, repeatY);
+  const m = new T.MeshStandardMaterial({ map, normalMap, roughnessMap: orm, metalnessMap: orm, aoMap: orm, roughness: 1, metalness: name === 'glass' ? 0 : 1 * 0, envMapIntensity: (MATS[name] || {}).envMapIntensity || 1 });
+  if (name === 'glass') { m.roughnessMap = null; m.roughness = 0.05; m.metalness = 0.6; m.metalnessMap = null; m.envMapIntensity = 2.2; m.color.set(0xb8d0dc); }
+  V.loaded.push('mat:' + name); return m;
+}
+const mats = {};
+for (const n of Object.keys(MATS)) mats[n] = await pbr(n);
+const tiled = (n, w, h) => { const m = mats[n].clone(); const s = MATS[n].tile_m; for (const k of ['map', 'normalMap', 'roughnessMap']) if (m[k]) { m[k] = m[k].clone(); m[k].repeat.set(w / s, h / s); m[k].needsUpdate = true; } m.metalnessMap = m.aoMap = m.roughnessMap; return m; };
+const plane = (n, w, d, x, z, y = 0) => { const g = new T.PlaneGeometry(w, d); g.rotateX(-Math.PI / 2); const me = new T.Mesh(g, tiled(n, w, d)); me.position.set(x, y, z); me.receiveShadow = true; scene.add(me); return me; };
+const block = (n, w, h, d, x, y, z, tileU = w, tileV = h) => { const me = new T.Mesh(new T.BoxGeometry(w, h, d), tiled(n, tileU, tileV)); me.position.set(x, y, z); me.castShadow = me.receiveShadow = true; scene.add(me); return me; };
+
+// ground: beach sand, promenade pavers, road
+plane('sand', 120, 40, 0, -40);
+plane('sidewalk_pavers', 120, 6, 0, -17, 0.02);
+plane('asphalt', 120, 10, 0, -9, 0.01);
+plane('sidewalk_pavers', 120, 5, 0, -1.5, 0.02);
+plane('concrete', 120, 60, 0, 31, 0.0);
+// a typical Ashdod 4-storey building: limestone base, plaster upper floors, flat roof
+block('limestone', 14, 3.2, 10, 0, 1.6, 6, 14, 3.2);
+block('plaster_light', 14, 9.6, 10, 0, 3.2 + 4.8, 6, 14, 9.6);
+plane('roof_flat', 14, 10, 0, 6, 12.81);
+// windows (glass) on the street facade
+for (let f = 0; f < 4; f++) for (let i = 0; i < 4; i++) { const w = new T.Mesh(new T.PlaneGeometry(1.6, 1.4), mats.glass); w.rotation.y = Math.PI; w.position.set(-5.2 + i * 3.4, 1.9 + f * 3.2, 0.99); scene.add(w); }
+// a tiled-roof neighbour and a raw-concrete parking structure
+block('limestone', 8, 6, 8, 18, 3, 8, 8, 6);
+const roof = new T.Mesh(new T.ConeGeometry(6.2, 2.6, 4, 1), tiled('roof_tiles', 8, 4)); roof.position.set(18, 7.3, 8); roof.rotation.y = Math.PI / 4; roof.castShadow = true; scene.add(roof);
+block('concrete', 10, 7, 9, -19, 3.5, 7, 10, 7);
+// building street facades are at z = 1 and face -Z (towards the camera)
+// ---- models ----
+const META = [];
+async function put(file, x, y, z, ry = 0, s = 1) {
+  try {
+    const g = await gltf.loadAsync('pack/models/' + file + '.glb');
+    const o = g.scene; o.position.set(x, y, z); o.rotation.y = ry; o.scale.setScalar(s);
+    o.traverse(c => { if (c.isMesh) { c.castShadow = true; c.receiveShadow = true; } });
+    scene.add(o); V.loaded.push(file); META.push({ file, o, g }); return g;
+  } catch (e) { V.errors.push(file + ': ' + e.message); }
+}
+const R = Math.PI;
+await Promise.all([
+  put('palm_washingtonia', -12, 0, -1.5), put('palm_washingtonia', 12, 0, -1.5), put('palm_date', -4, 0, -18), put('palm_date', 8, 0, -18),
+  put('tree_olive', 24, 0, -1.5), put('tree_ficus', -26, 0, -1.5),
+  put('street_light', -6, 0, -3.6), put('street_light', 22, 0, -3.6), put('bench', 2, 0, -18, R), put('bus_stop', 6, 0, -2.2, R),
+  put('dumpster_frog', -8.5, 0, -0.8), put('car_sedan', -3, 0, -7, R / 2), put('car_hatch', 5, 0, -11, -R / 2), put('car_taxi', 13, 0, -7, R / 2),
+  put('kenney_vehicle_truck_red', -14, 0, -11, -R / 2, 1.6), put('kenney_vehicle_motorcycle', 19, 0, -11, -R / 2, 1.2),
+  put('helicopter', -8, 16, -26, 0.6), put('drone_quad', 1.5, 2.2, -4.5, 0.3, 3), put('jetpack', -1.6, 0.0, -16.5, R * 0.8, 1.0),
+  put('solar_water_heater', -4, 12.8, 7), put('solar_water_heater', 2, 12.8, 7),
+  put('kenney_character_anim', 3.5, 0, -15.2, R * 0.9, 1.0),
+]);
+// AC units + railings on the facade (z = 1 face, facing -Z → rotate PI)
+for (let f = 1; f < 4; f++) {
+  await put('ac_unit', -3.4, 2.1 + f * 3.2, 0.7, R);
+  for (let i = 0; i < 3; i++) await put(f % 2 ? 'balcony_railing' : 'balcony_railing_glass', 3.6 + i, 0.2 + f * 3.2, 0.2, R);
+  const slab = new T.Mesh(new T.BoxGeometry(3.2, 0.2, 1.0), mats.concrete); slab.position.set(4.6, 0.1 + f * 3.2, 0.5); slab.castShadow = true; scene.add(slab);
+}
+// character: the game's Quaternius UBC + UAL anims if present (../game/assets), else Kenney's
+let mixer = null;
+try {
+  const [m, a] = await Promise.all([gltf.loadAsync('../game/assets/ubc_male.glb'), gltf.loadAsync('../game/assets/ual_anims.glb')]);
+  const o = m.scene; o.position.set(0.5, 0, -16); o.rotation.y = R * 0.85; o.traverse(c => { if (c.isMesh) c.castShadow = true; }); scene.add(o);
+  mixer = new T.AnimationMixer(o); const clip = a.animations.find(c => c.name === 'Walk_Loop'); if (clip) mixer.clipAction(clip).play(); V.loaded.push('quaternius_character');
+} catch (e) { V.errors.push('char: ' + e.message); }
+const kc = META.find(m => m.file === 'kenney_character_anim');
+let kmixer = null; if (kc && kc.g.animations.length) { kmixer = new T.AnimationMixer(kc.o); kmixer.clipAction(kc.g.animations.find(c => c.name === 'walk') || kc.g.animations[0]).play(); }
+
+// ---- views ----
+const VIEWS = { street: [[9, 1.7, -27], [-2, 4, 0]], air: [[-38, 34, -48], [0, 3, -4]], mat: [[0, 6, -14], [0, 5.5, 1]], veh: [[4, 3, -24], [-2, 2.2, -10]] };
+function view(v) { const [p, t] = VIEWS[v] || VIEWS.street; camera.position.set(...p); camera.lookAt(...t); V.view = v; }
+view(qs.get('view') || 'street');
+document.querySelectorAll('#views button').forEach(b => b.onclick = () => view(b.dataset.v));
+addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
+
+// ---- loop ----
+const clock = new T.Timer(); let frames = 0, fpsT = 0, fps = 0;
+const spin = []; scene.traverse(o => { if (/^rotor_main|^prop_/.test(o.name)) spin.push([o, 'y', 40]); if (/^rotor_tail/.test(o.name)) spin.push([o, 'x', 60]); });
+function tick() {
+  clock.update(); const dt = Math.min(clock.getDelta(), 0.1);
+  if (mixer) mixer.update(dt); if (kmixer) kmixer.update(dt);
+  for (const [o, ax, s] of spin) o.rotation[ax] += s * dt;
+  renderer.render(scene, camera);
+  frames++; fpsT += dt; if (fpsT > 0.5) { fps = Math.round(frames / fpsT); frames = 0; fpsT = 0; }
+  const i = renderer.info;
+  V.info = { calls: i.render.calls, tris: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, fps, dpr: DPR, loadMs: V.loadMs, ktx: useKTX };
+  st.innerHTML = `קריאות ציור: ${i.render.calls} · משולשים: ${(i.render.triangles / 1000).toFixed(1)} אלף · טקסטורות: ${i.memory.textures} · ${fps} FPS · טעינה ${(V.loadMs / 1000).toFixed(1)} ש׳ · ${useKTX ? 'KTX2' : 'WebP'}` +
+    (V.errors.length ? `<div class="e">שגיאות: ${V.errors.join(' | ')}</div>` : `<div>נטענו ${V.loaded.length} פריטים בלי שגיאות</div>`);
+  requestAnimationFrame(tick);
+}
+V.loadMs = Math.round(performance.now() - V.t0); V.ready = true; tick();
+})().catch(e => { (window.__VIEWER || (window.__VIEWER = { errors: [] })).errors.push('fatal: ' + e.message); document.getElementById('st').textContent = 'שגיאה: ' + e.message; });
+</script>
+</body>
+</html>

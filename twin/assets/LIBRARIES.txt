@@ -1,0 +1,25 @@
+ספריות קוד פתוח מומלצות – רישיון נבדק מקובץ LICENSE במאגר בגיטהאב (raw.githubusercontent.com), 23.11.2026
+
+ספרייה                         | רישיון (נבדק)        | מאגר                                         | למה
+-------------------------------|----------------------|----------------------------------------------|-----------------------------------------------
+three.js                       | MIT                  | github.com/mrdoob/three.js                   | המנוע שכבר בשימוש (r186)
+glTF-Transform                 | MIT                  | github.com/donmccurdy/glTF-Transform         | צינור הנכסים (מיזוג, כימות, meshopt, טקסטורות) – בשימוש ב-tools/
+meshoptimizer                  | MIT                  | github.com/zeux/meshoptimizer                | דחיסת רשתות + מפענח מהיר ב-WASM; כבר בתוך loaders של המשחק
+Basis Universal                | Apache-2.0           | github.com/BinomialLLC/basis_universal       | מקודד/מפענח KTX2; ה-transcoder מגיע עם three.js
+KTX-Software (toktx/ktx)       | Apache-2.0 (בעיקר)   | github.com/KhronosGroup/KTX-Software          | כלי שורת הפקודה הרשמי ל-KTX2 (חסום כאן להורדה – ראו FETCH-LATER)
+3DTilesRendererJS (NASA-AMMOS) | Apache-2.0           | github.com/NASA-AMMOS/3DTilesRendererJS      | הזרמת אריחי תלת-ממד (3D Tiles/OGC) ל-three.js – אם עוברים לפורמט אריחים סטנדרטי
+CesiumJS                       | Apache-2.0           | github.com/CesiumGS/cesium                   | חלופה/השראה לגלובוס; כבד לטלפון – לא מומלץ כמנוע
+Rapier (rapier.js)             | Apache-2.0           | github.com/dimforge/rapier.js                | פיזיקה דטרמיניסטית ב-WASM; רחפן, רכב, התנגשויות. מומלץ על פני cannon-es
+cannon-es                      | MIT                  | github.com/pmndrs/cannon-es                  | פיזיקה ב-JS טהור, קל; פחות מדויק ואיטי יותר
+three-mesh-bvh                 | MIT                  | github.com/gkjohnson/three-mesh-bvh          | raycast והתנגשות מהירים מול בניינים (הליכה, מצלמה, רחפן)
+recast-navigation-js           | MIT                  | github.com/isaac-mason/recast-navigation-js  | מפת ניווט להולכי רגל/רכבים ממוחשבים
+Yuka                           | MIT                  | github.com/Mugen87/yuka                      | בינה למשחק: היגוי, מכונות מצבים, מסלולים (תנועת הולכי רגל ומכוניות)
+MapLibre GL JS                 | BSD-3-Clause         | github.com/maplibre/maplibre-gl-js           | מפה דו-ממדית / מיני-מפה / בחירת מגרש
+PMTiles                        | BSD-3-Clause         | github.com/protomaps/PMTiles                 | אריחי מפה בקובץ אחד על R2 בלי שרת אריחים – מתאים ל-Cloudflare
+SunCalc                        | BSD-2-Clause         | github.com/mourner/suncalc                   | מיקום שמש לפי תאריך/שעה/מקום – לצל אמיתי. (לחלופין נוסחאות NOAA – נחלת הכלל)
+postprocessing (pmndrs)        | Zlib                 | github.com/pmndrs/postprocessing             | אפקטים (bloom לפנסים בלילה) – רק בשכבה הגבוהה
+
+שירות מזג אוויר – זהירות:
+Open-Meteo – קוד השרת AGPL-3.0 (נבדק), הנתונים CC BY 4.0. לפי ה-README: "free access for non-commercial use". לוח היזם הוא מוצר מסחרי → צריך מנוי בתשלום של Open-Meteo, או הרצה עצמית של השרת (AGPL – חובת פרסום קוד אם משנים ומגישים), או מקור אחר (השירות המטאורולוגי הישראלי – לבדוק תנאים). חובת קרדיט CC BY בכל מקרה.
+
+לא נכנס לחבילה (רישיון לא מתאים): מודלי CC-BY (לדוגמה רוב מודלי Sketchfab, ferrari.glb של three.js) – מותר עם קרדיט, אבל המדיניות כאן היא CC0 בלבד.

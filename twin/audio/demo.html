@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>מחלקת הקול — הדגמה | לוח היזם</title>
+<style>
+  :root { --bg:#0f1418; --card:#182027; --line:#2a3640; --fg:#e8eef2; --dim:#8fa1ad; --acc:#ffb547; --on:#2fbf8f; --off:#c0504d; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font: 15px/1.45 system-ui, "Segoe UI", Arial, sans-serif; padding: 10px 10px 40px; }
+  h1 { font-size: 18px; margin: 4px 0 2px; } .sub { color: var(--dim); font-size: 12.5px; margin-bottom: 10px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+  h2 { font-size: 14px; margin: 0 0 8px; color: var(--acc); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  button { background:#22303a; color:var(--fg); border:1px solid var(--line); border-radius:9px; padding:10px 4px; font: inherit; font-size: 13.5px; min-height: 44px; cursor: pointer; }
+  button.on { background: #1f4d3f; border-color: var(--on); }
+  #unlock { width:100%; font-size:17px; background: var(--acc); color:#1a1200; font-weight:700; min-height:56px; border:0; }
+  #unlock.done { background:#1f4d3f; color:var(--fg); }
+  label { display:flex; align-items:center; gap:8px; font-size:13px; margin: 6px 0; color: var(--dim); }
+  label span.v { min-width: 52px; color: var(--fg); text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
+  input[type=range] { flex:1; accent-color: var(--acc); min-height: 28px; }
+  select { background:#22303a; color:var(--fg); border:1px solid var(--line); border-radius:8px; padding:8px; font: inherit; }
+  canvas { width:100%; height:auto; background:#0b1014; border-radius:10px; touch-action: none; display:block; }
+  #stats { font: 12px/1.5 ui-monospace, Menlo, monospace; color: var(--dim); white-space: pre-wrap; direction: ltr; text-align: left; }
+  .row { display:flex; gap:6px; flex-wrap: wrap; } .row > * { flex: 1; }
+  .note { font-size: 12px; color: var(--dim); margin-top: 6px; }
+</style>
+</head>
+<body>
+<h1>מחלקת הקול — עולם תאום אשדוד</h1>
+<div class="sub">כל הצלילים מסונתזים בזמן אמת (Web Audio). אין קבצי קול, אין רישוי. עדיף עם אוזניות.</div>
+
+<section>
+  <button id="unlock">הקש כאן להפעלת קול (מושתק עד נגיעה)</button>
+  <div class="row" style="margin-top:8px">
+    <button id="mute">השתק</button>
+    <button id="shabbat">מצב שבת: כבוי</button>
+  </div>
+</section>
+
+<section>
+  <h2>כלי רכב — האזנה</h2>
+  <div class="grid" id="vehicles">
+    <button data-v="car">מכונית</button><button data-v="helicopter">מסוק</button><button data-v="jet">מטוס סילון</button><button data-v="drone">רחפן</button>
+    <button data-v="spaceship">חללית</button><button data-v="boat">סירה</button><button data-v="jetpack">תרמיל סילון</button><button data-v="walk">הליכה</button>
+  </div>
+  <label>מצערת <input id="thr" type="range" min="0" max="1" step="0.01" value="0.5"><span class="v" id="thrV"></span></label>
+  <label>מהירות (מ/ש) <input id="spd" type="range" min="0" max="70" step="0.5" value="12"><span class="v" id="spdV"></span></label>
+  <div class="row">
+    <button id="ab">מבער אחורי</button>
+    <label style="margin:0">משטח <select id="surf"></select></label>
+  </div>
+  <div class="note" id="vinfo"></div>
+</section>
+
+<section>
+  <h2>אווירה</h2>
+  <div class="grid">
+    <button data-a="calm">בהיר ושקט</button><button data-a="breeze">בריזת ים</button><button data-a="storm">סערת חורף</button><button data-a="drizzle">טפטוף</button>
+  </div>
+  <label>רוח (מ/ש) <input id="wind" type="range" min="0" max="20" step="0.5" value="1.5"><span class="v" id="windV"></span></label>
+  <label>גשם <input id="rain" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="rainV"></span></label>
+  <label>מרחק מהחוף (מ') <input id="shore" type="range" min="0" max="800" step="5" value="800"><span class="v" id="shoreV"></span></label>
+  <label>תנועה בכביש ראשי <input id="traffic" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="trafficV"></span></label>
+  <label>פארק (ציפורים) <input id="park" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="parkV"></span></label>
+  <label>נמל (מנופים, צופרים) <input id="port" type="range" min="0" max="1" step="0.01" value="0"><span class="v" id="portV"></span></label>
+</section>
+
+<section>
+  <h2>מקור נע — דופלר והסתרה</h2>
+  <canvas id="map" width="720" height="460"></canvas>
+  <div class="row" style="margin-top:8px">
+    <select id="mvMode"><option value="car">מכונית</option><option value="jet">מטוס סילון</option><option value="helicopter">מסוק</option><option value="drone">רחפן</option><option value="boat">סירה</option><option value="spaceship">חללית</option></select>
+    <button id="mv">הפעל מקור נע</button>
+  </div>
+  <label>מהירות המקור (מ/ש) <input id="mvSpd" type="range" min="5" max="250" step="1" value="35"><span class="v" id="mvSpdV"></span></label>
+  <div class="note">המאזין במרכז (●). המקור נוסע על הקו העליון; כשהבניין האפור ביניכם — הקול עמום (low-pass). גררו על המפה כדי להזיז את המאזין.</div>
+</section>
+
+<section>
+  <h2>ממשק וקול</h2>
+  <div class="row"><button id="uiClick">צליל לחיצה</button><button id="uiNotify">התראה</button><button id="voice">קשר רדיו (מנמיך מנועים)</button></div>
+</section>
+
+<section><h2>מצב</h2><div id="stats">—</div></section>
+
+<script type="module">
+import { createAudio, SURFACES, carRpm } from './audio.js';
+import { presetWeather } from '../weather/weather.js';
+
+const $ = id => document.getElementById(id);
+const audio = window.audio = createAudio({ shabbat: false });
+audio.installUnlock(document.body);
+const W = { wind: 1.5, gust: 3, rain: 0, day: true };
+const env = { shore: 800, traffic: 0, park: 0, port: 0 };
+const L = { x: 0, y: 1.7, z: 0 };
+let aud = null, audMode = null, ab = false, mover = null, mvX = -300;
+const B = { minx: -60, maxx: -5, minz: -60, maxz: -25, top: 30 }; // בניין בין המאזין לקו הנסיעה
+const PATH_Z = -80;
+
+for (const s of Object.keys(SURFACES)) $('surf').add(new Option({ asphalt: 'אספלט', concrete: 'בטון', tile: 'אריחים', wood: 'עץ', grass: 'דשא', sand: 'חול', metal: 'מתכת', water: 'מים' }[s], s));
+const bind = (id, fmt, cb) => { const el = $(id), out = $(id + 'V'); const f = () => { out.textContent = fmt(+el.value); cb(+el.value); }; el.addEventListener('input', f); f(); };
+const thr = () => +$('thr').value, spd = () => +$('spd').value;
+bind('thr', v => v.toFixed(2), () => {}); bind('spd', v => v.toFixed(1), () => {});
+bind('wind', v => v.toFixed(1), v => { W.wind = v; W.gust = v * 1.6; pushEnv(); });
+bind('rain', v => v.toFixed(2), v => { W.rain = v; pushEnv(); });
+bind('shore', v => v + '', v => { env.shore = v; pushEnv(); });
+for (const k of ['traffic', 'park', 'port']) bind(k, v => v.toFixed(2), v => { env[k] = v; pushEnv(); });
+bind('mvSpd', v => v + '', () => {});
+
+function pushEnv() {
+  audio.setEnvironment({
+    weather: { wind_10m_ms: W.wind, gust_ms: W.gust, rain: W.rain, day: W.day },
+    area: { traffic: env.traffic, park: env.park, port: env.port }, shoreDist: env.shore >= 800 ? Infinity : env.shore,
+    portPoint: { x: 250, y: 10, z: 120 }, surface: $('surf').value, buildings: [B], listener: { ...L },
+  });
+}
+$('surf').addEventListener('change', pushEnv);
+
+$('unlock').addEventListener('click', async () => { await audio.unlock(); $('unlock').textContent = 'הקול פעיל'; $('unlock').classList.add('done'); pushEnv(); });
+$('mute').addEventListener('click', e => { const m = !e.target.classList.contains('on'); audio.setMuted(m); e.target.classList.toggle('on', m); e.target.textContent = m ? 'בטל השתקה' : 'השתק'; });
+$('shabbat').addEventListener('click', e => { const s = !audio.shabbat; audio.setShabbat(s); e.target.classList.toggle('on', s); e.target.textContent = 'מצב שבת: ' + (s ? 'פעיל — רק אווירה' : 'כבוי'); });
+$('ab').addEventListener('click', e => { ab = !ab; e.target.classList.toggle('on', ab); });
+
+const DIST = { car: 7, helicopter: 45, jet: 90, drone: 3, spaceship: 25, boat: 10, jetpack: 8 };
+document.querySelectorAll('[data-v]').forEach(b => b.addEventListener('click', async () => {
+  await audio.unlock();
+  const m = b.dataset.v;
+  if (aud) { aud.detach(); aud = null; }
+  document.querySelectorAll('[data-v]').forEach(x => x.classList.remove('on'));
+  if (audMode === m) { audMode = null; return; }
+  audMode = m; b.classList.add('on');
+  if (m === 'walk') aud = audio.attachToVehicle('walk', () => ({ x: L.x, y: 0, z: L.z, vx: 0, vy: 0, vz: -Math.max(0.8, Math.min(spd(), 7)), surface: $('surf').value }), { player: true });
+  else aud = audio.attachToVehicle(m, () => ({ x: L.x + DIST[m] * 0.7, y: L.y + (m === 'helicopter' || m === 'jet' || m === 'spaceship' ? DIST[m] * 0.5 : 0), z: L.z - DIST[m] * 0.5, vx: 0, vy: 0, vz: 0, throttle: thr(), collective: thr(), thrust: thr(), speed: spd(), afterburner: ab }), { priority: 9 });
+}));
+document.querySelectorAll('[data-a]').forEach(b => b.addEventListener('click', async () => {
+  await audio.unlock();
+  const p = presetWeather({ calm: 'calm-clear', breeze: 'sea-breeze', storm: 'winter-storm', drizzle: 'drizzle' }[b.dataset.a]).current;
+  $('wind').value = p.wind_10m_ms; $('wind').dispatchEvent(new Event('input'));
+  const rain = p.precip_mm <= 0.05 ? 0 : Math.min(1, Math.log1p(p.precip_mm) / Math.log1p(10));
+  $('rain').value = rain; $('rain').dispatchEvent(new Event('input'));
+  W.gust = p.gust_ms; pushEnv();
+  document.querySelectorAll('[data-a]').forEach(x => x.classList.toggle('on', x === b));
+}));
+$('mv').addEventListener('click', async e => {
+  await audio.unlock();
+  if (mover) { mover.detach(); mover = null; e.target.classList.remove('on'); e.target.textContent = 'הפעל מקור נע'; return; }
+  mvX = -300; const m = $('mvMode').value; const air = m === 'jet' || m === 'helicopter' || m === 'spaceship';
+  mover = audio.attachToVehicle(m, () => ({ x: mvX, y: air ? 25 : 1, z: PATH_Z, vx: +$('mvSpd').value, vy: 0, vz: 0, throttle: 0.8, collective: 0.6, thrust: 0.6, speed: +$('mvSpd').value, afterburner: m === 'jet' }), { priority: 8 });
+  e.target.classList.add('on'); e.target.textContent = 'עצור מקור נע';
+});
+$('uiClick').addEventListener('click', () => audio.playUI('click'));
+$('uiNotify').addEventListener('click', () => { if (!audio.playUI('notify')) $('vinfo').textContent = 'התראה נחסמה (מצב שבת)'; });
+$('voice').addEventListener('click', () => audio.playVoice());
+
+// ---- מפה ----
+const cv = $('map'), g = cv.getContext('2d'), SC = 1.8; // פיקסלים למטר
+const toPx = (x, z) => [cv.width / 2 + x * SC, cv.height * 0.62 + z * SC];
+function draw() {
+  g.clearRect(0, 0, cv.width, cv.height);
+  g.strokeStyle = '#33424e'; g.setLineDash([6, 6]); g.beginPath(); let [a, b] = toPx(-400, PATH_Z); g.moveTo(a, b); [a, b] = toPx(400, PATH_Z); g.lineTo(a, b); g.stroke(); g.setLineDash([]);
+  const [bx, bz] = toPx(B.minx, B.minz), [bx2, bz2] = toPx(B.maxx, B.maxz); g.fillStyle = '#5b6670'; g.fillRect(bx, bz, bx2 - bx, bz2 - bz);
+  g.fillStyle = '#8fa1ad'; g.font = '22px system-ui'; g.fillText('בניין', bx + 30, bz + 40);
+  const [lx, lz] = toPx(L.x, L.z); g.fillStyle = '#ffb547'; g.beginPath(); g.arc(lx, lz, 9, 0, 7); g.fill();
+  const e = audio._eng.entries.find(x => mover && x.voice && x.voice.id === mover.id);
+  if (mover) {
+    const [sx, sz] = toPx(mvX, PATH_Z);
+    g.strokeStyle = e && e.occ ? '#c0504d' : '#2fbf8f'; g.lineWidth = 2; g.beginPath(); g.moveTo(lx, lz); g.lineTo(sx, sz); g.stroke(); g.lineWidth = 1;
+    g.fillStyle = '#2fbf8f'; g.beginPath(); g.arc(sx, sz, 10, 0, 7); g.fill();
+    if (e) { g.fillStyle = '#e8eef2'; g.fillText(`דופלר ×${e.dop.toFixed(3)}  ${e.occ ? 'מוסתר' : 'קו ראייה פתוח'}`, 16, 30); }
+  }
+}
+let drag = false;
+cv.addEventListener('pointerdown', ev => { drag = true; move(ev); }); cv.addEventListener('pointermove', ev => drag && move(ev)); addEventListener('pointerup', () => drag = false);
+function move(ev) { const r = cv.getBoundingClientRect(), px = (ev.clientX - r.left) * cv.width / r.width, pz = (ev.clientY - r.top) * cv.height / r.height; L.x = (px - cv.width / 2) / SC; L.z = (pz - cv.height * 0.62) / SC; pushEnv(); }
+
+let last = performance.now();
+function frame(t) {
+  const dt = Math.min(0.1, (t - last) / 1000); last = t;
+  if (mover) { mvX += +$('mvSpd').value * dt; if (mvX > 320) mvX = -320; }
+  audio.update(dt); draw();
+  const s = audio.stats();
+  $('stats').textContent = `ctx: ${s.ctxState}  unlocked: ${s.unlocked}  shabbat: ${s.shabbat}\nvoices: ${s.voices}/${s.maxVoices} (continuous ${s.continuous}, one-shots ${s.oneShots}, HRTF ${s.hrtf})\nupdate(): avg ${s.updateMsAvg.toFixed(3)} ms, max ${s.updateMsMax.toFixed(2)} ms   stolen ${s.stolen} dropped ${s.dropped}\nlimiter: ${(+s.compressorReductionDb).toFixed(1)} dB\nactive: ${s.active.join(', ')}`;
+  if (aud && audMode === 'car') { const r = carRpm(spd(), thr(), 1); $('vinfo').textContent = `סל"ד ${Math.round(aud.rpm || r.rpm)}`; } else if (audMode && audMode !== 'walk') $('vinfo').textContent = '';
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.demoReady = true;
+</script>
+</body>
+</html>

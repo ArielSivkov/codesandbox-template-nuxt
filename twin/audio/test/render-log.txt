@@ -1,0 +1,96 @@
+PASS v_car: no NaN
+PASS v_car: no clipping (peak -4.4 dBFS)
+PASS v_car: RMS -11.9 dBFS in [-36, -10]
+PASS v_car: voices ≤ 16 (max 1)
+PASS v_helicopter: no NaN
+PASS v_helicopter: no clipping (peak -9.8 dBFS)
+PASS v_helicopter: RMS -25.5 dBFS in [-40, -10]
+PASS v_helicopter: voices ≤ 16 (max 1)
+PASS v_jetpack: no NaN
+PASS v_jetpack: no clipping (peak -10.4 dBFS)
+PASS v_jetpack: RMS -25.2 dBFS in [-36, -10]
+PASS v_jetpack: voices ≤ 16 (max 1)
+PASS v_drone: no NaN
+PASS v_drone: no clipping (peak -8.5 dBFS)
+PASS v_drone: RMS -21.5 dBFS in [-40, -12]
+PASS v_drone: voices ≤ 16 (max 1)
+PASS v_jet: no NaN
+PASS v_jet: no clipping (peak -5.8 dBFS)
+PASS v_jet: RMS -20.3 dBFS in [-36, -8]
+PASS v_jet: voices ≤ 16 (max 1)
+PASS v_spaceship: no NaN
+PASS v_spaceship: no clipping (peak -2.3 dBFS)
+PASS v_spaceship: RMS -12.7 dBFS in [-40, -12]
+PASS v_spaceship: voices ≤ 16 (max 1)
+PASS v_boat: no NaN
+PASS v_boat: no clipping (peak -4.9 dBFS)
+PASS v_boat: RMS -11.4 dBFS in [-36, -10]
+PASS v_boat: voices ≤ 16 (max 1)
+PASS v_car_player: no NaN
+PASS v_car_player: no clipping (peak -3.3 dBFS)
+PASS v_car_player: RMS -9.1 dBFS in [-30, -8]
+PASS v_car_player: voices ≤ 16 (max 1)
+PASS amb_storm: no NaN
+PASS amb_storm: no clipping (peak -10.1 dBFS)
+PASS amb_storm: RMS -24.5 dBFS in [-36, -12]
+PASS amb_storm: voices ≤ 16 (max 2)
+PASS amb_breeze: no NaN
+PASS amb_breeze: no clipping (peak -24.1 dBFS)
+PASS amb_breeze: RMS -36.4 dBFS in [-50, -20]
+PASS amb_breeze: voices ≤ 16 (max 1)
+PASS amb_waves_near: no NaN
+PASS amb_waves_near: no clipping (peak -5.4 dBFS)
+PASS amb_waves_near: RMS -18.3 dBFS in [-36, -12]
+PASS amb_waves_near: voices ≤ 16 (max 2)
+PASS amb_waves_far: no NaN
+PASS amb_waves_far: no clipping (peak -27.2 dBFS)
+PASS amb_waves_far: RMS -39.9 dBFS in [-70, -30]
+PASS amb_waves_far: voices ≤ 16 (max 2)
+PASS amb_city: no NaN
+PASS amb_city: no clipping (peak -14.8 dBFS)
+PASS amb_city: RMS -27.0 dBFS in [-42, -14]
+PASS amb_city: voices ≤ 16 (max 2)
+PASS amb_port: no NaN
+PASS amb_port: no clipping (peak -7.2 dBFS)
+PASS amb_port: RMS -18.7 dBFS in [-48, -16]
+PASS amb_port: voices ≤ 16 (max 3)
+PASS steps: no NaN
+PASS steps: no clipping (peak -8.2 dBFS)
+PASS steps: RMS -30.9 dBFS in [-50, -18]
+PASS steps: voices ≤ 16 (max 1)
+PASS doppler: no NaN
+PASS doppler: no clipping (peak -15.5 dBFS)
+PASS doppler: RMS -34.4 dBFS in [-60, -6]
+PASS doppler: voices ≤ 16 (max 1)
+PASS full: no NaN
+PASS full: no clipping (peak -1.4 dBFS)
+PASS full: RMS -12.8 dBFS in [-30, -6]
+PASS full: voices ≤ 16 (max 16)
+PASS full_shabbat: no NaN
+PASS full_shabbat: no clipping (peak -2.7 dBFS)
+PASS full_shabbat: RMS -14.4 dBFS in [-36, -10]
+PASS full_shabbat: voices ≤ 16 (max 7)
+PASS full_8voices: no NaN
+PASS full_8voices: no clipping (peak -2.0 dBFS)
+PASS full_8voices: RMS -13.2 dBFS in [-32, -6]
+PASS full_8voices: voices ≤ 16 (max 8)
+PASS deterministic: two full-mix renders differ by ≤ 4.17e-7 (-128 dBFS), bit-exact=false
+PASS maxVoices option respected (8 → 8)
+PASS Shabbat mix quieter (engines off): -14.4 < -12.8
+PASS waves distance-driven: near -18.3 vs far -39.9
+PASS storm louder than breeze
+PASS doppler: pitch higher on approach (ZCR ratio 1.293)
+PASS occlusion: building lowers level -26.4 → -32.2 dB
+PASS occlusion: low-pass removes >2kHz (-9.7 dB)
+PASS CPU: full mix 16 voices HRTF×4 renders 2.32× realtime (HRTF×2 1.53×, none 1.06×) on a 2-core box at load 13.6
+PASS CPU relative: mix(HRTF×2) costs 2.24× a reference graph of 64 saw-osc+biquad+gain; 213 nodes in 16 voices; prewarm 797 ms
+PASS CPU: update() avg 0.399 ms (max 29.10)
+PASS muted by default: no AudioContext before tap (none)
+PASS tap unlocks → AudioContext running
+INFO demo async prewarm: total 535 ms, longest single task 54 ms (load 13.5)
+PASS demo live: 3 voices (helicopter#7, wind#1, rain#2)
+PASS tab hidden → AudioContext suspended (battery)
+PASS tab visible → resumed
+PASS Shabbat in demo: engines off, notify refused (wind#1, rain#2)
+
+94 passed, 0 failed

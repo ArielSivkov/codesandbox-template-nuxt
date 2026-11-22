@@ -1,0 +1,15 @@
+מה לא הצלחנו להוריד מארגז החול (חסום ע"י מדיניות הרשת, נבדק 23.11.2026 בבקשות curl) – ומה להביא כשיש גישה.
+אתרים שנבדקו וחסומים: polyhaven.com / dl.polyhaven.org / api.polyhaven.com, ambientcg.com, kenney.nl, quaternius.com, poly.pizza, opengameart.org, sketchfab.com, 3d.si.edu (סמיתסוניאן), nasa3d.arc.nasa.gov, science.nasa.gov, fonts.google.com, cdn.jsdelivr.net, unpkg.com, huggingface.co, הורדות releases של github.com.
+אתרים שעבדו: git clone מ-github.com, raw.githubusercontent.com, registry.npmjs.org, pypi.org.
+
+חשוב: את השמות המדויקים של הנכסים באתרים החסומים לא יכולנו לראות. לכן כתוב כאן "מה לחפש", לא מזהים מומצאים. מי שמוריד – לרשום את המזהה המדויק ואת כתובת הדף ב-manifest.json.
+
+1. חומרים אמיתיים (צילום/סריקה) במקום החומרים הפרוצדורליים שלנו – ambientCG (הכול CC0):
+   חיפוש באתר (או ב-API שלהם, ambientcg.com/api/v2/full_json עם q=...): Plaster (שליכט/טיח), Concrete, Asphalt, PavingStones (אבן משתלבת), Ground + "sand", RoofingTiles, Facade/Bricks בהירות ללבני גיר, Rock/Limestone.
+   להוריד ברזולוציה 1K-JPG, לשים את הקבצים ב-_build/tex בשמות <חומר>_albedo/_normal/_orm ולהריץ node tools/optimize.mjs. שימו לב: ambientCG מספק NormalGL (להשתמש בזה, לא NormalDX) ומפות Roughness/AO נפרדות – לארוז ל-ORM.
+2. Poly Haven (CC0): HDRI שמיים צלולים ים-תיכוניים בצהריים (קטגוריה outdoor / skies, "clear"/"partly cloudy"), 1K או 2K .hdr. טקסטורות: plastered wall, limestone/sandstone blocks, asphalt.
+3. Kenney (CC0) – kenney.nl/assets: ערכות "Car Kit" (מכוניות סדאן/טנדר/מונית/אמבולנס), "City Kit (Roads)", "City Kit (Commercial)", "City Kit (Suburban)", "Nature Kit" (כולל דקלים). לבדוק את השם המדויק באתר.
+4. Quaternius (CC0) – quaternius.com: חבילת טבע עם דקלים ועצים, חבילת מכוניות, "Universal Animation Library" + "Universal Base Characters" (שכבר נמצאות אצל צוות המשחק – לרשום להן מקור מדויק ותאריך הורדה, כי המקור שלהן לא תועד).
+5. גופנים – Heebo ו-Noto Sans Hebrew כבר בחבילה (מ-npm, OFL). אם רוצים משקלים נוספים – npm ‎@fontsource/heebo מספיק.
+6. KTX-Software (toktx/ktx) – קובץ release מ-github.com/KhronosGroup/KTX-Software/releases (חסום). הצינור שלנו עוקף זאת עם ktx2-encoder (WASM של Basis, MIT) מ-npm, כך שזה לא חוסם.
+7. סמיתסוניאן/נאס"א – לא מצאנו צורך: מסוק/רחפן נבנו בקוד. אם רוצים מסוק "אמיתי" – לבדוק בנאס"א (3D resources) מודלים של כלי טיס; תנאי השימוש של נאס"א שונים מ-CC0 (אסור לרמוז על תמיכת נאס"א) – לבדוק לכל מודל.

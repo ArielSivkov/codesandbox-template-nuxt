@@ -1,0 +1,16 @@
+קרדיטים ורישיונות – חבילת הנכסים של ESH27 (עולם תאום)
+
+כל קובץ ברשימה המלאה: manifest.json (רישיון, מקור, גודל, טביעת sha256).
+
+CC0-1.0 (נחלת הכלל, אין חובת קרדיט – נותנים בכל זאת):
+  Kenney – kenney.nl – Starter Kits (Racing, 3D Platformer, City Builder) מ-github.com/KenneyNL. הנכסים CC0 לפי ה-README של כל ערכה.
+  Poly Haven – polyhaven.com – HDRI: quarry_01, venice_sunset, spruit_sunrise (עותקים ממאגר three.js).
+  ESH27 – כל החומרים (textures/) וכל המודלים שאינם kenney_* נוצרו בקוד (tools/) ומשוחררים CC0.
+
+SIL Open Font License 1.1:
+  Heebo – The Heebo Project Authors (Oded Ezer). Noto Sans Hebrew – Google. קבצי רישיון בתיקייה fonts/.
+
+MIT: three.js (three.js authors), meshoptimizer decoder (Arseny Kapoulkine) – בתוך vendor/esh-assets-loaders.js.
+Apache-2.0: Basis Universal transcoder (Binomial LLC) – vendor/basis/.
+
+שימוש מחוץ לחבילה: דמות Quaternius (UBC + UAL) שבתיקיית המשחק – הוגדרה CC0 ע"י צוות המשחק; מקור המקור (quaternius.com) חסום מכאן ולא אומת.
