@@ -194,7 +194,7 @@ function buildBuildingGeo(list, lo) {
       const j = (i + 1) % n, ax = p[i * 2], az = p[i * 2 + 1], bx = p[j * 2], bz = p[j * 2 + 1];
       const dx = bx - ax, dz = bz - az, L = Math.hypot(dx, dz); if (L < 0.05) continue;
       const nx = -dz / L, nz = dx / L;
-      const bays = L < 1.6 ? 0.12 : Math.max(1, Math.round(L / bayW)) / (b.ind ? 1 : 2);
+      const bays = L < 1.6 ? 0.05 : Math.max(1, Math.round(L / bayW)) / (b.ind ? 1 : 2);
       const vT = (y1 - b.base) / flH / (b.ind ? 1 : 2);
       const sh = 0.9 + 0.1 * Math.abs(nx);               // הבדל עדין בין חזיתות
       const cb = [col[0] * dark * sh, col[1] * dark * sh, col[2] * dark * sh], ct = [col[0] * sh, col[1] * sh, col[2] * sh];
@@ -282,7 +282,7 @@ function buildRoadMeshes(t) {
     if (r.c >= 2) ribbon(t, r, r.w + 5, 0.06, P2, U2, N2, 4);
   }
   const g = new T.Group();
-  const mk = (P, U, N, mat) => { if (!P.length) return; const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(P, 3)); geo.setAttribute('uv', new T.Float32BufferAttribute(U, 2)); geo.setAttribute('normal', new T.Float32BufferAttribute(N, 3)); geo.computeBoundingSphere(); const m = new T.Mesh(geo, mat); m.renderOrder = 1; g.add(m); W.stats.tris += P.length / 9; };
+  const mk = (P, U, N, mat) => { if (!P.length) return; const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(P, 3)); geo.setAttribute('uv', new T.Float32BufferAttribute(U, 2)); geo.setAttribute('normal', new T.Float32BufferAttribute(N, 3)); geo.computeBoundingSphere(); const m = new T.Mesh(geo, mat); m.renderOrder = 1; m.receiveShadow = true; g.add(m); W.stats.tris += P.length / 9; };
   mk(P2, U2, N2, MAT.walk); mk(P, U, N, MAT.road);
   return g;
 }
@@ -301,7 +301,7 @@ function palms(t) {
   const a = new T.InstancedMesh(TRUNK_GEO, MAT.trunk, n), b = new T.InstancedMesh(CROWN_GEO, MAT.leaf, n); const m = new T.Matrix4(), q = new T.Quaternion(), s = new T.Vector3(), e = new T.Euler();
   for (let i = 0; i < n; i++) { const x = ok[i * 2], z = ok[i * 2 + 1], hs = hash32(x.toFixed(1) + z.toFixed(1)), sc = 0.8 + (hs % 50) / 100; e.set(((hs >> 3) % 10 - 5) / 100, (hs % 628) / 100, ((hs >> 7) % 10 - 5) / 100); q.setFromEuler(e); s.set(sc, sc, sc);
     m.compose(new T.Vector3(x, tileH(t, x + W.OX, W.OY - z) - 0.2, z), q, s); a.setMatrixAt(i, m); b.setMatrixAt(i, m); }
-  const g = new T.Group(); g.add(a, b); g.userData.n = n; return g;
+  a.castShadow = b.castShadow = true; const g = new T.Group(); g.add(a, b); g.userData.n = n; return g;
 }
 
 // ---------- קרקע
@@ -324,7 +324,7 @@ function terrainMesh(t) {
   const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(pos, 3)); g.setAttribute('color', new T.BufferAttribute(col, 3)); g.setAttribute('uv', new T.BufferAttribute(uv, 2));
   g.setIndex(idx); g.computeVertexNormals(); g.computeBoundingSphere();
   W.stats.tris += idx.length / 3;
-  const m = new T.Mesh(g, MAT.terrain); m.name = 'terrain'; return m;
+  const m = new T.Mesh(g, MAT.terrain); m.name = 'terrain'; m.receiveShadow = true; return m;
 }
 
 // ---------- אינדקס מרחבי
@@ -423,7 +423,7 @@ function flatTile(key) {      // אריח בלי נתונים: יבשה שטוח
 function setLOD(t, lod) {
   if (t.lod === lod || !t.blds) return;
   const t0 = performance.now();
-  if (lod === 1 && !t.hi) { const r = buildBuildingGeo(t.blds, false); t.hi = new T.Mesh(r.geo, [MAT.wall, MAT.ind, MAT.roof]); t.hiTris = r.tris; t.solar = solarMesh(r.solar); if (t.solar) t.grp.add(t.solar); t.palms = palms(t); if (t.palms) t.grp.add(t.palms); }
+  if (lod === 1 && !t.hi) { const r = buildBuildingGeo(t.blds, false); t.hi = new T.Mesh(r.geo, [MAT.wall, MAT.ind, MAT.roof]); t.hi.castShadow = t.hi.receiveShadow = true; t.hiTris = r.tris; t.solar = solarMesh(r.solar); if (t.solar) t.grp.add(t.solar); t.palms = palms(t); if (t.palms) t.grp.add(t.palms); }
   if (lod === 0 && !t.lo) { const r = buildBuildingGeo(t.blds, true); t.lo = new T.Mesh(r.geo, [MAT.lo]); t.loTris = r.tris; }
   if (t.hi) { if (lod === 1) t.grp.add(t.hi); else t.grp.remove(t.hi); }
   if (t.lo) { if (lod === 0) t.grp.add(t.lo); else t.grp.remove(t.lo); }

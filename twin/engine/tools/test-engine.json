@@ -1,0 +1,32 @@
+{
+ "loadAround_built": 9,
+ "building_at_point": {
+  "tested": 40,
+  "same_building": 39,
+  "sample": {
+   "id": "239196726",
+   "f": 8,
+   "h": 24,
+   "sg": 9,
+   "src": "R",
+   "rings": 1
+  }
+ },
+ "building_at_point_in_sea": null,
+ "building_at_screen": {
+  "tested": 13,
+  "same_building": 13
+ },
+ "sun_noon_jun21": {
+  "azimuth": 182.83684138241267,
+  "altitude": 81.62603755258556
+ },
+ "sun_dec21_0730": {
+  "azimuth": 124.6928001853496,
+  "altitude": 8.774738562507688
+ },
+ "ground_h": 15.136000091552733,
+ "setMaterials": 14,
+ "dispose_gpu_verts_after": 0,
+ "errors": []
+}

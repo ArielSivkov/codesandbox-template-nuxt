@@ -71,6 +71,7 @@ bmat.onBeforeCompile = sh => {
 };
 const gmat = new T.MeshLambertMaterial({ vertexColors: true });
 const rmat = new T.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.85 });
+const MAT = { b: null, r: null };   // וו חומרים (setMaterials)
 const groups = { b: new T.Group(), g: new T.Group(), r: new T.Group(), h: new T.Group() };
 Object.values(groups).forEach(g => scene.add(g)); groups.h.visible = false;
 
@@ -153,12 +154,12 @@ function applyTile(t, res) {
     g.setAttribute('position', new T.BufferAttribute(b.pos, 3)); g.setAttribute('normal', new T.BufferAttribute(b.nrm, 3, true));
     g.setAttribute('color', new T.BufferAttribute(col, 3, true)); g.setAttribute('afl', new T.BufferAttribute(b.fl, 2));
     g.setIndex(new T.BufferAttribute(b.idx, 1)); g.computeBoundingSphere();
-    const m = new T.Mesh(g, bmat); m.position.set(t.ox, 0, -t.on); m.matrixAutoUpdate = false; m.updateMatrix();
+    const m = new T.Mesh(g, MAT.b || bmat); m.position.set(t.ox, 0, -t.on); m.matrixAutoUpdate = false; m.updateMatrix();
     m.userData = { t, own: b.own, sh: b.sh, towner: b.towner, nib: b.nib }; if (!showB) g.setDrawRange(b.nib, Infinity); t.mesh.b = m; groups.b.add(m); paintTile(t); nv += n;
   }
   if (res.r && res.r.pos.length) {
     const g = new T.BufferGeometry(); g.setAttribute('position', new T.BufferAttribute(res.r.pos, 3)); g.setAttribute('color', new T.BufferAttribute(res.r.col, 3, true)); g.computeBoundingSphere();
-    const m = new T.LineSegments(g, rmat); m.position.set(t.ox, 0, -t.on); m.matrixAutoUpdate = false; m.updateMatrix(); t.mesh.r = m; groups.r.add(m); nv += res.r.pos.length / 3;
+    const m = new T.LineSegments(g, MAT.r || rmat); m.position.set(t.ox, 0, -t.on); m.matrixAutoUpdate = false; m.updateMatrix(); t.mesh.r = m; groups.r.add(m); nv += res.r.pos.length / 3;
   }
   t.lod = res.lod; t.verts = nv; gpuVerts += nv - oldV;
   if (groups.h.visible && t.heatTex && !t.mesh.h) heatMesh(t);
@@ -567,7 +568,7 @@ $('bSearch').onclick = async () => { const s = $('search'), open = s.style.displ
 function legend() {
   const L = $('legend'), parts = [], bar = 'linear-gradient(to left,#4575cc,#4db88c,#f7d14d,#e65440)';
   if (paintMode === 'height') parts.push(`<div>גובה בניין</div><div class="bar" style="background:${bar}"></div><div class="row"><span>3 מ'</span><span>43+ מ'</span></div>`);
-  if (paintMode === 'conf') parts.push(`<div>ודאות הגובה (σ ÷ גובה)</div><div class="bar" style="background:linear-gradient(to left,#4fae8f,#f7d14d,#e65440)"></div><div class="row"><span>±12% ומטה</span><span>±50% ומעלה</span></div><div style="margin-top:3px">כל הגבהים כרגע משוערים מכלל — ראו "קרדיטים".</div>`);
+  if (paintMode === 'conf') parts.push(`<div>ביטחון בגובה (צנרת גדוד 5)</div><div class="bar" style="background:linear-gradient(to left,#4575cc,#4db88c,#f7d14d,#e65440)"></div><div class="row"><span>מאומת</span><span>גבוה</span><span>בינוני</span><span>נמוך</span></div><div style="margin-top:3px">באשדוד כרגע אין מקור גובה אמיתי — הכול כלל אצבע.</div>`);
   if (paintMode === 'source') parts.push('<div>מקור הגובה</div><div><span class="sw" style="background:#a8b3c2"></span>משוער</div><div><span class="sw" style="background:#38cc73"></span>נמדד מתמונה – AI</div><div><span class="sw" style="background:#a86be6"></span>הוזן ידנית</div>');
   if ($('lP').checked) parts.push(`<div>פוטנציאל התחדשות — <b>הדגמה בלבד</b></div><div class="bar" style="background:${bar}"></div><div class="row"><span>נמוך</span><span>גבוה</span></div>`);
   if (ROOF_DEMO) parts.push('<div><b>הדגמת גגות רעפים</b> על בתים צמודי קרקע — לא נתון אמיתי</div>');
@@ -615,8 +616,58 @@ function info() {
   return { calls: renderer.info.render.calls, tris: renderer.info.render.triangles, geoms: renderer.info.memory.geometries, textures: renderer.info.memory.textures, tiles: tiles.size, tilesLoaded: tl, lod, gpuVerts,
     heap: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576 * 10) / 10 : null, bytes: PERF.bytes, firstFrameMs: Math.round(PERF.firstFrame), allVisibleMs: Math.round(PERF.allVisible), tilesBuilt: PERF.tilesBuilt, workerBuildMs: Math.round(PERF.buildMs), dpr: DPR, worker: !!W };
 }
+
+/* ===================== ממשק מנוע (לעולם המשחק / twin/engine) =====================
+   window.YZ.engine:
+     loadAround(x, n, radius = 1500, lod = 1) → Promise<number>   טוען אריחים סביב נקודת ITM (גם מחוץ למסך); מחזיר כמה נבנו
+     buildingAtScreen(px, py) → info|null                         בניין מתחת לפיקסל (raycast)
+     buildingAtPoint(x, n) → Promise<info|null>                   בניין שמכיל נקודת ITM (נקודה־בפוליגון על הטביעה המדויקת)
+       info = { key, k, id, name, type, base, h, par, sg, f, fl, fh, conf, src, rings }   (rings רק ב-buildingAtPoint)
+     groundHeight(x, n) → מ'                                       מאריחים טעונים (0 אם לא טעון)
+     setSun({ azimuth, altitude }) | setTime(date, lat = 31.8, lon = 34.65)   כיוון השמש (מעלות) / לפי תאריך-שעה
+     setMaterials({ buildings, ground, roads })                    וו לחומרים של צוות הנכסים. לבניינים יש attributes: position, normal (Int8), color (Uint8), afl (בסיס/גובה קומה בדצ"מ)
+     scene, camera, renderer, toScene(x, n, y) → THREE.Vector3, requestRender(), info(), dispose()
+   קואורדינטות: ITM (EPSG:2039) במטרים; בסצנה x = x − VO.x, z = −(n − VO.n). */
+function toScene(x, n, y = 0) { return new T.Vector3(x - VO.x, y, -(n - VO.n)); }
+function infoOf(t, k) { const M = t.meta, I = bInfo(t, k); return { key: t.key, k, id: mid(M.ids[k]), name: M.names[k], type: M.typ[k], base: M.base[k], h: I.h, par: I.par, sg: I.sg, f: I.f, fl: I.fl, fh: I.fh, conf: I.conf, src: M.src[k] }; }
+async function loadAround(x, n, radius = 1500, lod = 1) {
+  const jobs = []; for (const t of tiles.values()) { const cx = t.tx * TILE + TILE / 2, cn = t.ty * TILE + TILE / 2;
+    if (Math.hypot(cx - x, cn - n) < radius + TILE * 0.71 && t.lod < lod && !t.busy) { t.used = performance.now(); jobs.push(requestTile(t, lod)); } }
+  await Promise.all(jobs); requestRender(); return jobs.length;
+}
+function buildingAtScreen(px, py) { const h = hitAt(px, py); if (!h || !h.object.userData.towner) return null; const k = h.object.userData.towner[h.faceIndex]; return k === 65535 ? null : infoOf(h.object.userData.t, k); }
+async function buildingAtPoint(x, n) { // בניין שייך לאריח לפי נקודה מייצגת – לכן בודקים גם את האריחים השכנים
+  const cand = [], TX = Math.floor(x / TILE), TY = Math.floor(n / TILE);
+  for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) { const t = tiles.get((TX + dx) + '_' + (TY + dy)); if (!t || !t.meta) continue;
+    for (let k = 0; k < t.meta.n; k++) { const d = Math.hypot(t.tx * TILE + t.meta.cen[2 * k] - x, t.ty * TILE + t.meta.cen[2 * k + 1] - n); if (d < 150) cand.push([d, t, k]); } }
+  cand.sort((a, b) => a[0] - b[0]);
+  for (const [, t, k] of cand.slice(0, 16)) { const lx = x - t.tx * TILE, ln = n - t.ty * TILE, g = await call({ type: 'geom', key: t.key, k });
+    const P = r => { const p = []; for (let i = 0; i < r.length; i += 2) p.push([r[i], r[i + 1]]); return p; };
+    if (pointIn(P(g.rings[0]), lx, ln) && !g.rings.slice(1).some(h => pointIn(P(h), lx, ln))) return Object.assign(infoOf(t, k), { rings: g.rings }); }
+  return null;
+}
+function setSun({ azimuth, altitude }) { // מעלות; אזימוט 0 = צפון, 90 = מזרח
+  const az = azimuth * Math.PI / 180, al = Math.max(-5, altitude) * Math.PI / 180, R = 6000;
+  sun.position.set(Math.sin(az) * Math.cos(al) * R, Math.sin(al) * R, -Math.cos(az) * Math.cos(al) * R);
+  sun.intensity = 1.7 * Math.max(0, Math.min(1, (altitude + 2) / 12)); requestRender();
+}
+function setTime(date = new Date(), lat = 31.8, lon = 34.65) { // מיקום שמש מקורב (NOAA, דיוק ~1°)
+  const d = (date.getTime() / 86400000) + 2440587.5 - 2451545.0, g = (357.529 + 0.98560028 * d) * Math.PI / 180, q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * Math.PI / 180, e = (23.439 - 0.00000036 * d) * Math.PI / 180;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = (18.697374558 + 24.06570982441908 * d) % 24, ha = ((gmst * 15 + lon) * Math.PI / 180) - ra, la = lat * Math.PI / 180;
+  const alt = Math.asin(Math.sin(la) * Math.sin(dec) + Math.cos(la) * Math.cos(dec) * Math.cos(ha));
+  const az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(la) - Math.sin(la) * Math.cos(ha));
+  const r = { azimuth: (az * 180 / Math.PI + 360) % 360, altitude: alt * 180 / Math.PI }; setSun(r); return r;
+}
+function setMaterials({ buildings, ground, roads } = {}) {
+  for (const t of tiles.values()) { if (t.mesh.b && (buildings || ground)) t.mesh.b.material = buildings || ground; if (t.mesh.r && roads) t.mesh.r.material = roads; }
+  if (buildings || ground) MAT.b = buildings || ground; if (roads) MAT.r = roads; requestRender();
+}
+function dispose() { for (const t of tiles.values()) dropTile(t); if (W) W.terminate(); renderer.dispose(); cancelAnimationFrame(rafId); }
+
 // ממשק לבדיקות (תואם בחלקו ל-window.YZ של המפה המקורית)
-window.YZ = { ready: true, cam, applyCam, renderer, scene, camera, tiles, info, flyTo, closeCard, MAN, VO, INDEX, search: q => search(q), loadSearch,
+window.YZ = { engine: { loadAround, buildingAtScreen, buildingAtPoint, groundHeight: H, setSun, setTime, setMaterials, scene, camera, renderer, toScene, requestRender, info, dispose, VO }, ready: true, cam, applyCam, renderer, scene, camera, tiles, info, flyTo, closeCard, MAN, VO, INDEX, search: q => search(q), loadSearch,
   get loaded() { return inflight === 0 && ![...tiles.values()].some(t => t.vis && t.want >= 0 && t.lod !== t.want && !(t.failed >= 2)); },
   showBuildingAt(key, k) { const t = tiles.get(key); return t && t.meta ? showBuilding(t, k) : null; },
   pickAt: pick, plot, addPlotPoint, crossings, sortByAngle, toScreen, drawDown, drawMove, drawUp, get drawing() { return drawing; }, heightOf: (key, k) => { const t = tiles.get(key); return t && t.meta ? bInfo(t, k).h : 0; },

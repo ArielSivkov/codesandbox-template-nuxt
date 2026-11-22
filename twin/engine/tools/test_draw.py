@@ -54,7 +54,7 @@ with sync_playwright() as pw:
     page.mouse.move(p1[0], p1[1]); page.mouse.down(); page.wait_for_timeout(800); page.mouse.up(); page.wait_for_timeout(200)
     R['long_press_deleted'] = n1 - page.evaluate('() => window.YZ.plot.pts.length')
     # הצמדה: הקשה ליד פינת בניין
-    snap = page.evaluate('''() => { const Y = window.YZ; for (const t of Y.tiles.values()) { const m = t.mesh.b; if (!m || t.d > 600) continue;
+    snap = page.evaluate('''() => { const Y = window.YZ; for (const t of Y.tiles.values()) { const m = t.mesh.b; if (!m || t.d > 1500) continue;
         const pos = m.geometry.attributes.position.array, nrm = m.geometry.attributes.normal.array, nb = m.userData.own.length;
         for (let i = 0; i < nb; i++) if (nrm[i*3+1] >= 120) { const q = [pos[i*3] + t.ox + Y.VO.x, -(pos[i*3+2] - t.on) + Y.VO.n]; const v = new THREE.Vector3(pos[i*3] + t.ox, pos[i*3+1], pos[i*3+2] - t.on).project(Y.camera); const s = [(v.x+1)/2*360, (1-v.y)/2*800];
           if (s[0] > 40 && s[0] < 320 && s[1] > 200 && s[1] < 560) return { q, s }; } } return null; }''')
