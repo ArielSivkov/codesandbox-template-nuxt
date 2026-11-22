@@ -13,7 +13,7 @@ import json
 import numpy as np
 from shapely.geometry import Polygon, LineString
 
-ASSUMED_ORIGIN_ITM = (166300.0, 634400.0)   # ASSUMPTION – approx. Ashdod centre, testing only
+ASSUMED_ORIGIN_ITM = (167824.6, 635153.6)   # corrected 23.11.2026 from 3 georeferenced Ashdod landmarks (twin/groundtruth); was (166300, 634400) – off by ~1.7 km
 
 
 def load(html_path):

@@ -1,0 +1,145 @@
+"""Builds ashdod_reference.csv / .json from the hand-curated records below.
+Every number here was read from the cited page (2026-11-23). null = not stated by any source.
+Run: python3 build_reference.py"""
+import csv, json, os
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+COLS = ["ref_id", "name", "name_alt", "address", "osm_way_id", "id_match_method", "match_note",
+        "floors", "floors_alt", "height_m", "height_alt_m", "year_built", "status", "use",
+        "lat", "lon", "source_url", "source_url_2", "reliability", "use_in_eval", "notes"]
+
+R = [
+ dict(ref_id="ASH-001", name="K Tower 1 (מגדלי K)", name_alt="K Towers 1", address="שדרות ירושלים 12–16, הסיטי (רובע הקריה)",
+      osm_way_id="w358974561", id_match_method="name", match_note="OSM name 'K Towers 1'; second tower confirmed by location (see ASH-002)",
+      floors=40, floors_alt=42, height_m=142, height_alt_m=148, year_built=2014, status="built", use="residential",
+      source_url="https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Israel",
+      source_url_2="https://www.globes.co.il/news/article.aspx?did=1000488026",
+      reliability="high", use_in_eval=1,
+      notes="Wikipedia 142 m / 40 fl; Globes 2009 and a Yad2 listing say 42 floors (incl. lobby/technical?); aroundus.com says 148 m, completed 2017"),
+ dict(ref_id="ASH-002", name="K Tower 2 (מגדלי K)", name_alt="קיי טאוורס 2", address="שדרות ירושלים 12–16, הסיטי",
+      osm_way_id="w358974559", id_match_method="name+location",
+      match_note="OSM name 'קיי טאוורס 2'; aroundus.com coords 31.79472,34.64083 fall inside this footprint after georeferencing",
+      floors=40, floors_alt=42, height_m=138, height_alt_m=148, year_built=2014, status="built", use="residential",
+      lat=31.79472, lon=34.64083,
+      source_url="https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Israel",
+      source_url_2="https://aroundus.com/p/7784834-k-towers", reliability="high", use_in_eval=1,
+      notes="Yad2 listing (שדרות ירושלים 16) 'קומה 15/42' – https://www.yad2.co.il/realestate/item/qvsn9efw"),
+ dict(ref_id="ASH-003", name="Dimri Tower (מגדל דמרי / טאוור אשדוד)", name_alt="מגדלי דמארי", address="רחוב צה\"ל 5, הסיטי",
+      osm_way_id="w189733330", id_match_method="location+name",
+      match_note="scraperbase coords 31.793702,34.639678 fall inside this footprint; OSM name 'מגדלי דמארי' (tagged building=construction, 3,337 m2 – may be the whole site)",
+      floors=46, floors_alt=44, height_m=160, height_alt_m=154, year_built=2021, status="built", use="residential",
+      lat=31.793702, lon=34.639678,
+      source_url="https://www.skyscrapercenter.com/building/dimri-tower/49478",
+      source_url_2="https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Israel", reliability="high", use_in_eval=1,
+      notes="CTBUH: 160 m architectural, 46 fl, 2014–2021; Wikipedia 154 m / 44 fl / 2020; developer page says 40 (residential) floors"),
+ dict(ref_id="ASH-004", name="מלון ווסט / בראון סיסייד (West All Suites Hotel)", name_alt="West Hotel", address="הטיילת 21",
+      osm_way_id="w321354658", id_match_method="name", match_note="OSM name 'West Hotel'",
+      floors=9, height_m=None, status="built", use="hotel",
+      source_url="https://www.timeout.com/israel/hotels/west-boutique-hotel-ashdod",
+      source_url_2="https://brownhotels.com/west-ashdod-hotel", reliability="medium", use_in_eval=1,
+      notes="TimeOut: 'a 9-storey building facing the Mediterranean Sea'"),
+ dict(ref_id="ASH-005", name="מלון לאונרדו פלאזה אשדוד", name_alt="לאונרדו פלאזה אשדוד", address="שדרות הים התיכון 1, רובע ט\"ו (כיכר היובל)",
+      osm_way_id="w238281900", id_match_method="name", match_note="OSM name 'לאונרדו פלאזה אשדוד'",
+      floors=13, height_m=None, year_built=None, status="built", use="hotel",
+      source_url="https://www.gadish.co.il/en/project/%D7%9E%D7%9C%D7%95%D7%9F-%D7%9C%D7%90%D7%95%D7%A0%D7%A8%D7%93%D7%95-%D7%A4%D7%9C%D7%90%D7%96%D7%94-%D7%90%D7%A9%D7%93%D7%95%D7%93/",
+      source_url_2="https://www.inisrael.com/hotel.php?hotelid=874", reliability="medium", use_in_eval=1,
+      notes="Gadish: 10 hotel floors + 3 commerce floors (project 2015–2018); inisrael mentions suites on floor 12 (consistent with >=12)"),
+ dict(ref_id="ASH-006", name="נועה מדיקל סנטר", name_alt=None, address="ליד בית החולים אסותא, כניסה דרומית לעיר",
+      osm_way_id="w247265402", id_match_method="name", match_note="OSM name 'נועה מדיקל סנטר'; 170 m from Assuta footprint – consistent with '2 minutes walk'",
+      floors=5, height_m=None, status="built", use="medical/office",
+      source_url="https://ashdodi.com/noa-medical-tower/", reliability="medium", use_in_eval=1,
+      notes="'המגדל בן החמש קומות (ועוד קומות מרתף נוספות)' – 5 above ground"),
+ dict(ref_id="ASH-007", name="בית החולים אסותא אשדוד", name_alt="Assuta Ashdod Medical Center", address="מזרח העיר (רחוב לא אומת)",
+      osm_way_id="w532920578", id_match_method="location",
+      match_note="Wikipedia coords 31.78028,34.65722 are 53 m from this building=hospital footprint (10,386 m2), nearest hospital",
+      floors=9, height_m=38, year_built=2017, status="built", use="hospital", lat=31.78028, lon=34.65722,
+      source_url="https://www.kone.co.il/he/stories-and-references/references/assuta.aspx",
+      source_url_2="https://en.wikipedia.org/wiki/Assuta_Ashdod_Medical_Center", reliability="medium", use_in_eval=1,
+      notes="KONE (elevator supplier): 9 floors, 38 m. MEC: new hospitalization tower (phase B) 8 above ground + 2 basements – separate building, not matched. Street address not taken from any source"),
+ dict(ref_id="ASH-008", name="מרכז קליטה בית קנדה", name_alt="בית קנדה", address="שבי ציון 1 (לפי דפי זהב d.co.il/35598120)",
+      osm_way_id="w236834134", id_match_method="name", match_note="OSM name 'בית קנדה'",
+      floors=4, height_m=None, status="built (additions permitted 2018)", use="residential/absorption",
+      source_url="https://ashdodnet.com/%D7%97%D7%93%D7%A9%D7%95%D7%AA-%D7%90%D7%A9%D7%93%D7%95%D7%93/66432",
+      source_url_2="https://ashdodnet.com/%D7%97%D7%93%D7%A9%D7%95%D7%AA-%D7%90%D7%A9%D7%93%D7%95%D7%93/314493", reliability="low", use_in_eval=0,
+      notes="4 floors in 2016/2018; 2018 permit adds ~8 partial floors on top + a 21-floor tower east of it – current state unknown, so excluded from headline metrics"),
+ dict(ref_id="ASH-009", name="קניון סימול (Seamall)", name_alt="קניון סימול", address="הסיטי, ליד התחנה המרכזית",
+      osm_way_id="w101976162", id_match_method="name", match_note="OSM name 'קניון סימול' (8,349 m2)",
+      floors=3, height_m=None, status="built", use="mall",
+      source_url="https://www.calcalist.co.il/article/rkcenjem3", source_url_2="https://resido.com/projects/",
+      reliability="low", use_in_eval=0,
+      notes="3 commercial floors (+2 parking below). An office tower stands on the mall (TOP SEAMALL: 25 floors incl. 10 added ~2024) – footprint mixes mall and tower; excluded"),
+ dict(ref_id="ASH-010", name="Ki Tower – בניין משרדים, שדרות ירושלים", name_alt="מרכז קאי ?", address="שדרות ירושלים, הקריה מע\"ר",
+      osm_way_id="w189732282", id_match_method="name_fuzzy", match_note="Yad2 'קי טאוור' office building vs OSM 'מרכז קאי' adjacent to K Towers – identity NOT confirmed",
+      floors=6, height_m=None, status="built", use="office",
+      source_url="https://www.yad2.co.il/realestate/item/2noph86r", reliability="low", use_in_eval=0,
+      notes="listing: floor 3 of 6"),
+ # ---------- documented but NOT matched to the sample (no coords / name not in OSM sample) ----------
+ dict(ref_id="ASH-011", name="Dimri HaRova Tower B", address=None, osm_way_id=None, id_match_method="none",
+      floors=25, height_m=79.9, year_built=2014, status="built", use="residential",
+      source_url="https://skyscraperpage.com/b101520", reliability="medium", use_in_eval=0,
+      notes="height marked unconfirmed by source"),
+ dict(ref_id="ASH-012", name="City Center Tower 2", address=None, osm_way_id=None, id_match_method="none",
+      floors=14, height_m=50.9, status="built", use="residential",
+      source_url="https://skyscraperpage.com/b43949", reliability="medium", use_in_eval=0, notes="height unconfirmed (roof)"),
+ dict(ref_id="ASH-013", name="הדר על הים (2 בניינים)", address=None, osm_way_id=None, id_match_method="none",
+      floors=22, status="built?", use="residential",
+      source_url="https://www.denya-group.com/en/hadar-al-hayam-ashdod/", reliability="low", use_in_eval=0, notes="2 buildings x 22 floors, no address"),
+ dict(ref_id="ASH-014", name="Sea Side (י.ה.ב)", address=None, osm_way_id=None, id_match_method="none",
+      floors=21, floors_alt=19, status="built", use="residential",
+      source_url="https://y-hb.co.il/residential/done-projects/sea-side/", reliability="low", use_in_eval=0,
+      notes="'19 floors above lobby' vs summary 21"),
+ dict(ref_id="ASH-015", name="TOP SEAMALL (מגדל מעל קניון סימול)", address="הסיטי", osm_way_id=None, id_match_method="none",
+      floors=25, status="built/extended ~2024", use="office",
+      source_url="https://www.calcalist.co.il/article/rkcenjem3", reliability="low", use_in_eval=0,
+      notes="sponsored article: 25 floors incl. 10 new floors over the existing (15-floor) tower; completion late-2024 expected"),
+ dict(ref_id="ASH-016", name="מרכזיית בזק לשעבר – מעון סטודנטים", address="נתן אלתרמן 38, רובע ו'", osm_way_id=None, id_match_method="none",
+      floors=3, status="built (plan to add 8)", use="technical/office",
+      source_url="https://www.nadlancenter.co.il/article/4210", reliability="medium", use_in_eval=0,
+      notes="existing 3 floors above basement; plan -> 11"),
+ dict(ref_id="ASH-017", name="מבנים בני 4 קומות ברח' אבן עזרא", address="אבן עזרא, רובע ה'", osm_way_id=None, id_match_method="none",
+      floors=4, status="built (pinui-binui)", use="residential",
+      source_url="https://www.nadlancenter.co.il/article/7731", reliability="medium", use_in_eval=0,
+      notes="'הריסת מספר מבנים בני 4 קומות עם 144 יח\"ד' – several buildings, exact ones unknown"),
+ dict(ref_id="ASH-018", name="בניין בן 8 קומות ברובע י\"א (תביעת שכנים)", address="רובע י\"א", osm_way_id=None, id_match_method="none",
+      floors=8, status="built", use="residential",
+      source_url="https://www.ynet.co.il/articles/mobile/0,7340,L-4190171,00.html", reliability="low", use_in_eval=0,
+      notes="8 floors over pilotis + 2 roof apartments; street not named"),
+ dict(ref_id="ASH-019", name="בניין יוניטרייד", address="שדרות הרצל 1", osm_way_id=None, id_match_method="none",
+      floors=None, status="built 2002", use="office/retail",
+      source_url="https://www.globes.co.il/news/article.aspx?did=582970", reliability="low", use_in_eval=0,
+      notes="15,600 m2; a clinic is on floor 4 (doctorim.co.il) so floors >= 4; total not stated"),
+ dict(ref_id="ASH-020", name="מגדלי יחד (2 מגדלים)", address="פינת חיים משה שפירא והרצל, רובע ד'", osm_way_id=None, id_match_method="none",
+      floors=34, status="under construction (2024)", use="residential",
+      source_url="https://y-hb.co.il/news/yachad-towers-innovative-project-transforming-ashdod", reliability="medium", use_in_eval=0,
+      notes="not built at OSM snapshot time"),
+ dict(ref_id="ASH-021", name="בית משפט השלום אשדוד", name_alt="בית משפט השלום אשדוד", address="פארק בן גוריון, בין רובע ב' לג'",
+      osm_way_id="w546214721", id_match_method="name", match_note="OSM name 'בית משפט השלום אשדוד'",
+      floors=None, status="built 1973/1990/2012", use="court",
+      source_url="https://xnet.ynet.co.il/architecture/articles/0,14710,L-3097090,00.html", reliability="low", use_in_eval=0,
+      notes="floor count not stated; 2012 added one floor on columns; 1,600+1,800 m2"),
+ dict(ref_id="ASH-022", name="מוזיאון אשדוד לאמנות (מונארט)", name_alt="מרכז תרבות מונארט", address="דרך ארץ 8",
+      osm_way_id="w101976178", id_match_method="name+location", match_note="used as georeference anchor #1",
+      floors=None, year_built=2003, status="built", use="museum", lat=31.7919, lon=34.6374,
+      source_url="https://en.wikipedia.org/wiki/Ashdod_Museum_of_Art", reliability="n/a", use_in_eval=0,
+      notes="no height/floors – kept as georeference anchor only"),
+]
+
+def main():
+    rows = []
+    for r in R:
+        rows.append({c: r.get(c) for c in COLS})
+    with open(os.path.join(HERE, "ashdod_reference.csv"), "w", newline="", encoding="utf-8") as f:
+        f.write("# Ashdod building-height reference set v1 (2026-11-23). Schema: see README.txt. Empty = not stated by any source.\n")
+        w = csv.DictWriter(f, fieldnames=COLS); w.writeheader()
+        for r in rows:
+            w.writerow({k: ("" if v is None else v) for k, v in r.items()})
+    meta = {"version": 1, "built": "2026-11-23", "city": "ashdod", "crs_note":
+            "osm_way_id refers to twin/pipeline/sample-out-ashdod; lat/lon WGS84 as given by source",
+            "georef_offset_itm_m": {"dx": 1524.6, "dy": 753.6, "note":
+            "sample coordinates = real ITM - offset (yz_sample ASSUMED_ORIGIN was wrong); derived from Monart, checked by Dimri Tower and K Towers coords (both land inside the named footprints)"},
+            "columns": COLS, "records": rows}
+    json.dump(meta, open(os.path.join(HERE, "ashdod_reference.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(len(rows), "records;", sum(1 for r in rows if r["osm_way_id"]), "matched;", sum(r["use_in_eval"] for r in rows), "in eval")
+
+if __name__ == "__main__":
+    main()

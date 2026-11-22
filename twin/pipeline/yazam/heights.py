@@ -84,12 +84,22 @@ def _num(v):
     return float(m.group(1)) if m else None
 
 
+# High-rise residential storeys are taller than 3.0 m. Calibrated on 3 Ashdod towers where both
+# height and floors are published (K Towers 1: 142 m/40 fl, Damari tower: 160 m/46 fl and K Towers 2),
+# implied floor-to-floor 3.42–3.52 m -> 3.45 m from the 15th floor up (ground truth, twin/groundtruth).
+TOWER_FLOOR_H = 3.45
+TOWER_FROM = 15
+
+
 def floors_to_m(f, grp):
+    if grp == "res" and f >= TOWER_FROM:
+        return f * TOWER_FLOOR_H + PARAPET
     return f * FLOOR_H[grp] + PARAPET
 
 
 def m_to_floors(h, grp):
-    return max(1, int(round((h - PARAPET) / FLOOR_H[grp])))
+    fh = TOWER_FLOOR_H if grp == "res" and (h - PARAPET) / FLOOR_H[grp] >= TOWER_FROM else FLOOR_H[grp]
+    return max(1, int(round((h - PARAPET) / fh)))
 
 
 # ------------------------------------------------------------------ per-source estimators
@@ -160,13 +170,16 @@ def direct_estimates(b):
 def rule_prior(b):
     """Same spirit as the current page's estimate(), but returns metres + sigma."""
     t, a, name = b.get("type") or "", b.get("area", 0), b.get("name") or ""
-    if re.search(r"מגדל|tower", name, re.I): return 60.0, 20.0
+    # Rule-of-thumb priors. Sigmas were widened after the Ashdod ground-truth check (23.11.2026):
+    # with the old values only 29% of reference buildings fell inside ±σ (target ≈68%).
+    if re.search(r"מגדל|טאוו?ר|tower", name, re.I): return 100.0, 45.0   # Ashdod towers: 138–160 m
     if t in LOW: return (4.0 if t == "roof" else 3.5), 1.5
-    if t in PUB or t in IND: return 8.0, 4.0
-    if t == "" and a > 2500: return 10.0, 5.0
+    if (t in PUB or t in IND) and a > 2500: return 20.0, 12.0          # large hospital/office/hotel
+    if t in PUB or t in IND: return 8.0, 5.0
+    if t == "" and a > 2500: return 12.0, 8.0
     if a <= 150: return 6.0, 3.0
     if a <= 1000: return floors_to_m(4, "res"), SIGMA["R_rule"]
-    return floors_to_m(8, "res"), 9.0
+    return floors_to_m(8, "res"), 12.0
 
 
 # ------------------------------------------------------------------ neighbour prior (kNN)
