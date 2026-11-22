@@ -1,0 +1,34 @@
+# בדיקות אוטומטיות ללוח היזם.
+# רץ על כל דחיפה ועל כל בקשת מיזוג שנוגעת בתיקיית yazam או בבדיקות.
+# ענף main הוא האתר החי (ה-Worker מושך ממנו), לכן לא ממזגים ל-main בלי שהבדיקות עוברות.
+name: yazam-ci
+
+on:
+  push:
+    paths: ['yazam/**', 'tests/yazam/**', '.github/workflows/yazam-ci.yml']
+  pull_request:
+    paths: ['yazam/**', 'tests/yazam/**', '.github/workflows/yazam-ci.yml']
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: מנוע החישוב והמחירון
+        run: node tests/yazam/calc.test.mjs yazam/index.html
+      - name: התקנת דפדפן לבדיקה
+        run: |
+          npm i --no-save playwright@1
+          npx playwright install --with-deps chromium
+      - name: בדיקת עשן במסך טלפון
+        run: node tests/yazam/smoke.test.mjs yazam/index.html
+      - name: גודל המפה
+        run: |
+          size=$(stat -c%s yazam/map/index.html)
+          echo "גודל המפה: $size בתים"
+          if [ "$size" -gt 3500000 ]; then echo "המפה גדלה מעבר ל-3.5MB"; exit 1; fi
