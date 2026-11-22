@@ -1,0 +1,10 @@
+{
+  "name": "esh27-twin-sky",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sky & time department of the ESH27 twin: ephemeris (Moon, planets, 300 BSC stars), zmanim, Hebrew calendar, historical ΔT, camera calibration",
+  "type": "module",
+  "main": "dist/esh27-sky.mjs",
+  "scripts": { "build": "node tools/build.mjs", "test": "node tools/build.mjs && node --test test/*.test.mjs", "refs": "python3 tools/make_refs.py && python3 tools/make_zmanim_refs.py", "shot": "node tools/shot.mjs" },
+  "license": "MIT (code); data: see src/data/* headers"
+}
