@@ -47,6 +47,24 @@ ok(gD.v <= P.vMaxGPS + 0.1 && gD.tilt <= P.maxTilt / D2R_ + 0.05 && Math.abs(gD.
 const fs = require('fs'), path = require('path'), src = fs.readFileSync(path.join(__dirname, '../js/sim.js'), 'utf8');
 for (const c of ['../../integration/world/js/sim.js', '../../preview/world/js/sim.js']) { const f = path.join(__dirname, c); if (fs.existsSync(f)) ok(fs.readFileSync(f, 'utf8') === src, `העותק ${c.replace('../../', '')} זהה ל-game/js/sim.js`); }
 for (const c of ['../../integration/world/js/itm.js', '../../preview/world/js/itm.js']) { const f = path.join(__dirname, c); if (fs.existsSync(f)) ok(fs.readFileSync(f, 'utf8') === fs.readFileSync(path.join(__dirname, '../js/itm.js'), 'utf8'), `העותק ${c.replace('../../', '')} זהה ל-game/js/itm.js`); }
+// 4) שעות שמש בחזית: בלי שכנים, מול נוסחת אורך היום, ומול קיר אינסופי (חישוב אנליטי נפרד)
+{ const none = () => [], base = { lat: LAT, lon: LON, gamma: SIM.itmConvergence(LAT, LON), near: none, x: 0, y: 1.5, z: 0, step: 2 };
+  const dl = (decl) => { const f = LAT * Math.PI / 180, d = decl * Math.PI / 180, H0 = Math.acos((Math.sin(-0.833 * Math.PI / 180) - Math.sin(f) * Math.sin(d)) / (Math.cos(f) * Math.cos(d))); return 2 * H0 * 180 / Math.PI / 15; };
+  const W12 = SIM.sunHours({ ...base, day: '2026-12-21' }), S12 = SIM.sunHours({ ...base, day: '2026-12-21', nx: 0, nz: 1 }), N12 = SIM.sunHours({ ...base, day: '2026-12-21', nx: 0, nz: -1 });
+  const S6 = SIM.sunHours({ ...base, day: '2026-06-21', nx: 0, nz: 1 }), N6 = SIM.sunHours({ ...base, day: '2026-06-21', nx: 0, nz: -1 }), D6 = SIM.sunHours({ ...base, day: '2026-06-21' });
+  ok(Math.abs(W12.dayHours - dl(-23.44)) < 0.08 && Math.abs(D6.dayHours - dl(23.44)) < 0.08, `אורך יום באשדוד: 21.12 ${W12.dayHours.toFixed(2)} ש' (נוסחה ${dl(-23.44).toFixed(2)}), 21.6 ${D6.dayHours.toFixed(2)} ש' (נוסחה ${dl(23.44).toFixed(2)})`);
+  ok(Math.abs(S12.hours - W12.dayHours) < 0.05 && N12.hours === 0, `21.12 בלי שכנים: חזית דרום ${S12.hours.toFixed(2)} ש' (כל היום), צפון ${N12.hours} ש'`);
+  ok(N6.hours > 1 && Math.abs(S6.hours + N6.hours - D6.dayHours) < 0.1, `21.6 בלי שכנים: דרום ${S6.hours.toFixed(2)} + צפון ${N6.hours.toFixed(2)} = יום ${D6.dayHours.toFixed(2)} ש'`);
+  // קיר ארוך (4 ק"מ) בגובה 9 מ', 15 מ' מדרום לנקודה. מוסתר אם 1.5 + (D/dz)·tanEl < 9 – נספר כאן בנפרד
+  const Dw = 15, Hw = 9, wall = { id: 'wall', p: new Float32Array([-2000, Dw, 2000, Dw, 2000, Dw + 10, -2000, Dw + 10]), n: 4, top: Hw, sigma: 3, minx: -2000, maxx: 2000, minz: Dw, maxz: Dw + 10 };
+  const near1 = () => [wall], day = '2026-12-21', got = SIM.sunHours({ ...base, near: near1, day, nx: 0, nz: 1 });
+  let lit = 0; const off = SIM.israelOffsetMin(new Date(Date.UTC(2026, 11, 21, 12))), t0 = Date.UTC(2026, 11, 21) - off * 60000;
+  for (let m = 1; m < 1440; m += 2) { const sp = SIM.sunPosition(new Date(t0 + m * 60000), LAT, LON); if (sp.elevation <= 0) continue; const v = SIM.sunVector(sp, base.gamma), hl = Math.hypot(v.x, v.z);
+    if (v.z / hl <= 0) continue; const t = Dw / (v.z / hl), xw = t * v.x / hl; if (Math.abs(xw) > 2000 || 1.5 + t * v.y / hl >= Hw) lit++; }
+  ok(Math.abs(got.hours - lit * 2 / 60) < 0.05 && got.lo <= got.hours && got.hours <= got.hi && got.hi - got.lo > 0.1, `קיר 9±3 מ' במרחק 15 מ' דרומה, 21.12: ${got.hours.toFixed(2)} ש' (אנליטי ${(lit * 2 / 60).toFixed(2)}), טווח ${got.lo.toFixed(2)}–${got.hi.toFixed(2)}`);
+  // חזיתות של קופסה: נורמלים החוצה ובכיוון הנכון
+  const box = { p: new Float32Array([0, 0, 20, 0, 20, 10, 0, 10]), n: 4 }, fp = SIM.facadePoints(box);
+  ok(fp['דרום'] && fp['דרום'].nz > 0.99 && fp['דרום'].z > 10 && fp['צפון'].nz < -0.99 && fp['צפון'].z < 0 && fp['מזרח'].nx > 0.99 && fp['מערב'].nx < -0.99, 'נקודות חזית: 4 כיוונים, נורמלים החוצה'); }
 // פרופיל רוח: חזק יותר בגובה
 SIM.weather.windSpeed = 8; SIM.weather.gust = 1.5;
 const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).speed; ok(b > a, `רוח ב-60 מ' (${b.toFixed(1)}) > ב-2 מ' (${a.toFixed(1)})`);

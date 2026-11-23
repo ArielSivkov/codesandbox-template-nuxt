@@ -50,6 +50,69 @@ SIM.israelOffsetMin = function (date) {
     const asUTC = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour % 24, +p.minute); return Math.round((asUTC - date.getTime()) / 60000); } catch (e) { return 120; }
 };
 
+// ---------------- 1ב. שעות שמש ישירה בנקודה (חזית / קרקע) – הצללה מבניינים שכנים, עם טווח מאי־ודאות הגובה
+/** כניסת קרן אופקית (ox,oz)+t·(dx,dz) לפוליגון: t מינימלי > 0, 0 אם הנקודה בפנים, Infinity אם אין חיתוך */
+function rayPolyEntry(p, n, ox, oz, dx, dz) {
+  let tmin = Infinity, inside = false;
+  for (let i = 0, j = n - 1; i < n; j = i++) {
+    const ax = p[j * 2], az = p[j * 2 + 1], ex = p[i * 2] - ax, ez = p[i * 2 + 1] - az;
+    if ((p[i * 2 + 1] > oz) !== (az > oz) && ox < ex * (oz - az) / ez + ax) inside = !inside;
+    const den = dx * ez - dz * ex; if (Math.abs(den) < 1e-12) continue;
+    const qx = ax - ox, qz = az - oz, t = (qx * ez - qz * ex) / den, s = (qx * dz - qz * dx) / den;
+    if (s >= 0 && s <= 1 && t > 1e-6 && t < tmin) tmin = t;
+  }
+  return inside ? 0 : tmin;
+}
+SIM.rayPolyEntry = rayPolyEntry;
+/** שעות שמש ישירה ביום אחד (לפי לוח ישראל). o = { x, y, z, nx?, nz? (נורמל חזית החוצה; בלי = משטח אופקי פתוח),
+ *  day: 'YYYY-MM-DD', near(x,z,r) → בניינים {p,n,top,sigma,minx..maxz,id}, exclude: id, step: דקות (ברירת מחדל 5), lat, lon, gamma }
+ *  מחזיר { hours, lo, hi (שעות כששכנים נמוכים/גבוהים ב-σ), first, last (דקות מחצות שעון ישראל), dayHours }.
+ *  מקורב: אין הצללת תבליט/אופק, עצים ומרפסות; הבניינים מנסרות עם גג שטוח; רק אריחים טעונים; רזולוציה ±step/2 לכל מעבר. */
+SIM.sunHours = function (o) {
+  const step = o.step || 5, lat = o.lat, lon = o.lon, gam = o.gamma || 0, MAXR = 800, MAXTOP = 250;
+  const [Y, M, Dd] = o.day.split('-').map(Number), mid = new Date(Date.UTC(Y, M - 1, Dd, 12));
+  const off = SIM.israelOffsetMin(mid), t0 = Date.UTC(Y, M - 1, Dd) - off * 60000;
+  const cand = o.near(o.x, o.z, MAXR).filter(b => b.id !== o.exclude);   // פעם אחת לכל נקודה
+  let cnt = [0, 0, 0], first = -1, last = -1, day = 0; const d = new Date();
+  for (let m = step / 2; m < 1440; m += step) {
+    d.setTime(t0 + m * 60000); const sp = SIM.sunPosition(d, lat, lon); if (sp.elevation <= 0) continue; day++;
+    const v = SIM.sunVector(sp, gam), hl = Math.hypot(v.x, v.z), dx = v.x / hl, dz = v.z / hl, tanEl = v.y / hl;
+    if (o.nx !== undefined && dx * o.nx + dz * o.nz <= 0) continue;               // השמש מאחורי החזית
+    const R = Math.min(MAXR, (MAXTOP - o.y) / tanEl);
+    let lo = true, mi = true, hi = true;                                            // מואר כשהשכנים ב-−σ / 0 / +σ
+    for (const b of cand) {
+      // דחייה מהירה: מלבן חוסם מול הקרן
+      const cx = (b.minx + b.maxx) / 2, cz = (b.minz + b.maxz) / 2, rr = Math.hypot(b.maxx - b.minx, b.maxz - b.minz) / 2;
+      const along = (cx - o.x) * dx + (cz - o.z) * dz; if (along < -rr || along > R + rr) continue;
+      if (Math.abs((cx - o.x) * dz - (cz - o.z) * dx) > rr) continue;
+      const t = rayPolyEntry(b.p, b.n, o.x, o.z, dx, dz); if (t === Infinity) continue;
+      const yr = o.y + t * tanEl, s = b.sigma || 0;                                 // גובה הקרן בכניסה (הנמוך ביותר בתוך הטביעה)
+      if (yr < b.top + s) hi = false; if (yr < b.top) mi = false; if (yr < b.top - s) { lo = false; break; }
+    }
+    if (mi) { cnt[1]++; if (first < 0) first = m; last = m; } if (lo) cnt[0]++; if (hi) cnt[2]++;
+  }
+  const h = c => c * step / 60;
+  return { hours: h(cnt[1]), lo: h(cnt[2]), hi: h(cnt[0]), first: first < 0 ? null : first - step / 2, last: last < 0 ? null : last + step / 2, dayHours: h(day) };
+};
+/** נקודות מדידה לחזיתות בניין: לכל כיוון (דרום/מזרח/מערב/צפון) הקיר הארוך שהנורמל שלו הכי קרוב, 0.5 מ' מחוץ לקיר */
+SIM.facadePoints = function (b) {
+  const dirs = { 'דרום': [0, 1], 'מזרח': [1, 0], 'מערב': [-1, 0], 'צפון': [0, -1] }, out = {};
+  const p = b.p, n = b.n; let area = 0; for (let i = 0, j = n - 1; i < n; j = i++) area += p[j * 2] * p[i * 2 + 1] - p[i * 2] * p[j * 2 + 1];
+  const sg = area > 0 ? 1 : -1;
+  for (const [name, [ux, uz]] of Object.entries(dirs)) {
+    let best = null, bs = -1;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const ax = p[j * 2], az = p[j * 2 + 1], ex = p[i * 2] - ax, ez = p[i * 2 + 1] - az, L = Math.hypot(ex, ez); if (L < 3) continue;
+      let nx = -ez / L * sg, nz = ex / L * sg; const mx = ax + ex / 2, mz = az + ez / 2;
+      // ודא שהנורמל פונה החוצה: נקודה קטנה החוצה מחוץ לפוליגון
+      if (rayPolyEntry(p, n, mx + nx * 0.3, mz + nz * 0.3, 1, 0.0001) === 0) { nx = -nx; nz = -nz; }
+      const c = nx * ux + nz * uz; if (c < 0.5) continue; const sc = c * Math.sqrt(L); if (sc > bs) { bs = sc; best = { x: mx + nx * 0.5, z: mz + nz * 0.5, nx, nz, len: L }; }
+    }
+    if (best) out[name] = best;
+  }
+  return out;
+};
+
 // ---------------- 2. מזג אוויר + רוח
 SIM.weather = { windSpeed: 6, windFrom: 270, gust: 1.5, cloud: 0.2, rain: 0, source: 'ידני' };
 /** מתאם ל-Open-Meteo (חינמי, בלי מפתח). כבוי בגרסה הלא-מקוונת: נקרא רק כשמפעילים במפורש (?live=1). */

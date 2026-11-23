@@ -317,12 +317,32 @@ function showCard(b) {
     row('חזיתות ברוטו', `${fmt(q.gross)} מ"ר <span class="tag">טווח ${fmt(q.lo)}–${fmt(q.hi)}</span>`) + row(`חזיתות נטו (בניכוי ${OPEN * 100}% פתחים)`, fmt(q.net) + ' מ"ר') + row('גג', fmt(q.roof) + ' מ"ר') + '</table>' +
     `<div class="acts"><button class="btn ${own ? '' : 'pri'}" id="cMine">${own ? '✖ בטל סימון נכס' : '⭐ סמן כנכס שלי'}</button><a class="btn pri" id="cQuote" href="${preLink(b)}" target="_blank" rel="noopener">🧾 פתח הצעה בלוח היזם</a>` +
     (biz ? `<button class="btn" id="cBiz">🚪 היכנס לעסק</button>` : own ? `<button class="btn" id="cIn">🚪 היכנס לנכס</button>` : '') + `</div>` +
+    `<div class="acts"><button class="btn" id="cSun">☀️ שעות שמש בחזיתות</button></div><div id="cSunOut"></div>` +
     `<p class="note">הגובה והקומות הם הערכה (${esc(SRC_HE[b.src] || b.src)}). מודדים בשטח לפני שליחה ללקוח. נתוני מפה © תורמי OpenStreetMap.</p>`;
   $('card').style.display = 'block';
   $('cClose').onclick = closeCard;
   $('cMine').onclick = () => { toggleMine(b); showCard(b); };
   if ($('cBiz')) $('cBiz').onclick = () => { closeCard(); enterInterior('biz', b); };
   if ($('cIn')) $('cIn').onclick = () => { closeCard(); enterInterior('own', b); };
+  $('cSun').onclick = () => sunCard(b);
+}
+/** שעות שמש ישירה בחזיתות (21.12 / 21.6) עם טווח מאי־ודאות גובה השכנים (±σ). מקורב – ראו SIM.sunHours */
+function sunCard(b) {
+  const out = $('cSunOut'); if (!out) return; out.innerHTML = '<p class="note">מחשב…</p>';
+  setTimeout(() => {
+    if (cardB !== b) return;
+    const t0 = performance.now(), Y = new Date(ENV.date).getFullYear(), fp = SIM.facadePoints(b), names = Object.keys(fp);
+    const fl = [['קרקע', b.base + 1.5], ['עליונה', Math.max(b.base + 1.5, b.top - 1.5)]];
+    const cell = r => `${fmt(r.hours, 1)}<br><span class="tag" dir="ltr">${fmt(r.lo, 1)}–${fmt(r.hi, 1)}</span>`;
+    let html = '';
+    for (const [day, label] of [[`${Y}-12-21`, `21.12 · חורף`], [`${Y}-06-21`, `21.6 · קיץ`]]) {
+      let dayH = 0, rows = '';
+      for (const nm of names) { const f = fp[nm]; const r = fl.map(([, y]) => SIM.sunHours({ x: f.x, z: f.z, y, nx: f.nx, nz: f.nz, day, near: W.near, exclude: b.id, lat: LAT, lon: LON, gamma: GAMMA })); dayH = r[0].dayHours;
+        rows += `<tr><td>${nm}</td><td>${cell(r[0])}</td><td>${cell(r[1])}</td></tr>`; }
+      html += `<h3>☀️ ${label} · אורך היום ${fmt(dayH, 1)} ש'</h3><table><tr><td>חזית</td><td>קומת קרקע</td><td>קומה עליונה</td></tr>${rows}</table>`;
+    }
+    out.innerHTML = html + `<p class="note">שעות שמש ישירה על החזית (ש'). הטווח = גובה השכנים ±σ. מקורב: בלי עצים, מרפסות ותבליט; שכנים רק מהאזור הטעון (עד 800 מ'); צעד 5 דק'. מיקום שמש: NOAA, נבדק מול NREL SPA. (${Math.round(performance.now() - t0)} מ"ש)</p>`;
+  }, 30);
 }
 function closeCard() { $('card').style.display = 'none'; cardB = null; }
 function toggleMine(b) {
