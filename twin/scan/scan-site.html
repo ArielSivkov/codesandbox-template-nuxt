@@ -69,7 +69,7 @@ table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}td,th{bo
 <div id="guide"></div>
 
 <div id="bot">
-  <div class="side"><b id="sDist">0 מ'</b>הלכת</div>
+  <div class="side"><b id="sDist">0 מ'</b>הלכת<br><button class="ib" id="modeBtn">📷 צילום</button></div>
   <button id="go">התחל</button>
   <div class="side"><b id="sShots">0</b>צילומים<br><button class="ib" id="openTools">🛠 כלים</button></div>
 </div>
@@ -188,7 +188,7 @@ function frame(){
     $('sub').textContent=mv+' · '+S.pos.lat.toFixed(5)+', '+S.pos.lon.toFixed(5);}
   $('sDist').textContent=(S.dist<1000?Math.round(S.dist)+' מ\'':(S.dist/1000).toFixed(2)+' ק"מ');$('sShots').textContent=S.shots;
   drawHud(h);if((S.fr=(S.fr||0)+1)%4===0)drawMap();
-  if(S.on)autoShoot(h);
+  if(S.on&&S.mode==='photo')autoShoot(h);else if(S.on&&S.mode==='video'&&h){guide(Math.abs(h.pitch)>25?(h.pitch>0?'⬇️ הורד קצת':'⬆️ הרם מול הרחוב'):(S.gyro>60?'לאט… ✋':''));}
 }
 function drawHud(h){var c=$('hud'),W=c.clientWidth,H=c.clientHeight;if(c.width!==W){c.width=W;c.height=H;}var g=c.getContext('2d');g.clearRect(0,0,W,H);
   if(!h)return;var v=$('vid'),vw=v.videoWidth||W,vh=v.videoHeight||H,cover=Math.max(W/vw,H/vh);
@@ -238,6 +238,22 @@ function shoot(kind,why){var m=meta(kind,why);S.lastShotPos={lat:S.pos.lat,lon:S
   S.shots++;var f=$('flash');f.style.opacity=.35;setTimeout(function(){f.style.opacity=0;},120);if(navigator.vibrate)navigator.vibrate(25);
   grab().then(function(b){S.lastShot={blob:b,meta:{tilt:m.hold,pitch:m.hold&&m.hold.pitch}};enqueue(('000'+S.shots).slice(-4)+'_'+kind+'.jpg',b,m);log('צילום '+S.shots+' ('+why+')');});}
 
+// ---------- מצב וידאו: הקלטה רציפה במקטעים של 15 ש' + יומן חיישנים 10 פעמים בשנייה ----------
+S.mode='photo';S.rec=null;S.vlog=[];S.seg=0;
+$('modeBtn').onclick=function(){if(S.on){guide('קודם עצור');return;}S.mode=S.mode==='photo'?'video':'photo';this.textContent=S.mode==='video'?'🎥 וידאו':'📷 צילום';$('go').textContent=S.mode==='video'?'הקלט':'התחל';log('מצב '+S.mode);};
+function vSample(){var h=hold();S.vlog.push([Date.now(),S.pos&&+S.pos.lat.toFixed(7),S.pos&&+S.pos.lon.toFixed(7),S.pos&&+S.pos.acc.toFixed(1),S.head!=null?+S.head.toFixed(1):null,h?+h.pitch.toFixed(1):null,h?+h.roll.toFixed(1):null,+S.gyro.toFixed(1),S.steps,+S.speed.toFixed(2)]);}
+function vStart(){if(!S.stream||!window.MediaRecorder){guide('הדפדפן לא תומך בהקלטה');return false;}
+  var mt=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm','video/mp4'].find(function(t){return MediaRecorder.isTypeSupported(t);});if(!mt)return false;
+  var chunks=[],t0=Date.now(),seg=++S.seg;S.vlog=[];vSample();S.vt_iv=S.vt_iv||setInterval(function(){if(S.rec)vSample();},100);
+  var r=new MediaRecorder(S.stream,{mimeType:mt,videoBitsPerSecond:5e6});S.rec=r;
+  r.ondataavailable=function(e){if(e.data.size)chunks.push(e.data);};
+  r.onstop=function(){var blob=new Blob(chunks,{type:mt}),name=('000'+seg).slice(-4)+'_video.'+(mt.indexOf('mp4')>=0?'mp4':'webm'),log0=S.vlog;
+    enqueue(name,blob,{kind:'video',when:new Date(t0).toISOString(),dur_s:(Date.now()-t0)/1000,mime:mt,start:{pos:S.pos,heading:S.head},video:S.vt?S.vt.getSettings():null});
+    enqueue(name+'.sensors.json',new Blob([JSON.stringify({cols:['t','lat','lon','acc_m','heading','pitch','roll','gyro','steps','speed'],rows:log0}).padEnd(1200,' ')],{type:'application/json'}),{kind:'sensors',of:name});
+    S.shots++;log('מקטע וידאו '+seg+' ('+Math.round((Date.now()-t0)/1000)+' ש\')');if(S.on&&S.mode==='video')vStart();};
+  r.start(1000);setTimeout(function(){if(S.rec===r&&r.state==='recording')r.stop();},15000);return true;}
+function vStop(){if(S.rec&&S.rec.state==='recording'){var r=S.rec;S.rec=null;r.stop();}else S.rec=null;}
+
 // ---------- העלאה ----------
 function b64u(s){return btoa(unescape(encodeURIComponent(s)));}
 function enqueue(name,blob,m){S.queue.push({name:name,blob:blob,meta:m});pump();}
@@ -252,7 +268,7 @@ window.__esh27upload=function(name,blob,m){return new Promise(function(res,rej){
 window.__esh27sensors=function(){return{tilt:hold(),last:S.lastShot};};
 
 // ---------- התחלה ----------
-function startCam(){return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160}},audio:false})
+function startCam(){return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:2560},height:{ideal:1440},frameRate:{ideal:30,max:30}},audio:false})
   .then(function(st){S.stream=st;S.vt=st.getVideoTracks()[0];$('vid').srcObject=st;var s=S.vt.getSettings();log('מצלמה '+s.width+'x'+s.height);});}
 $('begin').onclick=function(){if(!S.key&&$('key').value)S.key=$('key').value.trim();try{localStorage.setItem('esh27key',S.key);}catch(e){}
   var ask=[];if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)ask.push(DeviceOrientationEvent.requestPermission());
@@ -260,7 +276,7 @@ $('begin').onclick=function(){if(!S.key&&$('key').value)S.key=$('key').value.tri
   Promise.all(ask).catch(function(){}).then(function(){sensors();return startCam();})
   .then(function(){$('intro').style.display='none';guide('לחץ התחל והתחל ללכת');},function(e){$('introMsg').textContent='לא הצלחתי לפתוח מצלמה: '+e.message;sensors();setTimeout(function(){$('intro').style.display='none';},1500);});
   if(S.key)fetch('/api/ping',{headers:{'X-Key':S.key}}).then(function(r){return r.json();}).then(function(j){if(!j.key_ok){dot('dUp','⚠️ מפתח שגוי','bad');}}).catch(function(){});};
-$('go').onclick=function(){S.on=!S.on;this.textContent=S.on?'עצור':'התחל';this.className=S.on?'on':'';if(S.on){S.lastShotPos=null;S.track=S.pos?[{lat:S.pos.lat,lon:S.pos.lon}]:[];S.dist=0;guide('הולכים 🚶 – הסורק מצלם לבד');setTimeout(function(){guide('');},2500);}else guide('נעצר ✋');log(S.on?'התחלה':'עצירה');};
+$('go').onclick=function(){S.on=!S.on;this.textContent=S.on?'עצור':(S.mode==='video'?'הקלט':'התחל');if(S.mode==='video'){if(S.on){if(!vStart()){S.on=false;this.textContent='הקלט';return;}}else vStop();}this.className=S.on?'on':'';if(S.on){S.lastShotPos=null;S.track=S.pos?[{lat:S.pos.lat,lon:S.pos.lon}]:[];S.dist=0;guide('הולכים 🚶 – הסורק מצלם לבד');setTimeout(function(){guide('');},2500);}else guide('נעצר ✋');log(S.on?'התחלה':'עצירה');};
 $('openTools').onclick=function(){$('tools').className='open';if(window.__esh27measure)window.__esh27measure.redraw();};$('closeTools').onclick=function(){$('tools').className='';};
 $('tbM').onclick=function(){$('tbM').className='on';$('tbS').className='';$('paneM').hidden=false;$('paneS').hidden=true;};
 $('tbS').onclick=function(){$('tbS').className='on';$('tbM').className='';$('paneS').hidden=false;$('paneM').hidden=true;};

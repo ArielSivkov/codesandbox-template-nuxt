@@ -50,6 +50,13 @@ const { chromium } = require('playwright');
   await p.waitForTimeout(500);
   check(/הרם|הורד/.test(await p.textContent('#guide')), 'הנחיית אחיזה: ' + await p.textContent('#guide'));
   await p.screenshot({ path: process.argv[3] || 'walk.png' });
+  // מצב וידאו: עוצרים צילום, עוברים לווידאו, מקליטים 3 שניות → מקטע וידאו + יומן חיישנים עולים
+  if (await p.$eval('#go', e => e.textContent) === 'עצור') await p.click('#go');
+  await p.click('#modeBtn'); check(await p.$eval('#go', e => e.textContent) === 'הקלט', 'מעבר למצב וידאו');
+  const before = ups.length; await p.click('#go'); await p.waitForTimeout(3000); await p.click('#go'); await p.waitForTimeout(2500);
+  const vids = ups.slice(before);
+  check(vids.some(n => /_video\.(webm|mp4)$/.test(n)) && vids.some(n => /sensors\.json$/.test(n)), 'וידאו + יומן חיישנים עלו: ' + vids.join(', '));
+  await p.click('#modeBtn');
   // בדיקה עצמית ומדידה
   await p.click('#openTools'); await p.click('#tbS'); await p.click('#runTest');
   check((await p.textContent('#selftest')).includes('✅ מצלמה'), 'בדיקה עצמית: מצלמה');
