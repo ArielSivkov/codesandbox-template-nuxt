@@ -309,7 +309,7 @@ function showCard(b) {
   const cf = CONF_HE[b.conf] || ['—', ''];
   $('card').innerHTML = `<h2>${biz ? '🏪 ' + esc(BIZ.name) : own ? '⭐ הנכס שלי' : '🏢 בניין'}${b.name && !biz ? ' · ' + esc(b.name) : ''}<button class="btn x" id="cClose" aria-label="סגירה">✕</button></h2><table>` +
     row('כתובת', st ? esc(st) + ' <span class="tag">רחוב קרוב, משוער</span>' : 'לא ידוע') +
-    row('מזהה OSM', `<span class="ltr">${esc(b.id)}</span>`) + row('סוג', esc(TYPE_HE[b.type] || b.type)) +
+    row('מזהה OSM', `<span class="ltr">${esc(b.id)}</span>`) + row('סוג', esc(TYPE_HE[b.type] || b.type) + (b.ty && b.ty !== 'ind' ? ' <span class="tag">' + ({ villa: 'וילה / בית פרטי', block: 'בלוק מגורים', tower: 'מגדל' }[b.ty] || '') + ' · נגזר מצורה</span>' : '')) +
     row('קומות', `${b.floors} <span class="tag">טווח ${b.fl}–${b.fh}</span>`) +
     row('גובה', `${fmt(b.h, 1)} מ' ± ${fmt(b.sigma, 1)} ${b.src === 'R' || b.src === 'N' || b.src === 'B' ? '<span class="tag low">משוער, לא נמדד</span>' : '<span class="tag ' + cf[1] + '">ביטחון ' + cf[0] + '</span>'}`) +
     row('מקור הגובה', esc(SRC_HE[b.src] || b.src)) + row('שטח טביעה (גג)', fmt(b.area) + ' מ"ר') + row('היקף', fmt(q.P) + " מ'") + '</table>' +

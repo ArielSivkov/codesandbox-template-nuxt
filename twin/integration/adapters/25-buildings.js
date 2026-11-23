@@ -34,9 +34,10 @@
     B.extra = placed;
   }
   YZW.register({
-    id: 'buildings', name: 'בניינים: ציוני דרך מצוטטים + מגדלי הדקל', dept: 'buildings', order: 25,
+    id: 'landmarks-lite', name: 'ציוני דרך מצוטטים + מגדלי הדקל (גישור)', dept: 'integration → buildings', order: 25,
     scripts: ['mods/buildings/src/landmarks.js'], requires: () => !!(window.ESHBuildings && ESHBuildings.landmarks),
     init(world, api) {
+      if (YZW.plugins().some(p => p.id === 'buildings' && p.dept === 'plugins/buildings' && p.state !== 'error')) return 'off:הוחלף בתוסף הבניינים המלא (plugins/buildings)';
       B.LM = ESHBuildings.landmarks; const grp = api.group();
       // חשוב: לפני שהמשחק בונה גאומטריה (setLOD) — אירוע add מגיע מ-buildTile, לפני הבנייה
       api.eachTile((t, kind) => { if (kind !== 'add' || !t.blds) return;

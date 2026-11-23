@@ -38,7 +38,9 @@
   }
   function spawnCar(world, c) { const p = pickRoad(world, true); if (!p) { c.r = null; return; } Object.assign(c, p, { dir: Math.random() < 0.5 ? 1 : -1, v: 7 + Math.random() * 7 + (p.r.c >= 3 ? 4 : 0), lane: p.r.w * 0.25 }); }
   function spawnPed(world, q) { const p = pickRoad(world, false); if (!p) { q.r = null; return; } Object.assign(q, p, { dir: Math.random() < 0.5 ? 1 : -1, v: 1.1 + Math.random() * 0.5, side: Math.random() < 0.5 ? 1 : -1, ph: Math.random() * 6 }); }
-  function counts(world) { const t = TIER[world.quality.tier] || TIER.medium; const sh = world.shabbat.active; return [Math.round(t[0] * (sh ? 0.12 : 1)), t[1]]; }
+  function counts(world) { const t = TIER[world.quality.tier] || TIER.medium; const sh = world.shabbat.active;
+    let carK = sh ? 0.12 : 1; if (world.providers.density) { try { carK = world.providers.density().cars; } catch (e) { /* */ } }
+    return [Math.round(t[0] * Math.max(0.05, Math.min(1.5, carK))), world.providers.pedestrians === 'npc' ? 0 : t[1]]; }   // הדמויות של מחלקת ה-NPC מחליפות את הקופסאות
   function recolorPeds(world) { const sh = world.shabbat.active, c = new THREE.Color();
     for (let i = 0; i < L.pedMesh.count; i++) { c.setHex(sh ? (i % 3 === 0 ? 0x22252a : 0xf4f4f0) : CLOTH[i % CLOTH.length]); L.pedMesh.setColorAt(i, c); } if (L.pedMesh.instanceColor) L.pedMesh.instanceColor.needsUpdate = true; }
   const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), S1 = new THREE.Vector3(1, 1, 1), UP = new THREE.Vector3(0, 1, 0);

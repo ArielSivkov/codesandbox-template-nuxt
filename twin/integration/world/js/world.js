@@ -92,6 +92,8 @@ function makeMaterials() {
   MAT.wall = new T.MeshLambertMaterial({ map: TEX.facade, vertexColors: true });
   MAT.ind = new T.MeshLambertMaterial({ map: TEX.ind, vertexColors: true });
   MAT.roof = new T.MeshLambertMaterial({ map: TEX.roof, vertexColors: true });
+  TEX.tile = canvasTex(64, 64, (x, w, h) => { x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); for (let r = 0; r < 4; r++) { x.fillStyle = 'rgba(0,0,0,0.28)'; x.fillRect(0, r * 16 + 13, w, 3); for (let c = 0; c < 4; c++) { x.fillStyle = 'rgba(0,0,0,0.12)'; x.fillRect(c * 16 + (r % 2) * 8, r * 16, 2, 16); } } noiseFill(x, w, h, 300, 0.12, 9, true); });
+  MAT.tile = new T.MeshLambertMaterial({ map: TEX.tile, vertexColors: true, side: T.DoubleSide });
   MAT.lo = new T.MeshLambertMaterial({ vertexColors: true });           // רמת פירוט רחוקה: בלי טקסטורה
   MAT.terrain = new T.MeshLambertMaterial({ vertexColors: true, map: TEX.ground });
   MAT.road = new T.MeshLambertMaterial({ map: TEX.road, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
@@ -174,15 +176,40 @@ function decodeBuildings(t, v) {
 }
 const PAL = [[0.95, 0.93, 0.88], [0.97, 0.96, 0.93], [0.92, 0.88, 0.80], [0.90, 0.86, 0.78], [0.88, 0.88, 0.86], [0.94, 0.90, 0.84], [0.85, 0.80, 0.72], [0.93, 0.86, 0.80], [0.82, 0.84, 0.86]];
 const IND_PAL = [[0.78, 0.80, 0.82], [0.70, 0.74, 0.78], [0.82, 0.78, 0.70], [0.62, 0.68, 0.72]];
+// טיפולוגיה נגזרת (לא נמדדת): וילה = עד 2 קומות וטביעה קטנה; מגדל = 12+ קומות; אחרת בלוק. דטרמיניסטי לפי מזהה.
+const VILLA_PAL = [[0.98, 0.97, 0.94], [0.97, 0.94, 0.86], [0.96, 0.92, 0.84], [0.99, 0.98, 0.96], [0.93, 0.90, 0.84], [0.97, 0.90, 0.82]];
+const BLOCK_PAL = [[0.93, 0.90, 0.82], [0.88, 0.84, 0.76], [0.95, 0.93, 0.88], [0.86, 0.86, 0.84], [0.92, 0.86, 0.80], [0.84, 0.82, 0.78], [0.96, 0.94, 0.90], [0.90, 0.88, 0.84], [0.80, 0.78, 0.74], [0.94, 0.88, 0.84]];
+const TOWER_PAL = [[0.90, 0.90, 0.88], [0.84, 0.86, 0.88], [0.92, 0.90, 0.85], [0.78, 0.82, 0.86]];
+function tyOf(b) { if (b.ty) return b.ty; let t = 'block'; if (b.ind) t = 'ind'; else if (b.floors >= 12 || b.h >= 36) t = 'tower'; else if (b.floors <= 2 && b.area < 450 && b.area > 35) t = 'villa'; b.ty = t; return t; }
+W.tyOf = tyOf;
+function hipRoof(b, p, n, y1, gr, hs) { // גג רעפים על מלבן מכוון; רק כשהטביעה קרובה למלבן
+  let bi = 0, bl = 0; for (let i = 0; i < n; i++) { const j = (i + 1) % n, l = Math.hypot(p[j * 2] - p[i * 2], p[j * 2 + 1] - p[i * 2 + 1]); if (l > bl) { bl = l; bi = i; } }
+  const j0 = (bi + 1) % n, ux = (p[j0 * 2] - p[bi * 2]) / bl, uz = (p[j0 * 2 + 1] - p[bi * 2 + 1]) / bl, vx = -uz, vz = ux;
+  let u0 = 1e9, u1 = -1e9, w0 = 1e9, w1 = -1e9; for (let i = 0; i < n; i++) { const u = p[i * 2] * ux + p[i * 2 + 1] * uz, w = p[i * 2] * vx + p[i * 2 + 1] * vz; u0 = Math.min(u0, u); u1 = Math.max(u1, u); w0 = Math.min(w0, w); w1 = Math.max(w1, w); }
+  const W_ = u1 - u0, D_ = w1 - w0; if (W_ * D_ <= 0 || b.area / (W_ * D_) < 0.72) return false;
+  const o = 0.45; u0 -= o; u1 += o; w0 -= o; w1 += o; const sw = D_ > W_; const L = sw ? D_ : W_, S = sw ? W_ : D_, hr = Math.min(3.6, Math.max(1.2, 0.36 * S));
+  const P = (u, w, y) => [u * ux + w * vx, y, u * uz + w * vz];
+  const um = (u0 + u1) / 2, wm = (w0 + w1) / 2, half = (S + 2 * o) / 2, yr = y1 + hr;
+  let r1, r2; if (!sw) { r1 = P(Math.min(um, u0 + half), wm, yr); r2 = P(Math.max(um, u1 - half), wm, yr); } else { r1 = P(um, Math.min(wm, w0 + half), yr); r2 = P(um, Math.max(wm, w1 - half), yr); }
+  const c00 = P(u0, w0, y1), c10 = P(u1, w0, y1), c11 = P(u1, w1, y1), c01 = P(u0, w1, y1);
+  const k = 0.82 + ((hs >>> 4) % 20) / 100, col = [0.70 * k, 0.34 * k, 0.22 * k];
+  const tri = (a, b2, c) => { const e1 = [b2[0] - a[0], b2[1] - a[1], b2[2] - a[2]], e2 = [c[0] - a[0], c[1] - a[1], c[2] - a[2]]; let nx = e1[1] * e2[2] - e1[2] * e2[1], ny = e1[2] * e2[0] - e1[0] * e2[2], nz = e1[0] * e2[1] - e1[1] * e2[0];
+    if (ny < 0) { const t = b2; b2 = c; c = t; nx = -nx; ny = -ny; nz = -nz; } const l = Math.hypot(nx, ny, nz) || 1;
+    for (const q of [a, b2, c]) { gr.p.push(q[0], q[1], q[2]); gr.n.push(nx / l, ny / l, nz / l); gr.c.push(col[0], col[1], col[2]); gr.u.push((q[0] * ux + q[2] * uz) / 1.4, (q[1] - y1) / 0.55 + (q[0] * vx + q[2] * vz) * 0.0); } };
+  if (!sw) { tri(c00, c10, r2); tri(c00, r2, r1); tri(c11, c01, r1); tri(c11, r1, r2); tri(c10, c11, r2); tri(c01, c00, r1); }
+  else { tri(c00, c01, r2); tri(c00, r2, r1); tri(c11, c10, r1); tri(c11, r1, r2); tri(c01, c11, r2); tri(c10, c00, r1); }
+  return true;
+}
 
 function buildBuildingGeo(list, lo) {
   // groups: 0 קירות מגורים, 1 קירות תעשייה, 2 גגות (ב-lo: הכול בקבוצה אחת)
-  const G = [{ p: [], n: [], c: [], u: [] }, { p: [], n: [], c: [], u: [] }, { p: [], n: [], c: [], u: [] }];
+  const G = [{ p: [], n: [], c: [], u: [] }, { p: [], n: [], c: [], u: [] }, { p: [], n: [], c: [], u: [] }, { p: [], n: [], c: [], u: [] }];   // 3 = גגות רעפים
   const solar = [];
   const v2 = [];
   for (const b of list) {
+    if (!isFinite(b.top) || !isFinite(b.base)) { b.base = isFinite(b.base) ? b.base : 0; b.h = isFinite(b.h) ? b.h : (b.floors || 1) * 3.3 + 1; b.top = b.base + b.h; }
     if (lo && b.area < 70) continue;
-    const pal = b.ind ? IND_PAL : PAL, hs = hash32(b.id), col = pal[hs % pal.length];
+    const ty = tyOf(b), pal = b.ind ? IND_PAL : ty === 'villa' ? VILLA_PAL : ty === 'tower' ? TOWER_PAL : BLOCK_PAL, hs = hash32(b.id), col = pal[hs % pal.length];
     const y0 = b.base - 0.6, y1 = b.top, gw = b.ind ? G[1] : G[0];
     const bayW = b.ind ? 4.0 : BAY, flH = b.ind ? 6.0 : FLOOR;
     // פישוט קל לרמה רחוקה: מדלגים על קודקודים שיוצרים קיר קצר מ-1.5 מ'
@@ -204,7 +231,8 @@ function buildBuildingGeo(list, lo) {
       gw.c.push(...cb, ...cb, ...ct, ...cb, ...ct, ...ct);
       gw.u.push(0, vB, bays, vB, bays, vT, 0, vB, bays, vT, 0, vT);
     }
-    // גג
+    // גג (וילה: רעפים; אחרת שטוח)
+    if (!(!lo && ty === 'villa' && hipRoof(b, p, n, y1, G[3], hs))) {
     v2.length = 0; for (let i = 0; i < n; i++) v2.push(new T.Vector2(p[i * 2], p[i * 2 + 1]));
     let tri; try { tri = T.ShapeUtils.triangulateShape(v2, []); } catch (e) { tri = []; }
     const rc = [col[0] * 0.86, col[1] * 0.86, col[2] * 0.86], gr = G[2];
@@ -214,8 +242,9 @@ function buildBuildingGeo(list, lo) {
       const seq = cr > 0 ? [a, b2, c] : [a, c, b2];
       for (const q of seq) { gr.p.push(q.x, y1, q.y); gr.n.push(0, 1, 0); gr.c.push(...rc); gr.u.push(q.x / 10, q.y / 10); }
     }
+    }
     // דודי שמש על גגות מגורים (סמל ישראלי) – רק ברמת פירוט קרובה
-    if (!lo && !b.ind && b.area > 120 && b.area < 3000 && b.floors >= 2) {
+    if (!lo && !b.ind && ty !== 'villa' && b.area > 120 && b.area < 3000 && b.floors >= 2) {
       const k = 1 + (hs >>> 8) % 3;
       for (let s = 0; s < k; s++) { const fx = ((hs >>> (s * 5)) % 100) / 100 - 0.5, fz = ((hs >>> (s * 7 + 3)) % 100) / 100 - 0.5;
         const x = b.cx + fx * (b.maxx - b.minx) * 0.45, z = b.cz + fz * (b.maxz - b.minz) * 0.45;
@@ -223,7 +252,7 @@ function buildBuildingGeo(list, lo) {
     }
   }
   const geo = new T.BufferGeometry(); const P = [], N = [], C = [], U = []; let start = 0;
-  const groups = lo ? [[0, 1, 2]] : [[0], [1], [2]];
+  const groups = lo ? [[0, 1, 2, 3]] : [[0], [1], [2], [3]];
   groups.forEach((gi, mi) => { let cnt = 0; for (const g of gi) { P.push(...G[g].p); N.push(...G[g].n); C.push(...G[g].c); U.push(...G[g].u); cnt += G[g].p.length / 3; }
     geo.addGroup(start, cnt, mi); start += cnt; });
   geo.setAttribute('position', new T.Float32BufferAttribute(P, 3));
@@ -424,7 +453,7 @@ function flatTile(key) {      // אריח בלי נתונים: יבשה שטוח
 function setLOD(t, lod) {
   if (t.lod === lod || !t.blds) return;
   const t0 = performance.now();
-  if (lod === 1 && !t.hi) { const r = buildBuildingGeo(t.blds, false); t.hi = new T.Mesh(r.geo, [MAT.wall, MAT.ind, MAT.roof]); t.hi.castShadow = t.hi.receiveShadow = true; t.hiTris = r.tris; t.solar = solarMesh(r.solar); if (t.solar) t.grp.add(t.solar); t.palms = palms(t); if (t.palms) t.grp.add(t.palms); }
+  if (lod === 1 && !t.hi) { const r = buildBuildingGeo(t.blds, false); t.hi = new T.Mesh(r.geo, [MAT.wall, MAT.ind, MAT.roof, MAT.tile || MAT.roof]); t.hi.castShadow = t.hi.receiveShadow = true; t.hiTris = r.tris; t.solar = solarMesh(r.solar); if (t.solar) t.grp.add(t.solar); t.palms = palms(t); if (t.palms) t.grp.add(t.palms); }
   if (lod === 0 && !t.lo) { const r = buildBuildingGeo(t.blds, true); t.lo = new T.Mesh(r.geo, [MAT.lo]); t.loTris = r.tris; }
   if (t.hi) { if (lod === 1) t.grp.add(t.hi); else t.grp.remove(t.hi); }
   if (t.lo) { if (lod === 0) t.grp.add(t.lo); else t.grp.remove(t.lo); }

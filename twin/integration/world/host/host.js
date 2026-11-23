@@ -63,14 +63,15 @@ const TIER_N = { low: 0, medium: 1, high: 2 };
 async function initPlugin(rec) {
   const d = rec.def;
   if (d.pending) { rec.state = 'pending'; rec.err = d.pending; refreshModes(); return; }
-  if (OFF.has(rec.id) || (qs.has('bare') && !d.core) || (d.defaultOff && !LS.get('on', []).includes(rec.id) && !qs.has(rec.id))) { rec.state = 'off'; refreshModes(); return; }
+  if (OFF.has(rec.id) || qs.get(rec.id) === '0' || (qs.has('bare') && !d.core) || (d.defaultOff && !LS.get('on', []).includes(rec.id) && !qs.has(rec.id))) { rec.state = 'off'; refreshModes(); return; }
   if (d.minTier && TIER_N[world.quality.tier] < TIER_N[d.minTier]) { rec.state = 'off'; rec.err = 'כבוי באיכות ' + TIER_HE[world.quality.tier]; refreshModes(); return; }
   rec.state = 'loading'; rec.err = null; const t0 = performance.now();
   try {
     for (const s of d.scripts || []) await loadScript(s);
     if (d.requires && !d.requires(world)) throw new Error('תלות חסרה');
-    await withTimeout(d.init ? d.init(world, api(rec)) : null, d.timeoutMs || 25000, 'אתחול');
+    const ir = await withTimeout(d.init ? d.init(world, api(rec)) : null, d.timeoutMs || 25000, 'אתחול');
     if (rec.state !== 'loading') return;            // הושבת בזמן האתחול
+    if (typeof ir === 'string' && ir.startsWith('off:')) { rec.state = 'off'; rec.err = ir.slice(4); refreshModes(); return; }   // מודול שהוחלף במודול מלא יותר
     rec.state = 'on'; rec.initMs = performance.now() - t0;
     rec.modes = (d.modes || []).map(m => Object.assign({ kind: 'plugin' }, m, { owner: rec }));
     refreshModes(); bus.emit('plugin', { id: rec.id, state: 'on' }); if (world.providers.zmanim && rec.id === 'sky') computeShabbat();
@@ -146,17 +147,20 @@ const world = {
 // ---------------------------------------------------------------- איכות
 function gpuInfo(r) { try { const gl = r.getContext(), x = gl.getExtension('WEBGL_debug_renderer_info'); return x ? String(gl.getParameter(x.UNMASKED_RENDERER_WEBGL)) : ''; } catch (e) { return ''; } }
 function autoTier() {
+  // נמדד על הרדמי של אריאל (23.11 02:58): 51–52 fps ברחוב באיכות בינונית → טלפון בינוני מתחיל ב"בינונית" ועולה אוטומטית אם יש מרווח.
   let s = 0; const why = [];
   const mem = navigator.deviceMemory, cores = navigator.hardwareConcurrency || 4, gpu = gpuInfo(world.renderer);
-  if (TOUCH) { s -= 1; why.push('מגע'); }
-  if (mem) { if (mem <= 4) { s -= 1; why.push('זיכרון ' + mem + 'GB'); } else if (mem >= 8) s += 1; }
-  if (cores <= 4) { s -= 1; why.push(cores + ' ליבות'); } else if (cores >= 8 && !TOUCH) s += 1;
-  if (/SwiftShader|llvmpipe|Mali-[GT][0-6]\d\b|Mali-G5|Adreno \(TM\) [3-6]\d\d|PowerVR/i.test(gpu)) { s -= 1; why.push('GPU ' + gpu.replace(/ANGLE \(|\)/g, '').slice(0, 30)); }
+  if (mem && mem <= 3) { s -= 2; why.push('זיכרון ' + mem + 'GB'); } else if (mem && mem >= 8) s += 1;
+  if (cores <= 4) { s -= 1; why.push(cores + ' ליבות'); }
+  if (/SwiftShader|llvmpipe/i.test(gpu)) { s -= 2; why.push('רינדור תוכנה'); }
+  else if (/Mali-[GT][0-4]\d\b|Adreno \(TM\) [3-5]\d\d|PowerVR/i.test(gpu)) { s -= 1; why.push('GPU ' + gpu.replace(/ANGLE \(|\)/g, '').slice(0, 30)); }
   else if (/Adreno \(TM\) 7[3-9]\d|Apple|NVIDIA|GeForce|Radeon|Iris/i.test(gpu)) s += 1;
-  const w = Math.max(screen.width, screen.height) * (devicePixelRatio || 1); if (w > 2400 && TOUCH) { s -= 0; }
+  if (!TOUCH && s >= 0) s += 1;
   const t = s <= -2 ? 'low' : s <= 0 ? 'medium' : 'high';
-  return { t, why: why.join(' · ') || 'מכשיר חזק' };
+  return { t, why: why.join(' · ') || 'מכשיר טוב' };
 }
+// יחס פיקסלים לפי שכבה (קצוות הדמות היו מפוקסלים ב-0.8–1.25): נמוכה 1.0, בינונית 1.5, גבוהה 2.0 — לא מעל יחס המסך
+const DPR = { low: 1.0, medium: 1.5, high: 2.0 };
 function setTier(setting, silent) {
   const q = world.quality; q.setting = setting; LS.set('tier', setting);
   let t = setting; if (setting === 'auto') { const a = autoTier(); t = a.t; q.reason = 'אוטומטי: ' + a.why; } else q.reason = 'ידני';
@@ -165,6 +169,7 @@ function setTier(setting, silent) {
 function applyTier(t, silent) {
   const q = world.quality; q.tier = t; q.budget = TIERS[t];
   const G = world.G27; G.Q.auto = false; G.setQuality(TIERS[t].lvl);
+  const pr = Math.min(window.devicePixelRatio || 1, DPR[t]); if (Math.abs(world.renderer.getPixelRatio() - pr) > 0.01) { world.renderer.setPixelRatio(pr); G.Q.pr = pr; dispatchEvent(new Event('resize')); }
   bus.emit('quality', { tier: t, budget: TIERS[t] });
   for (const r of P.values()) if (r.def.minTier && READY) { if (TIER_N[t] < TIER_N[r.def.minTier] && r.state === 'on') stopPlugin(r, 'off'); else if (TIER_N[t] >= TIER_N[r.def.minTier] && r.state === 'off' && !OFF.has(r.id)) initPlugin(r); }
   if (!silent) notice('איכות: ' + TIER_HE[t], { kind: 'info', ms: 1800 });
@@ -176,10 +181,10 @@ function autoQuality(dt) {
   overT = over ? overT + dt : Math.max(0, overT - dt);
   if (overT > 5) { overT = 0; bus.emit('budget', { tier: q.tier, calls: st.calls, tris: st.tris, budget: b }); }
   if (!q.auto) return;
-  if (st.fps < 26) lowT += dt; else lowT = Math.max(0, lowT - dt * 0.5);
-  if (st.fps > 57) highT += dt; else highT = 0;
-  if (lowT > 4 && q.tier !== 'low') { lowT = 0; downgraded = true; applyTier(q.tier === 'high' ? 'medium' : 'low', true); notice('האיכות הותאמה לביצועי המכשיר', { kind: 'info', ms: 1800 }); }
-  if (highT > 12 && !downgraded && q.tier !== 'high') { highT = 0; applyTier(q.tier === 'low' ? 'medium' : 'high', true); }
+  if (st.fps < 36) lowT += dt; else lowT = Math.max(0, lowT - dt * 0.5);
+  if (st.fps > 50) highT += dt; else highT = 0;
+  if (lowT > 5 && q.tier !== 'low') { lowT = 0; downgraded = true; applyTier(q.tier === 'high' ? 'medium' : 'low', true); notice('האיכות הותאמה לביצועי המכשיר', { kind: 'info', ms: 1800 }); }
+  if (highT > 8 && !downgraded && q.tier !== 'high') { highT = 0; applyTier(q.tier === 'low' ? 'medium' : 'high', true); }
 }
 
 // ---------------------------------------------------------------- זמן, שמש, מזג אוויר, שבת = מקור אמת יחיד
