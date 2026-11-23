@@ -16,6 +16,10 @@ const { chromium } = require('playwright');
   await p.evaluate(async () => { const sl = ms => new Promise(r => setTimeout(r, ms)); const ev = (x, y, z, rot) => window.dispatchEvent(Object.assign(new Event('devicemotion'), { accelerationIncludingGravity: { x, y, z }, rotationRate: { alpha: rot, beta: 5, gamma: 5 } }));
     const gaps = [250, 900, 400, 1500, 350, 700, 1200, 300];
     for (const gp of gaps) { for (let k = 0; k < 8; k++) ev(0.5, 9.5, -2, 120); ev(1.5, 12.3, -2, 120); await sl(gp); } });
+  // עמידה במקום עם רעש GPS של ±3 מ' – המהירות חייבת להישאר אפס
+  for (let i = 0; i < 8; i++) { await ctx.setGeolocation({ latitude: 31.7905 + (Math.random() - .5) * 5 / 111195, longitude: 34.6402 + (Math.random() - .5) * 5 / 94600, accuracy: 3 }); await p.waitForTimeout(400); }
+  const still = await p.evaluate(() => window.__esh27test.S.speed);
+  check(still < 0.3, 'עמידה עם רעש GPS: מהירות ' + still.toFixed(2) + ' מ/ש (צריך ≈0)');
   const sitSteps = await p.evaluate(() => window.__esh27test.S.steps);
   check(sitSteps === 0, 'ישיבה וסיבוב: ' + sitSteps + ' צעדים (צריך 0)');
   // הליכה: 10 צעדים צפונה, 1.2 מ' כל אחד, טלפון מוחזק ישר
@@ -29,7 +33,7 @@ const { chromium } = require('playwright');
   }
   await p.waitForTimeout(1500);
   const st = await p.evaluate(() => { const S = window.__esh27test.S; return { shots: S.shots, dist: S.dist, steps: S.steps, head: S.head, acc: S.pos && S.pos.acc, place: document.getElementById('place').textContent, sub: document.getElementById('sub').textContent }; });
-  check(st.dist > 10 && st.dist < 25, 'מרחק הליכה נמדד: ' + st.dist.toFixed(1) + ' מ\' (אמת ≈16.8)');
+  check(st.dist > 13 && st.dist < 21, 'מרחק הליכה נמדד: ' + st.dist.toFixed(1) + ' מ\' (אמת ≈16.8)');
   check(st.shots >= 3, 'צילום אוטומטי בהליכה: ' + st.shots + ' צילומים');
   check(st.steps >= 10, 'זיהוי צעדים: ' + st.steps);
   check(st.head !== null && Math.abs(st.head) < 1, 'מצפן: ' + st.head);

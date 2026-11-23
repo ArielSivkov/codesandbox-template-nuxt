@@ -142,7 +142,8 @@ function onGps(c,t){
   if(c.speed!=null&&c.speed>0.4&&c.heading!=null&&!isNaN(c.heading)){S.course=c.heading;S.speed=c.speed;}
 }
 function advance(np){var last=S.track[S.track.length-1];var d=enu(last,np),m=Math.hypot(d.x,d.y);
-  S.pos=np;var now=Date.now();S.mv=(S.mv||[]).concat([[now,m]]).filter(function(x){return now-x[0]<4000;});if(!S.gps||S.gps.speed==null||isNaN(S.gps.speed))S.speed=S.mv.reduce(function(a,x){return a+x[1];},0)/4;if(m>=0.8){S.track.push({lat:np.lat,lon:np.lon});if(S.on)S.dist+=m;if(m>1.5&&!S.course)S.course=(Math.atan2(d.x,d.y)/R+360)%360;if(S.track.length>2000)S.track.shift();}}
+  S.pos=np;var now=Date.now();S.mv=(S.mv||[]).concat([[now,m]]).filter(function(x){return now-x[0]<4000;});S.trk=(S.trk||[]).concat([[now,np.lat,np.lon]]).filter(function(x){return now-x[0]<5000;});if(!S.gps||S.gps.speed==null||isNaN(S.gps.speed)){var f0=S.trk[0],dsp=enu({lat:f0[1],lon:f0[2]},np),dt=Math.max(1,(now-f0[0])/1000),dm=Math.hypot(dsp.x,dsp.y);S.speed=dm>Math.max(2,np.acc*0.8)?dm/dt:0;}   // מהירות מהתזוזה נטו (לא מסכום הקפיצות של ה-GPS), ורק מעל רעש הדיוק
+if(m>=0.8){S.track.push({lat:np.lat,lon:np.lon});if(S.on&&(S.walking||S.speed>0.4))S.dist+=m;if(m>1.5&&!S.course)S.course=(Math.atan2(d.x,d.y)/R+360)%360;if(S.track.length>2000)S.track.shift();}}
 function onStep(){S.steps++;if(!S.pos||S.head==null)return;var L=0.72;   // אורך צעד משוער
   var np=moveLL(S.pos,Math.sin(S.head*R)*L,Math.cos(S.head*R)*L);np.acc=S.pos.acc+0.3;advance(np);}
 // צעד אמיתי: שיא תאוצה + קצב קבוע (0.3–1 ש') של לפחות 4 שיאים ברצף, ובלי סיבוב מהיר של הטלפון. ישיבה וסיבוב בכיסא לא נספרים.

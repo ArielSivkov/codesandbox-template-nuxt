@@ -37,10 +37,9 @@ async function runPhoto(env, t) {
   const uri = 'data:image/jpeg;base64,' + Buffer.from(buf).toString('base64');
   const ex = await examples(env, 'photo');
   const s = await env.AI.run(M.vision, { messages: [{ role: 'user', content: [{ type: 'text', text: PHOTO_PROMPT + (ex ? '\nLessons from review:\n' + ex : '') }, { type: 'image_url', image_url: { url: uri } }] }], max_tokens: 1200 });
-  // המודל מחזיר לפעמים אובייקט JSON מוכן ולא מחרוזת (תיקון: 9 תמונות נכשלו ב-replace)
-  let parsed = s.response && typeof s.response === 'object' ? s.response : null;
-  let txt = typeof s.response === 'string' ? s.response.replace(/^```(json)?|```$/gm, '').trim() : '';
-  if (!parsed) try { parsed = JSON.parse(txt); } catch (e) { }
+  let parsed = null, txt = '';
+  if (s.response && typeof s.response === 'object') parsed = s.response;   // לפעמים המודל מחזיר אובייקט מוכן
+  else { txt = String(s.response || '').replace(/^```(json)?|```$/gm, '').trim(); try { parsed = JSON.parse(txt); } catch (e) { } }
   return { model: M.vision, parsed, raw: parsed ? undefined : txt };
 }
 async function runCode(env, t) {
@@ -123,7 +122,7 @@ export default {
       for (const k of list.keys) { const t = await getJ(env.KV, k.name, {}); c[t.status] = (c[t.status] || 0) + 1; }
       return json({ status: await getJ(env.KV, 'status', {}), counts: c });
     }
-    if (u.pathname === '/task') return json(await getJ(env.KV, 't:' + u.searchParams.get('id'), { error: 'not found' }));
+    if (u.pathname === '/task' && !/^scan-/.test(u.searchParams.get('id') || '')) return json(await getJ(env.KV, 't:' + u.searchParams.get('id'), { error: 'not found' }));
     if (u.pathname === '/img') { const b = await env.KV.get('img:' + u.searchParams.get('id')); return b ? new Response(Buffer.from(b, 'base64'), { headers: { 'content-type': 'image/jpeg' } }) : json({ error: 'not found' }, 404); }
     return json({ name: 'esh27-vision', endpoints: ['/status', '/task?id=', '/img?id='] });
   }
