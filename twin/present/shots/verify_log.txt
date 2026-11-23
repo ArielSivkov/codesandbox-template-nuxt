@@ -1,0 +1,12 @@
+portrait analysis {"ms":1371,"rec":38,"a1":3,"any":5,"roof":3,"top":[{"id":"w552921286","dist":53,"samples":493,"lostMaxH":4.5,"lostMeanH":1,"roofLostH":2.5,"gainMaxH":0,"sunBeforeMinH":0,"sunAfterMinH":0},{"id":"w552916843","dist":39,"samples":29,"lostMaxH":3.5,"lostMeanH":1.63,"roofLostH":3,"gainMaxH":0,"sunBeforeMinH":0,"sunAfterMinH":0},{"id":"w357842696","dist":89,"samples":239,"lostMaxH":3,"lostMeanH":0.59,"roofLostH":1.5,"gainMaxH":0,"sunBeforeMinH":0,"sunAfterMinH":0}]}
+portrait cross-check {"prismMs":371,"rayMs":726,"maxDiffHours":0,"affected":[3,3],"sensitivity_minus_plus_sigma":[5,3]}
+portrait render {"calls":19,"tris":97307,"buildings":3431,"geoms":21}
+portrait gltf analysis {"ms":1012,"a1":3,"method":"קרן↔משולשי המודל (Raycaster)"}
+landscape analysis {"ms":1557,"rec":38,"a1":3,"any":5,"roof":3,"top":[{"id":"w552921286","dist":53,"samples":493,"lostMaxH":4.5,"lostMeanH":1,"roofLostH":2.5,"gainMaxH":0,"sunBeforeMinH":0,"sunAfterMinH":0},{"id":"w552916843","dist":39,"samples":29,"lostMaxH":3.5,"lostMeanH":1.63,"roofLostH":3,"gainMaxH":0,"sunBeforeMinH":0,"sunAfterMinH":0},{"id":"w357842696","dist":89,"samples":239,"lostMaxH":3,"lostMeanH":0.59,"roofLostH":1.5,"gainMaxH":0,"sunBeforeMinH":0,"sunAfterMinH":0}]}
+landscape cross-check {"prismMs":790,"rayMs":1332,"maxDiffHours":0,"affected":[3,3],"sensitivity_minus_plus_sigma":[5,3]}
+landscape render {"calls":22,"tris":106900,"buildings":3431,"geoms":26}
+landscape gltf analysis {"ms":930,"a1":3,"method":"קרן↔משולשי המודל (Raycaster)"}
+landscape errors: none
+portrait hash #site=w552921285&fl=14&fh=3.1&gf=4.5&sb=11:2&d=2026-12-21&h=12&v=after&shot=8
+landscape hash #site=w552921285&fl=14&fh=3.1&gf=4.5&sb=11:2&d=2026-12-21&h=12&v=after&shot=8
+landscape errors: none

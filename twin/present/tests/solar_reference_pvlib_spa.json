@@ -1,0 +1,301 @@
+{
+ "source": "pvlib 0.16.1 spa_python (NREL SPA, Reda & Andreas 2004), lat 31.7926 lon 34.6478; zenith = geometric (no refraction)",
+ "lat": 31.7926,
+ "lon": 34.6478,
+ "points": [
+  {
+   "utc": "2026-12-21T07:00:00Z",
+   "zenith": 67.09578,
+   "elevation_true": 22.90422,
+   "apparent_elevation": 22.94252,
+   "azimuth": 140.34601
+  },
+  {
+   "utc": "2026-12-21T09:00:00Z",
+   "zenith": 56.02961,
+   "elevation_true": 33.97039,
+   "apparent_elevation": 33.9946,
+   "azimuth": 169.08712
+  },
+  {
+   "utc": "2026-12-21T10:30:00Z",
+   "zenith": 56.53931,
+   "elevation_true": 33.46069,
+   "apparent_elevation": 33.48537,
+   "azimuth": 193.92502
+  },
+  {
+   "utc": "2026-12-21T12:00:00Z",
+   "zenith": 64.64705,
+   "elevation_true": 25.35295,
+   "apparent_elevation": 25.38719,
+   "azimuth": 215.75097
+  },
+  {
+   "utc": "2026-12-21T13:45:00Z",
+   "zenith": 80.5587,
+   "elevation_true": 9.4413,
+   "apparent_elevation": 9.53332,
+   "azimuth": 234.72621
+  },
+  {
+   "utc": "2026-12-21T15:00:00Z",
+   "zenith": 94.34338,
+   "elevation_true": -4.34338,
+   "apparent_elevation": -4.34338,
+   "azimuth": 245.02326
+  },
+  {
+   "utc": "2026-12-21T17:00:00Z",
+   "zenith": 118.53253,
+   "elevation_true": -28.53253,
+   "apparent_elevation": -28.53253,
+   "azimuth": 258.71644
+  },
+  {
+   "utc": "2026-06-21T07:00:00Z",
+   "zenith": 36.87823,
+   "elevation_true": 53.12177,
+   "apparent_elevation": 53.13405,
+   "azimuth": 92.66131
+  },
+  {
+   "utc": "2026-06-21T09:00:00Z",
+   "zenith": 12.68985,
+   "elevation_true": 77.31015,
+   "apparent_elevation": 77.31382,
+   "azimuth": 128.49798
+  },
+  {
+   "utc": "2026-06-21T10:30:00Z",
+   "zenith": 13.29691,
+   "elevation_true": 76.70309,
+   "apparent_elevation": 76.70694,
+   "azimuth": 233.97574
+  },
+  {
+   "utc": "2026-06-21T12:00:00Z",
+   "zenith": 31.28686,
+   "elevation_true": 58.71314,
+   "apparent_elevation": 58.72309,
+   "azimuth": 263.17122
+  },
+  {
+   "utc": "2026-06-21T13:45:00Z",
+   "zenith": 53.54068,
+   "elevation_true": 36.45932,
+   "apparent_elevation": 36.48142,
+   "azimuth": 277.11411
+  },
+  {
+   "utc": "2026-06-21T15:00:00Z",
+   "zenith": 69.15618,
+   "elevation_true": 20.84382,
+   "apparent_elevation": 20.8862,
+   "azimuth": 285.35002
+  },
+  {
+   "utc": "2026-06-21T17:00:00Z",
+   "zenith": 92.6779,
+   "elevation_true": -2.6779,
+   "apparent_elevation": -2.6779,
+   "azimuth": 299.83061
+  },
+  {
+   "utc": "2026-03-20T07:00:00Z",
+   "zenith": 51.08352,
+   "elevation_true": 38.91648,
+   "apparent_elevation": 38.93671,
+   "azimuth": 120.25541
+  },
+  {
+   "utc": "2026-03-20T09:00:00Z",
+   "zenith": 33.92035,
+   "elevation_true": 56.07965,
+   "apparent_elevation": 56.09066,
+   "azimuth": 157.70778
+  },
+  {
+   "utc": "2026-03-20T10:30:00Z",
+   "zenith": 33.3167,
+   "elevation_true": 56.6833,
+   "apparent_elevation": 56.69406,
+   "azimuth": 198.96822
+  },
+  {
+   "utc": "2026-03-20T12:00:00Z",
+   "zenith": 44.43047,
+   "elevation_true": 45.56953,
+   "apparent_elevation": 45.58556,
+   "azimuth": 230.67898
+  },
+  {
+   "utc": "2026-03-20T13:45:00Z",
+   "zenith": 64.08646,
+   "elevation_true": 25.91354,
+   "apparent_elevation": 25.94695,
+   "azimuth": 252.44801
+  },
+  {
+   "utc": "2026-03-20T15:00:00Z",
+   "zenith": 79.65101,
+   "elevation_true": 10.34899,
+   "apparent_elevation": 10.43362,
+   "azimuth": 263.50385
+  },
+  {
+   "utc": "2026-03-20T17:00:00Z",
+   "zenith": 105.04552,
+   "elevation_true": -15.04552,
+   "apparent_elevation": -15.04552,
+   "azimuth": 279.63515
+  },
+  {
+   "utc": "2026-09-23T07:00:00Z",
+   "zenith": 48.35854,
+   "elevation_true": 41.64146,
+   "apparent_elevation": 41.65985,
+   "azimuth": 123.65862
+  },
+  {
+   "utc": "2026-09-23T09:00:00Z",
+   "zenith": 32.92565,
+   "elevation_true": 57.07435,
+   "apparent_elevation": 57.08495,
+   "azimuth": 164.3029
+  },
+  {
+   "utc": "2026-09-23T10:30:00Z",
+   "zenith": 34.61712,
+   "elevation_true": 55.38288,
+   "apparent_elevation": 55.39418,
+   "azimuth": 205.29846
+  },
+  {
+   "utc": "2026-09-23T12:00:00Z",
+   "zenith": 47.08124,
+   "elevation_true": 42.91876,
+   "apparent_elevation": 42.93634,
+   "azimuth": 234.42082
+  },
+  {
+   "utc": "2026-09-23T13:45:00Z",
+   "zenith": 67.27603,
+   "elevation_true": 22.72397,
+   "apparent_elevation": 22.7626,
+   "azimuth": 254.65965
+  },
+  {
+   "utc": "2026-09-23T15:00:00Z",
+   "zenith": 82.96929,
+   "elevation_true": 7.03071,
+   "apparent_elevation": 7.14974,
+   "azimuth": 265.32673
+  },
+  {
+   "utc": "2026-09-23T17:00:00Z",
+   "zenith": 108.36541,
+   "elevation_true": -18.36541,
+   "apparent_elevation": -18.36541,
+   "azimuth": 281.52644
+  },
+  {
+   "utc": "2027-01-15T07:00:00Z",
+   "zenith": 66.87258,
+   "elevation_true": 23.12742,
+   "apparent_elevation": 23.16532,
+   "azimuth": 136.58319
+  },
+  {
+   "utc": "2027-01-15T09:00:00Z",
+   "zenith": 54.30364,
+   "elevation_true": 35.69636,
+   "apparent_elevation": 35.71908,
+   "azimuth": 165.40681
+  },
+  {
+   "utc": "2027-01-15T10:30:00Z",
+   "zenith": 53.748,
+   "elevation_true": 36.252,
+   "apparent_elevation": 36.27426,
+   "azimuth": 191.3814
+  },
+  {
+   "utc": "2027-01-15T12:00:00Z",
+   "zenith": 61.29529,
+   "elevation_true": 28.70471,
+   "apparent_elevation": 28.73441,
+   "azimuth": 214.65337
+  },
+  {
+   "utc": "2027-01-15T13:45:00Z",
+   "zenith": 77.06013,
+   "elevation_true": 12.93987,
+   "apparent_elevation": 13.00843,
+   "azimuth": 234.76049
+  },
+  {
+   "utc": "2027-01-15T15:00:00Z",
+   "zenith": 90.87919,
+   "elevation_true": -0.87919,
+   "apparent_elevation": -0.87919,
+   "azimuth": 245.55053
+  },
+  {
+   "utc": "2027-01-15T17:00:00Z",
+   "zenith": 115.16993,
+   "elevation_true": -25.16993,
+   "apparent_elevation": -25.16993,
+   "azimuth": 259.85435
+  },
+  {
+   "utc": "2026-11-23T07:00:00Z",
+   "zenith": 63.02171,
+   "elevation_true": 26.97829,
+   "apparent_elevation": 27.01021,
+   "azimuth": 140.78779
+  },
+  {
+   "utc": "2026-11-23T09:00:00Z",
+   "zenith": 52.59066,
+   "elevation_true": 37.40934,
+   "apparent_elevation": 37.43069,
+   "azimuth": 171.79986
+  },
+  {
+   "utc": "2026-11-23T10:30:00Z",
+   "zenith": 54.26857,
+   "elevation_true": 35.73143,
+   "apparent_elevation": 35.75412,
+   "azimuth": 198.03825
+  },
+  {
+   "utc": "2026-11-23T12:00:00Z",
+   "zenith": 63.66174,
+   "elevation_true": 26.33826,
+   "apparent_elevation": 26.37106,
+   "azimuth": 220.1376
+  },
+  {
+   "utc": "2026-11-23T13:45:00Z",
+   "zenith": 80.69476,
+   "elevation_true": 9.30524,
+   "apparent_elevation": 9.39848,
+   "azimuth": 238.83878
+  },
+  {
+   "utc": "2026-11-23T15:00:00Z",
+   "zenith": 95.01429,
+   "elevation_true": -5.01429,
+   "apparent_elevation": -5.01429,
+   "azimuth": 249.03442
+  },
+  {
+   "utc": "2026-11-23T17:00:00Z",
+   "zenith": 119.71514,
+   "elevation_true": -29.71514,
+   "apparent_elevation": -29.71514,
+   "azimuth": 263.14338
+  }
+ ]
+}
