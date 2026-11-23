@@ -113,7 +113,7 @@ var R=Math.PI/180;
 var S={key:'',session:new Date().toISOString().slice(0,16).replace(/[:T]/g,'-'),on:false,stream:null,track:null,
   gps:null,gpsT:0,head:null,headAbs:false,ori:{},grav:null,gyro:0,
   pos:null,track:[],dist:0,course:null,speed:0,steps:0,lastStepT:0,accHist:[],
-  shots:0,up:0,queue:[],busy:false,lastShotPos:null,lastShotT:0,lastShotHead:null,lastShot:null,demo:false,logs:[]};
+  shots:0,up:0,queue:[],busy:false,inflight:0,car:false,carT:0,lastShotPos:null,lastShotT:0,lastShotHead:null,lastShot:null,demo:false,logs:[]};
 function log(m){S.logs.push(new Date().toTimeString().slice(0,8)+' '+m);if(S.logs.length>80)S.logs.shift();$('log').textContent=S.logs.slice().reverse().join('\n');}
 try{S.key=new URLSearchParams(location.search).get('k')||localStorage.getItem('esh27key')||'';if(S.key)localStorage.setItem('esh27key',S.key);}catch(e){}
 if(!S.key)$('keyrow').hidden=false;
@@ -153,6 +153,7 @@ function onStep(){S.steps++;if(!S.pos||S.head==null)return;var L=0.72;   // או
 // צעד אמיתי: שיא תאוצה + קצב קבוע (0.3–1 ש') של לפחות 4 שיאים ברצף, ובלי סיבוב מהיר של הטלפון. ישיבה וסיבוב בכיסא לא נספרים.
 var cand=[];
 function stepDetect(a){var m=Math.hypot(a.x,a.y,a.z);S.accHist.push(m);if(S.accHist.length>30)S.accHist.shift();
+  if(S.car||(S.gps&&S.gps.speed>4.2&&Date.now()-S.gpsT<4000)){S.walking=false;cand=[];return;}   // ברכב: רעידות הרכב אינן צעדים
   var avg=S.accHist.reduce(function(s,v){return s+v;},0)/S.accHist.length,now=Date.now();
   if(cand.length&&now-cand[cand.length-1]>1300){S.walking=false;cand=[];}
   if(m-avg>1.2&&now-S.lastStepT>300&&S.gyro<90){S.lastStepT=now;cand.push(now);if(cand.length>8)cand.shift();
@@ -175,16 +176,21 @@ function sensors(){
 // ---------- תצוגה ----------
 var lastPlaceT=0;
 function frame(){
-  var gpsAge=(Date.now()-S.gpsT)/1000;
+  var gpsAge=(Date.now()-S.gpsT)/1000,nowF=Date.now();
+  // מצב רכב: מעל 15 קמ"ש נכנסים, מתחת ל-5 קמ"ש במשך 6 ש' יוצאים
+  var gs=S.gps&&S.gps.speed!=null&&!isNaN(S.gps.speed)&&nowF-S.gpsT<4000?S.gps.speed:null;   // רק מהירות אמיתית מה-GPS, לא הערכה
+  if(gs!=null&&gs>4.2){S.fastT=S.fastT||nowF;}else S.fastT=0;
+  if(S.fastT&&nowF-S.fastT>2500){if(!S.car){S.car=true;log('🚗 זוהתה נסיעה – מצב רכב');if(S.mode==='photo'&&S.on){guide('🚗 ברכב עדיף מצב וידאו');setTimeout(function(){guide('');},3000);}}S.carT=nowF;}
+  else if(S.car&&(gs==null||gs<1.4)&&nowF-S.carT>6000){S.car=false;log('🚶 חזרה להליכה');}
   if(S.pos){var a=Math.round(S.pos.acc);dot('dGps','📍 ±'+a+' מ\''+(gpsAge>10?' (צעדים)':''),a<=6?'ok':a<=15?'warn':'bad');}
-  if(S.head!=null)dot('dHead','🧭 '+Math.round(S.head)+'° '+dirName(S.head),S.headAbs?'ok':'warn');
+  if(S.car&&S.course!=null)dot('dHead','🚗 '+Math.round(S.course)+'° '+dirName(S.course),'ok');else if(S.head!=null)dot('dHead','🧭 '+Math.round(S.head)+'° '+dirName(S.head),S.headAbs?'ok':'warn');
   var h=hold();
   if(h){var okP=Math.abs(h.pitch)<20,okR=Math.abs(h.roll)<12;dot('dHold',okP&&okR?'✓ אחיזה טובה':'הטיה '+Math.round(h.pitch)+'°',okP&&okR?'ok':'warn');}
   // שורת "איפה אני"
   if(S.pos&&Date.now()-lastPlaceT>1500){lastPlaceT=Date.now();var near=nearest(S.pos);
     $('place').textContent=near&&near.d<800?(near.d<60?'ליד '+near.n:near.n+' · '+Math.round(near.d)+' מ\' '+dirName(near.b)):'אשדוד';
     var T=S.track,a0=T[Math.max(0,T.length-6)],a1=T[T.length-1];if(a0&&a1){var dd=enu(a0,a1);if(Math.hypot(dd.x,dd.y)>2)S.course=(Math.atan2(dd.x,dd.y)/R+360)%360;}
-    var mv=S.on&&S.speed>0.3?'הולך '+dirName(S.course)+' · '+(S.speed*3.6).toFixed(1)+' קמ"ש':(S.on?'עומד':'מוכן');
+    var mv=S.on&&S.speed>0.3?(S.car?'נוסע ':'הולך ')+dirName(S.course)+' · '+(S.speed*3.6).toFixed(1)+' קמ"ש':(S.on?'עומד':'מוכן');
     $('sub').textContent=mv+' · '+S.pos.lat.toFixed(5)+', '+S.pos.lon.toFixed(5);}
   $('sDist').textContent=(S.dist<1000?Math.round(S.dist)+' מ\'':(S.dist/1000).toFixed(2)+' ק"מ');$('sShots').textContent=S.shots;
   drawHud(h);if((S.fr=(S.fr||0)+1)%4===0)drawMap();
@@ -221,14 +227,15 @@ function autoShoot(h){
   if(!h){guide('');return;}
   if(Math.abs(h.pitch)>25){guide(h.pitch>0?'⬇️ הורד קצת את הטלפון':'⬆️ הרם את הטלפון מול הרחוב');return;}
   if(Math.abs(h.roll)>15){guide('↔️ ישר את הטלפון');return;}
-  if(S.gyro>40){guide('לאט… ✋');return;}
+  if(S.gyro>(S.car?90:40)){guide('לאט… ✋');return;}
   guide('');
   var every=+$('every').value||4,now=Date.now(),need=false,why='';
   if(!S.lastShotPos){need=true;why='התחלה';}
   else{var d=enu(S.lastShotPos,S.pos),m=Math.hypot(d.x,d.y);if(m>=every){need=true;why=Math.round(m)+' מ\'';}
-    else if(S.head!=null&&S.lastShotHead!=null&&Math.abs(((S.head-S.lastShotHead+540)%360)-180)>=25&&now-S.lastShotT>1200){need=true;why='סיבוב';}}
+    else if(!S.car&&S.head!=null&&S.lastShotHead!=null&&Math.abs(((S.head-S.lastShotHead+540)%360)-180)>=25&&now-S.lastShotT>1200){need=true;why='סיבוב';}}
   if(need&&now-S.lastShotT>900)shoot('walk',why);}
 function meta(kind,why){return{kind:kind,why:why,when:new Date().toISOString(),where:$('where').value,pos:S.pos,gps:S.gps,heading:S.head,heading_abs:S.headAbs,course:S.course,speed:S.speed,
+  car:S.car,heading_best:S.car&&S.course!=null?S.course:S.head,heading_src:S.car&&S.course!=null?'gps':'compass',
   hold:hold(),gyro:S.gyro,steps:S.steps,dist:S.dist,orientation:S.ori,video:S.track_?null:(S.vt?S.vt.getSettings():null),demo:S.demo};}
 function grab(){return still();}   // צילום מתוך הווידאו: בלי להקפיא את המצלמה (takePhoto עוצר את התצוגה ב-Android)
 function still(){return new Promise(function(res){var v=$('vid'),c=document.createElement('canvas');c.width=v.videoWidth||1280;c.height=v.videoHeight||720;var g=c.getContext('2d');
@@ -256,15 +263,28 @@ function vStop(){if(S.rec&&S.rec.state==='recording'){var r=S.rec;S.rec=null;r.s
 
 // ---------- העלאה ----------
 function b64u(s){return btoa(unescape(encodeURIComponent(s)));}
-function enqueue(name,blob,m){S.queue.push({name:name,blob:blob,meta:m});pump();}
-function pump(){if(S.busy)return;var q=S.queue.find(function(x){return!x.done&&!x.fail;});if(!q)return;S.busy=true;
-  if(S.demo){setTimeout(function(){q.done=true;S.up++;dot('dUp','⬆️ '+S.up+' (הדגמה)','ok');S.busy=false;pump();},200);return;}
-  fetch('/api/upload?session='+S.session+'&name='+encodeURIComponent(q.name),{method:'POST',headers:{'X-Key':S.key,'X-Meta':b64u(JSON.stringify(q.meta))},body:q.blob})
-  .then(function(r){if(!r.ok)throw new Error(r.status===401?'מפתח שגוי':String(r.status));q.done=true;S.up++;var w=S.queue.filter(function(x){return!x.done;}).length;dot('dUp','⬆️ '+S.up+(w?' · '+w+' ממתינים':''),'ok');})
-  .catch(function(e){q.fail=true;dot('dUp','⚠️ העלאה: '+e.message,'bad');log('upload fail '+e.message);})
-  .then(function(){S.busy=false;pump();});}
+// התור נשמר גם בזיכרון הטלפון (IndexedDB): סגירת הדף לא מוחקת צילומים – בפתיחה הבאה הם ממשיכים לעלות
+var DBP=null;
+function idb(){return DBP||(DBP=new Promise(function(res){try{var r=indexedDB.open('esh27scan',1);r.onupgradeneeded=function(){r.result.createObjectStore('q',{keyPath:'id'});};r.onsuccess=function(){res(r.result);};r.onerror=function(){res(null);};}catch(e){res(null);}}));}
+function idbDo(fn){return idb().then(function(db){if(!db)return null;return new Promise(function(res){try{var tx=db.transaction('q','readwrite'),rq=fn(tx.objectStore('q'));tx.oncomplete=function(){res(rq&&rq.result);};tx.onerror=tx.onabort=function(){res(null);};}catch(e){res(null);}});});}
+function pending(){return S.queue.filter(function(x){return!x.done;}).length;}
+function upStat(bad){var w=pending();if(bad)dot('dUp','⚠️ '+bad+(w?' · '+w+' ממתינים':''),'bad');else dot('dUp','⬆️ '+S.up+(w?' · '+w+' ממתינים':''),w>20?'warn':'ok');}
+function enqueue(name,blob,m){var q={id:S.session+'/'+name,session:S.session,name:name,blob:blob,meta:m,at:Date.now()};S.queue.push(q);
+  if(!S.demo)idbDo(function(st){return st.put({id:q.id,session:q.session,name:q.name,blob:q.blob,meta:q.meta,at:q.at});});upStat();pump();}
+function pump(){while(S.inflight<2){var q=S.queue.find(function(x){return!x.done&&!x.fail&&!x.go;});if(!q)return;q.go=true;S.inflight++;send(q);}}
+function finish(q){q.done=true;q.go=false;S.up++;S.inflight--;if(q.id)idbDo(function(st){return st.delete(q.id);});q.blob=null;upStat();pump();}
+function send(q){
+  if(S.demo){setTimeout(function(){finish(q);dot('dUp','⬆️ '+S.up+' (הדגמה)','ok');},200);return;}
+  fetch('/api/upload?session='+(q.session||S.session)+'&name='+encodeURIComponent(q.name),{method:'POST',headers:{'X-Key':S.key,'X-Meta':b64u(JSON.stringify(q.meta||{}))},body:q.blob})
+  .then(function(r){if(!r.ok)throw new Error(r.status===401?'מפתח שגוי':String(r.status));finish(q);})
+  .catch(function(e){q.fail=true;q.go=false;S.inflight--;upStat('העלאה: '+e.message);log('upload fail '+e.message);pump();});}
 setInterval(function(){if(navigator.onLine)S.queue.forEach(function(q){if(q.fail)q.fail=false;});pump();},10000);
-window.__esh27upload=function(name,blob,m){return new Promise(function(res,rej){var q={name:name,blob:blob,meta:m};S.queue.push(q);pump();var iv=setInterval(function(){if(q.done){clearInterval(iv);res();}else if(q.fail){clearInterval(iv);rej(new Error('upload'));}},300);});};
+// צילומים שנשארו מפעם קודמת (הדף נסגר לפני שעלו) – ממשיכים להעלות
+idbDo(function(st){return st.getAll();}).then(function(items){if(!items||!items.length)return;var n=0;
+  items.forEach(function(it){if(!S.queue.some(function(q){return q.id===it.id;})){S.queue.push(it);n++;}});
+  if(n){log('נמצאו '+n+' קבצים מפעם קודמת – מעלה אותם');guide('⬆️ '+n+' צילומים מפעם קודמת עולים עכשיו');setTimeout(function(){guide('');},3500);upStat();pump();}});
+window.addEventListener('beforeunload',function(e){if(pending()&&!S.demo){e.preventDefault();e.returnValue='';}});   // אזהרה בסגירה – אבל גם אם סוגרים, הצילומים שמורים
+window.__esh27upload=function(name,blob,m){return new Promise(function(res,rej){var q={name:name,blob:blob,meta:m,session:S.session};S.queue.push(q);pump();var iv=setInterval(function(){if(q.done){clearInterval(iv);res();}else if(q.fail){clearInterval(iv);rej(new Error('upload'));}},300);});};
 window.__esh27sensors=function(){return{tilt:hold(),last:S.lastShot};};
 
 // ---------- התחלה ----------
@@ -288,14 +308,14 @@ $('runTest').onclick=function(){var r=[],h=hold();
   r.push((S.head!=null?(S.headAbs?'✅':'⚠️'):'❌')+' מצפן'+(S.head!=null?(S.headAbs?' אמיתי (צפון)':' יחסי בלבד – סובב את הטלפון בצורת 8 לכיול'):''));
   r.push((h?'✅':'❌')+' כבידה/הטיה'+(h?' '+h.pitch.toFixed(1)+'° / '+h.roll.toFixed(1)+'°':''));
   r.push((S.gyro!=null?'✅':'❌')+' ג\'יירו '+S.gyro.toFixed(1)+'°/ש\' '+(S.gyro<3?'(הטלפון יציב)':'(בתנועה)'));
-  r.push('👣 צעדים: '+S.steps+(S.walking?' (הליכה מזוהה)':' (לא הולך)'));r.push('⬆️ עלו '+S.up+' · ממתינים '+S.queue.filter(function(q){return!q.done;}).length);
+  r.push('👣 צעדים: '+S.steps+(S.walking?' (הליכה מזוהה)':' (לא הולך)'));r.push('⬆️ עלו '+S.up+' · ממתינים '+pending()+' (שמורים בטלפון)');r.push(S.car?'🚗 מצב רכב (כיוון לפי GPS, בלי צעדים)':'🚶 מצב הליכה');
   $('selftest').innerHTML=r.join('<br>');log('בדיקה: '+r.join(' | '));};
 // הדגמה: הליכה מדומה לאורך רחוב, לבדיקה בלי לזוז
 $('demo').onclick=function(){S.demo=true;var p={latitude:31.7905,longitude:34.6402,accuracy:5},hd=20,t=0;S.head=hd;S.headAbs=true;S.grav={x:0.2,y:9.7,z:-0.5};S.gyro=2;
   $('tools').className='';if(!S.on)$('go').click();
   var iv=setInterval(function(){t++;var np=moveLL({lat:p.latitude,lon:p.longitude},Math.sin(hd*R)*1.3,Math.cos(hd*R)*1.3);p={latitude:np.lat,longitude:np.lon,accuracy:4+Math.random()*3,heading:hd,speed:1.3};
     onGps(p,Date.now());if(t%3===0)onStep();if(t===12)hd=110;S.head=hd;if(t>=24){clearInterval(iv);$('go').click();S.demo=false;log('הדגמה הסתיימה: '+S.shots+' צילומים, '+Math.round(S.dist)+' מ\'');}},1000);};
-window.__esh27test={S:S,onGps:onGps,onStep:onStep,hold:hold,enu:enu};
+window.__esh27test={S:S,onGps:onGps,onStep:onStep,hold:hold,enu:enu,idbDo:idbDo};
 })();
 </script>
 <script>
