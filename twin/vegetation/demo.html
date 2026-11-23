@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<link rel="icon" href="data:,">
+<title>עולם 27 · מחלקת הצמחייה · אשדוד</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#9cc3e4;font-family:system-ui,"Segoe UI",Arial,sans-serif}
+  canvas{display:block;touch-action:none}
+  #ui{position:fixed;top:8px;right:8px;left:8px;display:flex;flex-wrap:wrap;gap:5px;z-index:2}
+  #ui button,#ui select{font:600 12px system-ui;border:0;border-radius:14px;padding:6px 10px;background:rgba(255,255,255,.88);color:#123;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+  #ui button.on{background:#1f5f3a;color:#fff}
+  #hud{position:fixed;bottom:8px;right:8px;left:8px;background:rgba(10,20,15,.72);color:#e8f3ea;font:11px/1.45 system-ui;border-radius:10px;padding:7px 9px;z-index:2}
+  #hud b{color:#fff} #hud .est{color:#ffd27a}
+  #wind{width:90px;vertical-align:middle}
+  .lbl{font:600 12px system-ui;color:#123;background:rgba(255,255,255,.88);border-radius:14px;padding:5px 9px}
+</style>
+</head>
+<body>
+<div id="ui">
+  <button data-v="street" class="on">רחוב</button><button data-v="park">פארק</button><button data-v="dune">חולות</button><button data-v="beach">חוף</button><button data-v="aerial">מסוק</button>
+  <select id="month"></select>
+  <span class="lbl">רוח <input id="wind" type="range" min="0" max="20" step="1" value="6"> <span id="wv">6</span> מ/ש</span>
+</div>
+<div id="hud">טוען…</div>
+<script src="vendor/three.min.js"></script>
+<script type="module">
+import { createVegetation, SPECIES_DB, phenology, SRC_HE, LC } from './vegetation.js';
+const T = window.THREE, Q = new URLSearchParams(location.search);
+const SEA = -32768, OUT = -32767, NT = 41, STEP = 25, TILE = 1000, RW = [4, 5.0, 7.0, 8.5, 10.0];
+const MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+const $ = id => document.getElementById(id);
+
+// ---------- renderer / scene (טלפון: pixelRatio ≤ 2, צללים 1024)
+const renderer = new T.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(2, devicePixelRatio)); renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFShadowMap; renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+document.body.appendChild(renderer.domElement);
+const scene = new T.Scene();
+const SKY = new T.Color('#a9cbe8'); scene.fog = new T.FogExp2(SKY, 0.0009); scene.background = SKY;
+const camera = new T.PerspectiveCamera(62, innerWidth / innerHeight, 0.3, 6000);
+const hemi = new T.HemisphereLight(0xcfe3ff, 0x8a7a5a, 1.25); scene.add(hemi);
+const sun = new T.DirectionalLight(0xfff1dc, 2.6); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024);
+Object.assign(sun.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90, near: 1, far: 700 }); sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.6;
+scene.add(sun, sun.target);
+{ // sky dome gradient
+  const g = new T.SphereGeometry(5000, 24, 12), m = new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false,
+    vertexShader: 'varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }',
+    fragmentShader: 'varying vec3 vP; void main(){ float h = normalize(vP).y; vec3 c = mix(vec3(0.70,0.80,0.88), vec3(0.32,0.55,0.82), smoothstep(0.0,0.5,h)); gl_FragColor = vec4(c,1.); }' });
+  const sky = new T.Mesh(g, m); sky.renderOrder = -1; sky.frustumCulled = false; scene.add(sky); scene.userData.sky = sky;
+}
+const sea = new T.Mesh(new T.PlaneGeometry(20000, 20000), new T.MeshPhongMaterial({ color: 0x2f7da0, specular: 0x88aacc, shininess: 60 }));
+sea.rotation.x = -Math.PI / 2; sea.position.y = -0.35; sea.receiveShadow = true; scene.add(sea);
+
+// ---------- data
+async function fetchBuf(url) {
+  const r = await fetch(url); if (!r.ok) throw new Error(r.status + ' ' + url);
+  let b = await r.arrayBuffer(); const u = new Uint8Array(b, 0, 2);
+  if (u[0] === 0x1f && u[1] === 0x8b) b = await new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  return b;
+}
+const fetchJSON = async u => JSON.parse(new TextDecoder().decode(await fetchBuf(u)));
+const man = await fetchJSON('data/cities/ashdod/manifest.json'), TILESET = new Set(man.tiles);
+const [bx0, by0, bx1, by1] = man.bbox_itm, OX = Math.round((bx0 + bx1) / 2), OY = Math.round((by0 + by1) / 2);
+const tiles = new Map();
+function tileH(t, E, N) {   // same triangle split as the PlaneGeometry grid (diagonal b–d), so roads sit on the mesh
+  let fx = (E - t.tx * TILE) / STEP, fr = ((t.ty + 1) * TILE - N) / STEP;
+  fx = Math.min(39.9999, Math.max(0, fx)); fr = Math.min(39.9999, Math.max(0, fr));
+  const k = fx | 0, r = fr | 0, u = fx - k, v = fr - r, h = t.hgt, i = r * NT + k;
+  const a = h[i], b = h[i + 1], d = h[i + NT], e = h[i + NT + 1];
+  return (u + v < 1) ? a + (b - a) * u + (d - a) * v : e + (d - e) * (1 - u) + (b - e) * (1 - v);
+}
+function H(x, z) { const E = x + OX, N = OY - z, t = tiles.get(Math.floor(E / TILE) + '_' + Math.floor(N / TILE)); return t ? tileH(t, E, N) : 0.5; }
+
+// procedural façade (white Ashdod plaster, windows, shutters)
+function facadeTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, 128, 128);
+  for (let fy = 0; fy < 2; fy++) for (let bx = 0; bx < 2; bx++) {
+    const X = bx * 64, Y = fy * 64; x.fillStyle = 'rgba(0,0,0,.08)'; x.fillRect(X, Y + 61, 64, 3);
+    x.fillStyle = '#d5d1c8'; x.fillRect(X + 13, Y + 14, 38, 34); x.fillStyle = (bx + fy) % 2 ? '#3b5468' : '#2a3d4e'; x.fillRect(X + 16, Y + 17, 32, 28);
+    if ((bx * 3 + fy) % 3 === 0) { x.fillStyle = '#cfc8b8'; x.fillRect(X + 16, Y + 17, 32, 16); }
+  }
+  const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.colorSpace = T.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+const MAT = {
+  ground: new T.MeshLambertMaterial({ color: 0xa8a191 }),
+  wall: new T.MeshLambertMaterial({ map: facadeTex(), vertexColors: true }),
+  roof: new T.MeshLambertMaterial({ color: 0xd9d4c9 }),
+  road: new T.MeshLambertMaterial({ color: 0x4a4b4f, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
+  walk: new T.MeshLambertMaterial({ color: 0xbdb5a5, polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 }),
+};
+const dec = (r, ox, oy) => { const a = []; let x = ox, y = oy; for (let i = 0; i < r.length; i += 2) { x += r[i] / 10; y += r[i + 1] / 10; a.push([x - OX, -(y - OY)]); } return a; };
+function terrainMesh(t) {
+  const g = new T.PlaneGeometry(TILE, TILE, NT - 1, NT - 1); g.rotateX(-Math.PI / 2);
+  const p = g.attributes.position, x0 = t.tx * TILE - OX, z0 = -((t.ty + 1) * TILE - OY);
+  for (let r = 0; r < NT; r++) for (let k = 0; k < NT; k++) { const i = r * NT + k; p.setXYZ(i, x0 + k * STEP, t.hgt[i], z0 + r * STEP); }
+  g.computeVertexNormals(); const m = new T.Mesh(g, MAT.ground); m.receiveShadow = true; return m;
+}
+function buildingsMesh(t, v) {
+  const P = [], N = [], U = [], C = [], RP = [], RN = [];
+  const pal = [[0.95, 0.93, 0.88], [0.92, 0.89, 0.82], [0.97, 0.96, 0.93], [0.88, 0.85, 0.78], [0.93, 0.9, 0.85], [0.9, 0.88, 0.86]];
+  for (const b of v.b) {
+    let pts = dec(b.r[0], v.o[0], v.o[1]); if (pts.length > 3 && Math.hypot(pts[0][0] - pts.at(-1)[0], pts[0][1] - pts.at(-1)[1]) < 0.05) pts.pop(); if (pts.length < 3) continue;
+    const h = Math.max(3, b.h / 10); let base = 1e9; for (const q of pts) base = Math.min(base, H(q[0], q[1])); base -= 0.3; const top = base + 0.3 + h;
+    const c = pal[(b.i.charCodeAt(b.i.length - 1) + b.i.length) % pal.length];
+    let area = 0; for (let i = 0; i < pts.length; i++) { const a = pts[i], bb = pts[(i + 1) % pts.length]; area += a[0] * bb[1] - bb[0] * a[1]; }
+    if (area < 0) pts.reverse();
+    let u0 = 0;
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i], bb = pts[(i + 1) % pts.length], L = Math.hypot(bb[0] - a[0], bb[1] - a[1]); if (L < 0.05) continue;
+      const nx = (bb[1] - a[1]) / L, nz = -(bb[0] - a[0]) / L, u1 = u0 + L / 7, vt = h / 6;
+      const quad = [[a[0], base, a[1], u0, 0], [bb[0], base, bb[1], u1, 0], [bb[0], top, bb[1], u1, vt], [a[0], base, a[1], u0, 0], [bb[0], top, bb[1], u1, vt], [a[0], top, a[1], u0, vt]];
+      for (const q of quad) { P.push(q[0], q[1], q[2]); N.push(-nx, 0, -nz); U.push(q[3], q[4]); C.push(...c); }
+      u0 = u1;
+    }
+    const tri = T.ShapeUtils.triangulateShape(pts.map(q => new T.Vector2(q[0], q[1])), []);
+    for (const f of tri) for (const j of [f[0], f[2], f[1]]) { RP.push(pts[j][0], top, pts[j][1]); RN.push(0, 1, 0); }
+  }
+  const g = new T.Group();
+  const mk = (pos, nrm, mat, uv, col) => { if (!pos.length) return; const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new T.Float32BufferAttribute(nrm, 3)); if (uv) geo.setAttribute('uv', new T.Float32BufferAttribute(uv, 2)); if (col) geo.setAttribute('color', new T.Float32BufferAttribute(col, 3)); const m = new T.Mesh(geo, mat); m.castShadow = m.receiveShadow = true; g.add(m); };
+  mk(P, N, MAT.wall, U, C); mk(RP, RN, MAT.roof);
+  return g;
+}
+function roadsMesh(t, v) {
+  const R = [], W = [];
+  const ribbon = (pts, w, lift, out) => { for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1], L = Math.hypot(b[0] - a[0], b[1] - a[1]); if (L < 0.1) continue;
+    const nx = -(b[1] - a[1]) / L * w / 2, nz = (b[0] - a[0]) / L * w / 2, ya = H(a[0], a[1]) + lift, yb = H(b[0], b[1]) + lift;
+    out.push(a[0] + nx, ya, a[1] + nz, b[0] + nx, yb, b[1] + nz, b[0] - nx, yb, b[1] - nz, a[0] + nx, ya, a[1] + nz, b[0] - nx, yb, b[1] - nz, a[0] - nx, ya, a[1] - nz); } };
+  for (const r of v.rd) { const pts = dec(r.r, v.o[0], v.o[1]); ribbon(pts, RW[r.c] || 5, 0.1, R); if (r.c >= 1) ribbon(pts, (RW[r.c] || 5) + 6, 0.06, W); }
+  const g = new T.Group();
+  for (const [pos, mat] of [[R, MAT.road], [W, MAT.walk]]) { if (!pos.length) continue; const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); geo.computeVertexNormals(); const nr = geo.attributes.normal; for (let i = 0; i < nr.count; i++) nr.setXYZ(i, 0, 1, 0); const m = new T.Mesh(geo, mat); m.receiveShadow = true; g.add(m); }
+  return g;
+}
+
+// ---------- vegetation
+const veg = createVegetation(T, { renderer, scene, origin: { OX, OY }, heightAt: H, budget: Q.get('budget') || 'phone' });
+async function loadTile(key) {
+  if (tiles.has(key) || !TILESET.has(key)) return;
+  const [tx, ty] = key.split('_').map(Number);
+  const t = { key, tx, ty, grp: new T.Group() }; tiles.set(key, t);
+  const buf = await fetchBuf(`data/tiles/t/${key}.bin.gz`), dv = new DataView(buf);
+  const z = new Int16Array(buf.slice(20, 20 + NT * NT * 2)); t.hgt = new Float32Array(NT * NT);
+  for (let i = 0; i < NT * NT; i++) t.hgt[i] = z[i] === SEA ? -2.5 : z[i] === OUT ? 0.6 : Math.max(0.6, z[i] / 10);
+  const [v, g] = await Promise.all([fetchJSON(`data/tiles/v/${key}.json.gz`), fetchJSON(`data/tiles/g/${key}.json.gz`).catch(() => null)]);
+  const ter = terrainMesh(t); t.v = v; t.grp.add(ter, buildingsMesh(t, v), roadsMesh(t, v)); scene.add(t.grp);
+  if (g) { veg.addTile(key, g); veg.applyGroundCover(ter, key); t.g = g; }
+}
+function tileOf(x, z) { return Math.floor((x + OX) / TILE) + '_' + Math.floor((OY - z) / TILE); }
+async function ensureTiles(x, z, r = 1) {
+  const tx = Math.floor((x + OX) / TILE), ty = Math.floor((OY - z) / TILE), want = new Set();
+  for (let i = -r; i <= r; i++) for (let j = -r; j <= r; j++) want.add((tx + i) + '_' + (ty + j));
+  for (const [k, t] of tiles) if (!want.has(k)) { scene.remove(t.grp); t.grp.traverse(o => o.geometry && o.geometry.dispose()); veg.removeTile(k); tiles.delete(k); }
+  await Promise.all([...want].map(loadTile));
+}
+
+// ---------- viewpoints, found from the data itself
+function findCell(classes, near) {   // closest land-cover cell of a class to a scene point
+  let best = null, bd = 1e18;
+  for (const t of tiles.values()) { if (!t.g) continue; const lc = Uint8Array.from(atob(t.g.lc), c => c.charCodeAt(0));
+    for (let r = 2; r < 98; r += 2) for (let c = 2; c < 98; c += 2) { const v = lc[r * 100 + c] & 0x7f; if (!classes.includes(v)) continue;
+      let ok = true; for (const [dr, dc] of [[-2, 0], [2, 0], [0, -2], [0, 2]]) if (!classes.includes(lc[(r + dr) * 100 + c + dc] & 0x7f)) ok = false; if (!ok) continue;
+      const x = t.tx * TILE + c * 10 + 5 - OX, z = -((t.ty + 1) * TILE - r * 10 - 5 - OY), d = (x - near.x) ** 2 + (z - near.z) ** 2; if (d < bd) { bd = d; best = { x, z }; } } }
+  return best;
+}
+function findStreet(near, code) {   // street tree of a species (estimated slot) nearest the centre -> its road -> stand on the sidewalk 16 m before it
+  let tree = null, bd = 1e18;
+  for (const t of tiles.values()) { const g = t.g; if (!g) continue; const want = code ? g.sp.indexOf(code) : -2; if (code && want < 0) continue;
+    for (let i = 0; i < g.t.length; i += 5) { if (g.t[i + 4] !== 3 || (code && g.t[i + 2] !== want)) continue;
+      const x = g.o[0] + g.t[i] / 10 - OX, z = -(g.o[1] + g.t[i + 1] / 10 - OY), d = (x - near.x) ** 2 + (z - near.z) ** 2; if (d < bd) { bd = d; tree = { x, z }; } } }
+  if (!tree) return null;
+  let best = null, bs = 1e18;
+  for (const t of tiles.values()) { if (!t.v) continue; for (const r of t.v.rd) { if (r.c < 1) continue; const pts = dec(r.r, t.v.o[0], t.v.o[1]);
+    for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], L = Math.hypot(dx, dz); if (L < 1) continue;
+      const u = Math.max(0, Math.min(1, ((tree.x - a[0]) * dx + (tree.z - a[1]) * dz) / (L * L))), d = Math.hypot(tree.x - a[0] - u * dx, tree.z - a[1] - u * dz);
+      if (d < bs) { bs = d; const ux = dx / L, uz = dz / L, px = a[0] + u * dx, pz = a[1] + u * dz, side = Math.sign((tree.x - px) * -uz + (tree.z - pz) * ux) || 1, off = (RW[r.c] || 5) / 2 + 1.2;
+        best = { x: px - ux * 26 - side * -uz * off, z: pz - uz * 26 - side * ux * off, yaw: Math.atan2(-ux, -uz), side }; } } } }
+  return best;
+}
+const VIEWS = {
+  street: { center: [164500, 633600] }, park: { center: [165300, 633300] }, dune: { center: [162700, 629600] },
+  beach: { center: [164300, 634300] }, aerial: { center: [164800, 633800] },
+};
+let view = Q.get('view') || 'street', yaw = 0, pitch = 0, look = null;
+async function goView(name) {
+  view = name; document.querySelectorAll('#ui button').forEach(b => b.classList.toggle('on', b.dataset.v === name));
+  const [E, N] = VIEWS[name].center, c = { x: E - OX, z: -(N - OY) };
+  await ensureTiles(c.x, c.z, name === 'aerial' ? 1 : 1);
+  let p = c;
+  if (name === 'street') { const s = findStreet(c, Q.get('sp')); if (s) p = s; camera.position.set(p.x, H(p.x, p.z) + 1.7, p.z); yaw = s ? s.yaw - 0.3 * s.side : 0; pitch = 0.1; }
+  else if (name === 'park') { const s = findCell([LC.PARK], c); if (s) p = s; camera.position.set(p.x - 25, H(p.x, p.z) + 1.7, p.z + 25); yaw = -0.8; pitch = 0.05; }
+  else if (name === 'dune') { const s = findCell([LC.DUNE], c); if (s) p = s; camera.position.set(p.x, H(p.x, p.z) + 2.2, p.z); yaw = 1.2; pitch = -0.05; }
+  else if (name === 'beach') { const s = findCell([LC.BEACH], c); if (s) p = s; camera.position.set(p.x + 6, H(p.x, p.z) + 1.7, p.z); yaw = -0.75; pitch = 0.02; }
+  else { camera.position.set(c.x - 260, 240, c.z + 260); yaw = -Math.PI / 4 + Math.PI; pitch = -0.55; }
+  if (Q.get('yaw')) yaw = +Q.get('yaw'); if (Q.get('pitch')) pitch = +Q.get('pitch');
+  await ensureTiles(camera.position.x, camera.position.z, 1);
+}
+// ---------- season + wind UI
+const mSel = $('month'); MONTHS.forEach((m, i) => mSel.add(new Option(m, i)));
+let month = Q.has('month') ? +Q.get('month') - 1 : new Date().getMonth(); mSel.value = month;
+function setMonth(m) { month = m; veg.setDate(new Date(Date.UTC(2026, m, 15))); }
+mSel.onchange = () => setMonth(+mSel.value);
+let windSpeed = Q.has('wind') ? +Q.get('wind') : 6, windDir = 290;   // בריזת ים מערבית-צפון-מערבית
+$('wind').value = windSpeed; $('wv').textContent = windSpeed;
+function windVec(s, dir) { const r = dir * Math.PI / 180; return { x: -s * Math.sin(r), y: 0, z: s * Math.cos(r) }; }   // = weather.js windToVector
+$('wind').oninput = e => { windSpeed = +e.target.value; $('wv').textContent = windSpeed; veg.setWind(windVec(windSpeed, windDir)); };
+veg.setWind(windVec(windSpeed, windDir));
+document.querySelectorAll('#ui button').forEach(b => b.onclick = () => goView(b.dataset.v));
+// drag to look, double-tap / W to walk forward
+let drag = null; renderer.domElement.addEventListener('pointerdown', e => drag = { x: e.clientX, y: e.clientY });
+addEventListener('pointerup', () => drag = null);
+addEventListener('pointermove', e => { if (!drag) return; yaw += (e.clientX - drag.x) * 0.005; pitch = Math.max(-1.4, Math.min(1.2, pitch - (e.clientY - drag.y) * 0.004)); drag = { x: e.clientX, y: e.clientY }; });
+const keys = new Set(); addEventListener('keydown', e => keys.add(e.key)); addEventListener('keyup', e => keys.delete(e.key));
+addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); });
+
+// ---------- loop
+setMonth(month); await goView(view);
+const SHOT = Q.has('shot'); let shotFrames = 0, lastT = performance.now(); let frames = 0, fpsT = 0, fps = 0, lastHud = 0;
+const sunDir = new T.Vector3(-0.45, 0.75, 0.35).normalize();
+function frame() {
+  const nowT = performance.now(), dt = Math.min(0.05, (nowT - lastT) / 1000); lastT = nowT;
+  const fwd = new T.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw));
+  if (keys.has('w') || keys.has('ArrowUp')) camera.position.addScaledVector(fwd, dt * (view === 'aerial' ? 60 : 8));
+  if (keys.has('s') || keys.has('ArrowDown')) camera.position.addScaledVector(fwd, -dt * (view === 'aerial' ? 60 : 8));
+  if (view !== 'aerial') camera.position.y = H(camera.position.x, camera.position.z) + (view === 'dune' ? 2.2 : 1.7);
+  camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  const tgt = view === 'aerial' ? camera.position.clone().add(new T.Vector3(-Math.sin(yaw), 0, -Math.cos(yaw)).multiplyScalar(300)).setY(0) : camera.position.clone().addScaledVector(fwd, 50);
+  sun.target.position.copy(tgt); sun.position.copy(tgt).addScaledVector(sunDir, 300);
+  if (view === 'aerial') Object.assign(sun.shadow.camera, { left: -220, right: 220, top: 220, bottom: -220 }); else Object.assign(sun.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90 });
+  sun.shadow.camera.updateProjectionMatrix();
+  scene.userData.sky.position.copy(camera.position);
+  veg.update(camera, dt);
+  renderer.render(scene, camera);
+  frames++; fpsT += dt; if (fpsT > 1) { fps = frames / fpsT; frames = 0; fpsT = 0; }
+  const now = performance.now(); if (now - lastHud > 400) { lastHud = now; hud(); }
+  if (SHOT && ++shotFrames >= 3) { hud(); window.__veg.ready = true; return; }
+  requestAnimationFrame(frame);
+}
+function hud() {
+  const s = veg.stats(), info = renderer.info.render, mem = performance.memory ? (performance.memory.usedJSHeapSize / 1048576).toFixed(0) + 'MB' : '—';
+  const d = new Date(Date.UTC(2026, month, 15)), bloom = SPECIES_DB.species.map(sp => [sp, phenology(sp, d)]).filter(([sp, p]) => p.flower > 0.45 && sp.fcov > 0.3).map(([sp]) => sp.he.split(' (')[0]);
+  const cov = veg.coverAt(camera.position.x, camera.position.z);
+  window.__veg = { ready: !SHOT, view, month: month + 1, wind: windSpeed, calls: info.calls, tris: info.triangles, veg: s, heapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null, fps: +fps.toFixed(1) };
+  $('hud').innerHTML = `<b>${MONTHS[month]}</b> · פורחים: ${bloom.join(', ') || '—'}<br>` +
+    `קריאות ציור <b>${info.calls}</b> (צמחייה ${s.drawCalls}) · משולשים <b>${(info.triangles / 1000).toFixed(1)}K</b> (צמחייה ${(s.tris / 1000).toFixed(1)}K) · ערימה ${mem} · ${fps.toFixed(0)} פר'/ש'<br>` +
+    `צמחים: ${s.near} קרוב · ${s.far} כרטיס · ${s.plants.toLocaleString('he')} באריחים · בחירה ${s.ms} מ"ש<br>` +
+    `<span class="est">כיסוי קרקע ועצים בדגימה זו – משוערים (אין עדיין נתוני צמחייה מ-OSM לדגימה)${cov ? ' · כאן: ' + ({ 0: 'עירוני', 1: 'מדשאה', 2: 'פארק', 6: 'חוף', 7: 'חולית מיוצבת', 12: 'גינה/חצר', 15: 'חולית נודדת' }[cov.cls] || cov.cls) : ''}</span> · © OSM ODbL`;
+}
+window.__dbg = () => { const c = camera.position; let best = 1e9, info = null; for (const t of tiles.values()) { if (!t.v) continue; for (const r of t.v.rd) { const pts = dec(r.r, t.v.o[0], t.v.o[1]); for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1], dx = b[0] - a[0], dz = b[1] - a[1], l2 = dx * dx + dz * dz || 1, u = Math.max(0, Math.min(1, ((c.x - a[0]) * dx + (c.z - a[1]) * dz) / l2)), d = Math.hypot(c.x - a[0] - u * dx, c.z - a[1] - u * dz); if (d < best) { best = d; info = { c: r.c, n: r.n, y: H(a[0], a[1]) }; } } } } return { cam: [c.x, c.y, c.z], yaw, best, info }; };
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

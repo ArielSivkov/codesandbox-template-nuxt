@@ -1,0 +1,2423 @@
+diff -ruN a/twin/pipeline/build_city.py b/twin/pipeline/build_city.py
+--- a/twin/pipeline/build_city.py	2026-11-23 01:54:53.511202198 +0200
++++ b/twin/pipeline/build_city.py	2026-11-23 01:54:53.788444834 +0200
+@@ -78,6 +78,9 @@
+     ap.add_argument("--measurements", help="JSON from the correction loop (worker /api/corrections export)")
+     ap.add_argument("--out", default=os.path.join(HERE, "out"))
+     ap.add_argument("--context-m", type=float, default=300.0, help="buffer around city boundary")
++    ap.add_argument("--no-green", action="store_true", help="skip the vegetation layer (tiles/g)")
++    ap.add_argument("--tree-slots", help="street-tree slots JSON from the transport team [{x,y,cls,street}] ITM")
++    ap.add_argument("--ndvi", help="Sentinel-2 NDVI .npz on the ITM 10 m grid (see vegetation.load_ndvi_npz)")
+     args = ap.parse_args(argv)
+     t0 = time.time()
+     city = load_city(args)
+@@ -227,6 +230,22 @@
+     m = tiles.write_manifest(args.out, city, keys, study, stats, sources_used, heights.SIGMA,
+                              extra={"attribution": " | ".join(sorted(set(sources_used.values())))})
+     tiles.update_index(args.out, m)
++
++    # ---------------------------------------------------------------- 8. vegetation layer (tiles/g)
++    if not args.no_green:
++        from yazam import vegetation
++        slots = json.load(open(args.tree_slots, encoding="utf-8")) if args.tree_slots else None
++        nd = vegetation.load_ndvi_npz(args.ndvi) if args.ndvi else None
++        gsrc = {"osm_green": f"{len(osm.get('green', []))} polygons, {len(osm.get('trees', []))} trees, "
++                             f"{len(osm.get('tree_rows', []))} tree rows"}
++        if slots:
++            gsrc["slots"] = f"transport: {len(slots)} slots"
++        if nd:
++            gsrc["ndvi"] = ("SYNTHETIC FIXTURE " if nd["synthetic"] else "Sentinel-2 L2A ") + nd["scene"]
++        gt = vegetation.build_green(args.out, keys, osm.get("green", []), osm.get("trees", []),
++                                    osm.get("tree_rows", []), slots, nd)
++        gs = vegetation.write_green(args.out, gt, city["slug"], gsrc)
++        log("green:", gs["plants"], "plants by source", gs["by_src"])
+     log("done:", json.dumps(stats, ensure_ascii=False))
+     return m
+ 
+diff -ruN a/twin/pipeline/tests/test_vegetation.py b/twin/pipeline/tests/test_vegetation.py
+--- a/twin/pipeline/tests/test_vegetation.py	1970-01-01 02:00:00.000000000 +0200
++++ b/twin/pipeline/tests/test_vegetation.py	2026-11-23 01:54:53.537586809 +0200
+@@ -0,0 +1,224 @@
++"""Vegetation layer tests – run: python -m pytest -q tests/test_vegetation.py"""
++import base64
++import gzip
++import json
++import os
++import struct
++import sys
++import tempfile
++
++import numpy as np
++import pytest
++from shapely.geometry import LineString, Polygon, box
++
++sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
++from yazam import vegetation as V  # noqa: E402
++from yazam import sources_osm  # noqa: E402
++
++SAMPLE = os.path.join(os.path.dirname(__file__), "..", "sample-out-ashdod")
++
++
++# ---------------------------------------------------------------- helpers: tiny synthetic city
++def _write_tile(d, tx, ty, land_fn, buildings=(), roads=()):
++    """land_fn(x, y)->bool on ITM; buildings: list of ITM rings; roads: (cls, name, [ITM pts])."""
++    nt, nm = 41, 100
++    os.makedirs(os.path.join(d, "tiles/t"), exist_ok=True); os.makedirs(os.path.join(d, "tiles/v"), exist_ok=True)
++    x0, y0 = tx * 1000, ty * 1000
++    xs = x0 + (np.arange(nm) + 0.5) * 10; ys = y0 + (np.arange(nm)[::-1] + 0.5) * 10
++    X, Y = np.meshgrid(xs, ys)
++    mask = np.vectorize(land_fn)(X, Y)
++    z = np.full((nt, nt), 50, "<i2")
++    hdr = struct.pack("<4sHiiHHH", b"YZT1", 1, tx, ty, nt, nm, 25)
++    open(os.path.join(d, "tiles/t", f"{tx}_{ty}.bin.gz"), "wb").write(
++        gzip.compress(hdr + z.tobytes() + np.packbits(mask.astype(np.uint8).ravel()).tobytes()))
++
++    def enc(pts):
++        out, px, py = [], x0, y0
++        for x, y in pts:
++            qx, qy = int(round((x - px) * 10)), int(round((y - py) * 10)); out += [qx, qy]; px += qx / 10; py += qy / 10
++        return out
++    v = {"v": 1, "k": f"{tx}_{ty}", "o": [x0, y0],
++         "b": [{"i": f"w{i}", "t": "", "a": Polygon(r).area, "r": [enc(r)]} for i, r in enumerate(buildings)],
++         "rd": [{"c": c, "n": n, "r": enc(p)} for c, n, p in roads], "sea": []}
++    open(os.path.join(d, "tiles/v", f"{tx}_{ty}.json.gz"), "wb").write(gzip.compress(json.dumps(v).encode()))
++
++
++def _city(tmp, sea_x=None, blocks=True, roads=True):
++    land = (lambda x, y: x > sea_x) if sea_x else (lambda x, y: True)
++    b = []
++    if blocks:
++        for i in range(6):
++            for j in range(6):
++                cx, cy = 100400 + i * 40, 200300 + j * 40
++                b.append([(cx, cy), (cx + 20, cy), (cx + 20, cy + 15), (cx, cy + 15), (cx, cy)])
++    rd = [(2, "הרצל", [(100000, 200250), (101000, 200250)])] if roads else []
++    _write_tile(tmp, 100, 200, land, b, rd)
++    _write_tile(tmp, 101, 200, land, [], [(2, "הרצל", [(101000, 200250), (102000, 200250)])] if roads else [])
++    return ["100_200", "101_200"]
++
++
++def _plants(tile, src=None):
++    t = tile["t"]
++    out = [(tile["o"][0] + t[i] / 10, tile["o"][1] + t[i + 1] / 10, tile["sp"][t[i + 2]], t[i + 3] / 10, t[i + 4])
++           for i in range(0, len(t), 5)]
++    return [p for p in out if src is None or p[4] == src]
++
++
++def _lc(tile):
++    return np.frombuffer(base64.b64decode(tile["lc"]), np.uint8).reshape(100, 100)
++
++
++# ---------------------------------------------------------------- tags
++@pytest.mark.parametrize("tags,cls", [
++    ({"leisure": "park"}, V.LC["PARK"]), ({"landuse": "grass"}, V.LC["LAWN"]), ({"natural": "wood"}, V.LC["WOOD"]),
++    ({"landuse": "forest"}, V.LC["WOOD"]), ({"natural": "scrub"}, V.LC["SCRUB"]), ({"natural": "sand"}, V.LC["SAND"]),
++    ({"natural": "beach"}, V.LC["BEACH"]), ({"natural": "dune"}, V.LC["DUNE"]), ({"landuse": "cemetery"}, V.LC["CEMETERY"]),
++    ({"landuse": "orchard"}, V.LC["ORCHARD"]), ({"landuse": "farmland"}, V.LC["FARM"]), ({"leisure": "pitch"}, V.LC["PITCH"]),
++    ({"leisure": "garden"}, V.LC["GARDEN"]), ({"landuse": "meadow"}, V.LC["MEADOW"]), ({"building": "yes"}, None),
++    ({"highway": "residential"}, None)])
++def test_classify(tags, cls):
++    assert V.classify(tags) == cls
++
++
++@pytest.mark.parametrize("tags,code", [
++    ({"species": "Washingtonia robusta"}, "WASH"), ({"species": "Ficus sycomorus"}, "FSYC"), ({"genus": "Ficus"}, "FMIC"),
++    ({"species": "Jacaranda mimosifolia"}, "JACA"), ({"species:he": "צאלון נאה"}, "DELO"), ({"name": "שקמה עתיקה"}, "FSYC"),
++    ({"leaf_type": "needleleaved"}, "PINU"), ({"taxon": "Phoenix dactylifera"}, "PHOE"), ({}, None)])
++def test_species_from_tags(tags, code):
++    assert V.species_from_tags(tags) == code
++
++
++def test_species_db_has_sources_and_seasons():
++    db = V.species_db()
++    assert len(db["species"]) >= 15
++    for s in db["species"]:
++        assert len(s["leaf"]) == 12 and len(s["flower"]) == 12
++        assert s["h"][0] <= s["h"][1] and s["crown"][0] <= s["crown"][1]
++        assert s["src"] and all(x in db["sources"] for x in s["src"]), s["code"]
++    for pal in db["palettes"].values():
++        if isinstance(pal, dict):
++            assert all(k in db["by_code"] for k in pal if not k.startswith("_"))
++
++
++# ---------------------------------------------------------------- determinism
++def test_hash_is_deterministic_and_uniform():
++    a = V.hash_u(np.arange(10000), np.arange(10000) * 3, 7, 1)
++    b = V.hash_u(np.arange(10000), np.arange(10000) * 3, 7, 1)
++    assert np.array_equal(a, b) and 0.45 < a.mean() < 0.55 and a.min() >= 0 and a.max() < 1
++    assert not np.array_equal(a, V.hash_u(np.arange(10000), np.arange(10000) * 3, 8, 1))
++
++
++def test_build_is_byte_identical(tmp_path):
++    keys = _city(str(tmp_path))
++    park = {"geom": box(101200, 200400, 101500, 200700), "tags": {"leisure": "park"}}
++    o1 = V.build_green(str(tmp_path), keys, [park])
++    o2 = V.build_green(str(tmp_path), list(reversed(keys)), [park])
++    for k in keys:
++        assert json.dumps(o1[k], sort_keys=True) == json.dumps(o2[k], sort_keys=True)
++
++
++# ---------------------------------------------------------------- land cover + placement rules
++def test_osm_park_is_data_and_planted_at_expected_density(tmp_path):
++    keys = _city(str(tmp_path))
++    park = {"geom": box(101200, 200400, 101500, 200700), "tags": {"leisure": "park"}}
++    o = V.build_green(str(tmp_path), keys, [park])
++    t = o["101_200"]; lc = _lc(t)
++    r0, c0 = 100 - 70, 20                  # a cell well inside the park (row 0 = north)
++    assert lc[r0 + 10, c0 + 10] == V.LC["PARK"]            # not flagged estimated
++    inside = [p for p in _plants(t, V.SRC["proc"]) if 101200 < p[0] < 101500 and 200400 < p[1] < 200700]
++    trees = [p for p in inside if V.species_db()["by_code"][p[2]]["kind"] in ("tree", "palm")]
++    exp = 300 * 300 / (11 * 11) * 0.55
++    assert 0.7 * exp < len(trees) < 1.3 * exp, (len(trees), exp)
++
++
++def test_osm_trees_rows_and_slots(tmp_path):
++    keys = _city(str(tmp_path))
++    trees = [{"x": 101100.0, "y": 200600.0, "tags": {"species": "Delonix regia", "height": "9"}}]
++    rows = [{"geom": LineString([(101100, 200800), (101180, 200800)]), "tags": {"genus": "Phoenix"}}]
++    slots = [{"x": 100100.0 + i * 12, "y": 200256.0, "cls": 2, "street": "הרצל"} for i in range(20)]
++    o = V.build_green(str(tmp_path), keys, [], trees, rows, slots)
++    p0 = _plants(o["101_200"], V.SRC["osm_tree"])
++    assert len(p0) == 1 and p0[0][2] == "DELO" and abs(p0[0][3] - 9) < 0.05
++    pr = _plants(o["101_200"], V.SRC["osm_row"])
++    assert len(pr) == 10 and {p[2] for p in pr} == {"PHOE"}
++    ps = _plants(o["100_200"], V.SRC["slot"])
++    assert len(ps) == 20
++    top = max(sum(1 for p in ps if p[2] == c) for c in {p[2] for p in ps})
++    assert top >= 0.7 * len(ps)                            # one species per street (85%), a few mixed
++    assert not _plants(o["100_200"], V.SRC["slot_est"])    # transport slots replace our estimate
++
++
++def test_estimated_street_trees_follow_roads_and_avoid_buildings(tmp_path):
++    keys = _city(str(tmp_path))
++    o = V.build_green(str(tmp_path), keys)
++    ps = _plants(o["100_200"], V.SRC["slot_est"]) + _plants(o["101_200"], V.SRC["slot_est"])
++    assert len(ps) > 60
++    for x, y, code, h, s in ps:
++        d = abs(y - 200250)
++        assert 5.5 < d < 7.5, d                           # half width 3.5 + 2.5 m
++    pal = V.species_db()["palettes"]["street_c2"]
++    assert all(p[2] in pal for p in ps)
++
++
++def test_beach_dune_and_estimated_flag(tmp_path):
++    keys = _city(str(tmp_path), sea_x=100150, blocks=False, roads=False)
++    o = V.build_green(str(tmp_path), keys)
++    lc = _lc(o["100_200"])
++    assert (lc[:, 10] & 0x7F == V.LC["SEA"]).all()
++    assert (lc[50, 16:20] == (V.LC["BEACH"] | V.EST)).all()          # 10-50 m from the water line
++    assert (lc[50, 30] & 0x7F) == V.LC["MOBILE"] and lc[50, 30] & V.EST   # < 250 m from the sea: mobile dune
++    assert (lc[50, 80] & 0x7F) == V.LC["DUNE"]                        # stabilised dune further inland
++    sp = {p[2] for p in _plants(o["100_200"])}
++    assert sp <= {"ARTE", "RETA", "AMMO"}
++    assert not [p for p in _plants(o["100_200"]) if p[0] < 100150]    # nothing in the sea
++
++
++def test_ndvi_formula_and_gating(tmp_path):
++    nd = V.ndvi_from_l2a(np.array([1500, 1100]), np.array([4500, 1200]))
++    assert abs(nd[0] - (0.35 - 0.05) / (0.35 + 0.05)) < 1e-9 and abs(nd[1] - (0.02 - 0.01) / 0.03) < 1e-9
++    keys = _city(str(tmp_path))
++    base = V.build_green(str(tmp_path), keys)
++    # synthetic fixture: everything bare (0.05) except one irrigated 100x100 m patch (0.6)
++    g = np.full((100, 200), 0.05); g[10:20, 150:160] = 0.6
++    o = V.build_green(str(tmp_path), keys, ndvi={"x0": 100000, "y1": 201000, "step": 10, "ndvi": g})
++    lc0, lc1 = _lc(base["100_200"]), _lc(o["100_200"])
++    est_green0 = np.isin(lc0 & 0x7F, [V.LC["PARK"], V.LC["GARDEN"]]).sum()
++    est_green1 = np.isin(lc1 & 0x7F, [V.LC["PARK"], V.LC["GARDEN"]]).sum()
++    assert est_green0 > 0 and est_green1 == 0                          # bare NDVI removes estimated gardens
++    nd_trees = _plants(o["101_200"], V.SRC["ndvi"])
++    assert len(nd_trees) > 20 and all(101500 <= p[0] <= 101600 and 200800 <= p[1] <= 200900 for p in nd_trees)
++    assert o["101_200"]["stats"]["ndvi_green_frac"] == pytest.approx(0.01, abs=0.002)
++
++
++def test_overpass_parsing_keeps_green_trees_rows():
++    js = {"elements": [
++        {"type": "node", "id": 1, "lat": 31.80, "lon": 34.65, "tags": {"natural": "tree", "species": "Ficus microcarpa"}},
++        {"type": "way", "id": 2, "tags": {"leisure": "park"}, "geometry": [
++            {"lat": 31.80, "lon": 34.65}, {"lat": 31.80, "lon": 34.651}, {"lat": 31.801, "lon": 34.651}, {"lat": 31.80, "lon": 34.65}]},
++        {"type": "way", "id": 3, "tags": {"natural": "tree_row"}, "geometry": [{"lat": 31.80, "lon": 34.65}, {"lat": 31.801, "lon": 34.65}]},
++    ]}
++    o = sources_osm.parse_overpass(js)
++    assert len(o["trees"]) == 1 and o["trees"][0]["tags"]["species"] == "Ficus microcarpa"
++    assert len(o["green"]) == 1 and o["green"][0]["cls"] == V.LC["PARK"]
++    assert len(o["tree_rows"]) == 1 and 100 < o["tree_rows"][0]["geom"].length < 120
++    assert "natural" in sources_osm.overpass_query((34.6, 31.7, 34.7, 31.8))
++
++
++@pytest.mark.skipif(not os.path.exists(os.path.join(SAMPLE, "tiles/t/164_634.bin.gz")), reason="sample tiles missing")
++def test_real_sample_no_plants_in_buildings_or_sea():
++    keys = ["164_634", "165_634", "164_633", "165_633"]
++    o = V.build_green(SAMPLE, keys)
++    from shapely import contains_xy
++    from shapely.geometry import Polygon as P
++    for k in keys:
++        t = o[k]
++        v = json.load(gzip.open(os.path.join(SAMPLE, "tiles/v", k + ".json.gz")))
++        polys = [P(V.decode_ring(b["r"][0], *v["o"])) for b in v["b"]]
++        pl = np.array([(p[0], p[1]) for p in _plants(t)])
++        if not len(pl):
++            continue
++        inside = sum(int(contains_xy(q.buffer(0), pl[:, 0], pl[:, 1]).sum()) for q in polys if q.area > 30)
++        assert inside <= 0.01 * len(pl), (k, inside, len(pl))    # 10 m raster: allow 1% edge cases
++        lc = _lc(t)
++        r = np.clip((t["o"][1] + 1000 - pl[:, 1]) // 10, 0, 99).astype(int); c = np.clip((pl[:, 0] - t["o"][0]) // 10, 0, 99).astype(int)
++        assert not ((lc[r, c] & 0x7F) == V.LC["SEA"]).any()
+diff -ruN a/twin/pipeline/yazam/sources_osm.py b/twin/pipeline/yazam/sources_osm.py
+--- a/twin/pipeline/yazam/sources_osm.py	2026-11-23 01:54:53.512562773 +0200
++++ b/twin/pipeline/yazam/sources_osm.py	2026-11-23 01:54:53.790042516 +0200
+@@ -11,6 +11,9 @@
+   water:    Polygon (lakes, reservoirs, riverbanks, ponds)
+   boundary: Polygon|MultiPolygon (admin_level=8 municipality) or None
+   road:     {"geom": LineString, "cls": int, "name": str}
++  green:    {"geom": Polygon|MultiPolygon, "tags": {...}, "cls": int}   (vegetation.classify; parks, wood, sand, beach ...)
++  trees:    {"x": float, "y": float, "tags": {...}}                    (natural=tree nodes; species/genus/leaf_type kept)
++  tree_rows:{"geom": LineString, "tags": {...}}                        (natural=tree_row)
+ """
+ from __future__ import annotations
+ 
+@@ -25,6 +28,7 @@
+ from shapely.ops import polygonize, unary_union, transform as shp_transform
+ 
+ from .geo import to_itm, _tf
++from . import vegetation as veg
+ 
+ OVERPASS_URLS = [
+     os.environ.get("OVERPASS_URL", "https://overpass-api.de/api/interpreter"),
+@@ -73,6 +77,17 @@
+ );
+ out tags geom;
+ way["highway"]({b}); out tags geom;
++(
++  way["natural"~"^(wood|scrub|heath|sand|beach|dune|grassland|tree_row)$"]({b});
++  relation["natural"~"^(wood|scrub|heath|sand|beach|dune|grassland)$"]["type"="multipolygon"]({b});
++  way["landuse"~"^(grass|meadow|forest|cemetery|orchard|farmland|village_green|recreation_ground)$"]({b});
++  relation["landuse"~"^(grass|meadow|forest|cemetery|orchard|farmland)$"]["type"="multipolygon"]({b});
++  way["leisure"~"^(park|garden|pitch|golf_course|nature_reserve)$"]({b});
++  relation["leisure"~"^(park|garden|nature_reserve)$"]["type"="multipolygon"]({b});
++  way["amenity"="grave_yard"]({b});
++);
++out tags geom;
++node["natural"="tree"]({b}); out body;
+ {city}"""
+ 
+ 
+@@ -114,12 +129,22 @@
+     return g if not g.is_empty else None
+ 
+ 
++def _empty():
++    return {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": [],
++            "green": [], "trees": [], "tree_rows": []}
++
++
+ def parse_overpass(js, city_name=None):
+-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
++    out = _empty()
+     for el in js.get("elements", []):
+         tags = el.get("tags", {})
+         t = el["type"]
+         geom = None
++        if t == "node":
++            if tags.get("natural") == "tree" and "lon" in el:
++                x, y = to_itm(el["lon"], el["lat"])
++                out["trees"].append({"x": x, "y": y, "tags": tags})
++            continue
+         if t == "way":
+             c = _way_coords(el)
+             if len(c) < 2:
+@@ -133,6 +158,9 @@
+                                      "cls": ROAD_CLASS.get(tags["highway"], 0),
+                                      "name": tags.get("name:he") or tags.get("name", "")})
+                 continue
++            if tags.get("natural") == "tree_row":
++                out["tree_rows"].append({"geom": _itm_geom(LineString(c)), "tags": tags})
++                continue
+             if not closed:
+                 continue
+             geom = Polygon(c)
+@@ -152,6 +180,8 @@
+             out["buildings"].append({"id": f"{t[0]}{el['id']}", "geom": geom, "tags": tags})
+         elif _is_water(tags):
+             out["water"].append(geom)
++        elif veg.classify(tags) is not None:
++            out["green"].append({"geom": geom, "tags": tags, "cls": veg.classify(tags)})
+     return out
+ 
+ 
+@@ -179,15 +209,30 @@
+     src, cut = _extract_bbox(path, bbox)
+     w, s, e, n = bbox
+     fab = osmium.geom.WKBFactory()
+-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
++    out = _empty()
+ 
+     def inside(g):
+         minx, miny, maxx, maxy = g.bounds
+         return not (maxx < w or minx > e or maxy < s or miny > n)
+ 
+     class H(osmium.SimpleHandler):
++        def node(self, nd):
++            if nd.tags.get("natural") == "tree":
++                lon, lat = nd.location.lon, nd.location.lat
++                if w <= lon <= e and s <= lat <= n:
++                    x, y = to_itm(lon, lat)
++                    out["trees"].append({"x": x, "y": y, "tags": dict(nd.tags)})
++
+         def way(self, wy):
+             tags = dict(wy.tags)
++            if tags.get("natural") == "tree_row":
++                try:
++                    g = swkb.loads(fab.create_linestring(wy), hex=True)
++                except Exception:
++                    return
++                if inside(g):
++                    out["tree_rows"].append({"geom": _itm_geom(g), "tags": tags})
++                return
+             if tags.get("natural") == "coastline" or ("highway" in tags and "building" not in tags):
+                 try:
+                     g = swkb.loads(fab.create_linestring(wy), hex=True)
+@@ -206,7 +251,8 @@
+             is_b = "building" in tags
+             is_city = (tags.get("boundary") == "administrative" and tags.get("admin_level") == "8"
+                        and city_name and city_name in (tags.get("name"), tags.get("name:he"), tags.get("name:en")))
+-            if not (is_b or is_city or _is_water(tags)):
++            green_cls = None if (is_b or is_city or _is_water(tags)) else veg.classify(tags)
++            if not (is_b or is_city or _is_water(tags) or green_cls is not None):
+                 return
+             try:
+                 g = swkb.loads(fab.create_multipolygon(a), hex=True)
+@@ -224,6 +270,8 @@
+                     g = g.geoms[0]
+                 oid = ("w" if a.from_way() else "r") + str(a.orig_id())
+                 out["buildings"].append({"id": oid, "geom": g, "tags": tags})
++            elif green_cls is not None:
++                out["green"].append({"geom": g, "tags": tags, "cls": green_cls})
+             else:
+                 out["water"].append(g)
+ 
+@@ -235,9 +283,10 @@
+ 
+ # ---------------------------------------------------------------- GeoJSON (tests / any provider)
+ def from_geojson(path):
+-    """FeatureCollection in WGS84 with properties.kind in {building, coast, water, boundary, road}."""
++    """FeatureCollection in WGS84 with properties.kind in {building, coast, water, boundary, road,
++    green, tree, tree_row} (green/tree/tree_row carry OSM tags in properties.tags)."""
+     fc = json.load(open(path, encoding="utf-8"))
+-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
++    out = _empty()
+     for f in fc["features"]:
+         p = f.get("properties", {}) or {}
+         g = _itm_geom(shape(f["geometry"]))
+@@ -252,4 +301,12 @@
+             out["boundary"] = g
+         elif k == "road":
+             out["roads"].append({"geom": g, "cls": int(p.get("cls", 1)), "name": p.get("name", "")})
++        elif k == "green":
++            tags = p.get("tags", {})
++            if veg.classify(tags) is not None:
++                out["green"].append({"geom": g, "tags": tags, "cls": veg.classify(tags)})
++        elif k == "tree":
++            out["trees"].append({"x": g.x, "y": g.y, "tags": p.get("tags", {})})
++        elif k == "tree_row":
++            out["tree_rows"].append({"geom": g, "tags": p.get("tags", {})})
+     return out
+diff -ruN a/twin/pipeline/yazam/species_veg.json b/twin/pipeline/yazam/species_veg.json
+--- a/twin/pipeline/yazam/species_veg.json	1970-01-01 02:00:00.000000000 +0200
++++ b/twin/pipeline/yazam/species_veg.json	2026-11-23 01:54:53.789899488 +0200
+@@ -0,0 +1,1345 @@
++{
++ "v": 1,
++ "note": "מקור אמת אחד למיני הצמחייה של עולם 27 (אשדוד / מישור החוף). חודשים: אינדקס 0=ינואר. leaf = כמות עלווה 0..1 לפי חודש, flower = עוצמת פריחה/פרי 0..1 לפי חודש. src = מזהי מקורות (ראו sources). est = שדות שאינם מאומתים ממקור ישראלי (ידע גננות כללי) – מסומנים כמשוערים.",
++ "sources": {
++  "TLV22": "עיריית תל אביב-יפו, רשימת עצים מומלצים לנטיעה 2022 – https://www.tel-aviv.gov.il/Residents/Environment/Documents/רשימת עצים מומלצים לנטיעה 2022.pdf",
++  "TLVBOOK": "עיריית תל אביב-יפו, ספר העצים שלי בתל אביב-יפו – https://www.tel-aviv.gov.il/Residents/Environment/Documents/ספר%20העצים%20שלי%20בתל%20אביב-יפו.pdf",
++  "KAL_DELONIX": "אגודת כלנית, צאלון נאה יולי 2019 – https://www.kalanit.org.il/delonix_regia_july_2019/",
++  "KAL_FALL": "אגודת כלנית, עצים פורחים שלא בעונתם – https://www.kalanit.org.il/botanical_news/trees-blooming-fall-not-on-season/",
++  "TIMEOUT": "טיים אאוט תל אביב, פריחות עצים בתל אביב – https://timeout.co.il/פריחות-עצים-בתל-אביב/",
++  "KKL_ROAD": "קק\"ל, מדריך צמחים לשולי דרכים – https://kkl.org.il/files/Accessible-1/afforestation_and_environment/afforestation/afforestation_trees_and_plants_guide/trees_and_plants_guides_road_side_plants/road-side-plants.pdf",
++  "WF_RETAMA": "צמח השדה (wildflowers.co.il), רתם המדבר – https://wildflowers.co.il/english/plant.asp?id=65",
++  "DANIN": "Danin, Artemisia jordanica / A. monosperma (Willdenowia 29) – https://bgbm-web.bgbm.fu-berlin.de/sites/default/files/documents/w29Danin.pdf",
++  "COASTWIKI": "Sand Dune Inventory of Europe – Israel (Coastal Wiki) – https://www.coastalwiki.org/wiki/Sand_Dune_Inventory_of_Europe_-_Israel",
++  "HUJI_DUNE": "A field quantification of coastal dune perennial plants as indicators (HUJI) – https://cris.huji.ac.il/en/publications/a-field-quantification-of-coastal-dune-perennial-plants-as-indica/",
++  "UF_JACA": "UF/IFAS ST317 Jacaranda mimosifolia – https://ask.ifas.ufl.edu/publication/ST317",
++  "GEN": "ידע גננות כללי – לא אומת ממקור ישראלי (משוער)"
++ },
++ "species": [
++  {
++   "code": "WASH",
++   "he": "וושינגטוניה חסונה",
++   "sci": "Washingtonia robusta",
++   "kind": "palm",
++   "arch": "palm_fan",
++   "h": [
++    12,
++    30
++   ],
++   "crown": [
++    3,
++    5
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0.2,
++    0.5,
++    0.3,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#4f7a35",
++   "trunk_c": "#7d6a53",
++   "flower_c": "#efe4c2",
++   "flower_he": "תפרחות שמנת קטנות",
++   "src": [
++    "TLV22",
++    "TLVBOOK"
++   ],
++   "est": [
++    "פריחה: GEN",
++    "h מינימום: GEN"
++   ],
++   "fcov": 0.12,
++   "flex": 1.7
++  },
++  {
++   "code": "PHOE",
++   "he": "דקל תמר",
++   "sci": "Phoenix dactylifera",
++   "kind": "palm",
++   "arch": "palm_feather",
++   "h": [
++    8,
++    18
++   ],
++   "crown": [
++    6,
++    9
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0.2,
++    0.3,
++    0,
++    0,
++    0.3,
++    0.9,
++    1,
++    0.6,
++    0,
++    0
++   ],
++   "leaf_c": "#6f8a55",
++   "trunk_c": "#8a7458",
++   "flower_c": "#e0a32e",
++   "flower_he": "אשכולות תמרים כתומים-צהובים (פרי) אוג'–אוק'",
++   "src": [
++    "GEN"
++   ],
++   "est": [
++    "כל השדות: GEN"
++   ],
++   "fcov": 0.0,
++   "flex": 1.5
++  },
++  {
++   "code": "FMIC",
++   "he": "פיקוס השדרות",
++   "sci": "Ficus microcarpa",
++   "kind": "tree",
++   "arch": "round_dense",
++   "h": [
++    8,
++    18
++   ],
++   "crown": [
++    8,
++    15
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#386630",
++   "trunk_c": "#8b8378",
++   "flower_c": "#2f5a2a",
++   "flower_he": "ללא פריחה נראית",
++   "src": [
++    "TLV22",
++    "TLVBOOK"
++   ],
++   "est": [],
++   "fcov": 0,
++   "flex": 1.0
++  },
++  {
++   "code": "FSYC",
++   "he": "פיקוס השקמה",
++   "sci": "Ficus sycomorus",
++   "kind": "tree",
++   "arch": "round_wide",
++   "h": [
++    10,
++    15
++   ],
++   "crown": [
++    12,
++    20
++   ],
++   "habit": "ירוק עד למחצה",
++   "leaf": [
++    0.75,
++    0.7,
++    0.8,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.85
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#5d7d3a",
++   "trunk_c": "#9a9284",
++   "flower_c": "#5d7d3a",
++   "flower_he": "ללא פריחה נראית",
++   "src": [
++    "TLVBOOK",
++    "COASTWIKI"
++   ],
++   "est": [
++    "גובה/קוטר ונשירה חלקית: GEN"
++   ],
++   "fcov": 0,
++   "flex": 1.0
++  },
++  {
++   "code": "JACA",
++   "he": "סיגלון חד-עלים (ג'קרנדה)",
++   "sci": "Jacaranda mimosifolia",
++   "kind": "tree",
++   "arch": "vase",
++   "h": [
++    8,
++    14
++   ],
++   "crown": [
++    8,
++    12
++   ],
++   "habit": "נשיר",
++   "leaf": [
++    0.6,
++    0.3,
++    0.25,
++    0.4,
++    0.6,
++    0.85,
++    1,
++    1,
++    1,
++    1,
++    0.9,
++    0.75
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0.35,
++    1,
++    0.6,
++    0.15,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#5f8f3e",
++   "trunk_c": "#6e5a45",
++   "flower_c": "#a58be6",
++   "flower_he": "סגול-לילך, שיא במאי",
++   "src": [
++    "TLV22",
++    "UF_JACA"
++   ],
++   "est": [
++    "עקומת נשירה חודשית: GEN"
++   ],
++   "fcov": 0.85,
++   "flex": 1.0
++  },
++  {
++   "code": "DELO",
++   "he": "צאלון נאה",
++   "sci": "Delonix regia",
++   "kind": "tree",
++   "arch": "umbrella",
++   "h": [
++    6,
++    10
++   ],
++   "crown": [
++    10,
++    15
++   ],
++   "habit": "נשיר בתנאים",
++   "leaf": [
++    0.5,
++    0.3,
++    0.25,
++    0.4,
++    0.8,
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.85,
++    0.65
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0.3,
++    1,
++    0.9,
++    0.5,
++    0.1,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#4f8a32",
++   "trunk_c": "#7a6e60",
++   "flower_c": "#f0522a",
++   "flower_he": "אדום-כתום, יוני–אוגוסט",
++   "src": [
++    "TLV22",
++    "TLVBOOK",
++    "KAL_DELONIX",
++    "TIMEOUT"
++   ],
++   "est": [
++    "עקומת נשירה חודשית: GEN"
++   ],
++   "fcov": 0.9,
++   "flex": 1.0
++  },
++  {
++   "code": "TIPU",
++   "he": "מכנף נאה (טיפואנה)",
++   "sci": "Tipuana tipu",
++   "kind": "tree",
++   "arch": "round_open",
++   "h": [
++    10,
++    15
++   ],
++   "crown": [
++    10,
++    12
++   ],
++   "habit": "נשיר בתנאים",
++   "leaf": [
++    0.8,
++    0.6,
++    0.55,
++    0.8,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.9
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0.6,
++    1,
++    0.3,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#5a8a3a",
++   "trunk_c": "#6b5c4c",
++   "flower_c": "#e8c22a",
++   "flower_he": "צהוב, מאי–יוני",
++   "src": [
++    "TLV22"
++   ],
++   "est": [
++    "פריחה ונשירה: GEN"
++   ],
++   "fcov": 0.45,
++   "flex": 1.0
++  },
++  {
++   "code": "BRAC",
++   "he": "ברכיכיטון הסלעים",
++   "sci": "Brachychiton rupestris",
++   "kind": "tree",
++   "arch": "bottle",
++   "h": [
++    6,
++    12
++   ],
++   "crown": [
++    4,
++    6
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#4f7040",
++   "trunk_c": "#8f8676",
++   "flower_c": "#4f7040",
++   "flower_he": "פריחה לא בולטת",
++   "src": [
++    "TLV22"
++   ],
++   "est": [],
++   "fcov": 0,
++   "flex": 1.0
++  },
++  {
++   "code": "MELI",
++   "he": "אזדרכת מצויה",
++   "sci": "Melia azedarach",
++   "kind": "tree",
++   "arch": "round_open",
++   "h": [
++    6,
++    12
++   ],
++   "crown": [
++    6,
++    9
++   ],
++   "habit": "נשיר",
++   "leaf": [
++    0.1,
++    0.1,
++    0.45,
++    0.9,
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.9,
++    0.6,
++    0.25
++   ],
++   "flower": [
++    0,
++    0,
++    0.4,
++    1,
++    0.3,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#5e8a3a",
++   "trunk_c": "#5e5246",
++   "flower_c": "#b9a0d8",
++   "flower_he": "לילך, מרץ–אפריל",
++   "autumn_c": "#c9a441",
++   "src": [
++    "GEN"
++   ],
++   "est": [
++    "כל השדות: GEN"
++   ],
++   "fcov": 0.5,
++   "flex": 1.0
++  },
++  {
++   "code": "EUCA",
++   "he": "אקליפטוס המקור",
++   "sci": "Eucalyptus camaldulensis",
++   "kind": "tree",
++   "arch": "eucalyptus",
++   "h": [
++    15,
++    35
++   ],
++   "crown": [
++    10,
++    18
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#6f8a5e",
++   "trunk_c": "#cfc6b4",
++   "flower_c": "#6f8a5e",
++   "flower_he": "שמנת, לא בולטת",
++   "src": [
++    "TLVBOOK",
++    "TLV22"
++   ],
++   "est": [
++    "מידות: GEN (הרשימה ממליצה רק על מינים נמוכים; מינים גבוהים קיימים בעיר)"
++   ],
++   "fcov": 0.1,
++   "flex": 1.3
++  },
++  {
++   "code": "TAMA",
++   "he": "אשל הפרקים",
++   "sci": "Tamarix aphylla",
++   "kind": "tree",
++   "arch": "umbrella",
++   "h": [
++    8,
++    12
++   ],
++   "crown": [
++    6,
++    8
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0.2,
++    0.8,
++    0.6,
++    0.1,
++    0,
++    0
++   ],
++   "leaf_c": "#7c8f6a",
++   "trunk_c": "#6a5d50",
++   "flower_c": "#e8d6d6",
++   "flower_he": "ורוד-לבן, אוגוסט–ספטמבר",
++   "src": [
++    "TLV22",
++    "KAL_FALL",
++    "TLVBOOK"
++   ],
++   "est": [],
++   "fcov": 0.6,
++   "flex": 1.0
++  },
++  {
++   "code": "OLEA",
++   "he": "זית אירופי",
++   "sci": "Olea europaea",
++   "kind": "tree",
++   "arch": "olive",
++   "h": [
++    4,
++    7
++   ],
++   "crown": [
++    5,
++    10
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0.4,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#7b8a62",
++   "trunk_c": "#6e6253",
++   "flower_c": "#e9e6cf",
++   "flower_he": "לבנבן קטן, אביב",
++   "src": [
++    "TLV22"
++   ],
++   "est": [
++    "פריחה: GEN"
++   ],
++   "fcov": 0.15,
++   "flex": 1.0
++  },
++  {
++   "code": "CERA",
++   "he": "חרוב מצוי",
++   "sci": "Ceratonia siliqua",
++   "kind": "tree",
++   "arch": "round_dense",
++   "h": [
++    6,
++    12
++   ],
++   "crown": [
++    8,
++    12
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0.3,
++    0.4,
++    0.3,
++    0
++   ],
++   "leaf_c": "#3f5f2f",
++   "trunk_c": "#5f5347",
++   "flower_c": "#8a4a2a",
++   "flower_he": "אדמדם לא בולט, ספט'–נוב'",
++   "src": [
++    "TLV22",
++    "KAL_FALL"
++   ],
++   "est": [],
++   "fcov": 0.12,
++   "flex": 1.0
++  },
++  {
++   "code": "PINU",
++   "he": "אורן ירושלים",
++   "sci": "Pinus halepensis",
++   "kind": "tree",
++   "arch": "pine",
++   "h": [
++    8,
++    20
++   ],
++   "crown": [
++    5,
++    10
++   ],
++   "habit": "ירוק עד (מחטני)",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#3e5a35",
++   "trunk_c": "#6a4e3a",
++   "flower_c": "#3e5a35",
++   "flower_he": "—",
++   "src": [
++    "GEN"
++   ],
++   "est": [
++    "כל השדות: GEN (עץ היעור הנפוץ של קק\"ל)"
++   ],
++   "fcov": 0,
++   "flex": 1.0
++  },
++  {
++   "code": "CUPR",
++   "he": "ברוש מצוי",
++   "sci": "Cupressus sempervirens",
++   "kind": "tree",
++   "arch": "column",
++   "h": [
++    8,
++    20
++   ],
++   "crown": [
++    1.5,
++    3
++   ],
++   "habit": "ירוק עד (מחטני)",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#2e4a2a",
++   "trunk_c": "#5a4a3a",
++   "flower_c": "#2e4a2a",
++   "flower_he": "—",
++   "src": [
++    "GEN"
++   ],
++   "est": [
++    "כל השדות: GEN (נפוץ בבתי עלמין)"
++   ],
++   "fcov": 0,
++   "flex": 0.6
++  },
++  {
++   "code": "BOUG",
++   "he": "בוגנוויליאה נאה",
++   "sci": "Bougainvillea spectabilis",
++   "kind": "shrub",
++   "arch": "shrub",
++   "h": [
++    1.5,
++    4
++   ],
++   "crown": [
++    2,
++    4
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    0.9,
++    0.9,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.9
++   ],
++   "flower": [
++    0.15,
++    0.15,
++    0.4,
++    0.8,
++    1,
++    1,
++    0.9,
++    0.9,
++    0.9,
++    0.8,
++    0.6,
++    0.3
++   ],
++   "leaf_c": "#4a7a32",
++   "trunk_c": "#6a5a48",
++   "flower_c": "#c2187a",
++   "flower_he": "מגנטה/ורוד/סגול/כתום, אביב–סתיו",
++   "src": [
++    "KKL_ROAD"
++   ],
++   "est": [
++    "גובה כשיח גזום: GEN (כמטפס 5–7 מ')"
++   ],
++   "fcov": 0.55,
++   "flex": 1.0
++  },
++  {
++   "code": "NERI",
++   "he": "הרדוף הנחלים",
++   "sci": "Nerium oleander",
++   "kind": "shrub",
++   "arch": "shrub",
++   "h": [
++    1.5,
++    4
++   ],
++   "crown": [
++    2,
++    4
++   ],
++   "habit": "ירוק עד",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0.1,
++    0.5,
++    0.9,
++    1,
++    1,
++    0.9,
++    0.7,
++    0.4,
++    0.1,
++    0
++   ],
++   "leaf_c": "#4c6a3a",
++   "trunk_c": "#6a5a48",
++   "flower_c": "#e78fb0",
++   "flower_he": "ורוד/לבן/אדום, אביב–סתיו",
++   "src": [
++    "KKL_ROAD"
++   ],
++   "est": [],
++   "fcov": 0.4,
++   "flex": 1.0
++  },
++  {
++   "code": "RETA",
++   "he": "רתם המדבר",
++   "sci": "Retama raetam",
++   "kind": "shrub",
++   "arch": "broom",
++   "h": [
++    1,
++    3
++   ],
++   "crown": [
++    1.5,
++    3
++   ],
++   "habit": "חסר עלים רוב השנה (פוטוסינתזה בענפים)",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1,
++    1
++   ],
++   "flower": [
++    0.6,
++    1,
++    0.8,
++    0.3,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0.2
++   ],
++   "leaf_c": "#8a9a6a",
++   "trunk_c": "#7a7058",
++   "flower_c": "#f4f1ea",
++   "flower_he": "לבן, ינואר–אפריל",
++   "src": [
++    "WF_RETAMA",
++    "COASTWIKI",
++    "HUJI_DUNE"
++   ],
++   "est": [],
++   "fcov": 0.6,
++   "flex": 1.4
++  },
++  {
++   "code": "ARTE",
++   "he": "לענה חד-זרעית",
++   "sci": "Artemisia monosperma",
++   "kind": "shrub",
++   "arch": "dwarf",
++   "h": [
++    0.5,
++    1
++   ],
++   "crown": [
++    0.5,
++    1.2
++   ],
++   "habit": "בן-שיח ירוק",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    0.95,
++    0.9,
++    0.85,
++    0.85,
++    0.85,
++    0.9,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#8c9c68",
++   "trunk_c": "#6a6048",
++   "flower_c": "#7d8f5a",
++   "flower_he": "לא בולטת",
++   "src": [
++    "DANIN",
++    "COASTWIKI",
++    "HUJI_DUNE"
++   ],
++   "est": [],
++   "fcov": 0,
++   "flex": 1.2
++  },
++  {
++   "code": "AMMO",
++   "he": "מוצית חולית",
++   "sci": "Ammophila arenaria",
++   "kind": "grass",
++   "arch": "tussock",
++   "h": [
++    0.6,
++    1.2
++   ],
++   "crown": [
++    0.6,
++    1.2
++   ],
++   "habit": "דגן רב-שנתי",
++   "leaf": [
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.9,
++    0.8,
++    0.8,
++    0.8,
++    0.9,
++    1,
++    1
++   ],
++   "flower": [
++    0,
++    0,
++    0,
++    0.3,
++    0.6,
++    0.4,
++    0,
++    0,
++    0,
++    0,
++    0,
++    0
++   ],
++   "leaf_c": "#a8a66a",
++   "trunk_c": "#8f8a60",
++   "flower_c": "#d6c79a",
++   "flower_he": "שיבולת קשית",
++   "src": [
++    "COASTWIKI",
++    "HUJI_DUNE"
++   ],
++   "est": [
++    "גובה ופריחה: GEN"
++   ],
++   "fcov": 0.35,
++   "flex": 2.5
++  }
++ ],
++ "ground": {
++  "lawn": {
++   "he": "דשא קיקויו (מדשאה מושקית)",
++   "sci": "Pennisetum clandestinum",
++   "c": "#5f8f3a",
++   "c_dormant": "#9a9a5a",
++   "green": [
++    0.55,
++    0.6,
++    0.75,
++    0.9,
++    1,
++    1,
++    1,
++    1,
++    1,
++    0.95,
++    0.8,
++    0.6
++   ],
++   "src": [
++    "GEN"
++   ],
++   "est": [
++    "תרדמת חורף: GEN"
++   ]
++  },
++  "dune": {
++   "he": "חולית מיוצבת (לענה)",
++   "c": "#d9c89a",
++   "src": [
++    "COASTWIKI"
++   ]
++  },
++  "mobile_dune": {
++   "he": "חולית נודדת",
++   "c": "#e6d6ac",
++   "src": [
++    "COASTWIKI"
++   ]
++  },
++  "beach": {
++   "he": "חוף חול",
++   "c": "#e8dab4"
++  },
++  "meadow": {
++   "he": "שטח פתוח – עשבייה חד-שנתית (משוער)",
++   "c": "#7f9a4a",
++   "c_dry": "#c9b27c",
++   "green": [
++    0.75,
++    0.9,
++    1,
++    0.85,
++    0.45,
++    0.15,
++    0.05,
++    0,
++    0,
++    0.05,
++    0.3,
++    0.55
++   ],
++   "src": [
++    "GEN"
++   ],
++   "est": [
++    "עקומת ירוק-חורף / צהוב-קיץ: GEN (אקלים ים-תיכוני)"
++   ]
++  }
++ },
++ "palettes": {
++  "_note": "משקלות שיבוץ – משוערים (GEN), לא נתוני מצאי עירוני. מטרתם מראה סביר עד שיגיע מצאי עצים של העירייה / OSM.",
++  "street_c3": {
++   "WASH": 4,
++   "PHOE": 3,
++   "FMIC": 2,
++   "TIPU": 1
++  },
++  "street_c2": {
++   "FMIC": 3,
++   "TIPU": 2,
++   "JACA": 2,
++   "DELO": 1,
++   "BRAC": 1,
++   "WASH": 1
++  },
++  "street_c1": {
++   "JACA": 2,
++   "MELI": 2,
++   "BRAC": 2,
++   "DELO": 1,
++   "OLEA": 1,
++   "FMIC": 2,
++   "CERA": 1,
++   "TIPU": 1
++  },
++  "park": {
++   "FMIC": 3,
++   "FSYC": 1,
++   "JACA": 2,
++   "DELO": 2,
++   "TIPU": 1,
++   "CERA": 2,
++   "OLEA": 1,
++   "PINU": 2,
++   "EUCA": 1,
++   "WASH": 1,
++   "PHOE": 1,
++   "TAMA": 1
++  },
++  "park_shrub": {
++   "NERI": 2,
++   "BOUG": 1
++  },
++  "garden": {
++   "OLEA": 2,
++   "CERA": 1,
++   "MELI": 1,
++   "PHOE": 1,
++   "FMIC": 1,
++   "NERI": 2,
++   "BOUG": 2
++  },
++  "wood": {
++   "PINU": 5,
++   "EUCA": 3,
++   "CERA": 1,
++   "TAMA": 1
++  },
++  "scrub": {
++   "RETA": 3,
++   "ARTE": 2,
++   "TAMA": 1
++  },
++  "dune": {
++   "ARTE": 6,
++   "RETA": 2
++  },
++  "mobile_dune": {
++   "AMMO": 5,
++   "ARTE": 1
++  },
++  "cemetery": {
++   "CUPR": 5,
++   "OLEA": 1,
++   "PINU": 1
++  },
++  "orchard": {
++   "OLEA": 1
++  }
++ },
++ "osm_genus": {
++  "Washingtonia": "WASH",
++  "Phoenix": "PHOE",
++  "Ficus": "FMIC",
++  "Jacaranda": "JACA",
++  "Delonix": "DELO",
++  "Tipuana": "TIPU",
++  "Brachychiton": "BRAC",
++  "Melia": "MELI",
++  "Eucalyptus": "EUCA",
++  "Tamarix": "TAMA",
++  "Olea": "OLEA",
++  "Ceratonia": "CERA",
++  "Pinus": "PINU",
++  "Cupressus": "CUPR",
++  "Bougainvillea": "BOUG",
++  "Nerium": "NERI",
++  "Retama": "RETA",
++  "Artemisia": "ARTE",
++  "Ammophila": "AMMO"
++ },
++ "osm_species": {
++  "Ficus sycomorus": "FSYC"
++ },
++ "osm_he": {
++  "וושינגטוניה": "WASH",
++  "תמר": "PHOE",
++  "דקל": "PHOE",
++  "שקמה": "FSYC",
++  "פיקוס": "FMIC",
++  "סיגלון": "JACA",
++  "ג'קרנדה": "JACA",
++  "צאלון": "DELO",
++  "מכנף": "TIPU",
++  "ברכיכיטון": "BRAC",
++  "אזדרכת": "MELI",
++  "אקליפטוס": "EUCA",
++  "איקליפטוס": "EUCA",
++  "אשל": "TAMA",
++  "זית": "OLEA",
++  "חרוב": "CERA",
++  "אורן": "PINU",
++  "ברוש": "CUPR",
++  "בוגנוויליאה": "BOUG",
++  "הרדוף": "NERI",
++  "רתם": "RETA",
++  "לענה": "ARTE",
++  "מוצית": "AMMO"
++ }
++}
+\ No newline at end of file
+diff -ruN a/twin/pipeline/yazam/vegetation.py b/twin/pipeline/yazam/vegetation.py
+--- a/twin/pipeline/yazam/vegetation.py	1970-01-01 02:00:00.000000000 +0200
++++ b/twin/pipeline/yazam/vegetation.py	2026-11-23 01:54:53.789863218 +0200
+@@ -0,0 +1,646 @@
++"""Vegetation layer (מחלקת הצמחייה): land cover + every tree / shrub of a 1 km ITM tile.
++
++Additive to the tile contract – existing tiles are never rewritten. New files:
++
++  tiles/g/<tx>_<ty>.json.gz      green layer of one tile
++  cities/<slug>/green.json       per-city summary: counts by source, sources, licences, NDVI status
++
++Green tile JSON:
++  {"v":1,"k":"164_634","o":[164000,634000],
++   "lc_step":10, "lc":"<base64 of 100x100 uint8, row 0 = NORTH>",   # class | 0x80 when ESTIMATED
++   "sp":["WASH","FMIC",...],                                         # species codes used in this tile
++   "t":[dx_dm,dy_dm,sp_idx,h_dm,src, ...],                           # flat, 5 ints per plant, dm from tile origin
++   "stats":{...}}
++  src: 0 OSM natural=tree · 1 OSM tree_row · 2 transport street slot · 3 street slot ESTIMATED from road
++       4 procedural by land cover (OSM polygon) · 5 procedural in ESTIMATED land cover · 6 NDVI-driven
++
++Determinism: every procedural plant comes from a GLOBAL jittered grid anchored to absolute ITM metres and
++hashed per (grid cell, rule). Same input -> byte-identical tiles; tile borders never seam or double-plant.
++Nothing here is presented as measured unless it came from OSM / transport / NDVI – see `src` and the
++0x80 'estimated' bit of the land-cover raster.
++"""
++from __future__ import annotations
++
++import base64
++import gzip
++import json
++import math
++import os
++import struct
++
++import numpy as np
++
++HERE = os.path.dirname(os.path.abspath(__file__))
++TILE = 1000
++STEP = 10                  # land-cover raster (same grid as the land/sea mask)
++NM = TILE // STEP
++EST = 0x80
++
++LC = {"NONE": 0, "LAWN": 1, "PARK": 2, "WOOD": 3, "SCRUB": 4, "SAND": 5, "BEACH": 6, "DUNE": 7, "FARM": 8,
++      "ORCHARD": 9, "CEMETERY": 10, "PITCH": 11, "GARDEN": 12, "MEADOW": 13, "SEA": 14, "MOBILE": 15}
++LC_HE = {0: "עירוני/לא ידוע", 1: "מדשאה", 2: "פארק", 3: "חורש/יער", 4: "בתה/שיחים", 5: "חול", 6: "חוף",
++         7: "חולית מיוצבת", 8: "שדה", 9: "מטע", 10: "בית עלמין", 11: "מגרש ספורט", 12: "גינה/חצר", 13: "אחו",
++         14: "ים", 15: "חולית נודדת"}
++# when OSM polygons overlap, the higher number wins (a lawn inside a park stays a lawn, a pitch stays a pitch)
++PRIORITY = {LC["FARM"]: 1, LC["MEADOW"]: 2, LC["SAND"]: 2, LC["DUNE"]: 3, LC["MOBILE"]: 3, LC["SCRUB"]: 3,
++            LC["WOOD"]: 4, LC["PARK"]: 5, LC["ORCHARD"]: 5, LC["BEACH"]: 6, LC["CEMETERY"]: 6, LC["LAWN"]: 7,
++            LC["GARDEN"]: 8, LC["PITCH"]: 9}
++SRC = {"osm_tree": 0, "osm_row": 1, "slot": 2, "slot_est": 3, "proc": 4, "proc_est": 5, "ndvi": 6}
++ROAD_W = [4.0, 5.0, 7.0, 8.5, 10.0]          # same widths as the game (RW) – c0..c4
++
++# area rules: class -> (grid spacing m, probability, palette, probability when the cell is ESTIMATED)
++RULES = {
++    LC["PARK"]: (11.0, 0.55, "park", 0.40),
++    LC["LAWN"]: (16.0, 0.18, "park", 0.12),
++    LC["GARDEN"]: (12.0, 0.33, "garden", 0.22),
++    LC["WOOD"]: (6.5, 0.80, "wood", 0.6),
++    LC["SCRUB"]: (5.0, 0.45, "scrub", 0.35),
++    LC["DUNE"]: (5.0, 0.32, "dune", 0.30),
++    LC["MOBILE"]: (6.0, 0.16, "mobile_dune", 0.14),
++    LC["SAND"]: (9.0, 0.05, "dune", 0.04),
++    LC["CEMETERY"]: (9.0, 0.40, "cemetery", 0.3),
++    LC["ORCHARD"]: (6.0, 0.95, "orchard", 0.9),
++}
++SHRUB_RULES = {LC["PARK"]: (7.0, 0.10, "park_shrub"), LC["GARDEN"]: (6.0, 0.10, "park_shrub")}
++
++
++# ---------------------------------------------------------------- species
++_SP = None
++
++
++def species_db():
++    global _SP
++    if _SP is None:
++        p = os.path.join(HERE, "species_veg.json")
++        _SP = json.load(open(p, encoding="utf-8"))
++        _SP["by_code"] = {s["code"]: s for s in _SP["species"]}
++    return _SP
++
++
++def species_from_tags(tags):
++    """OSM tags of a tree -> species code or None. Uses species, genus, taxon, species:he, name, leaf_type."""
++    db = species_db()
++    for k in ("species", "taxon", "species:en"):
++        v = (tags.get(k) or "").strip()
++        if v:
++            if v in db["osm_species"]:
++                return db["osm_species"][v]
++            g = v.split()[0].capitalize()
++            if g in db["osm_genus"]:
++                return db["osm_genus"][g]
++    g = (tags.get("genus") or "").strip().capitalize()
++    if g in db["osm_genus"]:
++        return db["osm_genus"][g]
++    for k in ("species:he", "taxon:he", "name:he", "name"):
++        v = tags.get(k) or ""
++        for he, code in db["osm_he"].items():
++            if he in v:
++                return code
++    lt = tags.get("leaf_type")
++    if lt == "needleleaved":
++        return "PINU"
++    if lt == "palm":
++        return "WASH"
++    return None
++
++
++def classify(tags):
++    """OSM polygon tags -> land-cover class or None (not vegetation)."""
++    n, lu, le = tags.get("natural"), tags.get("landuse"), tags.get("leisure")
++    if le in ("pitch", "golf_course", "stadium") or lu == "recreation_ground" and tags.get("sport"):
++        return LC["PITCH"]
++    if le == "garden":
++        return LC["GARDEN"]
++    if lu == "grass" or (lu == "village_green"):
++        return LC["LAWN"]
++    if lu == "cemetery" or tags.get("amenity") == "grave_yard":
++        return LC["CEMETERY"]
++    if le in ("park", "nature_reserve") and n not in ("sand", "beach") or lu == "recreation_ground":
++        return LC["PARK"]
++    if lu == "orchard":
++        return LC["ORCHARD"]
++    if n == "wood" or lu == "forest":
++        return LC["WOOD"]
++    if n in ("scrub", "heath"):
++        return LC["SCRUB"]
++    if n == "beach":
++        return LC["BEACH"]
++    if n == "dune" or (n == "sand" and "dune" in (tags.get("name:en", "") + tags.get("description", "")).lower()):
++        return LC["DUNE"]
++    if n == "sand":
++        return LC["SAND"]
++    if lu == "meadow" or n == "grassland":
++        return LC["MEADOW"]
++    if lu == "farmland":
++        return LC["FARM"]
++    return None
++
++
++GREEN_TAGS = ("natural", "landuse", "leisure", "amenity")
++
++
++def is_green(tags):
++    return classify(tags) is not None
++
++
++# ---------------------------------------------------------------- deterministic hashing (vectorised)
++def _mix(a):
++    a = a.astype(np.uint64)
++    a ^= a >> np.uint64(33); a *= np.uint64(0xff51afd7ed558ccd) & np.uint64(0xFFFFFFFFFFFFFFFF)
++    a ^= a >> np.uint64(33); a *= np.uint64(0xc4ceb9fe1a85ec53)
++    a ^= a >> np.uint64(33)
++    return a
++
++
++def hash_u(i, j, salt, k):
++    """uniform [0,1) per integer grid cell (i,j), rule salt and channel k – independent of tile order."""
++    with np.errstate(over="ignore"):
++        i = np.asarray(i, dtype=np.int64).astype(np.uint64)
++        j = np.asarray(j, dtype=np.int64).astype(np.uint64)
++        h = _mix(i * np.uint64(0x9E3779B97F4A7C15) ^ _mix(j + np.uint64(0x632BE59BD9B4E019))
++                 ^ np.uint64((salt * 1000003 + k * 7919) & 0xFFFFFFFF))
++    return (h >> np.uint64(11)).astype(np.float64) / float(1 << 53)
++
++
++def fnv(s):
++    h = 2166136261
++    for ch in s.encode("utf-8"):
++        h = ((h ^ ch) * 16777619) & 0xFFFFFFFF
++    return h
++
++
++def pick(palette, u):
++    """weighted pick from {code: weight}, u in [0,1) (scalar or array) -> code(s)."""
++    items = [(k, v) for k, v in palette.items() if not k.startswith("_")]
++    w = np.array([v for _, v in items], float); c = np.cumsum(w) / w.sum()
++    idx = np.searchsorted(c, np.asarray(u), side="right")
++    idx = np.minimum(idx, len(items) - 1)
++    codes = np.array([k for k, _ in items])
++    if np.ndim(idx) == 0:
++        return str(codes[int(idx)])
++    return codes[idx]
++
++
++def tree_height(code, u):
++    s = species_db()["by_code"][code]
++    lo, hi = s["h"]
++    return lo + (hi - lo) * (0.15 + 0.85 * float(u)) ** 0.9
++
++
++# ---------------------------------------------------------------- reading the existing tiles
++def read_terrain_tile(path):
++    b = gzip.open(path).read()
++    magic, ver, tx, ty, nt, nm, step = struct.unpack("<4sHiiHHH", b[:20])
++    z = np.frombuffer(b[20:20 + nt * nt * 2], "<i2").reshape(nt, nt)
++    bits = np.unpackbits(np.frombuffer(b[20 + nt * nt * 2:], np.uint8))[:nm * nm].reshape(nm, nm).astype(bool)
++    return {"tx": tx, "ty": ty, "z": z, "land": bits}
++
++
++def decode_ring(r, ox, oy):
++    pts, x, y = [], ox, oy
++    for i in range(0, len(r) - 1, 2):
++        x += r[i] / 10.0; y += r[i + 1] / 10.0
++        pts.append((x, y))
++    return pts
++
++
++# ---------------------------------------------------------------- mosaic (whole city at 10 m)
++class Mosaic:
++    """All tiles of a city on one 10 m grid so distances (to sea, to buildings) cross tile borders."""
++
++    def __init__(self, keys):
++        txy = [tuple(map(int, k.split("_"))) for k in keys]
++        self.tx0 = min(t[0] for t in txy); self.ty0 = min(t[1] for t in txy)
++        self.tx1 = max(t[0] for t in txy); self.ty1 = max(t[1] for t in txy)
++        self.W = (self.tx1 - self.tx0 + 1) * NM; self.H = (self.ty1 - self.ty0 + 1) * NM
++        self.x0 = self.tx0 * TILE; self.y1 = (self.ty1 + 1) * TILE      # NW corner
++        self.keys = keys
++
++    def slice(self, tx, ty):
++        c = (tx - self.tx0) * NM; r = (self.ty1 - ty) * NM
++        return slice(r, r + NM), slice(c, c + NM)
++
++    def to_px(self, x, y):
++        return (np.asarray(x) - self.x0) / STEP, (self.y1 - np.asarray(y)) / STEP
++
++    def cell(self, x, y):
++        c, r = self.to_px(x, y)
++        c = np.floor(c).astype(int); r = np.floor(r).astype(int)
++        ok = (c >= 0) & (r >= 0) & (c < self.W) & (r < self.H)
++        return r, c, ok
++
++
++def _draw(H, W, polys=(), lines=(), mosaic=None):
++    """Rasterise ITM polygons / (line, width) pairs to a bool grid with PIL (cell-centre-ish fill)."""
++    from PIL import Image, ImageDraw
++    im = Image.new("1", (W, H), 0); d = ImageDraw.Draw(im)
++    for ring in polys:
++        c, r = mosaic.to_px([p[0] for p in ring], [p[1] for p in ring])
++        if len(ring) >= 3:
++            d.polygon(list(zip((c - 0.5).tolist(), (r - 0.5).tolist())), fill=1)
++    for pts, w in lines:
++        c, r = mosaic.to_px([p[0] for p in pts], [p[1] for p in pts])
++        d.line(list(zip((c - 0.5).tolist(), (r - 0.5).tolist())), fill=1, width=max(1, int(round(w / STEP))))
++    return np.array(im, dtype=bool)
++
++
++def _rings(geom):
++    from shapely.geometry import Polygon, MultiPolygon
++    if isinstance(geom, Polygon):
++        return [list(geom.exterior.coords)], [list(r.coords) for r in geom.interiors]
++    if isinstance(geom, MultiPolygon):
++        o, i = [], []
++        for g in geom.geoms:
++            a, b = _rings(g); o += a; i += b
++        return o, i
++    return [], []
++
++
++# ---------------------------------------------------------------- main builder
++def build_green(data_dir, keys, green=(), trees=(), rows=(), slots=None, ndvi=None, coast_km=3.0):
++    """Returns {key: tile_dict}. green: [{"geom","cls"|None,"tags"}] ITM; trees: [{"x","y","tags"}];
++    rows: [{"geom": LineString,"tags"}]; slots: [{"x","y","cls","street"}] from the transport team (ITM) or None;
++    ndvi: None or {"x0","y1","step":10,"ndvi": 2-D float array} on the ITM grid (see ndvi_* helpers)."""
++    from scipy import ndimage
++    db = species_db(); pal = db["palettes"]
++    M = Mosaic(keys)
++    land = np.zeros((M.H, M.W), bool); have = np.zeros((M.H, M.W), bool)
++    blds, res_blds, roads = [], [], []
++    for k in keys:
++        tx, ty = map(int, k.split("_"))
++        t = read_terrain_tile(os.path.join(data_dir, "tiles/t", k + ".bin.gz"))
++        rs, cs = M.slice(tx, ty)
++        land[rs, cs] = t["land"]; have[rs, cs] = True
++        vp = os.path.join(data_dir, "tiles/v", k + ".json.gz")
++        if os.path.exists(vp):
++            v = json.load(gzip.open(vp))
++            ox, oy = v["o"]
++            for b in v["b"]:
++                ring = decode_ring(b["r"][0], ox, oy)
++                blds.append(ring)
++                if b.get("a", 0) < 2500 and b.get("t", "") not in ("industrial", "warehouse", "retail", "commercial",
++                                                                    "manufacture", "roof", "construction"):
++                    res_blds.append(ring)
++            for r in v.get("rd", []):
++                roads.append({"pts": decode_ring(r["r"], ox, oy), "c": int(r.get("c", 1)), "n": r.get("n", "")})
++    land &= have
++    bld = _draw(M.H, M.W, polys=blds, mosaic=M)
++    res = _draw(M.H, M.W, polys=res_blds, mosaic=M)
++    road = _draw(M.H, M.W, lines=[(r["pts"], ROAD_W[min(r["c"], 4)]) for r in roads if r["c"] >= 1], mosaic=M)
++
++    # ---- 1. OSM land cover (priority order)
++    lc = np.zeros((M.H, M.W), np.uint8)
++    for g in sorted(green, key=lambda g: PRIORITY.get(g.get("cls") if g.get("cls") is not None else classify(g.get("tags", {})), 0)):
++        cls = g.get("cls") if g.get("cls") is not None else classify(g.get("tags", {}))
++        if cls is None:
++            continue
++        outer, inner = _rings(g["geom"])
++        m = _draw(M.H, M.W, polys=outer, mosaic=M)
++        if inner:
++            m &= ~_draw(M.H, M.W, polys=inner, mosaic=M)
++        lc[m & land] = cls
++    lc[~land & have] = LC["SEA"]
++    osm_cells = int(((lc != 0) & (lc != LC["SEA"])).sum())
++
++    # ---- 2. ESTIMATED land cover where OSM says nothing (flag 0x80)
++    free = land & (lc == 0) & ~bld & ~road
++    sea_m = have & ~land
++    if sea_m.any():                                                   # inland cities: no beach / dunes
++        d_sea = ndimage.distance_transform_edt(~sea_m) * STEP
++    else:
++        d_sea = np.full(land.shape, 1e9)
++    d_sea = np.where(have, d_sea, 1e9)
++    d_bld = ndimage.distance_transform_edt(~bld) * STEP
++    d_res = ndimage.distance_transform_edt(~res) * STEP
++    d_road = ndimage.distance_transform_edt(~road) * STEP
++    beach = free & (d_sea <= 60)
++    lc[beach] = LC["BEACH"] | EST
++    free &= ~beach
++    dune_c = free & (d_bld > 100) & (d_road > 25) & (d_sea <= coast_km * 1000)
++    lab, n = ndimage.label(dune_c)
++    if n:
++        area = ndimage.sum(dune_c, lab, index=np.arange(1, n + 1)) * STEP * STEP
++        keep = np.zeros(n + 1, bool); keep[1:] = area >= 20000
++        dune_c = keep[lab]
++    lc[dune_c & (d_sea < 250)] = LC["MOBILE"] | EST
++    lc[dune_c & (d_sea >= 250)] = LC["DUNE"] | EST
++    free &= ~dune_c
++    # an open gap is a (possible) park only when it is ENCLOSED by the city: its connected open area
++    # (free cells >= 25 m from buildings, no upper limit) must be small. Open land around isolated
++    # buildings belongs to one huge component and is left unknown.
++    park_c = free & (d_bld >= 25) & (d_road > 8)
++    lab, n = ndimage.label(park_c)
++    if n:
++        area = ndimage.sum(park_c, lab, index=np.arange(1, n + 1)) * STEP * STEP
++        keep = np.zeros(n + 1, bool); keep[1:] = (area >= 2500) & (area <= 100000)
++        park_c = keep[lab]
++    lc[park_c] = LC["PARK"] | EST
++    free &= ~park_c
++    yard = free & (d_res <= 20)
++    lc[yard] = LC["GARDEN"] | EST
++    free &= ~yard
++    # open land away from buildings/roads that matched nothing above: annual vegetation (green in
++    # winter, straw in summer) – the typical look of unbuilt plots on the coastal plain. ESTIMATED.
++    lc[free & (d_bld > 40) & (d_road > 10)] = LC["MEADOW"] | EST
++
++    ndvi_m = None
++    if ndvi is not None:
++        ndvi_m = ndvi_to_mosaic(ndvi, M)
++        known = ~np.isnan(ndvi_m)
++        est = (lc & EST) > 0; base = lc & 0x7F
++        bare = known & est & np.isin(base, [LC["PARK"], LC["GARDEN"], LC["LAWN"]]) & (ndvi_m < 0.18)
++        lc[bare] = 0
++        grassy = known & land & (lc == 0) & ~bld & ~road & (ndvi_m >= 0.30)
++        lc[grassy] = LC["LAWN"] | EST
++        lc[known & est & (base == LC["MEADOW"]) & (ndvi_m >= 0.30)] = LC["LAWN"] | EST
++        dn = known & np.isin(base, [LC["DUNE"], LC["MOBILE"]]) & est
++        lc[dn & (ndvi_m < 0.10)] = LC["MOBILE"] | EST
++        lc[dn & (ndvi_m >= 0.20)] = LC["DUNE"] | EST
++
++    # ---- 3. plants
++    plants = []          # (x, y, code, h, src)
++
++    def ok_cell(xs, ys, allow_classes=None):
++        r, c, ok = M.cell(xs, ys)
++        r = np.clip(r, 0, M.H - 1); c = np.clip(c, 0, M.W - 1)
++        good = ok & land[r, c] & ~bld[r, c] & ~road[r, c]
++        if allow_classes is not None:
++            good &= np.isin(lc[r, c] & 0x7F, allow_classes)
++        return good
++
++    # 3a OSM single trees
++    for t in trees:
++        code = species_from_tags(t.get("tags", {})) or pick(pal["street_c1"], hash_u(int(t["x"]), int(t["y"]), 1, 0))
++        h = t.get("tags", {}).get("height")
++        try:
++            h = float(str(h).replace("m", "").strip())
++        except Exception:
++            h = tree_height(code, hash_u(int(t["x"]), int(t["y"]), 1, 1))
++        plants.append((t["x"], t["y"], str(code), h, SRC["osm_tree"]))
++    # 3b OSM tree rows: every 8 m
++    for rw in rows:
++        g = rw["geom"]; L = g.length
++        code = species_from_tags(rw.get("tags", {}))
++        for s in np.arange(4.0, max(L, 4.01), 8.0):
++            p = g.interpolate(float(s))
++            c = code or pick(pal["street_c1"], hash_u(int(g.coords[0][0]), int(g.coords[0][1]), 2, 0))
++            plants.append((p.x, p.y, str(c), tree_height(c, hash_u(int(p.x), int(p.y), 2, 1)), SRC["osm_row"]))
++    # 3c street slots: from transport, or estimated along our own road lines
++    if slots:
++        for s in slots:
++            cls = int(s.get("cls", 1)); key = "street_c%d" % max(1, min(3, cls))
++            street = s.get("street", "") or "%d_%d" % (int(s["x"] // 200), int(s["y"] // 200))
++            u = (fnv(street + key) % 100000) / 100000.0
++            mix = hash_u(int(s["x"] * 10), int(s["y"] * 10), 3, 0)
++            code = pick(pal[key], u if mix > 0.15 else hash_u(int(s["x"]), int(s["y"]), 3, 1))
++            plants.append((s["x"], s["y"], str(code), tree_height(code, hash_u(int(s["x"]), int(s["y"]), 3, 2)), SRC["slot"]))
++    else:
++        for r in roads:
++            if r["c"] < 1:
++                continue
++            key = "street_c%d" % min(3, r["c"]); sp = 9.0 if r["c"] >= 3 else 11.0
++            off = ROAD_W[min(r["c"], 4)] / 2 + 2.5
++            street = r["n"] or "%d_%d" % (int(r["pts"][0][0] // 200), int(r["pts"][0][1] // 200))
++            code_street = pick(pal[key], (fnv(street + key) % 100000) / 100000.0)
++            pts = np.array(r["pts"]); acc = 0.0
++            for i in range(len(pts) - 1):
++                a, b = pts[i], pts[i + 1]; d = b - a; L = float(np.hypot(*d))
++                if L < 0.5:
++                    continue
++                u = d / L; nrm = np.array([-u[1], u[0]])
++                ss = np.arange(acc, L, sp)
++                acc = (acc - L) % sp
++                for side in (-1, 1):
++                    P = a + np.outer(ss, u) + side * off * nrm
++                    if not len(P):
++                        continue
++                    qi = np.floor(P[:, 0] / 2).astype(np.int64); qj = np.floor(P[:, 1] / 2).astype(np.int64)
++                    occ = hash_u(qi, qj, 4, 0) < 0.62
++                    good = ok_cell(P[:, 0], P[:, 1]) & occ
++                    r_, c_, _ = M.cell(P[:, 0], P[:, 1])
++                    r_ = np.clip(r_, 0, M.H - 1); c_ = np.clip(c_, 0, M.W - 1)
++                    good &= ~np.isin(lc[r_, c_] & 0x7F, [LC["BEACH"], LC["SEA"], LC["MOBILE"], LC["DUNE"]])
++                    mix = hash_u(qi, qj, 4, 1)
++                    alt = pick(pal[key], hash_u(qi, qj, 4, 2))
++                    for k in np.nonzero(good)[0]:
++                        code = code_street if mix[k] > 0.15 else str(alt[k])
++                        plants.append((float(P[k, 0]), float(P[k, 1]), str(code),
++                                       tree_height(code, hash_u(qi[k], qj[k], 4, 3)), SRC["slot_est"]))
++    # 3d area rules on a global jittered grid
++    def area_rule(cls, spacing, prob, palette, prob_est, salt):
++        x0, y1 = M.x0, M.y1; x1 = x0 + M.W * STEP; y0 = y1 - M.H * STEP
++        I = np.arange(math.floor(x0 / spacing), math.ceil(x1 / spacing))
++        J = np.arange(math.floor(y0 / spacing), math.ceil(y1 / spacing))
++        II, JJ = np.meshgrid(I, J); II = II.ravel(); JJ = JJ.ravel()
++        jit = 0.0 if cls == LC["ORCHARD"] else 0.9
++        X = (II + 0.5 + (hash_u(II, JJ, salt, 0) - 0.5) * jit) * spacing
++        Y = (JJ + 0.5 + (hash_u(II, JJ, salt, 1) - 0.5) * jit) * spacing
++        r, c, ok = M.cell(X, Y)
++        r = np.clip(r, 0, M.H - 1); c = np.clip(c, 0, M.W - 1)
++        cell = lc[r, c]
++        sel = ok & ((cell & 0x7F) == cls) & land[r, c] & ~bld[r, c] & ~road[r, c]
++        est = (cell & EST) > 0
++        p = np.where(est, prob_est, prob)
++        u = hash_u(II, JJ, salt, 2)
++        sel &= u < p
++        idx = np.nonzero(sel)[0]
++        codes = pick(pal[palette], hash_u(II[idx], JJ[idx], salt, 3))
++        hu = hash_u(II[idx], JJ[idx], salt, 4)
++        for n_, k in enumerate(idx):
++            code = str(codes[n_])
++            plants.append((float(X[k]), float(Y[k]), code, tree_height(code, hu[n_]),
++                           SRC["proc_est"] if est[k] else SRC["proc"]))
++
++    for cls, (sp_, pr, pa, pe) in RULES.items():
++        area_rule(cls, sp_, pr, pa, pe, 10 + cls)
++    for cls, (sp_, pr, pa) in SHRUB_RULES.items():
++        area_rule(cls, sp_, pr, pa, pr * 0.8, 40 + cls)
++
++    # 3e NDVI canopy in otherwise unplanted urban cells (tree canopy reads NDVI >= 0.5 at 10 m)
++    if ndvi_m is not None:
++        r, c = np.nonzero(land & ~bld & ~road & (np.nan_to_num(ndvi_m) >= 0.5) & np.isin(lc & 0x7F, [0, LC["LAWN"], LC["MEADOW"]]))
++        X = M.x0 + (c + 0.5) * STEP; Y = M.y1 - (r + 0.5) * STEP
++        u = hash_u(c + M.tx0 * NM, r - M.ty1 * NM, 60, 0)
++        codes = pick(pal["street_c1"], hash_u(c + M.tx0 * NM, r - M.ty1 * NM, 60, 1))
++        for k in np.nonzero(u < 0.6)[0]:
++            plants.append((float(X[k]), float(Y[k]), str(codes[k]), tree_height(str(codes[k]), u[k] / 0.6), SRC["ndvi"]))
++
++    # ---- 4. exact clearance from building footprints (the 10 m raster misses small overlaps).
++    #      Only generated plants are moved out; mapped OSM trees / transport slots are kept as given.
++    P = plants
++    if blds and P:
++        import shapely
++        from shapely.geometry import Polygon as _P
++        polys = []
++        for ring in blds:
++            try:
++                g = _P(ring)
++                g = g if g.is_valid else g.buffer(0)
++                if not g.is_empty:
++                    polys.append(g.buffer(1.0, quad_segs=2))
++            except Exception:
++                pass
++        if polys:
++            gen = [i for i, p in enumerate(P) if p[4] in (SRC["slot_est"], SRC["proc"], SRC["proc_est"], SRC["ndvi"])]
++            pts = shapely.points(np.array([[P[i][0], P[i][1]] for i in gen]))
++            hit = shapely.STRtree(polys).query(pts, predicate="within")
++            drop = {gen[i] for i in np.unique(hit[0])}
++            P = [p for i, p in enumerate(P) if i not in drop]
++
++    # ---- 5. split into tiles
++    out = {}
++    byt = {}
++    for p in P:
++        byt.setdefault((int(p[0] // TILE), int(p[1] // TILE)), []).append(p)
++    for k in keys:
++        tx, ty = map(int, k.split("_"))
++        rs, cs = M.slice(tx, ty)
++        lct = np.ascontiguousarray(lc[rs, cs])
++        pl = sorted(byt.get((tx, ty), []), key=lambda p: (p[4], round(p[1], 1), round(p[0], 1)))
++        codes = sorted({p[2] for p in pl}); ci = {c: i for i, c in enumerate(codes)}
++        flat = []
++        by_src = {}
++        for x, y, code, h, src in pl:
++            flat += [int(round((x - tx * TILE) * 10)), int(round((y - ty * TILE) * 10)), ci[code], int(round(h * 10)), src]
++            by_src[src] = by_src.get(src, 0) + 1
++        lt = lct & 0x7F
++        landc = max(1, int((lt != LC["SEA"]).sum()))
++        stats = {"plants": len(pl), "by_src": {str(k_): v for k_, v in sorted(by_src.items())},
++                 "est_cells": int(((lct & EST) > 0).sum()),
++                 "osm_cells": int(((lct & EST) == 0).sum() - (lt == 0).sum() - (lt == LC["SEA"]).sum()),
++                 "green_frac_est": round(float(np.isin(lt, [1, 2, 3, 4, 9, 10, 11, 12, 13]).sum()) / landc, 3)}
++        if ndvi_m is not None:
++            nv = ndvi_m[rs, cs]; kn = ~np.isnan(nv)
++            stats["ndvi_green_frac"] = round(float((nv[kn] >= 0.3).mean()), 3) if kn.any() else None
++        out[k] = {"v": 1, "k": k, "o": [tx * TILE, ty * TILE], "lc_step": STEP,
++                  "lc": base64.b64encode(lct.tobytes()).decode(), "sp": codes, "t": flat, "stats": stats}
++    out["_summary"] = {"plants": len(P), "osm_cells": osm_cells, "tiles": len(keys),
++                       "by_src": {str(s): sum(1 for p in P if p[4] == s) for s in sorted({p[4] for p in P})}}
++    return out
++
++
++# ---------------------------------------------------------------- NDVI (Sentinel-2 L2A, 10 m)
++def ndvi_from_l2a(b04_dn, b08_dn, offset=-1000, scale=1e-4):
++    """Sentinel-2 L2A digital numbers -> NDVI. Processing baseline >= 04.00 adds BOA_ADD_OFFSET = -1000."""
++    r = (np.asarray(b04_dn, float) + offset) * scale
++    n = (np.asarray(b08_dn, float) + offset) * scale
++    with np.errstate(invalid="ignore", divide="ignore"):
++        v = (n - r) / (n + r)
++    v[(n + r) <= 0] = np.nan
++    return np.clip(v, -1, 1)
++
++
++def ndvi_to_mosaic(ndvi, M):
++    """Resample an ITM-gridded NDVI {"x0","y1","step","ndvi"} onto the mosaic (nearest cell centre)."""
++    a = np.asarray(ndvi["ndvi"], float); st = float(ndvi.get("step", 10))
++    xs = M.x0 + (np.arange(M.W) + 0.5) * STEP; ys = M.y1 - (np.arange(M.H) + 0.5) * STEP
++    ci = np.floor((xs - ndvi["x0"]) / st).astype(int); ri = np.floor((ndvi["y1"] - ys) / st).astype(int)
++    R, C = np.meshgrid(ri, ci, indexing="ij")
++    ok = (R >= 0) & (C >= 0) & (R < a.shape[0]) & (C < a.shape[1])
++    out = np.full((M.H, M.W), np.nan)
++    out[ok] = a[R[ok], C[ok]]
++    return out
++
++
++def load_ndvi_npz(path):
++    z = np.load(path)
++    nd = z["ndvi"].astype(float)
++    if nd.dtype.kind in "iu" or nd.max() > 1.5:          # uint8 0..250 = NDVI*125+125 (255 = nodata)
++        raw = z["ndvi"]; nd = np.where(raw == 255, np.nan, (raw.astype(float) - 125) / 125.0)
++    return {"x0": float(z["x0"]), "y1": float(z["y1"]), "step": float(z["step"]), "ndvi": nd,
++            "synthetic": bool(z["synthetic"]) if "synthetic" in z else False,
++            "scene": str(z["scene"]) if "scene" in z else ""}
++
++
++def fetch_sentinel_ndvi(bbox_itm, date_range="2026-06-01/2026-08-31", max_cloud=10):
++    """Real path (needs network to earth-search.aws.element84.com + sentinel-cogs.s3): STAC search for
++    sentinel-2-l2a, least-cloudy summer scene, read B04/B08 COG windows, reproject to ITM 10 m.
++    Raises RuntimeError offline – callers fall back to land-cover rules (all plants then marked estimated)."""
++    try:
++        import pystac_client  # noqa: F401
++        import rasterio  # noqa: F401
++    except Exception as ex:   # pragma: no cover - environment dependent
++        raise RuntimeError(f"NDVI needs pystac-client + rasterio: {ex}")
++    raise RuntimeError("network fetch not implemented in this environment (blocked); see NDVI-DESIGN.txt")
++
++
++# ---------------------------------------------------------------- writer + CLI
++def write_green(out_dir, tiles, slug, sources):
++    import time
++    keys = [k for k in tiles if not k.startswith("_")]
++    for k in keys:
++        p = os.path.join(out_dir, "tiles/g", k + ".json.gz")
++        os.makedirs(os.path.dirname(p), exist_ok=True)
++        data = json.dumps(tiles[k], ensure_ascii=False, separators=(",", ":")).encode()
++        with open(p, "wb") as fh:
++            fh.write(gzip.compress(data, compresslevel=9, mtime=0))
++    summ = dict(tiles.get("_summary", {}))
++    summ.update({"v": 1, "layer": "tiles/g", "lc_classes": LC_HE, "src_codes": {
++        "0": "OSM natural=tree", "1": "OSM tree_row", "2": "משבצת עץ ממחלקת התחבורה", "3": "משבצת רחוב משוערת מקו הכביש",
++        "4": "פרוצדורלי לפי פוליגון OSM", "5": "פרוצדורלי בכיסוי קרקע משוער", "6": "לפי NDVI"},
++        "sources": sources, "built_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
++        "licence": "OSM © OpenStreetMap contributors ODbL; Sentinel-2 © Copernicus (if used)"})
++    p = os.path.join(out_dir, "cities", slug, "green.json")
++    os.makedirs(os.path.dirname(p), exist_ok=True)
++    json.dump(summ, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
++    return summ
++
++
++def load_green_geojson(path):
++    """FeatureCollection WGS84 (or ITM if crs says 2039): polygons with OSM tags (kind=green), points
++    natural=tree (kind=tree), lines natural=tree_row (kind=tree_row). Returns (green, trees, rows)."""
++    from shapely.geometry import shape
++    from .geo import _tf
++    from shapely.ops import transform as shp_transform
++    fc = json.load(open(path, encoding="utf-8"))
++    itm = "2039" in json.dumps(fc.get("crs", ""))
++    fwd = _tf()[0] if not itm else None
++    tf = (lambda g: g) if itm else (lambda g: shp_transform(lambda x, y, z=None: fwd.transform(x, y), g))
++    green, trees, rows = [], [], []
++    for f in fc["features"]:
++        p = f.get("properties") or {}
++        tags = p.get("tags", p)
++        g = tf(shape(f["geometry"]))
++        kind = p.get("kind") or ("tree" if tags.get("natural") == "tree" else
++                                 "tree_row" if tags.get("natural") == "tree_row" else "green")
++        if kind == "tree":
++            trees.append({"x": g.x, "y": g.y, "tags": tags})
++        elif kind == "tree_row":
++            rows.append({"geom": g, "tags": tags})
++        elif classify(tags) is not None:
++            green.append({"geom": g, "tags": tags, "cls": classify(tags)})
++    return green, trees, rows
++
++
++def main(argv=None):
++    import argparse
++    ap = argparse.ArgumentParser(description="build tiles/g (vegetation) for an existing city output")
++    ap.add_argument("--data", required=True, help="pipeline output dir (has index.json, tiles/, cities/)")
++    ap.add_argument("--city", required=True)
++    ap.add_argument("--osm-geojson", help="green polygons / trees / tree rows (GeoJSON)")
++    ap.add_argument("--slots", help="JSON list of street-tree slots from the transport team [{x,y,cls,street}] ITM")
++    ap.add_argument("--ndvi", help=".npz NDVI grid on ITM (see NDVI-DESIGN.txt)")
++    ap.add_argument("--out", help="default: --data")
++    a = ap.parse_args(argv)
++    man = json.load(open(os.path.join(a.data, "cities", a.city, "manifest.json"), encoding="utf-8"))
++    green = trees = rows = ()
++    sources = {}
++    if a.osm_geojson:
++        green, trees, rows = load_green_geojson(a.osm_geojson)
++        sources["osm_green"] = os.path.basename(a.osm_geojson)
++    slots = json.load(open(a.slots, encoding="utf-8")) if a.slots else None
++    if slots:
++        sources["slots"] = "transport " + os.path.basename(a.slots)
++    nd = load_ndvi_npz(a.ndvi) if a.ndvi else None
++    if nd:
++        sources["ndvi"] = ("SYNTHETIC FIXTURE " if nd["synthetic"] else "Sentinel-2 L2A ") + nd["scene"]
++    if not a.osm_geojson:
++        sources["land_cover"] = "ESTIMATED from buildings/roads/coast (no OSM green input)"
++    tiles = build_green(a.data, man["tiles"], green, trees, rows, slots, nd)
++    s = write_green(a.out or a.data, tiles, a.city, sources)
++    print(json.dumps({k: v for k, v in s.items() if k != "lc_classes"}, ensure_ascii=False))
++    return s
++
++
++if __name__ == "__main__":
++    main()
