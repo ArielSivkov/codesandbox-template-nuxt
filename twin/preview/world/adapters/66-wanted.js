@@ -41,7 +41,7 @@
     if (flash) { el.classList.remove('fl'); void el.offsetWidth; el.classList.add('fl'); }
   }
   function offense(heat, reason) {
-    const h0 = st.heat, r = core.add(st, heat, reason); WD.offenses.push({ t: Math.round(st.t * 10) / 10, heat: Math.round(st.heat - h0), reason: reason || '', level: st.level });   // heat = מה שנוסף בפועל (כולל מכפיל שרשרת ותקרה) if (WD.offenses.length > 50) WD.offenses.shift();
+    const h0 = st.heat, r = core.add(st, heat, reason); WD.offenses.push({ t: Math.round(st.t * 10) / 10, heat: Math.round(st.heat - h0), reason: reason || '', level: st.level }); if (WD.offenses.length > 50) WD.offenses.shift();   // heat = מה שנוסף בפועל (כולל מכפיל שרשרת ותקרה); תקרת 50 עבירות
     if (r.to > r.from) { try { YZW.notice('🚨 מבוקש: ' + core.stars(r.to) + (reason ? ' (' + reason + ')' : ''), { kind: 'info', ms: 2600 }); } catch (e) { /* */ } }
     show(true); YZW.bus.emit('wanted', { level: st.level, heat: st.heat, reason });
   }
