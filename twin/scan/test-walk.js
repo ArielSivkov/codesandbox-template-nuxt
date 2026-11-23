@@ -12,6 +12,12 @@ const { chromium } = require('playwright');
   await p.goto(url + '?k=test'); await p.click('#begin'); await p.waitForTimeout(1500);
   check(await p.$eval('#intro', e => e.style.display === 'none'), 'מסך פתיחה נסגר אחרי הרשאות');
   await p.click('#go');
+  // ישיבה וסיבוב בכיסא: תנועות ידיים לא סדירות + סיבוב – אסור שייספרו צעדים
+  await p.evaluate(async () => { const sl = ms => new Promise(r => setTimeout(r, ms)); const ev = (x, y, z, rot) => window.dispatchEvent(Object.assign(new Event('devicemotion'), { accelerationIncludingGravity: { x, y, z }, rotationRate: { alpha: rot, beta: 5, gamma: 5 } }));
+    const gaps = [250, 900, 400, 1500, 350, 700, 1200, 300];
+    for (const gp of gaps) { for (let k = 0; k < 8; k++) ev(0.5, 9.5, -2, 120); ev(1.5, 12.3, -2, 120); await sl(gp); } });
+  const sitSteps = await p.evaluate(() => window.__esh27test.S.steps);
+  check(sitSteps === 0, 'ישיבה וסיבוב: ' + sitSteps + ' צעדים (צריך 0)');
   // הליכה: 10 צעדים צפונה, 1.2 מ' כל אחד, טלפון מוחזק ישר
   let lat = 31.7905;
   for (let i = 0; i < 14; i++) {

@@ -127,7 +127,8 @@ function moveLL(p,dx,dy){return{lat:p.lat+dy/EARTH/R,lon:p.lon+dx/(EARTH*Math.co
 function dirName(h){if(h==null)return'';return['צפונה','צפון-מזרחה','מזרחה','דרום-מזרחה','דרומה','דרום-מערבה','מערבה','צפון-מערבה'][Math.round(((h%360)+360)%360/45)%8];}
 
 // ---------- אחיזה: הטיה וגלגול מכוח הכבידה ----------
-function hold(){var g=S.grav;if(!g)return null;var n=Math.hypot(g.x,g.y,g.z)||9.81;
+function hold(){var g0=S.grav;if(!g0)return null;var an=((screen.orientation&&screen.orientation.angle)||window.orientation||0)*R;
+  var g={x:g0.x*Math.cos(an)+g0.y*Math.sin(an),y:-g0.x*Math.sin(an)+g0.y*Math.cos(an),z:g0.z};var n=Math.hypot(g.x,g.y,g.z)||9.81;
   return{pitch:Math.asin(Math.max(-1,Math.min(1,-g.z/n)))/R,roll:Math.atan2(g.x,g.y)/R};}   // טלפון לאורך: pitch 0 = מצלמה מול האופק
 
 // ---------- מיקום משולב: GPS + צעדים ----------
@@ -144,9 +145,15 @@ function advance(np){var last=S.track[S.track.length-1];var d=enu(last,np),m=Mat
   S.pos=np;var now=Date.now();S.mv=(S.mv||[]).concat([[now,m]]).filter(function(x){return now-x[0]<4000;});if(!S.gps||S.gps.speed==null||isNaN(S.gps.speed))S.speed=S.mv.reduce(function(a,x){return a+x[1];},0)/4;if(m>=0.8){S.track.push({lat:np.lat,lon:np.lon});if(S.on)S.dist+=m;if(m>1.5&&!S.course)S.course=(Math.atan2(d.x,d.y)/R+360)%360;if(S.track.length>2000)S.track.shift();}}
 function onStep(){S.steps++;if(!S.pos||S.head==null)return;var L=0.72;   // אורך צעד משוער
   var np=moveLL(S.pos,Math.sin(S.head*R)*L,Math.cos(S.head*R)*L);np.acc=S.pos.acc+0.3;advance(np);}
-function stepDetect(a){var m=Math.hypot(a.x,a.y,a.z);S.accHist.push(m);if(S.accHist.length>25)S.accHist.shift();
+// צעד אמיתי: שיא תאוצה + קצב קבוע (0.3–1 ש') של לפחות 4 שיאים ברצף, ובלי סיבוב מהיר של הטלפון. ישיבה וסיבוב בכיסא לא נספרים.
+var cand=[];
+function stepDetect(a){var m=Math.hypot(a.x,a.y,a.z);S.accHist.push(m);if(S.accHist.length>30)S.accHist.shift();
   var avg=S.accHist.reduce(function(s,v){return s+v;},0)/S.accHist.length,now=Date.now();
-  if(m-avg>1.6&&now-S.lastStepT>300){S.lastStepT=now;onStep();}}
+  if(cand.length&&now-cand[cand.length-1]>1300){S.walking=false;cand=[];}
+  if(m-avg>2.0&&now-S.lastStepT>300&&S.gyro<90){S.lastStepT=now;cand.push(now);if(cand.length>8)cand.shift();
+    if(S.walking){onStep();return;}
+    if(cand.length>=4){var iv=[];for(var i=1;i<cand.length;i++)iv.push(cand[i]-cand[i-1]);var mu=iv.reduce(function(s,v){return s+v;},0)/iv.length,sd=Math.sqrt(iv.reduce(function(s,v){return s+(v-mu)*(v-mu);},0)/iv.length);
+      if(mu>300&&mu<1000&&sd/mu<0.3){S.walking=true;for(var k=0;k<cand.length;k++)onStep();}}}}
 
 // ---------- חיישנים ----------
 function sensors(){
@@ -175,11 +182,14 @@ function frame(){
     var mv=S.on&&S.speed>0.3?'הולך '+dirName(S.course)+' · '+(S.speed*3.6).toFixed(1)+' קמ"ש':(S.on?'עומד':'מוכן');
     $('sub').textContent=mv+' · '+S.pos.lat.toFixed(5)+', '+S.pos.lon.toFixed(5);}
   $('sDist').textContent=(S.dist<1000?Math.round(S.dist)+' מ\'':(S.dist/1000).toFixed(2)+' ק"מ');$('sShots').textContent=S.shots;
-  drawHud(h);drawMap();
+  drawHud(h);if((S.fr=(S.fr||0)+1)%4===0)drawMap();
   if(S.on)autoShoot(h);
 }
 function drawHud(h){var c=$('hud'),W=c.clientWidth,H=c.clientHeight;if(c.width!==W){c.width=W;c.height=H;}var g=c.getContext('2d');g.clearRect(0,0,W,H);
-  if(!h)return;var f=24*Math.hypot(W,H)/43.27,cx=W/2,cy=H/2,dy=f*Math.tan(h.pitch*R);
+  if(!h)return;var v=$('vid'),vw=v.videoWidth||W,vh=v.videoHeight||H,cover=Math.max(W/vw,H/vh);
+  var f=(+$('mF').value||24)/43.27*Math.hypot(vw,vh)*cover,cx=W/2,cy=H/2,dy=f*Math.tan(h.pitch*R);
+  if(Math.abs(dy)>H*0.45){g.fillStyle='#f5b342';g.font='bold 16px sans-serif';g.textAlign='center';var up=dy<0;
+    g.fillText(up?'⬆ האופק מעליך – הרם את הטלפון ('+Math.round(-h.pitch)+'°)':'⬇ האופק מתחתיך – הורד את הטלפון ('+Math.round(h.pitch)+'°)',cx,up?H*0.3:H*0.72);g.textAlign='start';}
   g.save();g.translate(cx,cy+dy);g.rotate(-h.roll*R);var good=Math.abs(h.roll)<2&&Math.abs(h.pitch)<10;
   g.strokeStyle=good?'#3ecf8e':'#f5b342';g.lineWidth=3;g.beginPath();g.moveTo(-W,0);g.lineTo(-40,0);g.moveTo(40,0);g.lineTo(W,0);g.stroke();
   g.fillStyle=g.strokeStyle;g.font='bold 13px sans-serif';g.fillText('אופק',W*0.3,-6);g.restore();
@@ -215,10 +225,10 @@ function autoShoot(h){
   if(need&&now-S.lastShotT>900)shoot('walk',why);}
 function meta(kind,why){return{kind:kind,why:why,when:new Date().toISOString(),where:$('where').value,pos:S.pos,gps:S.gps,heading:S.head,heading_abs:S.headAbs,course:S.course,speed:S.speed,
   hold:hold(),gyro:S.gyro,steps:S.steps,dist:S.dist,orientation:S.ori,video:S.track_?null:(S.vt?S.vt.getSettings():null),demo:S.demo};}
-function grab(){var v=$('vid');if(window.ImageCapture&&S.vt&&!S.demo){try{return new ImageCapture(S.vt).takePhoto().catch(function(){return still();});}catch(e){}}return still();}
+function grab(){return still();}   // צילום מתוך הווידאו: בלי להקפיא את המצלמה (takePhoto עוצר את התצוגה ב-Android)
 function still(){return new Promise(function(res){var v=$('vid'),c=document.createElement('canvas');c.width=v.videoWidth||1280;c.height=v.videoHeight||720;var g=c.getContext('2d');
   if(v.videoWidth)g.drawImage(v,0,0);else{g.fillStyle='#456';g.fillRect(0,0,c.width,c.height);g.fillStyle='#fff';g.font='60px sans-serif';g.fillText('DEMO '+S.shots,80,200);}
-  c.toBlob(res,'image/jpeg',0.9);});}
+  c.toBlob(res,'image/jpeg',0.85);});}
 function shoot(kind,why){var m=meta(kind,why);S.lastShotPos={lat:S.pos.lat,lon:S.pos.lon};S.lastShotT=Date.now();S.lastShotHead=S.head;S.shotPts=(S.shotPts||[]).concat([S.lastShotPos]).slice(-300);
   S.shots++;var f=$('flash');f.style.opacity=.35;setTimeout(function(){f.style.opacity=0;},120);if(navigator.vibrate)navigator.vibrate(25);
   grab().then(function(b){S.lastShot={blob:b,meta:{tilt:m.hold,pitch:m.hold&&m.hold.pitch}};enqueue(('000'+S.shots).slice(-4)+'_'+kind+'.jpg',b,m);log('צילום '+S.shots+' ('+why+')');});}
@@ -257,7 +267,7 @@ $('runTest').onclick=function(){var r=[],h=hold();
   r.push((S.head!=null?(S.headAbs?'✅':'⚠️'):'❌')+' מצפן'+(S.head!=null?(S.headAbs?' אמיתי (צפון)':' יחסי בלבד – סובב את הטלפון בצורת 8 לכיול'):''));
   r.push((h?'✅':'❌')+' כבידה/הטיה'+(h?' '+h.pitch.toFixed(1)+'° / '+h.roll.toFixed(1)+'°':''));
   r.push((S.gyro!=null?'✅':'❌')+' ג\'יירו '+S.gyro.toFixed(1)+'°/ש\' '+(S.gyro<3?'(הטלפון יציב)':'(בתנועה)'));
-  r.push('👣 צעדים שנספרו: '+S.steps);r.push('⬆️ עלו '+S.up+' · ממתינים '+S.queue.filter(function(q){return!q.done;}).length);
+  r.push('👣 צעדים: '+S.steps+(S.walking?' (הליכה מזוהה)':' (לא הולך)'));r.push('⬆️ עלו '+S.up+' · ממתינים '+S.queue.filter(function(q){return!q.done;}).length);
   $('selftest').innerHTML=r.join('<br>');log('בדיקה: '+r.join(' | '));};
 // הדגמה: הליכה מדומה לאורך רחוב, לבדיקה בלי לזוז
 $('demo').onclick=function(){S.demo=true;var p={latitude:31.7905,longitude:34.6402,accuracy:5},hd=20,t=0;S.head=hd;S.headAbs=true;S.grav={x:0.2,y:9.7,z:-0.5};S.gyro=2;
