@@ -195,6 +195,21 @@ figure{margin:0}
 .price-line b{font-family:var(--display);font-size:22px;display:block}
 .price-line p{margin:4px 0 0;color:#C9D4E0;font-size:15.5px}
 
+
+/* בדיקת כדאיות – כרטיס תצוגה מקדימה */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.feat-link{text-decoration:none;color:inherit;min-height:48px}
+.feat-link:hover{outline:2px solid var(--line)}
+.feas-card{background:#fff;border:2px dashed #C9B48A;border-radius:18px;padding:18px 18px 14px;box-shadow:0 18px 40px -24px rgba(16,36,59,.35)}
+.feas-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.feas-head b{font-family:var(--display);font-size:24px;font-weight:900}
+.feas-card dl{margin:0}
+.feas-card dl>div{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--line)}
+.feas-card dt{color:var(--muted);font-size:15.5px}
+.feas-card dd{margin:0;min-width:96px;text-align:center;font-weight:600;color:#7A8796;background:repeating-linear-gradient(135deg,#F1F3F5 0 8px,#E7EBEF 8px 16px);border-radius:8px;padding:2px 10px}
+.feas-card .sum{border-bottom:0;padding-top:14px}
+.feas-card .sum dt{color:var(--ink);font-weight:700}
+.feas-foot{margin:10px 0 0;font-size:14px;color:var(--muted)}
 footer{background:var(--ink);color:#AFC0D2;font-size:14.5px;padding:26px 0 calc(26px + env(safe-area-inset-bottom))}
 footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
 footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
@@ -234,6 +249,7 @@ footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
     <a href="#renewal">התחדשות עירונית <small>חלקי</small></a>
     <a href="#sky">שמש וצל <small>חי</small></a>
     <a href="#costs">כמויות ועלויות <small>בפיתוח</small></a>
+    <a href="#feasibility">בדיקת כדאיות <small>בפיתוח</small></a>
     <hr>
     <a class="sib" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/yazam-design/yazam/app.html" target="_blank" rel="noopener">תכלס קבלנים <small>מוצר אחות, לקבלנים</small></a>
     <hr>
@@ -476,7 +492,7 @@ footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
       <p>כדי לדעת אם פרויקט שווה את זה, צריך הערכה של עלות הביצוע. המנוע שמאחורי זה הוא מנוע המחירים של הקבלנים — אותו מנוע שמפעיל את "תכלס קבלנים".</p>
       <div class="feat-list">
         <div class="feat-row"><span>מנוע מחירים לפריטי עבודה</span><span class="chip ok">חי, אצל הקבלנים</span></div>
-        <div class="feat-row"><span>תמונת עלויות ברמת פרויקט ליזם</span><span class="chip soon">בקרוב</span></div>
+        <a class="feat-row feat-link" href="#feasibility"><span>בדיקת כדאיות לפרויקט</span><span class="chip part">בפיתוח</span></a>
       </div>
       <div class="links"><a class="btn btn-line" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/yazam-design/yazam/app.html" target="_blank" rel="noopener">תכלס קבלנים – הצעות מחיר לקבלנים</a></div>
     </div>
@@ -490,6 +506,38 @@ footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
       </svg>
       <figcaption>איור הסבר בלבד, בלי נתונים אמיתיים.</figcaption>
     </figure>
+  </div>
+</section>
+
+<!-- ===== 6. בדיקת כדאיות (בפיתוח) ===== -->
+<section class="mod flip" id="feasibility" aria-labelledby="feasTitle">
+  <div class="wrap">
+    <div class="copy">
+      <span class="chip part">בפיתוח</span>
+      <h2 id="feasTitle">בדיקת כדאיות: שווה להמשיך?</h2>
+      <p>כלי שייקח את המגרש מהעולם ואת הבניין המוצע מהמצגת, ויחבר אותם להערכה ראשונית של עלות, הכנסה ורווח — כדי להחליט מהר אם להתקדם.</p>
+      <ul>
+        <li>המגרש והבניין המוצע — מהעולם ומהמצגת</li>
+        <li>עלויות ביצוע — ממנוע המחירים של הקבלנים</li>
+        <li>מחירי מכירה והנחות — אתם מזינים</li>
+      </ul>
+      <p class="note"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg><span>הערכה ראשונית בלבד. היא לא מחליפה דו״ח שמאי או דו״ח אפס.</span></p>
+      <div class="links"><a class="btn btn-ink" href="https://wa.me/972502525066?text=%D7%94%D7%99%D7%99%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A2%D7%93%D7%9B%D7%95%D7%9F%20%D7%9B%D7%A9%D7%91%D7%93%D7%99%D7%A7%D7%AA%20%D7%94%D7%9B%D7%93%D7%90%D7%99%D7%95%D7%AA%20%D7%A9%D7%9C%20%D7%9C%D7%95%D7%97%20%D7%94%D7%99%D7%96%D7%9D%20%D7%9E%D7%95%D7%9B%D7%A0%D7%94" target="_blank" rel="noopener">לקבל עדכון כשזה מוכן</a></div>
+    </div>
+    <div class="feas-card" role="group" aria-labelledby="feasCardTitle">
+      <div class="feas-head"><b id="feasCardTitle">בדיקת כדאיות</b><span class="chip part">בפיתוח</span></div>
+      <p class="sr-only">תצוגה מקדימה. הכלי עדיין לא פעיל ואין בו נתונים.</p>
+      <dl>
+        <div><dt>שטח המגרש</dt><dd aria-label="אין נתון">—</dd></div>
+        <div><dt>קומות מוצעות</dt><dd aria-label="אין נתון">—</dd></div>
+        <div><dt>יחידות דיור</dt><dd aria-label="אין נתון">—</dd></div>
+        <div><dt>שטח בנוי</dt><dd aria-label="אין נתון">—</dd></div>
+        <div><dt>עלות ביצוע משוערת</dt><dd aria-label="אין נתון">—</dd></div>
+        <div><dt>הכנסות צפויות</dt><dd aria-label="אין נתון">—</dd></div>
+        <div class="sum"><dt>רווח יזמי משוער</dt><dd aria-label="אין נתון">—</dd></div>
+      </dl>
+      <p class="feas-foot">תצוגה מקדימה, בלי נתונים. הכלי עדיין לא פעיל.</p>
+    </div>
   </div>
 </section>
 
@@ -519,7 +567,7 @@ footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
         <tr><td>מצגת לוועדה ולדיירים</td><td><span class="chip ok">הדגמה חיה</span></td><td>גובהי השכנים מוערכים; לבדיקה רשמית צריך גבהים מדודים</td></tr>
         <tr><td>כרטיס בניין להתחדשות עירונית</td><td><span class="chip ok">חי</span></td><td>קומות ושטח</td></tr>
         <tr><td>כתב כמויות לבניין</td><td><span class="chip part">בפיתוח</span></td><td>על בסיס מנוע המחירים של הקבלנים</td></tr>
-        <tr><td>עלויות ביצוע לבדיקת היתכנות</td><td><span class="chip soon">בקרוב</span></td><td></td></tr>
+        <tr><td>בדיקת כדאיות לפרויקט</td><td><span class="chip part">בפיתוח</span></td><td>הערכה ראשונית של עלות, הכנסה ורווח; לא מחליפה דו״ח שמאי</td></tr>
         <tr><td>ערים נוספות וכל הארץ</td><td><span class="chip soon">בקרוב</span></td><td>מתחילים באשדוד</td></tr>
       </tbody>
     </table>
@@ -596,12 +644,30 @@ footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
   var city=document.getElementById('city'), blds=document.getElementById('blds'), shG=document.getElementById('shadows'), sp=document.getElementById('sparkle');
   function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
   var B=[], wins=[], shadows=[], W=400, wideMQ=window.matchMedia('(min-width:900px)');
+  // מקטין את הבניינים רק כשהם עלולים לגעת בכותרת, בפסקה או בכפתורים מעליהם (לפי המדידה בפועל במסך)
+  function fitFactor(list){
+    var art=document.querySelector('.hero-art'); if(!art) return 1;
+    var a=art.getBoundingClientRect(); if(!a.width||!a.height) return 1;
+    var sc=Math.max(a.width/W, a.height/700), offX=a.left+(a.width-W*sc)/2, groundPx=a.top+a.height-(700-G)*sc;
+    var els=[document.getElementById('heroTitle'),document.querySelector('.hero p.lead')].concat([].slice.call(document.querySelectorAll('.hero .ctas .btn')));
+    var rects=els.filter(Boolean).map(function(e){return e.getBoundingClientRect()}).filter(function(r){return r.bottom<groundPx});
+    var f=1, gap=18;
+    list.forEach(function(b){
+      var x0=offX+b[0]*sc, x1=offX+(b[0]+b[1])*sc, hpx=b[2]*sc;
+      rects.forEach(function(r){
+        if(x1>r.left-6 && x0<r.right+6){ var allow=groundPx-(r.bottom+gap); if(hpx>allow) f=Math.min(f, Math.max(0.35, allow/hpx)); }
+      });
+    });
+    return f;
+  }
   function build(){
     var wide=wideMQ.matches;
     // במסך רחב: הים במערב (שמאל), העיר במרכז־שמאל, ומימין שמיים פתוחים מאחורי הכותרת
     W=wide?1600:400;
     city.setAttribute('viewBox','0 0 '+W+' 700');
-    B=wide?BASE.concat(EXTRA.slice(0,8)).map(function(b){return [Math.round(60+b[0]*1.15),Math.round(b[1]*1.3),Math.round(b[2]*1.75),b[3]]}):BASE.map(function(b){return [b[0],b[1],Math.round(b[2]*0.86),b[3]]});
+    var B0=wide?BASE.concat(EXTRA.slice(0,8)).map(function(b){return [Math.round(60+b[0]*1.15),Math.round(b[1]*1.3),Math.round(b[2]*1.75),b[3]]}):BASE;
+    var f=fitFactor(B0);
+    B=B0.map(function(b){return [b[0],b[1],Math.max(14,Math.round(b[2]*f)),b[3]]});
     blds.textContent='';shG.textContent='';sp.textContent='';wins=[];shadows=[];
     B.forEach(function(b){
       var x=b[0],w=b[1],h=b[2],prop=b[3];
@@ -653,6 +719,8 @@ footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
   var range=document.getElementById('hour');
   var onMQ=function(){build();render(+range.value)};
   if(wideMQ.addEventListener)wideMQ.addEventListener('change',onMQ);else wideMQ.addListener(onMQ);
+  var rz; window.addEventListener('resize',function(){clearTimeout(rz);rz=setTimeout(onMQ,150)});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(onMQ);
   range.addEventListener('input',function(){render(+range.value)});
   range.setAttribute('aria-valuetext','שעה '+'16:30');
   range.addEventListener('change',function(){range.setAttribute('aria-valuetext','שעה '+out.value)});
