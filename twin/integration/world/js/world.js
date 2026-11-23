@@ -168,9 +168,9 @@ function decodeBuildings(t, v) {
     let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9, per = 0, cx = 0, cz = 0;
     for (let i = 0; i < n; i++) { const x = p[i * 2], z = p[i * 2 + 1]; minx = Math.min(minx, x); maxx = Math.max(maxx, x); minz = Math.min(minz, z); maxz = Math.max(maxz, z); cx += x; cz += z;
       const j = (i + 1) % n; per += Math.hypot(p[j * 2] - x, p[j * 2 + 1] - z); }
-    const base = b.z / 10, h = Math.max(3, b.h / 10);
+    const _ov = window.YZ_BOVR && window.YZ_BOVR[b.i], base = b.z / 10, h = _ov && _ov.h ? _ov.h : Math.max(3, b.h / 10);
     const ind = /industrial|warehouse|manufacture|cowshed/.test(b.t) || (b.a > 2500 && b.f <= 3);
-    out.push({ id: b.i, name: b.n || '', type: b.t || '', area: b.a, base, h, top: base + h, sigma: b.s / 10, floors: b.f, fl: b.fl, fh: b.fh, src: b.src, conf: b.c,
+    out.push({ id: b.i, name: b.n || '', type: b.t || '', area: b.a, base, h, top: base + h, sigma: b.s / 10, floors: _ov && _ov.f ? _ov.f : b.f, ty: _ov ? _ov.ty : undefined, ovr: _ov ? _ov.note : undefined, fl: b.fl, fh: b.fh, src: b.src, conf: b.c,
       p, n, minx, maxx, minz, maxz, cx: cx / n, cz: cz / n, per, ind, tile: t.key });
   }
   return out;
