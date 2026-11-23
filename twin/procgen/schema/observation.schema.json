@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "esh27/procgen/observation.schema.json",
+  "title": "תצפית שטח – תמונה אחת (עולם תאום, אשדוד)",
+  "description": "כל שדה עטוף ב-{v, prov, conf}. prov: נצפה = רואים בתמונה; נגזר = חושב ממדידה/נוסחה; משוער = הנחה/הערכה. conf: 0..1. אסור: לוחיות רישוי, שמות פרטיים, פנים.",
+  "type": "object",
+  "required": ["v", "frame", "photos"],
+  "properties": {
+    "v": {"const": 1},
+    "frame": {"type": "object", "required": ["sample_to_itm"], "properties": {"sample_to_itm": {"type": "array", "items": {"type": "number"}, "minItems": 2, "maxItems": 2}}},
+    "photos": {"type": "array", "items": {"$ref": "#/$defs/photo"}}
+  },
+  "$defs": {
+    "prov": {"enum": ["נצפה", "נגזר", "משוער"]},
+    "conf": {"type": "number", "minimum": 0, "maximum": 1},
+    "fnum": {"type": "object", "required": ["v", "prov", "conf"], "properties": {"v": {"type": ["number", "null"]}, "prov": {"$ref": "#/$defs/prov"}, "conf": {"$ref": "#/$defs/conf"}, "pm": {"type": "number"}, "src": {"type": "string"}}},
+    "fstr": {"type": "object", "required": ["v", "prov", "conf"], "properties": {"v": {"type": ["string", "null"]}, "prov": {"$ref": "#/$defs/prov"}, "conf": {"$ref": "#/$defs/conf"}, "src": {"type": "string"}}},
+    "finding": {
+      "type": "object", "required": ["dept", "kind", "he", "prov", "conf"],
+      "properties": {
+        "dept": {"enum": ["תחבורה", "תאורה", "ריצוף", "אבני שפה", "גדרות", "צמחייה", "בניינים", "רכב", "ריהוט רחוב", "שמיים", "זמני"]},
+        "kind": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "he": {"type": "string", "maxLength": 200},
+        "count": {"type": "integer", "minimum": 0},
+        "attrs": {"type": "object"},
+        "prov": {"$ref": "#/$defs/prov"},
+        "conf": {"$ref": "#/$defs/conf"}
+      }
+    },
+    "photo": {
+      "type": "object",
+      "required": ["id", "file", "sha256", "time_local", "orientation", "pos", "heading", "pitch", "fov_h", "style_class", "findings", "privacy", "quality"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[0-9]{3}$"},
+        "file": {"type": "string", "pattern": "^[0-9]{3}_[0-9]{8}_[0-9]{4}\\.jpg$"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "time_local": {"type": "string"},
+        "orientation": {"enum": ["לאורך", "לרוחב"]},
+        "pos": {"type": "object", "required": ["x", "y", "r_m", "prov", "conf", "src"],
+          "properties": {"x": {"type": ["number", "null"]}, "y": {"type": ["number", "null"]}, "r_m": {"type": "number"}, "prov": {"$ref": "#/$defs/prov"}, "conf": {"$ref": "#/$defs/conf"}, "src": {"type": "string"}, "street": {"type": ["string", "null"]}, "itm": {"type": ["array", "null"]}, "wgs84": {"type": ["array", "null"]}}},
+        "heading": {"allOf": [{"$ref": "#/$defs/fnum"}], "properties": {"method": {"enum": ["שלט", "גרם שמיים", "כיוון רחוב", "ציון דרך", "מצפן", "לא ידוע"]}}},
+        "pitch": {"$ref": "#/$defs/fnum"},
+        "fov_h": {"$ref": "#/$defs/fnum"},
+        "style_class": {"$ref": "#/$defs/fstr"},
+        "quality": {"type": "object"},
+        "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+        "privacy": {"type": "object", "required": ["plates_visible", "plates_recorded", "private_names_recorded", "faces"],
+          "properties": {"plates_recorded": {"const": false}, "private_names_recorded": {"const": false}}},
+        "notes": {"type": "string"}
+      }
+    }
+  }
+}

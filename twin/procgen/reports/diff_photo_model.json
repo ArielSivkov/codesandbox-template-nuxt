@@ -1,0 +1,604 @@
+{
+ "v": 1,
+ "photos_checked": 31,
+ "checks": 38,
+ "ok": 22,
+ "mismatch": 16,
+ "rows": [
+  {
+   "id": "001",
+   "pos_conf": 0.25,
+   "heading_known": false,
+   "n_bld_in_view": 169,
+   "checks": []
+  },
+  {
+   "id": "002",
+   "pos_conf": 0.25,
+   "heading_known": false,
+   "n_bld_in_view": 169,
+   "checks": []
+  },
+  {
+   "id": "003",
+   "pos_conf": 0.25,
+   "heading_known": false,
+   "n_bld_in_view": 169,
+   "checks": []
+  },
+  {
+   "id": "004",
+   "pos_conf": 0.45,
+   "heading_known": true,
+   "n_bld_in_view": 39,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_curved_led"
+     ],
+     "ok": false,
+     "he": "המחולל בחר סוג פנס אחר ליד נקודה זו"
+    }
+   ]
+  },
+  {
+   "id": "005",
+   "pos_conf": 0.25,
+   "heading_known": false,
+   "n_bld_in_view": 169,
+   "checks": []
+  },
+  {
+   "id": "006",
+   "pos_conf": 0.4,
+   "heading_known": true,
+   "n_bld_in_view": 28,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    }
+   ]
+  },
+  {
+   "id": "007",
+   "pos_conf": 0.3,
+   "heading_known": true,
+   "n_bld_in_view": 39,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_curved_led"
+     ],
+     "ok": false,
+     "he": "המחולל בחר סוג פנס אחר ליד נקודה זו"
+    }
+   ]
+  },
+  {
+   "id": "008",
+   "pos_conf": 0.4,
+   "heading_known": true,
+   "n_bld_in_view": 30,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    }
+   ]
+  },
+  {
+   "id": "009",
+   "pos_conf": 0.35,
+   "heading_known": true,
+   "n_bld_in_view": 25,
+   "checks": [
+    {
+     "check": "בית גג רעפים בתצפית מול צורת גג במודל (≤30 מ')",
+     "ok": false,
+     "he": "1 בניינים קרובים – כולם גג שטוח במודל"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_curved_led"
+     ],
+     "ok": false,
+     "he": "המחולל בחר סוג פנס אחר ליד נקודה זו"
+    }
+   ]
+  },
+  {
+   "id": "010",
+   "pos_conf": 0.35,
+   "heading_known": true,
+   "n_bld_in_view": 30,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    }
+   ]
+  },
+  {
+   "id": "011",
+   "pos_conf": 0.35,
+   "heading_known": true,
+   "n_bld_in_view": 12,
+   "checks": [
+    {
+     "check": "בית גג רעפים בתצפית מול צורת גג במודל (≤30 מ')",
+     "ok": false,
+     "he": "1 בניינים קרובים – כולם גג שטוח במודל"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_curved_led"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "012",
+   "pos_conf": 0.3,
+   "heading_known": true,
+   "n_bld_in_view": 44,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    }
+   ]
+  },
+  {
+   "id": "013",
+   "pos_conf": 0.3,
+   "heading_known": true,
+   "n_bld_in_view": 44,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    }
+   ]
+  },
+  {
+   "id": "014",
+   "pos_conf": 0.3,
+   "heading_known": true,
+   "n_bld_in_view": 44,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    }
+   ]
+  },
+  {
+   "id": "015",
+   "pos_conf": 0.5,
+   "heading_known": true,
+   "n_bld_in_view": 17,
+   "checks": [
+    {
+     "check": "בית גג רעפים בתצפית מול צורת גג במודל (≤30 מ')",
+     "ok": false,
+     "he": "1 בניינים קרובים – כולם גג שטוח במודל"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_curved_led"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סגנון שלט רחוב בתצפית מול שנוצר (≤60 מ')",
+     "observed": [
+      "new_blue"
+     ],
+     "generated": [
+      "new_blue"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "016",
+   "pos_conf": 0.5,
+   "heading_known": true,
+   "n_bld_in_view": 16,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_curved_led"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סגנון שלט רחוב בתצפית מול שנוצר (≤60 מ')",
+     "observed": [
+      "new_blue"
+     ],
+     "generated": [
+      "new_blue"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "017",
+   "pos_conf": 0.5,
+   "heading_known": true,
+   "n_bld_in_view": 19,
+   "checks": [
+    {
+     "check": "בית גג רעפים בתצפית מול צורת גג במודל (≤30 מ')",
+     "ok": false,
+     "he": "1 בניינים קרובים – כולם גג שטוח במודל"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_curved_led"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "018",
+   "pos_conf": 0.4,
+   "heading_known": false,
+   "n_bld_in_view": 187,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_ornate_red_double"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "019",
+   "pos_conf": 0.4,
+   "heading_known": false,
+   "n_bld_in_view": 187,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_ornate_red_double"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "020",
+   "pos_conf": 0.45,
+   "heading_known": false,
+   "n_bld_in_view": 176,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 60.0,
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_led_white",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "021",
+   "pos_conf": 0.45,
+   "heading_known": false,
+   "n_bld_in_view": 174,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 60.0,
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "026",
+   "pos_conf": 0.45,
+   "heading_known": false,
+   "n_bld_in_view": 175,
+   "checks": []
+  },
+  {
+   "id": "027",
+   "pos_conf": 0.45,
+   "heading_known": false,
+   "n_bld_in_view": 184,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 60.0,
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_led_white",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סגנון שלט רחוב בתצפית מול שנוצר (≤60 מ')",
+     "observed": [
+      "new_blue"
+     ],
+     "generated": [
+      "old_white"
+     ],
+     "ok": false,
+     "he": "סגנון שונה"
+    }
+   ]
+  },
+  {
+   "id": "028",
+   "pos_conf": 0.3,
+   "heading_known": false,
+   "n_bld_in_view": 184,
+   "checks": []
+  },
+  {
+   "id": "029",
+   "pos_conf": 0.4,
+   "heading_known": false,
+   "n_bld_in_view": 184,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 60.0,
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_led_white",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "030",
+   "pos_conf": 0.3,
+   "heading_known": true,
+   "n_bld_in_view": 19,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_led_white"
+     ],
+     "generated": [
+      "lamp_led_white",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "031",
+   "pos_conf": 0.35,
+   "heading_known": true,
+   "n_bld_in_view": 44,
+   "checks": []
+  },
+  {
+   "id": "032",
+   "pos_conf": 0.6,
+   "heading_known": true,
+   "n_bld_in_view": 35,
+   "checks": [
+    {
+     "check": "מגדל 20+ קומות בתצפית מול גובה מרבי במודל בשדה הראייה",
+     "model_max_h_m": 25.0,
+     "ok": false,
+     "he": "במודל הבניין הגבוה בשדה הראייה 25 מ' – המגדל חסר/נמוך מדי"
+    },
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_curved_led"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_led_white",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סגנון שלט רחוב בתצפית מול שנוצר (≤60 מ')",
+     "observed": [
+      "old_white"
+     ],
+     "generated": [
+      "old_white"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "033",
+   "pos_conf": 0.6,
+   "heading_known": false,
+   "n_bld_in_view": 200,
+   "checks": [
+    {
+     "check": "סגנון שלט רחוב בתצפית מול שנוצר (≤60 מ')",
+     "observed": [
+      "old_white"
+     ],
+     "generated": [
+      "old_white"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "034",
+   "pos_conf": 0.55,
+   "heading_known": true,
+   "n_bld_in_view": 37,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_ornate_red_double"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_led_white",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  },
+  {
+   "id": "035",
+   "pos_conf": 0.6,
+   "heading_known": false,
+   "n_bld_in_view": 191,
+   "checks": [
+    {
+     "check": "סוג פנס בתצפית מול הפנסים שנוצרו (≤60 מ')",
+     "observed": [
+      "lamp_ornate_red_double"
+     ],
+     "generated": [
+      "lamp_curved_led",
+      "lamp_ornate_red_double"
+     ],
+     "ok": true,
+     "he": "תואם"
+    },
+    {
+     "check": "סגנון שלט רחוב בתצפית מול שנוצר (≤60 מ')",
+     "observed": [
+      "new_blue"
+     ],
+     "generated": [
+      "new_blue",
+      "old_white"
+     ],
+     "ok": true,
+     "he": "תואם"
+    }
+   ]
+  }
+ ],
+ "note": "כל בדיקה תלויה במיקום/כיוון התמונה – בתמונות עם ביטחון מיקום < 0.4 התוצאה מסומנת כחלשה"
+}

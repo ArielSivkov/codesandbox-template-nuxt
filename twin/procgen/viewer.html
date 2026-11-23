@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:,">
+<title>עולם תאום – תצפיות, שכבות ועולם נוצר</title>
+<style>
+  :root { --bg:#0e1420; --panel:rgba(18,24,36,.94); --fg:#eef2f7; --mut:#9aa6b8; --acc:#4da3ff; --obs:#38d97a; --gen:#d65cff; --est:#ffb547; --bad:#ff5a5a; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--fg); font:14px/1.45 system-ui,"Segoe UI","Noto Sans Hebrew",Arial,sans-serif; overflow:hidden; }
+  #cv { position:fixed; inset:0; width:100%; height:100%; touch-action:none; display:block; }
+  header { position:fixed; top:0; inset-inline:0; display:flex; gap:6px; align-items:center; padding:8px max(8px,env(safe-area-inset-right)) 8px max(8px,env(safe-area-inset-left)); background:linear-gradient(var(--panel),rgba(18,24,36,.0)); z-index:5; }
+  header h1 { font-size:15px; margin:0; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  button { font:inherit; color:var(--fg); background:#223049; border:1px solid #33435f; border-radius:10px; padding:7px 10px; min-height:38px; }
+  button[aria-pressed="true"] { background:#2f5d9a; border-color:#4d86d0; }
+  #layers { position:fixed; top:56px; inset-inline-start:8px; width:min(300px,calc(100vw - 16px)); max-height:calc(100vh - 140px); overflow:auto; background:var(--panel); border:1px solid #2a3850; border-radius:12px; padding:8px 10px; z-index:6; display:none; }
+  #layers.open { display:block; }
+  #layers label { display:flex; gap:8px; align-items:center; padding:5px 0; }
+  #layers input { width:20px; height:20px; }
+  #layers h3 { font-size:13px; margin:8px 0 2px; color:var(--mut); }
+  .sw { display:inline-block; width:12px; height:12px; border-radius:3px; vertical-align:middle; }
+  #card { position:fixed; inset-inline:0; bottom:0; max-height:62vh; overflow:auto; background:var(--panel); border-top:1px solid #2a3850; border-radius:14px 14px 0 0; padding:10px 12px 16px; z-index:7; transform:translateY(105%); transition:transform .2s; }
+  #card.open { transform:none; }
+  #card h2 { font-size:16px; margin:0 0 6px; }
+  #card img { width:100%; max-width:360px; border-radius:8px; display:block; margin:4px 0 8px; }
+  #card .x { position:absolute; inset-inline-end:8px; top:6px; min-height:32px; }
+  #card ul { padding-inline-start:18px; margin:4px 0; }
+  .tag { display:inline-block; font-size:12px; padding:1px 6px; border-radius:8px; margin-inline-end:4px; }
+  .t-obs { background:#164a2c; color:#9ff0c0; } .t-der { background:#163a5a; color:#a9d4ff; } .t-est { background:#5a3d10; color:#ffd89a; } .t-gen { background:#4a1d55; color:#f1b8ff; }
+  #legend { position:fixed; bottom:30px; inset-inline-end:8px; background:var(--panel); border-radius:10px; padding:6px 8px; font-size:12px; z-index:4; max-width:62vw; }
+  #status { position:fixed; bottom:0; inset-inline:0; font-size:11px; color:var(--mut); padding:4px 8px; background:rgba(10,14,22,.8); z-index:4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #labels { position:fixed; inset:0; pointer-events:none; z-index:3; }
+  .lbl { position:absolute; transform:translate(50%,-130%); font:bold 11px system-ui; color:#fff; background:rgba(20,30,50,.85); border:1px solid #6aa8ff; border-radius:8px; padding:0 4px; white-space:nowrap; }
+  .lbl.anc { border-color:var(--obs); }
+  .mut { color:var(--mut); font-size:12px; }
+  @media (max-width:420px){ header h1{font-size:13px} button{padding:6px 8px} }
+</style>
+</head>
+<body>
+<canvas id="cv" aria-label="מפה תלת-ממדית"></canvas>
+<div id="labels"></div>
+<header>
+  <h1>עולם תאום · אשדוד – רובע א'</h1>
+  <button id="bLayers" aria-expanded="false">שכבות</button>
+  <button id="bMode" aria-pressed="false">2D</button>
+  <button id="bNight" aria-pressed="true">לילה</button>
+</header>
+<div id="layers" role="dialog" aria-label="שכבות">
+  <h3>מה אמיתי ומה נוצר</h3>
+  <label><input type="checkbox" id="lTruth"> מצב "אמת מול נוצר" (ירוק = נצפה · סגול = נגזר · כתום = משוער)</label>
+  <h3>נתונים</h3>
+  <label><input type="checkbox" id="lBld" checked> בניינים לפי מקור הגובה</label>
+  <label><input type="checkbox" id="lRoads" checked> רחובות (OSM)</label>
+  <label><input type="checkbox" id="lPhotos" checked> נקודות צילום + קונוסי מבט</label>
+  <label><input type="checkbox" id="lRoute" checked> מסלול ההליכה המשוחזר (צד)</label>
+  <label><input type="checkbox" id="lDisc" checked> אי-התאמות מודל↔מציאות</label>
+  <label><input type="checkbox" id="lGhost" checked> גובה משוער אמיתי (רוח רפאים)</label>
+  <h3>עולם נוצר (נגזר מסגנון השכונה)</h3>
+  <label><input type="checkbox" id="lGen" checked> ריהוט רחוב, פנסים, עצים, גדרות</label>
+  <label><input type="checkbox" id="lFacade" checked> חזיתות: מזגנים, מרפסות, חנויות</label>
+  <label><input type="checkbox" id="lGlb" checked> מודלי החבילה (CC0) במקום צורות פשוטות</label>
+  <h3>מקרא מקור גובה</h3>
+  <div><span class="sw" style="background:#7d8796"></span> כלל אצבע (משוער) · <span class="sw" style="background:#3fbf7f"></span> מאומת חלקית · <span class="sw" style="background:#ff6b6b"></span> שגוי לפי תצפית</div>
+  <p style="color:var(--mut);font-size:12px">OSM © תורמי OpenStreetMap (ODbL). מודלים: חבילת ESH27 (CC0). תמונות: אריאל, 23.11.2026, 00:58–01:30. בלי לוחיות רישוי ובלי שמות פרטיים.</p>
+</div>
+<div id="legend"></div>
+<section id="card" aria-live="polite"><button class="x" id="cardX" aria-label="סגור">✕</button><div id="cardBody"></div></section>
+<div id="status">טוען…</div>
+<script src="vendor/three.min.js"></script>
+<script src="js/procgen.js"></script>
+<script src="js/viewer.js"></script>
+</body>
+</html>

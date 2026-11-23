@@ -1,0 +1,1292 @@
+{
+ "v": 1,
+ "alpha": 0.5,
+ "method": "Dirichlet-smoothed presence counts (weighted by finding conf) per style class",
+ "labels": {
+  "lamp": {
+   "lamp_curved_led": "פנס LED על עמוד מעוקל",
+   "lamp_led_white": "פנס LED על עמוד ישר",
+   "lamp_ornate_red_double": "עמוד אדום מעוטר, ראש כפול"
+  },
+  "paving": {
+   "pavers_red_rect": "משתלבת אדומה מלבנית",
+   "pavers_red_square": "משתלבת אדמדמה מרובעת",
+   "pavers_beige_square": "אבן בהירה מרובעת",
+   "slabs_light_grey": "לוחות בהירים"
+  },
+  "curb": {
+   "curb_grey_plain": "אפורה לא צבועה",
+   "curb_red_white": "אדום-לבן",
+   "curb_white_painted": "לבנה",
+   "curb_black_white": "שחור-לבן"
+  },
+  "fence": {
+   "rail_white_metal": "מעקה מתכת לבן",
+   "fence_white_picket": "כלונסאות עץ לבנה",
+   "wall_stone_clad": "חומת אבן מסותתת",
+   "fence_dark_slats": "רפפות כהות",
+   "fence_metal_bars": "מוטות מתכת",
+   "rail_red_median": "מעקה אדום מעוטר (אי תנועה)",
+   "fence_blue_rail": "מעקה כחול נמוך",
+   "rail_grey_metal": "מעקה אפור"
+  },
+  "tree": {
+   "palm_date": "דקל תמר",
+   "tree_broadleaf_large": "עץ רחב-נוף (פיקוס?)",
+   "tree_ficus": "פיקוס",
+   "palm_small_pots": "דקלונים בעציצים",
+   "street_trees_young": "עצי רחוב צעירים",
+   "cypress_row": "ברושים",
+   "hedge": "גדר חיה",
+   "climber_on_fence": "מטפס על גדר",
+   "planters": "אדניות"
+  },
+  "building": {
+   "villa_stone_clad": "וילה חדשה בחיפוי אבן",
+   "old_house_tile_roof": "בית ישן עם גג רעפים",
+   "block_mid_rise": "בלוק 8–10 קומות",
+   "block_mid_rise_commercial": "בלוק עם חזית מסחרית",
+   "tower_highrise": "מגדל 20+ קומות",
+   "public_low_raised": "מבנה ציבור נמוך",
+   "commercial_round_pavilion": "ביתן מסחרי עגול"
+  },
+  "sign": {
+   "tactile_paving": "מסלול מנחה מישושי",
+   "street_name_sign": "שלט רחוב חדש (כחול, מסגרת לבנה)",
+   "street_name_sign_old": "שלט רחוב ישן (לבן, מסגרת אפורה)",
+   "sign_yield": "תן זכות קדימה",
+   "sign_parking_blue": "תמרור חניה",
+   "crosswalk_zebra": "מעבר חצייה",
+   "traffic_light": "רמזור",
+   "road_arrows": "חיצי נתיב"
+  }
+ },
+ "classes": {
+  "רחוב מגורים ותיק": {
+   "n_photos": 5,
+   "photos": [
+    "001",
+    "002",
+    "003",
+    "005",
+    "009"
+   ],
+   "streets": [
+    "הארז"
+   ],
+   "road_class_counts": {
+    "2": 1
+   },
+   "conf": 0.33,
+   "priors": {
+    "lamp": {
+     "lamp_curved_led": {
+      "n": 0,
+      "p": 0.227
+     },
+     "lamp_led_white": {
+      "n": 0.7,
+      "p": 0.545
+     },
+     "lamp_ornate_red_double": {
+      "n": 0,
+      "p": 0.227
+     },
+     "_n_total": 0.7
+    },
+    "paving": {
+     "pavers_red_rect": {
+      "n": 2.5,
+      "p": 0.667
+     },
+     "pavers_red_square": {
+      "n": 0,
+      "p": 0.111
+     },
+     "pavers_beige_square": {
+      "n": 0,
+      "p": 0.111
+     },
+     "slabs_light_grey": {
+      "n": 0,
+      "p": 0.111
+     },
+     "_n_total": 2.5
+    },
+    "curb": {
+     "curb_grey_plain": {
+      "n": 1.4,
+      "p": 0.475
+     },
+     "curb_red_white": {
+      "n": 0,
+      "p": 0.125
+     },
+     "curb_white_painted": {
+      "n": 0.6,
+      "p": 0.275
+     },
+     "curb_black_white": {
+      "n": 0,
+      "p": 0.125
+     },
+     "_n_total": 2.0
+    },
+    "fence": {
+     "rail_white_metal": {
+      "n": 1.5,
+      "p": 0.299
+     },
+     "fence_white_picket": {
+      "n": 0,
+      "p": 0.075
+     },
+     "wall_stone_clad": {
+      "n": 0,
+      "p": 0.075
+     },
+     "fence_dark_slats": {
+      "n": 0,
+      "p": 0.075
+     },
+     "fence_metal_bars": {
+      "n": 0.6,
+      "p": 0.164
+     },
+     "rail_red_median": {
+      "n": 0,
+      "p": 0.075
+     },
+     "fence_blue_rail": {
+      "n": 0.6,
+      "p": 0.164
+     },
+     "rail_grey_metal": {
+      "n": 0,
+      "p": 0.075
+     },
+     "_n_total": 2.7
+    },
+    "tree": {
+     "palm_date": {
+      "n": 0,
+      "p": 0.087
+     },
+     "tree_broadleaf_large": {
+      "n": 0.85,
+      "p": 0.235
+     },
+     "tree_ficus": {
+      "n": 0,
+      "p": 0.087
+     },
+     "palm_small_pots": {
+      "n": 0,
+      "p": 0.087
+     },
+     "street_trees_young": {
+      "n": 0,
+      "p": 0.087
+     },
+     "cypress_row": {
+      "n": 0.4,
+      "p": 0.157
+     },
+     "hedge": {
+      "n": 0,
+      "p": 0.087
+     },
+     "climber_on_fence": {
+      "n": 0,
+      "p": 0.087
+     },
+     "planters": {
+      "n": 0,
+      "p": 0.087
+     },
+     "_n_total": 1.25
+    },
+    "building": {
+     "villa_stone_clad": {
+      "n": 0,
+      "p": 0.077
+     },
+     "old_house_tile_roof": {
+      "n": 0.8,
+      "p": 0.2
+     },
+     "block_mid_rise": {
+      "n": 0.6,
+      "p": 0.169
+     },
+     "block_mid_rise_commercial": {
+      "n": 0,
+      "p": 0.077
+     },
+     "tower_highrise": {
+      "n": 0,
+      "p": 0.077
+     },
+     "public_low_raised": {
+      "n": 1.6,
+      "p": 0.323
+     },
+     "commercial_round_pavilion": {
+      "n": 0,
+      "p": 0.077
+     },
+     "_n_total": 3.0
+    },
+    "sign": {
+     "tactile_paving": {
+      "n": 0,
+      "p": 0.088
+     },
+     "street_name_sign": {
+      "n": 0,
+      "p": 0.088
+     },
+     "street_name_sign_old": {
+      "n": 0,
+      "p": 0.088
+     },
+     "sign_yield": {
+      "n": 0.8,
+      "p": 0.23
+     },
+     "sign_parking_blue": {
+      "n": 0,
+      "p": 0.088
+     },
+     "crosswalk_zebra": {
+      "n": 0.85,
+      "p": 0.239
+     },
+     "traffic_light": {
+      "n": 0,
+      "p": 0.088
+     },
+     "road_arrows": {
+      "n": 0,
+      "p": 0.088
+     },
+     "_n_total": 1.65
+    }
+   }
+  },
+  "רחוב מגורים חדש": {
+   "n_photos": 11,
+   "photos": [
+    "004",
+    "006",
+    "007",
+    "008",
+    "010",
+    "011",
+    "015",
+    "016",
+    "017",
+    "030",
+    "032"
+   ],
+   "streets": [
+    "הארז",
+    "הדקל",
+    "יצחק נשיא",
+    "רוגזין"
+   ],
+   "road_class_counts": {
+    "2": 2,
+    "4": 1,
+    "3": 1
+   },
+   "conf": 0.55,
+   "priors": {
+    "lamp": {
+     "lamp_curved_led": {
+      "n": 4.3,
+      "p": 0.611
+     },
+     "lamp_led_white": {
+      "n": 2.05,
+      "p": 0.325
+     },
+     "lamp_ornate_red_double": {
+      "n": 0,
+      "p": 0.064
+     },
+     "_n_total": 6.35
+    },
+    "paving": {
+     "pavers_red_rect": {
+      "n": 0.8,
+      "p": 0.224
+     },
+     "pavers_red_square": {
+      "n": 0.7,
+      "p": 0.207
+     },
+     "pavers_beige_square": {
+      "n": 1.6,
+      "p": 0.362
+     },
+     "slabs_light_grey": {
+      "n": 0.7,
+      "p": 0.207
+     },
+     "_n_total": 3.8
+    },
+    "curb": {
+     "curb_grey_plain": {
+      "n": 0.7,
+      "p": 0.279
+     },
+     "curb_red_white": {
+      "n": 1.6,
+      "p": 0.488
+     },
+     "curb_white_painted": {
+      "n": 0,
+      "p": 0.116
+     },
+     "curb_black_white": {
+      "n": 0,
+      "p": 0.116
+     },
+     "_n_total": 2.3
+    },
+    "fence": {
+     "rail_white_metal": {
+      "n": 0,
+      "p": 0.053
+     },
+     "fence_white_picket": {
+      "n": 1.8,
+      "p": 0.245
+     },
+     "wall_stone_clad": {
+      "n": 1.65,
+      "p": 0.229
+     },
+     "fence_dark_slats": {
+      "n": 1.45,
+      "p": 0.207
+     },
+     "fence_metal_bars": {
+      "n": 0,
+      "p": 0.053
+     },
+     "rail_red_median": {
+      "n": 0,
+      "p": 0.053
+     },
+     "fence_blue_rail": {
+      "n": 0,
+      "p": 0.053
+     },
+     "rail_grey_metal": {
+      "n": 0.5,
+      "p": 0.106
+     },
+     "_n_total": 5.4
+    },
+    "tree": {
+     "palm_date": {
+      "n": 1.35,
+      "p": 0.17
+     },
+     "tree_broadleaf_large": {
+      "n": 0,
+      "p": 0.046
+     },
+     "tree_ficus": {
+      "n": 0,
+      "p": 0.046
+     },
+     "palm_small_pots": {
+      "n": 0.7,
+      "p": 0.11
+     },
+     "street_trees_young": {
+      "n": 0.5,
+      "p": 0.092
+     },
+     "cypress_row": {
+      "n": 0.85,
+      "p": 0.124
+     },
+     "hedge": {
+      "n": 1.4,
+      "p": 0.174
+     },
+     "climber_on_fence": {
+      "n": 1.6,
+      "p": 0.193
+     },
+     "planters": {
+      "n": 0,
+      "p": 0.046
+     },
+     "_n_total": 6.4
+    },
+    "building": {
+     "villa_stone_clad": {
+      "n": 2.55,
+      "p": 0.24
+     },
+     "old_house_tile_roof": {
+      "n": 2.55,
+      "p": 0.24
+     },
+     "block_mid_rise": {
+      "n": 0,
+      "p": 0.039
+     },
+     "block_mid_rise_commercial": {
+      "n": 0,
+      "p": 0.039
+     },
+     "tower_highrise": {
+      "n": 4.1,
+      "p": 0.362
+     },
+     "public_low_raised": {
+      "n": 0,
+      "p": 0.039
+     },
+     "commercial_round_pavilion": {
+      "n": 0,
+      "p": 0.039
+     },
+     "_n_total": 9.2
+    },
+    "sign": {
+     "tactile_paving": {
+      "n": 0,
+      "p": 0.059
+     },
+     "street_name_sign": {
+      "n": 1.9,
+      "p": 0.282
+     },
+     "street_name_sign_old": {
+      "n": 0.95,
+      "p": 0.171
+     },
+     "sign_yield": {
+      "n": 0,
+      "p": 0.059
+     },
+     "sign_parking_blue": {
+      "n": 1.65,
+      "p": 0.253
+     },
+     "crosswalk_zebra": {
+      "n": 0,
+      "p": 0.059
+     },
+     "traffic_light": {
+      "n": 0,
+      "p": 0.059
+     },
+     "road_arrows": {
+      "n": 0,
+      "p": 0.059
+     },
+     "_n_total": 4.5
+    }
+   }
+  },
+  "שדרה עירונית ותיקה": {
+   "n_photos": 8,
+   "photos": [
+    "018",
+    "019",
+    "027",
+    "028",
+    "029",
+    "033",
+    "034",
+    "035"
+   ],
+   "streets": [
+    "?",
+    "יצחק נשיא",
+    "רוגוזין",
+    "רוגזין"
+   ],
+   "road_class_counts": {
+    "4": 1,
+    "3": 3
+   },
+   "conf": 0.5,
+   "priors": {
+    "lamp": {
+     "lamp_curved_led": {
+      "n": 0,
+      "p": 0.08
+     },
+     "lamp_led_white": {
+      "n": 1.4,
+      "p": 0.304
+     },
+     "lamp_ornate_red_double": {
+      "n": 3.35,
+      "p": 0.616
+     },
+     "_n_total": 4.75
+    },
+    "paving": {
+     "pavers_red_rect": {
+      "n": 0,
+      "p": 0.152
+     },
+     "pavers_red_square": {
+      "n": 0,
+      "p": 0.152
+     },
+     "pavers_beige_square": {
+      "n": 0,
+      "p": 0.152
+     },
+     "slabs_light_grey": {
+      "n": 1.3,
+      "p": 0.545
+     },
+     "_n_total": 1.3
+    },
+    "curb": {
+     "curb_grey_plain": {
+      "n": 0,
+      "p": 0.082
+     },
+     "curb_red_white": {
+      "n": 2.45,
+      "p": 0.484
+     },
+     "curb_white_painted": {
+      "n": 0,
+      "p": 0.082
+     },
+     "curb_black_white": {
+      "n": 1.65,
+      "p": 0.352
+     },
+     "_n_total": 4.1
+    },
+    "fence": {
+     "rail_white_metal": {
+      "n": 0,
+      "p": 0.068
+     },
+     "fence_white_picket": {
+      "n": 0,
+      "p": 0.068
+     },
+     "wall_stone_clad": {
+      "n": 0,
+      "p": 0.068
+     },
+     "fence_dark_slats": {
+      "n": 0,
+      "p": 0.068
+     },
+     "fence_metal_bars": {
+      "n": 0,
+      "p": 0.068
+     },
+     "rail_red_median": {
+      "n": 3.4,
+      "p": 0.527
+     },
+     "fence_blue_rail": {
+      "n": 0,
+      "p": 0.068
+     },
+     "rail_grey_metal": {
+      "n": 0,
+      "p": 0.068
+     },
+     "_n_total": 3.4
+    },
+    "tree": {
+     "palm_date": {
+      "n": 0.7,
+      "p": 0.161
+     },
+     "tree_broadleaf_large": {
+      "n": 0.5,
+      "p": 0.134
+     },
+     "tree_ficus": {
+      "n": 1.75,
+      "p": 0.302
+     },
+     "palm_small_pots": {
+      "n": 0,
+      "p": 0.067
+     },
+     "street_trees_young": {
+      "n": 0,
+      "p": 0.067
+     },
+     "cypress_row": {
+      "n": 0,
+      "p": 0.067
+     },
+     "hedge": {
+      "n": 0,
+      "p": 0.067
+     },
+     "climber_on_fence": {
+      "n": 0,
+      "p": 0.067
+     },
+     "planters": {
+      "n": 0,
+      "p": 0.067
+     },
+     "_n_total": 2.95
+    },
+    "building": {
+     "villa_stone_clad": {
+      "n": 0,
+      "p": 0.055
+     },
+     "old_house_tile_roof": {
+      "n": 0,
+      "p": 0.055
+     },
+     "block_mid_rise": {
+      "n": 0.75,
+      "p": 0.138
+     },
+     "block_mid_rise_commercial": {
+      "n": 3.25,
+      "p": 0.414
+     },
+     "tower_highrise": {
+      "n": 1.55,
+      "p": 0.227
+     },
+     "public_low_raised": {
+      "n": 0,
+      "p": 0.055
+     },
+     "commercial_round_pavilion": {
+      "n": 0,
+      "p": 0.055
+     },
+     "_n_total": 5.55
+    },
+    "sign": {
+     "tactile_paving": {
+      "n": 0.85,
+      "p": 0.12
+     },
+     "street_name_sign": {
+      "n": 1.4,
+      "p": 0.169
+     },
+     "street_name_sign_old": {
+      "n": 0.95,
+      "p": 0.129
+     },
+     "sign_yield": {
+      "n": 0,
+      "p": 0.044
+     },
+     "sign_parking_blue": {
+      "n": 0.7,
+      "p": 0.107
+     },
+     "crosswalk_zebra": {
+      "n": 0.9,
+      "p": 0.124
+     },
+     "traffic_light": {
+      "n": 1.6,
+      "p": 0.187
+     },
+     "road_arrows": {
+      "n": 0.85,
+      "p": 0.12
+     },
+     "_n_total": 7.25
+    }
+   }
+  },
+  "רחוב ראשי חדש עם מגדל": {
+   "n_photos": 2,
+   "photos": [
+    "020",
+    "021"
+   ],
+   "streets": [
+    "רוגזין"
+   ],
+   "road_class_counts": {
+    "3": 1
+   },
+   "conf": 0.24,
+   "priors": {
+    "lamp": {
+     "lamp_curved_led": {
+      "n": 0,
+      "p": 0.217
+     },
+     "lamp_led_white": {
+      "n": 0.8,
+      "p": 0.565
+     },
+     "lamp_ornate_red_double": {
+      "n": 0,
+      "p": 0.217
+     },
+     "_n_total": 0.8
+    },
+    "paving": {
+     "pavers_red_rect": {
+      "n": 0.7,
+      "p": 0.444
+     },
+     "pavers_red_square": {
+      "n": 0,
+      "p": 0.185
+     },
+     "pavers_beige_square": {
+      "n": 0,
+      "p": 0.185
+     },
+     "slabs_light_grey": {
+      "n": 0,
+      "p": 0.185
+     },
+     "_n_total": 0.7
+    },
+    "curb": {
+     "curb_grey_plain": {
+      "n": 0,
+      "p": 0.25
+     },
+     "curb_red_white": {
+      "n": 0,
+      "p": 0.25
+     },
+     "curb_white_painted": {
+      "n": 0,
+      "p": 0.25
+     },
+     "curb_black_white": {
+      "n": 0,
+      "p": 0.25
+     },
+     "_n_total": 0
+    },
+    "fence": {
+     "rail_white_metal": {
+      "n": 0,
+      "p": 0.125
+     },
+     "fence_white_picket": {
+      "n": 0,
+      "p": 0.125
+     },
+     "wall_stone_clad": {
+      "n": 0,
+      "p": 0.125
+     },
+     "fence_dark_slats": {
+      "n": 0,
+      "p": 0.125
+     },
+     "fence_metal_bars": {
+      "n": 0,
+      "p": 0.125
+     },
+     "rail_red_median": {
+      "n": 0,
+      "p": 0.125
+     },
+     "fence_blue_rail": {
+      "n": 0,
+      "p": 0.125
+     },
+     "rail_grey_metal": {
+      "n": 0,
+      "p": 0.125
+     },
+     "_n_total": 0
+    },
+    "tree": {
+     "palm_date": {
+      "n": 0,
+      "p": 0.096
+     },
+     "tree_broadleaf_large": {
+      "n": 0,
+      "p": 0.096
+     },
+     "tree_ficus": {
+      "n": 0,
+      "p": 0.096
+     },
+     "palm_small_pots": {
+      "n": 0,
+      "p": 0.096
+     },
+     "street_trees_young": {
+      "n": 0,
+      "p": 0.096
+     },
+     "cypress_row": {
+      "n": 0,
+      "p": 0.096
+     },
+     "hedge": {
+      "n": 0,
+      "p": 0.096
+     },
+     "climber_on_fence": {
+      "n": 0,
+      "p": 0.096
+     },
+     "planters": {
+      "n": 0.7,
+      "p": 0.231
+     },
+     "_n_total": 0.7
+    },
+    "building": {
+     "villa_stone_clad": {
+      "n": 0,
+      "p": 0.085
+     },
+     "old_house_tile_roof": {
+      "n": 0,
+      "p": 0.085
+     },
+     "block_mid_rise": {
+      "n": 0,
+      "p": 0.085
+     },
+     "block_mid_rise_commercial": {
+      "n": 0,
+      "p": 0.085
+     },
+     "tower_highrise": {
+      "n": 1.55,
+      "p": 0.347
+     },
+     "public_low_raised": {
+      "n": 0,
+      "p": 0.085
+     },
+     "commercial_round_pavilion": {
+      "n": 0.85,
+      "p": 0.229
+     },
+     "_n_total": 2.4
+    },
+    "sign": {
+     "tactile_paving": {
+      "n": 0,
+      "p": 0.104
+     },
+     "street_name_sign": {
+      "n": 0,
+      "p": 0.104
+     },
+     "street_name_sign_old": {
+      "n": 0,
+      "p": 0.104
+     },
+     "sign_yield": {
+      "n": 0,
+      "p": 0.104
+     },
+     "sign_parking_blue": {
+      "n": 0,
+      "p": 0.104
+     },
+     "crosswalk_zebra": {
+      "n": 0.8,
+      "p": 0.271
+     },
+     "traffic_light": {
+      "n": 0,
+      "p": 0.104
+     },
+     "road_arrows": {
+      "n": 0,
+      "p": 0.104
+     },
+     "_n_total": 0.8
+    }
+   }
+  }
+ },
+ "rules": [
+  {
+   "id": "curb_rw_near_junction",
+   "he": "שפה צבועה (אדום-לבן/לבן) עד 20 מ' מצומת",
+   "near_counts": {
+    "yes": 4,
+    "no": 1
+   },
+   "far_counts": {
+    "yes": 1,
+    "no": 2
+   },
+   "p_near": 0.75,
+   "p_far": 0.375,
+   "prov": "נגזר",
+   "conf": 0.8,
+   "gen_param": {
+    "paint_within_m": 12,
+    "src": "משוער: מקובל בישראל לסמן אדום-לבן ליד צמתים; 12 מ' – הנחה"
+   }
+  }
+ ],
+ "params": {
+  "רחוב מגורים חדש": {
+   "lamp_kind": "lamp_curved_led",
+   "lamp_spacing_m": {
+    "v": 27,
+    "prov": "משוער",
+    "conf": 0.4,
+    "src": "015–017: שורת פנסים, הערכה 25–30 מ'"
+   },
+   "lamp_side": {
+    "v": "one",
+    "prov": "נצפה",
+    "conf": 0.6,
+    "src": "011, 015"
+   },
+   "lamp_h_m": {
+    "v": 8,
+    "prov": "משוער",
+    "conf": 0.4
+   },
+   "tree_spacing_m": {
+    "v": 14,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "fence_setback_m": {
+    "v": 4.5,
+    "prov": "משוער",
+    "conf": 0.3
+   }
+  },
+  "רחוב מגורים ותיק": {
+   "lamp_kind": "lamp_led_white",
+   "lamp_spacing_m": {
+    "v": 30,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "009"
+   },
+   "lamp_side": {
+    "v": "one",
+    "prov": "משוער",
+    "conf": 0.4
+   },
+   "lamp_h_m": {
+    "v": 7,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "tree_spacing_m": {
+    "v": 12,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "fence_setback_m": {
+    "v": 4.0,
+    "prov": "משוער",
+    "conf": 0.3
+   }
+  },
+  "שדרה עירונית ותיקה": {
+   "lamp_kind": "lamp_ornate_red_double",
+   "lamp_spacing_m": {
+    "v": 22,
+    "prov": "משוער",
+    "conf": 0.35,
+    "src": "018–019"
+   },
+   "lamp_side": {
+    "v": "median",
+    "prov": "נצפה",
+    "conf": 0.7,
+    "src": "018, 019"
+   },
+   "lamp_h_m": {
+    "v": 9,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "tree_spacing_m": {
+    "v": 16,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "fence_setback_m": {
+    "v": 0.0,
+    "prov": "נצפה",
+    "conf": 0.6,
+    "src": "מעקה אדום על אי התנועה"
+   }
+  },
+  "רחוב ראשי חדש עם מגדל": {
+   "lamp_kind": "lamp_led_white",
+   "lamp_spacing_m": {
+    "v": 25,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "020"
+   },
+   "lamp_side": {
+    "v": "both",
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "lamp_h_m": {
+    "v": 10,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "tree_spacing_m": {
+    "v": 15,
+    "prov": "משוער",
+    "conf": 0.3
+   },
+   "fence_setback_m": {
+    "v": 3.0,
+    "prov": "משוער",
+    "conf": 0.3
+   }
+  }
+ },
+ "p_style_given_road_class": {
+  "v": {
+   "1": {
+    "רחוב מגורים ותיק": 0.667,
+    "רחוב מגורים חדש": 0.333,
+    "שדרה עירונית ותיקה": 0.0,
+    "רחוב ראשי חדש עם מגדל": 0.0
+   },
+   "2": {
+    "רחוב מגורים ותיק": 0.571,
+    "רחוב מגורים חדש": 0.429,
+    "שדרה עירונית ותיקה": 0.0,
+    "רחוב ראשי חדש עם מגדל": 0.0
+   },
+   "3": {
+    "שדרה עירונית ותיקה": 0.571,
+    "רחוב ראשי חדש עם מגדל": 0.286,
+    "רחוב מגורים ותיק": 0.0,
+    "רחוב מגורים חדש": 0.143
+   },
+   "4": {
+    "שדרה עירונית ותיקה": 0.5,
+    "רחוב ראשי חדש עם מגדל": 0.25,
+    "רחוב מגורים ותיק": 0.0,
+    "רחוב מגורים חדש": 0.25
+   },
+   "5": {
+    "שדרה עירונית ותיקה": 1.0,
+    "רחוב מגורים ותיק": 0.0,
+    "רחוב מגורים חדש": 0.0,
+    "רחוב ראשי חדש עם מגדל": 0.0
+   }
+  },
+  "prov": "נגזר",
+  "conf": 0.3,
+  "src": "מוצא משוער (רובע א' = הרובע הוותיק → עדיפות לותיק) + ספירת רחובות שונים שנצפו; המדגם מוטה (סביב פרויקט מגדלים חדש)"
+ },
+ "sign_style_by_class": {
+  "v": {
+   "רחוב מגורים חדש": "new_blue",
+   "רחוב ראשי חדש עם מגדל": "new_blue",
+   "רחוב מגורים ותיק": "old_white",
+   "שדרה עירונית ותיקה": "old_white"
+  },
+  "prov": "נגזר",
+  "conf": 0.45,
+  "src": "כחול חדש: האורן (015–016, רחוב מחודש); לבן ישן: רוגוזין, יצחק הנשיא (032–033, רחובות ותיקים). 2 רחובות לכל סגנון – מדגם קטן. 035: שלטים כחולים בצומת הדקל×רוגוזין, לבנים בצומת רוגוזין×יצחק הנשיא (032) → הסגנון לפי קטע: שלט שנצפה עד 120 מ' קובע; אחרת לפי הסגנון"
+ },
+ "observed_signs": [
+  {
+   "id": "015",
+   "x": 164655.0,
+   "y": 634174.0,
+   "style": "new_blue"
+  },
+  {
+   "id": "016",
+   "x": 164655.0,
+   "y": 634174.0,
+   "style": "new_blue"
+  },
+  {
+   "id": "032",
+   "x": 164765.0,
+   "y": 634043.0,
+   "style": "old_white"
+  },
+  {
+   "id": "033",
+   "x": 164765.0,
+   "y": 634043.0,
+   "style": "old_white"
+  },
+  {
+   "id": "035",
+   "x": 164794.0,
+   "y": 634104.0,
+   "style": "new_blue"
+  }
+ ],
+ "observed_points": [
+  {
+   "id": "004",
+   "x": 164755.0,
+   "y": 634173.2,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "006",
+   "x": 164761.9,
+   "y": 634188.8,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "007",
+   "x": 164749.0,
+   "y": 634159.5,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "008",
+   "x": 164765.1,
+   "y": 634196.1,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "009",
+   "x": 164737.0,
+   "y": 634132.0,
+   "cls": "רחוב מגורים ותיק"
+  },
+  {
+   "id": "010",
+   "x": 164650.0,
+   "y": 634178.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "011",
+   "x": 164650.0,
+   "y": 634178.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "015",
+   "x": 164655.0,
+   "y": 634174.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "016",
+   "x": 164655.0,
+   "y": 634174.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "017",
+   "x": 164652.0,
+   "y": 634176.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "018",
+   "x": 164600.0,
+   "y": 634093.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "019",
+   "x": 164600.0,
+   "y": 634093.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "020",
+   "x": 164722.0,
+   "y": 633915.0,
+   "cls": "רחוב ראשי חדש עם מגדל"
+  },
+  {
+   "id": "021",
+   "x": 164720.0,
+   "y": 633905.0,
+   "cls": "רחוב ראשי חדש עם מגדל"
+  },
+  {
+   "id": "027",
+   "x": 164718.0,
+   "y": 633948.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "028",
+   "x": 164718.0,
+   "y": 633948.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "029",
+   "x": 164718.0,
+   "y": 633948.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "030",
+   "x": 164690.0,
+   "y": 634068.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "032",
+   "x": 164765.0,
+   "y": 634043.0,
+   "cls": "רחוב מגורים חדש"
+  },
+  {
+   "id": "033",
+   "x": 164765.0,
+   "y": 634043.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "034",
+   "x": 164765.0,
+   "y": 634043.0,
+   "cls": "שדרה עירונית ותיקה"
+  },
+  {
+   "id": "035",
+   "x": 164794.0,
+   "y": 634104.0,
+   "cls": "שדרה עירונית ותיקה"
+  }
+ ],
+ "proximity_m": {
+  "v": 120,
+  "prov": "משוער",
+  "conf": 0.3,
+  "src": "השפעת תצפית דועכת exp(-d/120)"
+ }
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="data:,">
+<title>מצלמת שטח – עולם תאום</title>
+<style>
+  :root { --bg:#0e1420; --fg:#eef2f7; --mut:#9aa6b8; --ok:#38d97a; --warn:#ffb547; --bad:#ff5a5a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui,"Noto Sans Hebrew",Arial,sans-serif; padding:10px max(10px,env(safe-area-inset-right)) 90px max(10px,env(safe-area-inset-left)); }
+  h1 { font-size:17px; margin:4px 0 8px; }
+  .row { display:flex; justify-content:space-between; gap:8px; padding:6px 8px; border-radius:8px; background:#18233a; margin:4px 0; }
+  .row b { font-weight:600; } .ok { color:var(--ok); } .warn { color:var(--warn); } .bad { color:var(--bad); } .mut { color:var(--mut); font-size:13px; }
+  #shutter { position:fixed; bottom:max(14px,env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); width:84px; height:84px; border-radius:50%; border:6px solid #fff; background:#e63946; color:#fff; font-size:15px; font-weight:700; }
+  button.s { font:inherit; color:var(--fg); background:#223049; border:1px solid #33435f; border-radius:10px; padding:8px 12px; min-height:42px; margin:4px 0; width:100%; }
+  #last img { width:100%; border-radius:8px; margin-top:6px; }
+  details { margin:8px 0; } summary { cursor:pointer; color:var(--mut); }
+  #compass { width:120px; height:120px; display:block; margin:6px auto; }
+</style>
+</head>
+<body>
+<h1>מצלמת שטח · עולם תאום</h1>
+<button class="s" id="perm">הפעל מיקום ומצפן</button>
+<div class="row"><b>מיקום</b><span id="gps" class="mut">לא פעיל</span></div>
+<div class="row"><b>רשת ישראל</b><span id="itm" class="mut">—</span></div>
+<div class="row"><b>כיוון מצלמה (אמיתי)</b><span id="head" class="mut">—</span></div>
+<div class="row"><b>הטיה / גלגול</b><span id="tilt" class="mut">—</span></div>
+<canvas id="compass" width="240" height="240" aria-label="מצפן"></canvas>
+<div class="row"><b>בדיקת מצפן מול השמיים</b><span id="sky" class="mut">—</span></div>
+<p class="mut" id="skyHint"></p>
+<input type="file" id="file" accept="image/*" capture="environment" hidden>
+<button id="shutter" aria-label="צלם">צלם</button>
+<section id="last"></section>
+<details><summary>מגבלות – לקרוא פעם אחת</summary>
+<ul class="mut">
+<li>GPS בטלפון: 3–10 מ' בשטח פתוח, 10–30 מ' בין בניינים גבוהים, ובתוך חנות לרוב 20–50 מ' או מיקום ישן. הדיוק המוצג הוא מה שהטלפון מדווח (רדיוס ~68%).</li>
+<li>מצפן: מגנטומטר מושפע ממתכת, מכוניות, עמודי חשמל וכיסוי מגנטי. אם הכיוון "קופץ" – לנפנף את הטלפון בצורת 8 כמה פעמים (כיול).</li>
+<li>הטלפון מודד צפון מגנטי. בישראל הסטייה המגנטית כ-+5° מזרחה (משוער, לאמת מול מחשבון WMM של NOAA) – האפליקציה מוסיפה אותה כדי לקבל צפון אמיתי.</li>
+<li>החיישנים נשמרים ברגע הלחיצה על "צלם" וגם כשהתמונה חוזרת; אם הטלפון זז ביניהם – ההפרש נרשם.</li>
+<li>הקבצים נשמרים רק אצלך (הורדה/שיתוף). אין שרת. לוחיות רישוי ושמות פרטיים – לא נרשמים ממילא בניתוח.</li>
+</ul></details>
+<script src="js/itm.js"></script>
+<script src="js/capture.js"></script>
+</body>
+</html>

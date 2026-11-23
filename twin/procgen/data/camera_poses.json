@@ -1,0 +1,885 @@
+{
+ "v": 1,
+ "frame": {
+  "sample_to_itm": [
+   1524.6,
+   753.6
+  ],
+  "crs": "EPSG:2039 (מסגרת דגימה + היסט)"
+ },
+ "eye_height_m": {
+  "v": 1.5,
+  "prov": "משוער"
+ },
+ "note": "roll לא נמדד (0). fov_h = שדה ראייה אופקי בתמונה כפי שצולמה. ערכים עם conf<0.3 – לא לכיול.",
+ "poses": [
+  {
+   "id": "001",
+   "file": "001_20261123_0058.jpg",
+   "time_local": "2026-11-23T00:58+02:00",
+   "orientation": "לאורך",
+   "x": 164752.0,
+   "y": 634222.0,
+   "itm": [
+    166276.6,
+    634975.6
+   ],
+   "wgs84": [
+    31.806287,
+    34.64284
+   ],
+   "pos_r_m": 60,
+   "pos_prov": "משוער",
+   "pos_conf": 0.25,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים ותיק",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "002",
+   "file": "002_20261123_0059.jpg",
+   "time_local": "2026-11-23T00:59+02:00",
+   "orientation": "לאורך",
+   "x": 164752.0,
+   "y": 634222.0,
+   "itm": [
+    166276.6,
+    634975.6
+   ],
+   "wgs84": [
+    31.806287,
+    34.64284
+   ],
+   "pos_r_m": 60,
+   "pos_prov": "משוער",
+   "pos_conf": 0.25,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים ותיק",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "003",
+   "file": "003_20261123_0059.jpg",
+   "time_local": "2026-11-23T00:59+02:00",
+   "orientation": "לרוחב",
+   "x": 164752.0,
+   "y": 634222.0,
+   "itm": [
+    166276.6,
+    634975.6
+   ],
+   "wgs84": [
+    31.806287,
+    34.64284
+   ],
+   "pos_r_m": 60,
+   "pos_prov": "משוער",
+   "pos_conf": 0.25,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים ותיק",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "004",
+   "file": "004_20261123_0059.jpg",
+   "time_local": "2026-11-23T00:59+02:00",
+   "orientation": "לרוחב",
+   "x": 164755.0,
+   "y": 634173.2,
+   "itm": [
+    166279.6,
+    634926.8
+   ],
+   "wgs84": [
+    31.805847,
+    34.642874
+   ],
+   "pos_r_m": 25,
+   "pos_prov": "משוער",
+   "pos_conf": 0.45,
+   "heading_deg": 204.0,
+   "heading_pm": 30,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.3,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "005",
+   "file": "005_20261123_0100.jpg",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לרוחב",
+   "x": 164752.0,
+   "y": 634222.0,
+   "itm": [
+    166276.6,
+    634975.6
+   ],
+   "wgs84": [
+    31.806287,
+    34.64284
+   ],
+   "pos_r_m": 60,
+   "pos_prov": "משוער",
+   "pos_conf": 0.25,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים ותיק",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "006",
+   "file": "006_20261123_0100.jpg",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לאורך",
+   "x": 164761.9,
+   "y": 634188.8,
+   "itm": [
+    166286.5,
+    634942.4
+   ],
+   "wgs84": [
+    31.805988,
+    34.642946
+   ],
+   "pos_r_m": 20,
+   "pos_prov": "משוער",
+   "pos_conf": 0.4,
+   "heading_deg": 246.2,
+   "heading_pm": 4.0,
+   "heading_method": "גרם שמיים",
+   "heading_prov": "נגזר",
+   "heading_conf": 0.8,
+   "pitch_deg": 28.3,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "A"
+  },
+  {
+   "id": "007",
+   "file": "007_20261123_0100.jpg",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לרוחב",
+   "x": 164749.0,
+   "y": 634159.5,
+   "itm": [
+    166273.6,
+    634913.1
+   ],
+   "wgs84": [
+    31.805723,
+    34.642812
+   ],
+   "pos_r_m": 35,
+   "pos_prov": "משוער",
+   "pos_conf": 0.3,
+   "heading_deg": 235.0,
+   "heading_pm": 25,
+   "heading_method": "ציון דרך",
+   "heading_prov": "משוער",
+   "heading_conf": 0.25,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "008",
+   "file": "008_20261123_0100.jpg",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לאורך",
+   "x": 164765.1,
+   "y": 634196.1,
+   "itm": [
+    166289.7,
+    634949.7
+   ],
+   "wgs84": [
+    31.806054,
+    34.64298
+   ],
+   "pos_r_m": 20,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.4,
+   "heading_deg": 257.8,
+   "heading_pm": 4.0,
+   "heading_method": "גרם שמיים",
+   "heading_prov": "נגזר",
+   "heading_conf": 0.8,
+   "pitch_deg": 28.9,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "A"
+  },
+  {
+   "id": "009",
+   "file": "009_20261123_0101.jpg",
+   "time_local": "2026-11-23T01:01+02:00",
+   "orientation": "לאורך",
+   "x": 164737.0,
+   "y": 634132.0,
+   "itm": [
+    166261.6,
+    634885.6
+   ],
+   "wgs84": [
+    31.805475,
+    34.642686
+   ],
+   "pos_r_m": 25,
+   "pos_prov": "משוער",
+   "pos_conf": 0.35,
+   "heading_deg": 285.0,
+   "heading_pm": 20,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.35,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים ותיק",
+   "calibration_grade": "B"
+  },
+  {
+   "id": "010",
+   "file": "010_20261123_0102.jpg",
+   "time_local": "2026-11-23T01:02+02:00",
+   "orientation": "לאורך",
+   "x": 164650.0,
+   "y": 634178.0,
+   "itm": [
+    166174.6,
+    634931.6
+   ],
+   "wgs84": [
+    31.805885,
+    34.641765
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "משוער",
+   "pos_conf": 0.35,
+   "heading_deg": 245.0,
+   "heading_pm": 20,
+   "heading_method": "ציון דרך",
+   "heading_prov": "משוער",
+   "heading_conf": 0.3,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "011",
+   "file": "011_20261123_0102.jpg",
+   "time_local": "2026-11-23T01:02+02:00",
+   "orientation": "לאורך",
+   "x": 164650.0,
+   "y": 634178.0,
+   "itm": [
+    166174.6,
+    634931.6
+   ],
+   "wgs84": [
+    31.805885,
+    34.641765
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "משוער",
+   "pos_conf": 0.35,
+   "heading_deg": 290.0,
+   "heading_pm": 20,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.4,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "B"
+  },
+  {
+   "id": "012",
+   "file": "012_20261123_0105.jpg",
+   "time_local": "2026-11-23T01:05+02:00",
+   "orientation": "לאורך",
+   "x": 164600.0,
+   "y": 634170.0,
+   "itm": [
+    166124.6,
+    634923.6
+   ],
+   "wgs84": [
+    31.805811,
+    34.641238
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "משוער",
+   "pos_conf": 0.3,
+   "heading_deg": 230.0,
+   "heading_pm": 30,
+   "heading_method": "ציון דרך",
+   "heading_prov": "משוער",
+   "heading_conf": 0.25,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "קרוב למגדל",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "013",
+   "file": "013_20261123_0106.jpg",
+   "time_local": "2026-11-23T01:06+02:00",
+   "orientation": "לאורך",
+   "x": 164600.0,
+   "y": 634170.0,
+   "itm": [
+    166124.6,
+    634923.6
+   ],
+   "wgs84": [
+    31.805811,
+    34.641238
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "משוער",
+   "pos_conf": 0.3,
+   "heading_deg": 230.0,
+   "heading_pm": 30,
+   "heading_method": "ציון דרך",
+   "heading_prov": "משוער",
+   "heading_conf": 0.25,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "קרוב למגדל",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "014",
+   "file": "014_20261123_0106.jpg",
+   "time_local": "2026-11-23T01:06+02:00",
+   "orientation": "לאורך",
+   "x": 164600.0,
+   "y": 634170.0,
+   "itm": [
+    166124.6,
+    634923.6
+   ],
+   "wgs84": [
+    31.805811,
+    34.641238
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "משוער",
+   "pos_conf": 0.3,
+   "heading_deg": 230.0,
+   "heading_pm": 30,
+   "heading_method": "ציון דרך",
+   "heading_prov": "משוער",
+   "heading_conf": 0.25,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "קרוב למגדל",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "015",
+   "file": "015_20261123_0106.jpg",
+   "time_local": "2026-11-23T01:06+02:00",
+   "orientation": "לרוחב",
+   "x": 164655.0,
+   "y": 634174.0,
+   "itm": [
+    166179.6,
+    634927.6
+   ],
+   "wgs84": [
+    31.80585,
+    34.641818
+   ],
+   "pos_r_m": 15,
+   "pos_prov": "משוער",
+   "pos_conf": 0.5,
+   "heading_deg": 278.0,
+   "heading_pm": 15,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.45,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "B"
+  },
+  {
+   "id": "016",
+   "file": "016_20261123_0107.jpg",
+   "time_local": "2026-11-23T01:07+02:00",
+   "orientation": "לרוחב",
+   "x": 164655.0,
+   "y": 634174.0,
+   "itm": [
+    166179.6,
+    634927.6
+   ],
+   "wgs84": [
+    31.80585,
+    34.641818
+   ],
+   "pos_r_m": 15,
+   "pos_prov": "משוער",
+   "pos_conf": 0.5,
+   "heading_deg": 280.0,
+   "heading_pm": 15,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.45,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "B"
+  },
+  {
+   "id": "017",
+   "file": "017_20261123_0107.jpg",
+   "time_local": "2026-11-23T01:07+02:00",
+   "orientation": "לרוחב",
+   "x": 164652.0,
+   "y": 634176.0,
+   "itm": [
+    166176.6,
+    634929.6
+   ],
+   "wgs84": [
+    31.805867,
+    34.641786
+   ],
+   "pos_r_m": 15,
+   "pos_prov": "משוער",
+   "pos_conf": 0.5,
+   "heading_deg": 272.0,
+   "heading_pm": 15,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.4,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "B"
+  },
+  {
+   "id": "018",
+   "file": "018_20261123_0111.jpg",
+   "time_local": "2026-11-23T01:11+02:00",
+   "orientation": "לאורך",
+   "x": 164600.0,
+   "y": 634093.0,
+   "itm": [
+    166124.6,
+    634846.6
+   ],
+   "wgs84": [
+    31.805117,
+    34.641242
+   ],
+   "pos_r_m": 150,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.4,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "019",
+   "file": "019_20261123_0111.jpg",
+   "time_local": "2026-11-23T01:11+02:00",
+   "orientation": "לרוחב",
+   "x": 164600.0,
+   "y": 634093.0,
+   "itm": [
+    166124.6,
+    634846.6
+   ],
+   "wgs84": [
+    31.805117,
+    34.641242
+   ],
+   "pos_r_m": 150,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.4,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "020",
+   "file": "020_20261123_0114.jpg",
+   "time_local": "2026-11-23T01:14+02:00",
+   "orientation": "לאורך",
+   "x": 164722.0,
+   "y": 633915.0,
+   "itm": [
+    166246.6,
+    634668.6
+   ],
+   "wgs84": [
+    31.803517,
+    34.64254
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.45,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב ראשי חדש עם מגדל",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "021",
+   "file": "021_20261123_0114.jpg",
+   "time_local": "2026-11-23T01:14+02:00",
+   "orientation": "לאורך",
+   "x": 164720.0,
+   "y": 633905.0,
+   "itm": [
+    166244.6,
+    634658.6
+   ],
+   "wgs84": [
+    31.803427,
+    34.642519
+   ],
+   "pos_r_m": 25,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.45,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב ראשי חדש עם מגדל",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "026",
+   "file": "026_20261123_0117.jpg",
+   "time_local": "2026-11-23T01:17+02:00",
+   "orientation": "לאורך",
+   "x": 164717.0,
+   "y": 633900.0,
+   "itm": [
+    166241.6,
+    634653.6
+   ],
+   "wgs84": [
+    31.803382,
+    34.642488
+   ],
+   "pos_r_m": 25,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.45,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "כניסה לחנות",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "027",
+   "file": "027_20261123_0118.jpg",
+   "time_local": "2026-11-23T01:18+02:00",
+   "orientation": "לרוחב",
+   "x": 164718.0,
+   "y": 633948.0,
+   "itm": [
+    166242.6,
+    634701.6
+   ],
+   "wgs84": [
+    31.803814,
+    34.642496
+   ],
+   "pos_r_m": 40,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.45,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 69.4,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "028",
+   "file": "028_20261123_0118.jpg",
+   "time_local": "2026-11-23T01:18+02:00",
+   "orientation": "לאורך",
+   "x": 164718.0,
+   "y": 633948.0,
+   "itm": [
+    166242.6,
+    634701.6
+   ],
+   "wgs84": [
+    31.803814,
+    34.642496
+   ],
+   "pos_r_m": 60,
+   "pos_prov": "משוער",
+   "pos_conf": 0.3,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "029",
+   "file": "029_20261123_0118.jpg",
+   "time_local": "2026-11-23T01:18+02:00",
+   "orientation": "לאורך",
+   "x": 164718.0,
+   "y": 633948.0,
+   "itm": [
+    166242.6,
+    634701.6
+   ],
+   "wgs84": [
+    31.803814,
+    34.642496
+   ],
+   "pos_r_m": 50,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.4,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "030",
+   "file": "030_20261123_0120.jpg",
+   "time_local": "2026-11-23T01:20+02:00",
+   "orientation": "לאורך",
+   "x": 164690.0,
+   "y": 634068.0,
+   "itm": [
+    166214.6,
+    634821.6
+   ],
+   "wgs84": [
+    31.804895,
+    34.642194
+   ],
+   "pos_r_m": 80,
+   "pos_prov": "משוער",
+   "pos_conf": 0.3,
+   "heading_deg": 300.0,
+   "heading_pm": 20,
+   "heading_method": "ציון דרך",
+   "heading_prov": "משוער",
+   "heading_conf": 0.3,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "031",
+   "file": "031_20261123_0121.jpg",
+   "time_local": "2026-11-23T01:21+02:00",
+   "orientation": "לאורך",
+   "x": 164765.0,
+   "y": 634043.0,
+   "itm": [
+    166289.6,
+    634796.6
+   ],
+   "wgs84": [
+    31.804673,
+    34.642987
+   ],
+   "pos_r_m": 30,
+   "pos_prov": "משוער",
+   "pos_conf": 0.35,
+   "heading_deg": 264.3,
+   "heading_pm": 4.0,
+   "heading_method": "גרם שמיים",
+   "heading_prov": "נגזר",
+   "heading_conf": 0.8,
+   "pitch_deg": 28.6,
+   "fov_h_deg": 54.9,
+   "style_class": "קרוב למגדל",
+   "calibration_grade": "B"
+  },
+  {
+   "id": "032",
+   "file": "032_20261123_0121.jpg",
+   "time_local": "2026-11-23T01:21+02:00",
+   "orientation": "לאורך",
+   "x": 164765.0,
+   "y": 634043.0,
+   "itm": [
+    166289.6,
+    634796.6
+   ],
+   "wgs84": [
+    31.804673,
+    34.642987
+   ],
+   "pos_r_m": 15,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.6,
+   "heading_deg": 281.5,
+   "heading_pm": 4.0,
+   "heading_method": "גרם שמיים",
+   "heading_prov": "נגזר",
+   "heading_conf": 0.8,
+   "pitch_deg": 12.7,
+   "fov_h_deg": 54.9,
+   "style_class": "רחוב מגורים חדש",
+   "calibration_grade": "A"
+  },
+  {
+   "id": "033",
+   "file": "033_20261123_0122.jpg",
+   "time_local": "2026-11-23T01:22+02:00",
+   "orientation": "לאורך",
+   "x": 164765.0,
+   "y": 634043.0,
+   "itm": [
+    166289.6,
+    634796.6
+   ],
+   "wgs84": [
+    31.804673,
+    34.642987
+   ],
+   "pos_r_m": 15,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.6,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "034",
+   "file": "034_20261123_0122.jpg",
+   "time_local": "2026-11-23T01:22+02:00",
+   "orientation": "לאורך",
+   "x": 164765.0,
+   "y": 634043.0,
+   "itm": [
+    166289.6,
+    634796.6
+   ],
+   "wgs84": [
+    31.804673,
+    34.642987
+   ],
+   "pos_r_m": 20,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.55,
+   "heading_deg": 110.0,
+   "heading_pm": 25,
+   "heading_method": "כיוון רחוב",
+   "heading_prov": "משוער",
+   "heading_conf": 0.3,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  },
+  {
+   "id": "035",
+   "file": "035_20261123_0126.jpg",
+   "time_local": "2026-11-23T01:26+02:00",
+   "orientation": "לאורך",
+   "x": 164794.0,
+   "y": 634104.0,
+   "itm": [
+    166318.6,
+    634857.6
+   ],
+   "wgs84": [
+    31.805225,
+    34.64329
+   ],
+   "pos_r_m": 15,
+   "pos_prov": "נגזר",
+   "pos_conf": 0.6,
+   "heading_deg": null,
+   "heading_pm": null,
+   "heading_method": "לא ידוע",
+   "heading_prov": "משוער",
+   "heading_conf": 0.0,
+   "pitch_deg": null,
+   "fov_h_deg": 54.9,
+   "style_class": "שדרה עירונית ותיקה",
+   "calibration_grade": "C"
+  }
+ ]
+}

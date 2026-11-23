@@ -1,0 +1,99 @@
+{
+ "loadMs": 13208,
+ "ready": {
+  "tiles": 8,
+  "blds": 1470,
+  "gen": 62430,
+  "genMs": 1723
+ },
+ "glb": 4,
+ "perf": {
+  "calls": 32,
+  "tris": 165396,
+  "cpu_render_ms_median": 2.800000000745058,
+  "cpu_render_ms_p95": 37.90000000037253,
+  "frame_gap_ms_median": 1267.5999999996275,
+  "cullMs": 110.9,
+  "budget": {
+   "lamp_curved_led": {
+    "n": 54,
+    "tris_each": 84,
+    "total": 4536
+   },
+   "lamp_led_white": {
+    "n": 10,
+    "tris_each": 160,
+    "total": 1600
+   },
+   "lamp_ornate_red_double": {
+    "n": 72,
+    "tris_each": 164,
+    "total": 11808
+   },
+   "tree_ficus": {
+    "n": 24,
+    "tris_each": 512,
+    "total": 12288
+   },
+   "tree_young": {
+    "n": 24,
+    "tris_each": 400,
+    "total": 9600
+   },
+   "palm_date": {
+    "n": 25,
+    "tris_each": 784,
+    "total": 19600
+   },
+   "fence": {
+    "n": 345,
+    "tris_each": 12,
+    "total": 4140
+   },
+   "street_sign": {
+    "n": 47,
+    "tris_each": 84,
+    "total": 3948
+   },
+   "curb_paint": {
+    "n": 655,
+    "tris_each": 12,
+    "total": 7860
+   },
+   "crosswalk": {
+    "n": 371,
+    "tris_each": 12,
+    "total": 4452
+   },
+   "tactile": {
+    "n": 56,
+    "tris_each": 12,
+    "total": 672
+   },
+   "ac_unit": {
+    "n": 1219,
+    "tris_each": 24,
+    "total": 29256
+   },
+   "balcony": {
+    "n": 462,
+    "tris_each": 24,
+    "total": 11088
+   },
+   "shopfront": {
+    "n": 19,
+    "tris_each": 12,
+    "total": 228
+   },
+   "shop_sign": {
+    "n": 19,
+    "tris_each": 12,
+    "total": 228
+   },
+   "buildings": 35514
+  }
+ },
+ "card": "אי-התאמה: לבדיקהחישוב מיקום 008 (ירח + כיוון למגדל) נדחק לקצה הצפוני של קטע הארז במפה (70 מ') – ייתכן שהרחוב ארוך יותר או שהמגדל זוהה לא נכוןבמודל:   len_m :70 ",
+ "overflow360": false,
+ "errors": []
+}

@@ -1,0 +1,3794 @@
+{
+ "v": 1,
+ "frame": {
+  "sample_to_itm": [
+   1524.6,
+   753.6
+  ],
+  "crs": "EPSG:2039 (מסגרת דגימה + היסט)"
+ },
+ "generated": "2026-11-23",
+ "photos": [
+  {
+   "id": "001",
+   "file": "001_20261123_0058.jpg",
+   "sha256": "40c339691a78e87ec87569a3758c021b572c6a2604d6f8b6e42b131d93117f3d",
+   "time_local": "2026-11-23T00:58+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164752.0,
+    "y": 634222.0,
+    "r_m": 60,
+    "prov": "משוער",
+    "conf": 0.25,
+    "src": "ליד מבנה ציבור \"מועדון שחמט אשדוד\" – מיקום המבנה לא מאומת במפה",
+    "street": null,
+    "itm": [
+     166276.6,
+     634975.6
+    ],
+    "wgs84": [
+     31.806287,
+     34.64284
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים ותיק",
+    "prov": "משוער",
+    "conf": 0.5
+   },
+   "quality": {
+    "he": "בינונית – חשוך, רעש"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "public_low_raised",
+     "he": "מבנה ציבור קומה אחת על בסיס מוגבה ~1 מ', טיח לבן, חלונות עם סורגים, שלט גג",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "crosswalk_zebra",
+     "he": "מעבר חצייה זברה לבן",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "parking_perpendicular",
+     "he": "חניה ניצבת לאורך המבנה",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_red_rect",
+     "he": "מדרכה מאבנים משתלבות אדומות מלבניות",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "attrs": {
+      "color": "#9a4a3a"
+     }
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_grey_plain",
+     "he": "אבן שפה אפורה לא צבועה",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_white_metal",
+     "he": "מעקה/גדר מתכת לבנה (מוטות אנכיים)",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_broadleaf_large",
+     "he": "עץ רחב-נוף בוגר – כנראה פיקוס (לאימות ביום)",
+     "prov": "משוער",
+     "conf": 0.4,
+     "attrs": {
+      "species_guess": "Ficus"
+     }
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "רכבים חונים: האצ'בק, סדאן, רכב שטח קטן",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 3
+    },
+    {
+     "dept": "שמיים",
+     "kind": "clouds_partial",
+     "he": "עננות חלקית, ירח מאיר את העננים",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "002",
+   "file": "002_20261123_0059.jpg",
+   "sha256": "59e81d88cca0d723def399d26918b5e1e7a45bc6e3358d959fa0688cb2423f38",
+   "time_local": "2026-11-23T00:59+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164752.0,
+    "y": 634222.0,
+    "r_m": 60,
+    "prov": "משוער",
+    "conf": 0.25,
+    "src": "אותו מבנה כמו 001",
+    "street": null,
+    "itm": [
+     166276.6,
+     634975.6
+    ],
+    "wgs84": [
+     31.806287,
+     34.64284
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים ותיק",
+    "prov": "משוער",
+    "conf": 0.5
+   },
+   "quality": {
+    "he": "טובה לשלט, רעש בקיר"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "roof_sign",
+     "he": "שלט גג כחול-לבן: \"מועדון שחמט אשדוד\" (שם מוסד ציבורי, לא אדם פרטי)",
+     "prov": "נצפה",
+     "conf": 0.95
+    },
+    {
+     "dept": "בניינים",
+     "kind": "window_bars",
+     "he": "שלושה חלונות עם סורגים בחזית",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 3
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_white_metal",
+     "he": "גדר מוטות לבנה בתחתית",
+     "prov": "נצפה",
+     "conf": 0.7
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "003",
+   "file": "003_20261123_0059.jpg",
+   "sha256": "869073621af07ff750a229db68fb462f68ddc322e7e25b522a2ba0b4383d6142",
+   "time_local": "2026-11-23T00:59+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164752.0,
+    "y": 634222.0,
+    "r_m": 60,
+    "prov": "משוער",
+    "conf": 0.25,
+    "src": "אותו מבנה כמו 001",
+    "street": null,
+    "itm": [
+     166276.6,
+     634975.6
+    ],
+    "wgs84": [
+     31.806287,
+     34.64284
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים ותיק",
+    "prov": "משוער",
+    "conf": 0.5
+   },
+   "quality": {
+    "he": "בינונית"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "public_low_raised",
+     "he": "מבנה הציבור + מדרגות ומעקה לבן, סמל על הקיר; ברקע מבנה 2 קומות עם דגלים",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "האצ'בק, סדאן, רכב שטח קטן 4×4 (סוג בלבד)",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 3
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "bins_green",
+     "he": "פחי אשפה ירוקים",
+     "prov": "נצפה",
+     "conf": 0.6,
+     "count": 2
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "cypress_row",
+     "he": "שורת ברושים/עצים צרים ברקע",
+     "prov": "משוער",
+     "conf": 0.4
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "004",
+   "file": "004_20261123_0059.jpg",
+   "sha256": "107bf8477a09aad1906d02aac592d48bf52efb324d8568a5689158e33c8b04ce",
+   "time_local": "2026-11-23T00:59+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164755.0,
+    "y": 634173.2,
+    "r_m": 25,
+    "prov": "משוער",
+    "conf": 0.45,
+    "src": "הארז: אותה דלת מוסך כהה עם מדבקה כתומה כמו ב-006",
+    "street": "הארז",
+    "itm": [
+     166279.6,
+     634926.8
+    ],
+    "wgs84": [
+     31.805847,
+     34.642874
+    ]
+   },
+   "heading": {
+    "v": 204.0,
+    "prov": "משוער",
+    "conf": 0.3,
+    "pm": 30,
+    "method": "כיוון רחוב",
+    "src": "לאורך ציר הארז דרומה (204°); חלופה 24° – לא הוכרע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.7
+   },
+   "quality": {
+    "he": "בינונית – בוהק חזק מפנס"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "villa_stone_clad",
+     "he": "וילות חדשות 2–3 קומות, חיפוי אבן בהירה, דלת מוסך כהה גדולה",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_red_rect",
+     "he": "מדרכה אדומה מאבנים משתלבות, מתעקלת",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "attrs": {
+      "color": "#9a4a3a"
+     }
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_grey_plain",
+     "he": "אבן שפה אפורה",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "פנס רחוב לבן חזק (LED) – בוהק",
+     "prov": "נצפה",
+     "conf": 0.6,
+     "attrs": {
+      "cct_K_est": "4000–5000"
+     }
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "palm_date",
+     "he": "דקלים מאחורי חומות",
+     "prov": "משוער",
+     "conf": 0.5
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "רכב שטח ושני רכבים נוספים חונים בצד שמאל",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 3
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "005",
+   "file": "005_20261123_0100.jpg",
+   "sha256": "6384da5509fef8698397b9c1af731a764ab08be82b3c5a12989ff2f2c6b74665",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164752.0,
+    "y": 634222.0,
+    "r_m": 60,
+    "prov": "משוער",
+    "conf": 0.25,
+    "src": "אותו רכב לבן כמו ב-001 נראה – ליד מבנה הציבור",
+    "street": null,
+    "itm": [
+     166276.6,
+     634975.6
+    ],
+    "wgs84": [
+     31.806287,
+     34.64284
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים ותיק",
+    "prov": "משוער",
+    "conf": 0.5
+   },
+   "quality": {
+    "he": "בינונית – מטושטש"
+   },
+   "findings": [
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_red_rect",
+     "he": "פינת מדרכה אדומה עם קצה מעוגל",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "attrs": {
+      "color": "#9a4a3a"
+     }
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_white_painted",
+     "he": "אבן שפה צבועה לבן בפינה",
+     "prov": "נצפה",
+     "conf": 0.6
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "manhole",
+     "he": "מכסה שוחה עגול במדרכה",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "pole_wood_utility",
+     "he": "עמוד עץ (חשמל/תקשורת) עם שלט קטן",
+     "prov": "נצפה",
+     "conf": 0.75,
+     "count": 1
+    },
+    {
+     "dept": "גדרות",
+     "kind": "fence_metal_bars",
+     "he": "גדר מוטות מתכת לבנה",
+     "prov": "נצפה",
+     "conf": 0.6
+    },
+    {
+     "dept": "בניינים",
+     "kind": "garage_door_dark",
+     "he": "דלת מוסך/תריס כהה",
+     "prov": "נצפה",
+     "conf": 0.7
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "006",
+   "file": "006_20261123_0100.jpg",
+   "sha256": "004a85c02a539651f25353978e8596d5af5b7de3e352336ab63e325d0c796981",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164761.9,
+    "y": 634188.8,
+    "r_m": 20,
+    "prov": "משוער",
+    "conf": 0.4,
+    "src": "ליד הארז 3 (כמו 008)",
+    "street": "הארז",
+    "itm": [
+     166286.5,
+     634942.4
+    ],
+    "wgs84": [
+     31.805988,
+     34.642946
+    ]
+   },
+   "heading": {
+    "v": 246.2,
+    "prov": "נגזר",
+    "conf": 0.8,
+    "pm": 4.0,
+    "method": "גרם שמיים",
+    "src": "ירח az 264.88° alt 44.31° (2026-11-22T23:00:30.000Z, sky.js) בפיקסל u=0.7378, v=0.2708; ±4° מהנחת שדה ראייה וגלגול"
+   },
+   "pitch": {
+    "v": 28.3,
+    "prov": "נגזר",
+    "conf": 0.7,
+    "pm": 3.0,
+    "src": "מגובה הירח בתמונה"
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.75
+   },
+   "quality": {
+    "he": "בינונית – מטושטש"
+   },
+   "findings": [
+    {
+     "dept": "שמיים",
+     "kind": "moon",
+     "he": "ירח בשמיים – משמש מצפן",
+     "prov": "נצפה",
+     "conf": 0.95
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן צריח אדום עם תאורה",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 1
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מגדל מגורים גבוה ברקע (מ\"מגדלי הדקל\")",
+     "prov": "נצפה",
+     "conf": 0.75
+    },
+    {
+     "dept": "בניינים",
+     "kind": "villa_stone_clad",
+     "he": "וילה חדשה עם חיפוי אבן, מספר בית \"3\" על הקיר",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "palm_small_pots",
+     "he": "דקלונים בעציצים גבוהים שחורים",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 2
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "overhead_cable",
+     "he": "כבל עילי חוצה",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "007",
+   "file": "007_20261123_0100.jpg",
+   "sha256": "1f288da00fef9242ce3ba0c25a204963d46ed87e27a6a446890736a145be336c",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164749.0,
+    "y": 634159.5,
+    "r_m": 35,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "הארז או סמוך – לפי רצף הצילום",
+    "street": "הארז",
+    "itm": [
+     166273.6,
+     634913.1
+    ],
+    "wgs84": [
+     31.805723,
+     34.642812
+    ]
+   },
+   "heading": {
+    "v": 235.0,
+    "prov": "משוער",
+    "conf": 0.25,
+    "pm": 25,
+    "method": "ציון דרך",
+    "src": "העגורן (אתר מגדלי הדקל) בצד ימין למעלה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "משוער",
+    "conf": 0.5
+   },
+   "quality": {
+    "he": "בינונית – מטושטש"
+   },
+   "findings": [
+    {
+     "dept": "צמחייה",
+     "kind": "palm_date",
+     "he": "דקל תמר בוגר",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "פנס רחוב לבן על עמוד ישר",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 1,
+     "attrs": {
+      "cct_K_est": "4000–5000"
+     }
+    },
+    {
+     "dept": "גדרות",
+     "kind": "fence_dark_slats",
+     "he": "גדר/שער רפפות כהה על חומה בנויה",
+     "prov": "נצפה",
+     "conf": 0.75
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "hedge",
+     "he": "גדר חיה/שיחים כהים",
+     "prov": "נצפה",
+     "conf": 0.6
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן עם פסי תאורה כחולים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "סדאן ורכב שטח חונים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 3
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "008",
+   "file": "008_20261123_0100.jpg",
+   "sha256": "b206d41e91a8d1e40a33aa0be002d7af5486e34ff6dcab812e405ed7d8d50040",
+   "time_local": "2026-11-23T01:00+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164765.1,
+    "y": 634196.1,
+    "r_m": 20,
+    "prov": "נגזר",
+    "conf": 0.4,
+    "src": "שלט \"הארז 3\" + כיוון למגדל w1280878706 (255.1°) → 70 מ' מקצה הדרומי של הארז (שארית 1.3°) – נחתך בקצה הקטע במפה: ייתכן שהרחוב ארוך יותר מהקטע ב-OSM",
+    "street": "הארז",
+    "itm": [
+     166289.7,
+     634949.7
+    ],
+    "wgs84": [
+     31.806054,
+     34.64298
+    ]
+   },
+   "heading": {
+    "v": 257.8,
+    "prov": "נגזר",
+    "conf": 0.8,
+    "pm": 4.0,
+    "method": "גרם שמיים",
+    "src": "ירח az 264.88° alt 44.31° (2026-11-22T23:00:30.000Z, sky.js) בפיקסל u=0.5889, v=0.2979; ±4° מהנחת שדה ראייה וגלגול"
+   },
+   "pitch": {
+    "v": 28.9,
+    "prov": "נגזר",
+    "conf": 0.7,
+    "pm": 3.0,
+    "src": "מגובה הירח בתמונה"
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.75
+   },
+   "quality": {
+    "he": "טובה יחסית לשמיים, חזית כהה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "house_number_sign",
+     "he": "שלט מספר בית שחור: \"הארז 3\" (שם המשפחה בשלט לא נרשם)",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "שמיים",
+     "kind": "moon",
+     "he": "ירח מעל המגדל – מצפן",
+     "prov": "נצפה",
+     "conf": 0.95
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "שני מגדלים ~30 קומות ב-WSW (מגדלי הדקל)",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 2,
+     "attrs": {
+      "floors_est": "~29"
+     }
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן צריח אדום",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 1
+    },
+    {
+     "dept": "בניינים",
+     "kind": "villa_stone_clad",
+     "he": "חומת/וילה בחיפוי לוחות אבן גדולים בהירים; גג רעפים קטן מימין",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "גדרות",
+     "kind": "fence_dark_slats",
+     "he": "שער רפפות כהה",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "overhead_cable",
+     "he": "כבל עילי",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "009",
+   "file": "009_20261123_0101.jpg",
+   "sha256": "43f9173975c8a9cbfae378f846a89d86b365042b8531987d1b06e12348ef7e0e",
+   "time_local": "2026-11-23T01:01+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164737.0,
+    "y": 634132.0,
+    "r_m": 25,
+    "prov": "משוער",
+    "conf": 0.35,
+    "src": "צומת הארז/הדקל, מבט לאורך הדקל מערבה – לפי העגורן ושלט תן זכות קדימה",
+    "street": "הדקל",
+    "itm": [
+     166261.6,
+     634885.6
+    ],
+    "wgs84": [
+     31.805475,
+     34.642686
+    ]
+   },
+   "heading": {
+    "v": 285.0,
+    "prov": "משוער",
+    "conf": 0.35,
+    "pm": 20,
+    "method": "כיוון רחוב",
+    "src": "ציר הדקל ~296°, העגורן ממש לפנים"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים ותיק",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "sign_yield",
+     "he": "תמרור \"תן זכות קדימה\" (משולש אדום) בצומת הבא",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "שורת פנסים לבנים",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 3,
+     "attrs": {
+      "cct_K_est": "4000–5000"
+     }
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_red_rect",
+     "he": "מדרכה אדומה אבנים משתלבות מימין",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "attrs": {
+      "color": "#9a4a3a"
+     }
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_grey_plain",
+     "he": "אבן שפה אפורה",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "בניינים",
+     "kind": "old_house_tile_roof",
+     "he": "בתים ישנים חד-קומתיים עם גג רעפים",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "בניינים",
+     "kind": "block_mid_rise",
+     "he": "בלוקים 8–10 קומות ברקע",
+     "prov": "נצפה",
+     "conf": 0.6
+    },
+    {
+     "dept": "גדרות",
+     "kind": "fence_blue_rail",
+     "he": "מעקה כחול נמוך על קיר",
+     "prov": "נצפה",
+     "conf": 0.6
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_broadleaf_large",
+     "he": "עצים רחבי נוף (פיקוס?)",
+     "prov": "משוער",
+     "conf": 0.45
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "האצ'בק וסדאנים חונים בחניה אלכסונית/ניצבת",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 3
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן עם תאורה כחולה",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 1
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "010",
+   "file": "010_20261123_0102.jpg",
+   "sha256": "8f2341f3071183e608dd4eedf58ad31409c13dca7a64eadf98bc1852d2a77488",
+   "time_local": "2026-11-23T01:02+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164650.0,
+    "y": 634178.0,
+    "r_m": 30,
+    "prov": "משוער",
+    "conf": 0.35,
+    "src": "לאורך הדקל, מול המגדל עם העגורן",
+    "street": "הדקל",
+    "itm": [
+     166174.6,
+     634931.6
+    ],
+    "wgs84": [
+     31.805885,
+     34.641765
+    ]
+   },
+   "heading": {
+    "v": 245.0,
+    "prov": "משוער",
+    "conf": 0.3,
+    "pm": 20,
+    "method": "ציון דרך",
+    "src": "המגדל w1280878706 במרכז התמונה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "משוער",
+    "conf": 0.5
+   },
+   "quality": {
+    "he": "טובה – בוהק מפנס"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מגדל מגורים ~29 קומות בבנייה, עגורן צמוד",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "attrs": {
+      "floors_est": "~29"
+     }
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "sign_parking_blue",
+     "he": "תמרור חניה כחול (P)",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן צריח צמוד למגדל",
+     "prov": "נצפה",
+     "conf": 0.95,
+     "count": 1
+    },
+    {
+     "dept": "זמני",
+     "kind": "construction_fence",
+     "he": "גדר אתר בנייה ופסולת",
+     "prov": "נצפה",
+     "conf": 0.7
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "011",
+   "file": "011_20261123_0102.jpg",
+   "sha256": "d4ef6d660050f41ca2a9e3d5ea83b2195b25abe7f4ced3dc684c91cec67a8717",
+   "time_local": "2026-11-23T01:02+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164650.0,
+    "y": 634178.0,
+    "r_m": 30,
+    "prov": "משוער",
+    "conf": 0.35,
+    "src": "אותו תמרור חניה כמו 010",
+    "street": "הדקל",
+    "itm": [
+     166174.6,
+     634931.6
+    ],
+    "wgs84": [
+     31.805885,
+     34.641765
+    ]
+   },
+   "heading": {
+    "v": 290.0,
+    "prov": "משוער",
+    "conf": 0.4,
+    "pm": 20,
+    "method": "כיוון רחוב",
+    "src": "לאורך הדקל; המגדל משמאל"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תאורה",
+     "kind": "lamp_curved_led",
+     "he": "פנס LED לבן על עמוד מעוקל יחיד (זרוע אחת), אפור-לבן",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 4,
+     "attrs": {
+      "cct_K_est": "4000–5000",
+      "pole_h_m_est": 8
+     }
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "sign_parking_blue",
+     "he": "תמרור חניה כחול",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "parking_bay",
+     "he": "מפרץ חניה מרוצף",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_beige_square",
+     "he": "מדרכה אבנים בהירות (בז'-אפור), שוליים צהבהבים",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "attrs": {
+      "color": "#c9b9a0"
+     }
+    },
+    {
+     "dept": "גדרות",
+     "kind": "wall_stone_clad",
+     "he": "חומת אבן מסותתת בהירה (סגנון אבן ירושלמית) ~1.5 מ'",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "בניינים",
+     "kind": "old_house_tile_roof",
+     "he": "בית ישן עם גג רעפים מעבר לחומה",
+     "prov": "נצפה",
+     "conf": 0.75
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "street_trees_young",
+     "he": "עצי רחוב צעירים בהמשך",
+     "prov": "משוער",
+     "conf": 0.5
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "האצ'בק ומסחרית קלה",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 2
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "012",
+   "file": "012_20261123_0105.jpg",
+   "sha256": "982490904de61fe1a329b9f1e60243e8da530fb978a0a1eacf7acaa480f0d44b",
+   "time_local": "2026-11-23T01:05+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164600.0,
+    "y": 634170.0,
+    "r_m": 30,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "בסיס מגדלי הדקל",
+    "street": "הדקל",
+    "itm": [
+     166124.6,
+     634923.6
+    ],
+    "wgs84": [
+     31.805811,
+     34.641238
+    ]
+   },
+   "heading": {
+    "v": 230.0,
+    "prov": "משוער",
+    "conf": 0.25,
+    "pm": 30,
+    "method": "ציון דרך",
+    "src": "מבט אל המגדל, זווית חדה כלפי מעלה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "קרוב למגדל",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מגדל ~29–30 קומות, חיפוי אבן בהירה, מרפסות מעוגלות, פסי חלונות כהים; מגדל שני מימין",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2,
+     "attrs": {
+      "floors_est": "~29 (ספירה גסה; מקור ציבורי: 29)"
+     }
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "013",
+   "file": "013_20261123_0106.jpg",
+   "sha256": "1c2f9a47b6c98dedabc673779c7646d21346b583e12510aefd6f40eee619a5b3",
+   "time_local": "2026-11-23T01:06+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164600.0,
+    "y": 634170.0,
+    "r_m": 30,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "בסיס מגדלי הדקל",
+    "street": "הדקל",
+    "itm": [
+     166124.6,
+     634923.6
+    ],
+    "wgs84": [
+     31.805811,
+     34.641238
+    ]
+   },
+   "heading": {
+    "v": 230.0,
+    "prov": "משוער",
+    "conf": 0.25,
+    "pm": 30,
+    "method": "ציון דרך",
+    "src": "כמו 012"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "קרוב למגדל",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "אותו מגדל – תאורת חזית חמה מלמטה, תריסים בחלונות",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2,
+     "attrs": {
+      "floors_est": "~29"
+     }
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "014",
+   "file": "014_20261123_0106.jpg",
+   "sha256": "049775ee019709977391f1d2be006e351254d1bbf1fe264f54162e0dd36c18c0",
+   "time_local": "2026-11-23T01:06+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164600.0,
+    "y": 634170.0,
+    "r_m": 30,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "בסיס מגדלי הדקל",
+    "street": "הדקל",
+    "itm": [
+     166124.6,
+     634923.6
+    ],
+    "wgs84": [
+     31.805811,
+     34.641238
+    ]
+   },
+   "heading": {
+    "v": 230.0,
+    "prov": "משוער",
+    "conf": 0.25,
+    "pm": 30,
+    "method": "ציון דרך",
+    "src": "כמו 012"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "קרוב למגדל",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "אותו מגדל, זווית מעט שונה (לסדרת שחזור)",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2,
+     "attrs": {
+      "floors_est": "~29"
+     }
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_broadleaf_large",
+     "he": "עץ רחב-נוף בפינה",
+     "prov": "משוער",
+     "conf": 0.5
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "015",
+   "file": "015_20261123_0106.jpg",
+   "sha256": "26d8f687a5942d9f05e74ac25ca34ad1773a4d94213ecf37abcc25a6753ade44",
+   "time_local": "2026-11-23T01:06+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164655.0,
+    "y": 634174.0,
+    "r_m": 15,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "פינת הדקל/האורן – שלט \"רח' האורן\"",
+    "street": "האורן",
+    "itm": [
+     166179.6,
+     634927.6
+    ],
+    "wgs84": [
+     31.80585,
+     34.641818
+    ]
+   },
+   "heading": {
+    "v": 278.0,
+    "prov": "משוער",
+    "conf": 0.45,
+    "pm": 15,
+    "method": "כיוון רחוב",
+    "src": "לאורך הדקל מערבה; שלט האורן מימין, מגדלים בקצה השמאלי"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "street_name_sign",
+     "he": "שלט שם רחוב כחול, מסגרת לבנה, עברית למעלה (\"רח' האורן\") ואנגלית למטה (HA'OREN St.), עמוד לבן מעוטר",
+     "prov": "נצפה",
+     "conf": 0.95,
+     "count": 1,
+     "attrs": {
+      "color": "#1f4fa0"
+     }
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_curved_led",
+     "he": "שורת פנסי LED לבנים על עמודים מעוקלים לאורך הרחוב",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 6,
+     "attrs": {
+      "cct_K_est": "4000–5000",
+      "spacing_m_est": "25–30"
+     }
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_red_white",
+     "he": "אבן שפה אדום-לבן בפינה (איסור חניה ליד צומת)",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_red_square",
+     "he": "מדרכה אבנים מרובעות אדמדמות בפינה",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "attrs": {
+      "color": "#a0564a"
+     }
+    },
+    {
+     "dept": "גדרות",
+     "kind": "fence_white_picket",
+     "he": "גדר כלונסאות עץ לבנה",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "climber_on_fence",
+     "he": "מטפס ירוק על הגדר",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "בניינים",
+     "kind": "old_house_tile_roof",
+     "he": "בית ישן חד-קומתי, טיח בהיר, גג רעפים",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "bollards_red_white",
+     "he": "עמודונים אדום-לבן לאורך המדרכה הרחוקה",
+     "prov": "משוער",
+     "conf": 0.5
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "bench",
+     "he": "ספסל ליד גדר הגן",
+     "prov": "משוער",
+     "conf": 0.4
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן ברקע",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "רכב",
+     "kind": "parked_car",
+     "he": "האצ'בק, סדאן, רכבי שטח",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 4
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "016",
+   "file": "016_20261123_0107.jpg",
+   "sha256": "6cbc168fb2b2ff43fe0c4f7d49d51e9a511e8e267a43220a244e266167650aca",
+   "time_local": "2026-11-23T01:07+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164655.0,
+    "y": 634174.0,
+    "r_m": 15,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "כמו 015",
+    "street": "האורן",
+    "itm": [
+     166179.6,
+     634927.6
+    ],
+    "wgs84": [
+     31.80585,
+     34.641818
+    ]
+   },
+   "heading": {
+    "v": 280.0,
+    "prov": "משוער",
+    "conf": 0.45,
+    "pm": 15,
+    "method": "כיוון רחוב",
+    "src": "כמו 015"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "street_name_sign",
+     "he": "אותו שלט \"רח' האורן\" – עמוד לבן מעוטר, כחול עם מסגרת לבנה",
+     "prov": "נצפה",
+     "conf": 0.95,
+     "count": 1,
+     "attrs": {
+      "color": "#1f4fa0"
+     }
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_curved_led",
+     "he": "פנסים מעוקלים לבנים",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 6
+    },
+    {
+     "dept": "גדרות",
+     "kind": "fence_white_picket",
+     "he": "גדר כלונסאות לבנה",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_grey_metal",
+     "he": "מעקה מתכת אפור בגן משמאל",
+     "prov": "משוער",
+     "conf": 0.5
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "017",
+   "file": "017_20261123_0107.jpg",
+   "sha256": "2aab85382ab943908e8a1a40273b33a57697f8041e89d30302f95c4abcc4bf54",
+   "time_local": "2026-11-23T01:07+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": true,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164652.0,
+    "y": 634176.0,
+    "r_m": 15,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "כמו 015, צעד אחד",
+    "street": "האורן",
+    "itm": [
+     166176.6,
+     634929.6
+    ],
+    "wgs84": [
+     31.805867,
+     34.641786
+    ]
+   },
+   "heading": {
+    "v": 272.0,
+    "prov": "משוער",
+    "conf": 0.4,
+    "pm": 15,
+    "method": "כיוון רחוב",
+    "src": "כמו 015"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תאורה",
+     "kind": "lamp_curved_led",
+     "he": "פנסים מעוקלים",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 5
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_red_white",
+     "he": "שפה אדום-לבן באי התנועה/פינה",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "בניינים",
+     "kind": "old_house_tile_roof",
+     "he": "בית רעפים ישן",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "climber_on_fence",
+     "he": "מטפס על גדר",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "018",
+   "file": "018_20261123_0111.jpg",
+   "sha256": "40dba62d412f70b8140bf847a980551470d4c72d8188516151223e9c70000315",
+   "time_local": "2026-11-23T01:11+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164600.0,
+    "y": 634093.0,
+    "r_m": 150,
+    "prov": "נגזר",
+    "conf": 0.4,
+    "src": "שד' יצחק הנשיא – נגזר: אותו סגנון (פנסים אדומים כפולים + מעקה אדום עם אדניות) צולם ב-034 ליד שלט \"שד' יצחק הנשיא\" (033); 4 דק' אחרי 017; מיקום לאורך הרחוב משוער",
+    "street": "יצחק נשיא",
+    "itm": [
+     166124.6,
+     634846.6
+    ],
+    "wgs84": [
+     31.805117,
+     34.641242
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.85
+   },
+   "quality": {
+    "he": "בינונית – מטושטש, בוהק"
+   },
+   "findings": [
+    {
+     "dept": "תאורה",
+     "kind": "lamp_ornate_red_double",
+     "he": "עמודי תאורה אדומים מעוטרים, ראש LED לבן (כפול)",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 5,
+     "attrs": {
+      "cct_K_est": "4000–5000"
+     }
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_red_median",
+     "he": "מעקה הולכי רגל אדום מעוטר על אי התנועה",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_black_white",
+     "he": "שפת אי תנועה שחור-לבן",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_red_white",
+     "he": "שפת מדרכה אדום-לבן",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "slabs_light_grey",
+     "he": "מדרכה לוחות בהירים",
+     "prov": "נצפה",
+     "conf": 0.6,
+     "attrs": {
+      "color": "#cfc8bd"
+     }
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "traffic_light",
+     "he": "רמזור",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 2
+    },
+    {
+     "dept": "בניינים",
+     "kind": "block_mid_rise",
+     "he": "בלוקים 8–10 קומות",
+     "prov": "נצפה",
+     "conf": 0.75
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_broadleaf_large",
+     "he": "עץ רחב-נוף על אי התנועה",
+     "prov": "משוער",
+     "conf": 0.5
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "019",
+   "file": "019_20261123_0111.jpg",
+   "sha256": "19d261de4097cab19ae47f862b0a32282b0b2ee71a8e206a913fb7bd4d5e11d9",
+   "time_local": "2026-11-23T01:11+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164600.0,
+    "y": 634093.0,
+    "r_m": 150,
+    "prov": "נגזר",
+    "conf": 0.4,
+    "src": "כמו 018",
+    "street": "יצחק נשיא",
+    "itm": [
+     166124.6,
+     634846.6
+    ],
+    "wgs84": [
+     31.805117,
+     34.641242
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.85
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תאורה",
+     "kind": "lamp_ornate_red_double",
+     "he": "עמודי תאורה אדומים מעוטרים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 4
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_red_median",
+     "he": "מעקה אדום מעוטר + אדניות",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_black_white",
+     "he": "שפה שחור-לבן",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "road_arrows",
+     "he": "חיצי נתיב לבנים צבועים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "traffic_light",
+     "he": "רמזור",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 2
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "sign_parking_blue",
+     "he": "תמרור חניה כחול",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 1
+    },
+    {
+     "dept": "בניינים",
+     "kind": "block_mid_rise_commercial",
+     "he": "בלוקים 8–10 קומות עם חזית מסחרית וקולונדה; תריסי חנויות (שמות עסקים לא נרשמו)",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_ficus",
+     "he": "פיקוס בוגר באדנית",
+     "prov": "משוער",
+     "conf": 0.55,
+     "count": 2
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "palm_date",
+     "he": "דקלים באדניות",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 2
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "020",
+   "file": "020_20261123_0114.jpg",
+   "sha256": "5ad0f298cdfe0ce5f196bbe6272eb1ac1bbd79ad5fae286d9cfe8843585f7877",
+   "time_local": "2026-11-23T01:14+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164722.0,
+    "y": 633915.0,
+    "r_m": 30,
+    "prov": "נגזר",
+    "conf": 0.45,
+    "src": "בין הכיכר (029) ל-Sea View Tower (w238846044, 60 מ', 20 קומות) וביתן המסחר w238846041 – תואם מגדל ~20 קומות עם בסיס מסחרי",
+    "street": "רוגזין",
+    "itm": [
+     166246.6,
+     634668.6
+    ],
+    "wgs84": [
+     31.803517,
+     34.64254
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב ראשי חדש עם מגדל",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "בינונית – בוהק"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מגדל מגורים ~20–22 קומות (ספירה גסה) עם מבנה מסחרי עגול בבסיס",
+     "prov": "נצפה",
+     "conf": 0.75,
+     "attrs": {
+      "floors_est": "~20–22"
+     }
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "bike_rack_blue",
+     "he": "מתקני אופניים/מחסום כחולים מתפתלים",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 4
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "bin_street",
+     "he": "פח אשפה רחובי",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "פנסי LED לבנים על עמודים ישרים גבוהים",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 5,
+     "attrs": {
+      "cct_K_est": "4000–5000"
+     }
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "crosswalk_zebra",
+     "he": "מעבר חצייה",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_red_rect",
+     "he": "מדרכה אדומה",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "attrs": {
+      "color": "#9a4a3a"
+     }
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "planters",
+     "he": "אדניות עם שיחים לפני המבנה",
+     "prov": "נצפה",
+     "conf": 0.7
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "021",
+   "file": "021_20261123_0114.jpg",
+   "sha256": "7a8fa62feef649fae31c0e87bfb1baa0af3b3de9f4756329206192ed0bd67ab7",
+   "time_local": "2026-11-23T01:14+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164720.0,
+    "y": 633905.0,
+    "r_m": 25,
+    "prov": "נגזר",
+    "conf": 0.45,
+    "src": "מול הביתן העגול w238846041",
+    "street": "רוגזין",
+    "itm": [
+     166244.6,
+     634658.6
+    ],
+    "wgs84": [
+     31.803427,
+     34.642519
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב ראשי חדש עם מגדל",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "commercial_round_pavilion",
+     "he": "מבנה מסחרי עגול חד-קומתי עם חזית זכוכית ושלט (שם העסק לא נרשם)",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "אותו מגדל, מרפסות בפינה",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "022",
+   "file": "022_20261123_0115.jpg",
+   "sha256": "774737995d03a23972a009f601fc07add11cc1162f10abddce63a30c00e24f27",
+   "time_local": "2026-11-23T01:15+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false,
+    "persons_partial": true
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "צילום פנים (מכולת 24/7 בבסיס המגדל של 020) – לא ממוקם; תבנית חנות: מעבר",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": "פנים – לא בשימוש",
+    "prov": "נצפה",
+    "conf": 0.95
+   },
+   "quality": {
+    "he": "טובה, פנים"
+   },
+   "findings": [],
+   "status": "excluded_indoor"
+  },
+  {
+   "id": "023",
+   "file": "023_20261123_0115.jpg",
+   "sha256": "2b31e11f7a6959afd45469e462176a2340c9da0b8e4f95834617f7bdefa76334",
+   "time_local": "2026-11-23T01:15+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false,
+    "persons_partial": true
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "צילום פנים (מכולת 24/7 בבסיס המגדל של 020) – לא ממוקם; תבנית חנות: מקרר",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": "פנים – לא בשימוש",
+    "prov": "נצפה",
+    "conf": 0.95
+   },
+   "quality": {
+    "he": "טובה, פנים"
+   },
+   "findings": [],
+   "status": "excluded_indoor"
+  },
+  {
+   "id": "024",
+   "file": "024_20261123_0115.jpg",
+   "sha256": "b9e8026f7229e18c6dbe2dcc9d03f09d3ccc12bbf981b8b7579e614b8ac2aaed",
+   "time_local": "2026-11-23T01:15+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false,
+    "persons_partial": true
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "צילום פנים (מכולת 24/7 בבסיס המגדל של 020) – לא ממוקם; תבנית חנות: מקרר",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": "פנים – לא בשימוש",
+    "prov": "נצפה",
+    "conf": 0.95
+   },
+   "quality": {
+    "he": "טובה, פנים"
+   },
+   "findings": [],
+   "status": "excluded_indoor"
+  },
+  {
+   "id": "025",
+   "file": "025_20261123_0115.jpg",
+   "sha256": "1f2566e1bf290eeddd3e3878a780706fa013fb97736fce4a09ea4c00149e770f",
+   "time_local": "2026-11-23T01:15+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false,
+    "persons_partial": true
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "צילום פנים (מכולת 24/7 בבסיס המגדל של 020) – לא ממוקם; תבנית חנות: קופה",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": "פנים – לא בשימוש",
+    "prov": "נצפה",
+    "conf": 0.95
+   },
+   "quality": {
+    "he": "טובה, פנים"
+   },
+   "findings": [],
+   "status": "excluded_indoor"
+  },
+  {
+   "id": "026",
+   "file": "026_20261123_0117.jpg",
+   "sha256": "d5017c9bbd3285adfc5c034e55d93afab637f379b694e88d81d9da37b59724c7",
+   "time_local": "2026-11-23T01:17+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164717.0,
+    "y": 633900.0,
+    "r_m": 25,
+    "prov": "נגזר",
+    "conf": 0.45,
+    "src": "כניסת מכולת 24/7 בבסיס המגדל של 020 (רצף 020→026)",
+    "street": "רוגזין",
+    "itm": [
+     166241.6,
+     634653.6
+    ],
+    "wgs84": [
+     31.803382,
+     34.642488
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "כניסה לחנות",
+    "prov": "נצפה",
+    "conf": 0.9
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "בניינים",
+     "kind": "shop_entrance_glass",
+     "he": "כניסת חנות: דלת זכוכית הזזה, מדפי תצוגה חיצוניים, שלט מואר (שם העסק לא נרשם)",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "attrs": {
+      "template": "חנות נכנסת: חוץ→מעבר→מקרר→קופה",
+      "seq": "021,026,022,023,024,025"
+     }
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "tiles_terrazzo",
+     "he": "ריצוף כניסה בהיר מנוקד (טרצו)",
+     "prov": "נצפה",
+     "conf": 0.6
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "027",
+   "file": "027_20261123_0118.jpg",
+   "sha256": "c095891fb834b132dd77656eb22ce79b5d66a69983a5ed400082235b01a8dd3f",
+   "time_local": "2026-11-23T01:18+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164718.0,
+    "y": 633948.0,
+    "r_m": 40,
+    "prov": "נגזר",
+    "conf": 0.45,
+    "src": "אבן \"כיכר הפועלים\" (נקרא אצלנו) + שלט רוגוזין (נקרא ע\"י המטה). נבחרה הכיכר על רוגזין דרומית ליצחק הנשיא: רצף זמנים 01:14→01:18→01:21 (032 בצומת) + Sea View Tower (20 קומות) תואם 020/029. חלופה: מרכז רובע א' (PUB-006, ~480 מ' צפונה)",
+    "street": "רוגזין",
+    "itm": [
+     166242.6,
+     634701.6
+    ],
+    "wgs84": [
+     31.803814,
+     34.642496
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.8
+   },
+   "quality": {
+    "he": "טובה – בוהק"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "roundabout",
+     "he": "כיכר תנועה עם דשא, סלעים, עצים בוגרים ואבן שם \"כיכר הפועלים\"",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "sign_roundabout",
+     "he": "תמרור כיכר (עיגול כחול)",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "street_name_sign",
+     "he": "שלט שם רחוב כחול על עמוד (רוגוזין – לפי המטה)",
+     "prov": "משוער",
+     "conf": 0.5,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "ped_barrier_blue_white",
+     "he": "מחסומי הולכי רגל מתפתלים כחול-לבן",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 6
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_ficus",
+     "he": "פיקוסים בוגרים עם גזע עבה בכיכר",
+     "prov": "משוער",
+     "conf": 0.6,
+     "count": 3
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "פנסי LED לבנים",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 3
+    },
+    {
+     "dept": "בניינים",
+     "kind": "block_mid_rise_commercial",
+     "he": "בלוק 8–10 קומות עם חנויות בקומת הקרקע",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מגדל ~20 קומות ברקע",
+     "prov": "נצפה",
+     "conf": 0.7
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "taxi_sign",
+     "he": "שלט תחנת מוניות צהוב",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן עם תאורה כחולה ברקע",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "028",
+   "file": "028_20261123_0118.jpg",
+   "sha256": "d1227c6794e230309881f663cdc83264fb8a3bd3e1baf5d69eef52246ad59129",
+   "time_local": "2026-11-23T01:18+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164718.0,
+    "y": 633948.0,
+    "r_m": 60,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "מעבר חצייה ליד הכיכר (01:18, כמו 027)",
+    "street": "רוגזין",
+    "itm": [
+     166242.6,
+     634701.6
+    ],
+    "wgs84": [
+     31.803814,
+     34.642496
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "משוער",
+    "conf": 0.4
+   },
+   "quality": {
+    "he": "טובה לטקסטורה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "crosswalk_zebra_worn",
+     "he": "מעבר חצייה שחוק: פסים לבנים סדוקים על אספלט, רוחב פס ~50 ס\"מ (לפי כף רגל כסרגל)",
+     "prov": "נצפה",
+     "conf": 0.75,
+     "attrs": {
+      "stripe_w_m_est": 0.5,
+      "use": "טקסטורה"
+     }
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "029",
+   "file": "029_20261123_0118.jpg",
+   "sha256": "44fce1f8a3920241c4adb9c4f95cde46319389bf2dea8c37514070a9da2285e1",
+   "time_local": "2026-11-23T01:18+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164718.0,
+    "y": 633948.0,
+    "r_m": 50,
+    "prov": "נגזר",
+    "conf": 0.4,
+    "src": "אותה כיכר כמו 027, מבט אל המגדל והביתן העגול של 020",
+    "street": "רוגזין",
+    "itm": [
+     166242.6,
+     634701.6
+    ],
+    "wgs84": [
+     31.803814,
+     34.642496
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "בינונית – בוהק"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "roundabout",
+     "he": "כיכר עם דשא, סלעים, עץ זית/פיקוס",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_red_white",
+     "he": "שפת כיכר אדום-לבן",
+     "prov": "נצפה",
+     "conf": 0.75
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "המגדל של 020 + ביתן מסחרי עגול",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "פנס LED לבן",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 2
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "overhead_cable",
+     "he": "כבלים עיליים",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "030",
+   "file": "030_20261123_0120.jpg",
+   "sha256": "ed9b9db642aef043e3a68e3dbcc0e2b4f4c96b103c0eba161aefa3066f1e19a4",
+   "time_local": "2026-11-23T01:20+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164690.0,
+    "y": 634068.0,
+    "r_m": 80,
+    "prov": "משוער",
+    "conf": 0.3,
+    "src": "שד' יצחק הנשיא סמוך לרוגוזין (01:20) – מבט אל מתחם המגדלים",
+    "street": "יצחק נשיא",
+    "itm": [
+     166214.6,
+     634821.6
+    ],
+    "wgs84": [
+     31.804895,
+     34.642194
+    ]
+   },
+   "heading": {
+    "v": 300.0,
+    "prov": "משוער",
+    "conf": 0.3,
+    "pm": 20,
+    "method": "ציון דרך",
+    "src": "מגדלי הדקל במרכז התמונה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.7
+   },
+   "quality": {
+    "he": "בינונית – מטושטש"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "bike_lane_blue",
+     "he": "שביל אופניים צבוע כחול עם סימון לבן",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "cypress_row",
+     "he": "ברושים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2
+    },
+    {
+     "dept": "גדרות",
+     "kind": "wall_stone_clad",
+     "he": "קיר אבן טבעית נמוך + גדר לבנה",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "pavers_beige_square",
+     "he": "מדרכה אבן משתלבת בהירה",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "attrs": {
+      "color": "#c9b9a0"
+     }
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_led_white",
+     "he": "פנסי LED לבנים גבוהים",
+     "prov": "נצפה",
+     "conf": 0.75,
+     "count": 3
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מתחם מגדלי הדקל – 3 מגדלים נראים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 3,
+     "attrs": {
+      "floors_est": "~29"
+     }
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "031",
+   "file": "031_20261123_0121.jpg",
+   "sha256": "20291dda88dbf56f193583130705039c450b0b164747fb937914839bc8805e33",
+   "time_local": "2026-11-23T01:21+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164765.0,
+    "y": 634043.0,
+    "r_m": 30,
+    "prov": "משוער",
+    "conf": 0.35,
+    "src": "סמוך לצומת רוגוזין × יצחק הנשיא (01:21, כמו 032)",
+    "street": "רוגוזין",
+    "itm": [
+     166289.6,
+     634796.6
+    ],
+    "wgs84": [
+     31.804673,
+     34.642987
+    ]
+   },
+   "heading": {
+    "v": 264.3,
+    "prov": "נגזר",
+    "conf": 0.8,
+    "pm": 4.0,
+    "method": "גרם שמיים",
+    "src": "ירח az 267.89° alt 40.01° (2026-11-22T23:21:30.000Z, sky.js) בפיקסל u=0.5473, v=0.3535; ±4° מהנחת שדה ראייה וגלגול"
+   },
+   "pitch": {
+    "v": 28.6,
+    "prov": "נגזר",
+    "conf": 0.7,
+    "pm": 3.0,
+    "src": "מגובה הירח בתמונה"
+   },
+   "style_class": {
+    "v": "קרוב למגדל",
+    "prov": "נצפה",
+    "conf": 0.7
+   },
+   "quality": {
+    "he": "בינונית"
+   },
+   "findings": [
+    {
+     "dept": "שמיים",
+     "kind": "moon",
+     "he": "ירח בין העננים – מצפן",
+     "prov": "נצפה",
+     "conf": 0.95
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "זרוע עגורן ומגדל בבנייה בזווית חדה כלפי מעלה",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 1
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "032",
+   "file": "032_20261123_0121.jpg",
+   "sha256": "b802961b31e957966f81a474b99cabb8ad1532b833fad1ca2ec2160c5d97b9dc",
+   "time_local": "2026-11-23T01:21+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164765.0,
+    "y": 634043.0,
+    "r_m": 15,
+    "prov": "נגזר",
+    "conf": 0.6,
+    "src": "שלט \"רח' רוגוזין\" בצומת עם יצחק הנשיא (033) – עוגן",
+    "street": "רוגוזין",
+    "itm": [
+     166289.6,
+     634796.6
+    ],
+    "wgs84": [
+     31.804673,
+     34.642987
+    ]
+   },
+   "heading": {
+    "v": 281.5,
+    "prov": "נגזר",
+    "conf": 0.8,
+    "pm": 4.0,
+    "method": "גרם שמיים",
+    "src": "ירח az 267.89° alt 40.01° (2026-11-22T23:21:30.000Z, sky.js) בפיקסל u=0.2996, v=0.1139; ±4° מהנחת שדה ראייה וגלגול",
+    "check": {
+     "he": "מגדל w1280878706: נצפה מול צפוי מהמפה",
+     "observed_deg": 302.2,
+     "predicted_deg": 299.3,
+     "residual_deg": 3.0
+    }
+   },
+   "pitch": {
+    "v": 12.7,
+    "prov": "נגזר",
+    "conf": 0.7,
+    "pm": 3.0,
+    "src": "מגובה הירח בתמונה"
+   },
+   "style_class": {
+    "v": "רחוב מגורים חדש",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "street_name_sign_old",
+     "he": "שלט רחוב בסגנון ישן: לבן עם מסגרת אפורה, \"רח' רוגוזין\" / ROGOZIN ST",
+     "prov": "נצפה",
+     "conf": 0.95,
+     "count": 1,
+     "attrs": {
+      "color": "#f4f4f0"
+     }
+    },
+    {
+     "dept": "שמיים",
+     "kind": "moon",
+     "he": "ירח – מצפן",
+     "prov": "נצפה",
+     "conf": 0.95
+    },
+    {
+     "dept": "זמני",
+     "kind": "construction_hoarding_render",
+     "he": "גדר אתר עם הדמיה של 5 מגדלים מול הים – מצב עתידי (שכבת \"עתיד\" ב-4D)",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "זמני",
+     "kind": "crane_tower",
+     "he": "עגורן צריח כתום",
+     "prov": "נצפה",
+     "conf": 0.95,
+     "count": 1
+    },
+    {
+     "dept": "בניינים",
+     "kind": "tower_highrise",
+     "he": "מגדלי הדקל ברקע ימין",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "hedge",
+     "he": "גדר חיה נמוכה",
+     "prov": "נצפה",
+     "conf": 0.8
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "slabs_light_grey",
+     "he": "מדרכה לוחות בהירים",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "attrs": {
+      "color": "#cfc8bd"
+     }
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_curved_led",
+     "he": "פנסים מעוקלים לבנים בהמשך",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "count": 3
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "033",
+   "file": "033_20261123_0122.jpg",
+   "sha256": "8a9a17b7573727140b49297b3527a47b2ec3e3bd8e0d83880579962d9c771cac",
+   "time_local": "2026-11-23T01:22+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164765.0,
+    "y": 634043.0,
+    "r_m": 15,
+    "prov": "נגזר",
+    "conf": 0.6,
+    "src": "שלט \"שד' יצחק הנשיא\" בצומת עם רוגוזין",
+    "street": "יצחק נשיא",
+    "itm": [
+     166289.6,
+     634796.6
+    ],
+    "wgs84": [
+     31.804673,
+     34.642987
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "street_name_sign_old",
+     "he": "שלט רחוב ישן לבן: \"שד' יצחק הנשיא\" / YIZHAK HANASI SED",
+     "prov": "נצפה",
+     "conf": 0.95,
+     "count": 1,
+     "attrs": {
+      "color": "#f4f4f0"
+     }
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "hv_lattice_pole",
+     "he": "עמוד מתח גבוה מסבכי פלדה עם מבדדים – תשתית שחסרה בעולם",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "electrical_cabinet",
+     "he": "ארון חשמל מתכת על בסיס/מעטפת לבנים",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "ריצוף",
+     "kind": "slabs_light_grey",
+     "he": "מדרכה לוחות בהירים",
+     "prov": "נצפה",
+     "conf": 0.7,
+     "attrs": {
+      "color": "#cfc8bd"
+     }
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "034",
+   "file": "034_20261123_0122.jpg",
+   "sha256": "fe85e8a969c9bdee491e054aa563df3dacf2e3e4e52ebf9c175da97f44953548",
+   "time_local": "2026-11-23T01:22+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164765.0,
+    "y": 634043.0,
+    "r_m": 20,
+    "prov": "נגזר",
+    "conf": 0.55,
+    "src": "ליד 033, מבט לאורך יצחק הנשיא",
+    "street": "יצחק נשיא",
+    "itm": [
+     166289.6,
+     634796.6
+    ],
+    "wgs84": [
+     31.804673,
+     34.642987
+    ]
+   },
+   "heading": {
+    "v": 110.0,
+    "prov": "משוער",
+    "conf": 0.3,
+    "pm": 25,
+    "method": "כיוון רחוב",
+    "src": "לאורך יצחק הנשיא מזרחה (~113°) או מערבה – לא הוכרע; לפי צל וחזיתות משוער מזרחה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.85
+   },
+   "quality": {
+    "he": "טובה"
+   },
+   "findings": [
+    {
+     "dept": "תאורה",
+     "kind": "lamp_ornate_red_double",
+     "he": "עמודי תאורה אדומים, ראש כפול – כמו 018/019",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 5
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_red_median",
+     "he": "מעקה אדום על אי התנועה",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_pine",
+     "he": "עץ מחטני (אורן?) גבוה במדרכה",
+     "prov": "משוער",
+     "conf": 0.5,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "ped_barrier_blue_white",
+     "he": "מחסום הולכי רגל כחול מתפתל",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "hv_lattice_pole",
+     "he": "עמוד מתח גבוה (אותו מ-033)",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "electrical_cabinet",
+     "he": "ארון חשמל",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "manhole",
+     "he": "מכסה שוחה",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 2
+    },
+    {
+     "dept": "בניינים",
+     "kind": "block_mid_rise_commercial",
+     "he": "בלוקים 4–8 קומות עם חנויות",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "035",
+   "file": "035_20261123_0126.jpg",
+   "sha256": "74e2f3455e659c12f8b9f51cfd5e12ff066fc3e9ff4f3ea20136eec5c278f657",
+   "time_local": "2026-11-23T01:26+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": 164794.0,
+    "y": 634104.0,
+    "r_m": 15,
+    "prov": "נגזר",
+    "conf": 0.6,
+    "src": "שני שלטים כחולים בצומת הדקל × רוגוזין",
+    "street": "רוגוזין",
+    "itm": [
+     166318.6,
+     634857.6
+    ],
+    "wgs84": [
+     31.805225,
+     34.64329
+    ]
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0,
+    "method": "לא ידוע",
+    "src": "אין שלט/גרם שמיים/ציר רחוב מזוהה"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0.0
+   },
+   "style_class": {
+    "v": "שדרה עירונית ותיקה",
+    "prov": "נצפה",
+    "conf": 0.6
+   },
+   "quality": {
+    "he": "טובה – בוהק"
+   },
+   "findings": [
+    {
+     "dept": "תחבורה",
+     "kind": "street_name_sign",
+     "he": "שני שלטי רחוב בסגנון חדש (כחול, מסגרת לבנה) – הדקל ורוגוזין: סגנון השלט משתנה לפי קטע, לא לפי רחוב",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 2,
+     "attrs": {
+      "color": "#1f4fa0"
+     }
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "tactile_paving",
+     "he": "מסלול מנחה מישושי (אריחים מחורצים) אל מעבר החצייה",
+     "prov": "נצפה",
+     "conf": 0.85
+    },
+    {
+     "dept": "תחבורה",
+     "kind": "crosswalk_zebra",
+     "he": "מעבר חצייה",
+     "prov": "נצפה",
+     "conf": 0.9,
+     "count": 2
+    },
+    {
+     "dept": "אבני שפה",
+     "kind": "curb_red_white",
+     "he": "שפה מעוגלת אדום-לבן בפינה",
+     "prov": "נצפה",
+     "conf": 0.9
+    },
+    {
+     "dept": "צמחייה",
+     "kind": "tree_ficus",
+     "he": "פיקוס בוגר בתוך המדרכה",
+     "prov": "משוער",
+     "conf": 0.6,
+     "count": 2
+    },
+    {
+     "dept": "תאורה",
+     "kind": "lamp_ornate_red_double",
+     "he": "עמודי תאורה אדומים כפולים",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 3
+    },
+    {
+     "dept": "גדרות",
+     "kind": "rail_red_median",
+     "he": "מעקה אדום",
+     "prov": "נצפה",
+     "conf": 0.75
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "fire_hydrant_red",
+     "he": "ברז כיבוי אדום",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "bin_street",
+     "he": "פח רחוב",
+     "prov": "נצפה",
+     "conf": 0.85,
+     "count": 1
+    },
+    {
+     "dept": "ריהוט רחוב",
+     "kind": "pole_wood_utility",
+     "he": "עמוד עץ לכבלים",
+     "prov": "נצפה",
+     "conf": 0.8,
+     "count": 1
+    },
+    {
+     "dept": "בניינים",
+     "kind": "block_mid_rise_commercial",
+     "he": "בלוק 8 קומות, חזית מסחרית מוארת",
+     "prov": "נצפה",
+     "conf": 0.8
+    }
+   ],
+   "status": "analyzed"
+  },
+  {
+   "id": "036",
+   "file": "036_20261123_0127.jpg",
+   "sha256": "65e667d0427842b87339b84fcd279ee3638dd9a978d9f1a47b0a5454e6473a56",
+   "time_local": "2026-11-23T01:27+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "ממתין לניתוח",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "quality": {
+    "he": "ממתין"
+   },
+   "findings": [],
+   "status": "stub"
+  },
+  {
+   "id": "037",
+   "file": "037_20261123_0128.jpg",
+   "sha256": "a0790e0f7e0e08f7aa6569b7562cda84ee14b0300edb18568a23c583b156e2e8",
+   "time_local": "2026-11-23T01:28+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "ממתין לניתוח",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "quality": {
+    "he": "ממתין"
+   },
+   "findings": [],
+   "status": "stub"
+  },
+  {
+   "id": "038",
+   "file": "038_20261123_0128.jpg",
+   "sha256": "c32a5d249755d64bab417642b19ae8e542aee99c7df42fae5efdc9ea60022f12",
+   "time_local": "2026-11-23T01:28+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "ממתין לניתוח",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "quality": {
+    "he": "ממתין"
+   },
+   "findings": [],
+   "status": "stub"
+  },
+  {
+   "id": "039",
+   "file": "039_20261123_0128.jpg",
+   "sha256": "5594ee67ffc8b83f600d0aeecb78ded0f1f255aebdd8bcb5a9ad289232fb88a3",
+   "time_local": "2026-11-23T01:28+02:00",
+   "orientation": "לרוחב",
+   "fov_h": {
+    "v": 69.4,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "ממתין לניתוח",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "quality": {
+    "he": "ממתין"
+   },
+   "findings": [],
+   "status": "stub"
+  },
+  {
+   "id": "040",
+   "file": "040_20261123_0129.jpg",
+   "sha256": "a3975eb709db05f69a3d811ef7ab225f701a7460c98478212c3b030c59f387f7",
+   "time_local": "2026-11-23T01:29+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "ממתין לניתוח",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "quality": {
+    "he": "ממתין"
+   },
+   "findings": [],
+   "status": "stub"
+  },
+  {
+   "id": "041",
+   "file": "041_20261123_0130.jpg",
+   "sha256": "19b44dc1760a8f4ca828e08bff8bb9887938549898d317121d7b40934efbdf8d",
+   "time_local": "2026-11-23T01:30+02:00",
+   "orientation": "לאורך",
+   "fov_h": {
+    "v": 54.9,
+    "prov": "משוער",
+    "conf": 0.5,
+    "src": "אין EXIF; מצלמה ראשית ~26 מ\"מ שקול"
+   },
+   "privacy": {
+    "plates_visible": false,
+    "plates_recorded": false,
+    "private_names_recorded": false,
+    "faces": false
+   },
+   "pos": {
+    "x": null,
+    "y": null,
+    "r_m": 0,
+    "prov": "משוער",
+    "conf": 0,
+    "src": "ממתין לניתוח",
+    "street": null,
+    "itm": null,
+    "wgs84": null
+   },
+   "heading": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0,
+    "method": "לא ידוע"
+   },
+   "pitch": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "style_class": {
+    "v": null,
+    "prov": "משוער",
+    "conf": 0
+   },
+   "quality": {
+    "he": "ממתין"
+   },
+   "findings": [],
+   "status": "stub"
+  }
+ ]
+}
