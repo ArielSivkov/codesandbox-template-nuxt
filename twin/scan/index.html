@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סורק השטח – עולם תאום אשדוד</title>
+<style>
+  :root{--bg:#0f1214;--card:#1a1f23;--line:#2a3238;--text:#eef2f4;--mute:#9aa7b0;--ok:#3ecf8e;--warn:#f5b342;--bad:#ff6b6b;--acc:#ff8a3d}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.45}
+  header{position:sticky;top:0;z-index:5;background:#0f1214ee;backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:10px 14px}
+  h1{font-size:18px;margin:0}
+  .sub{color:var(--mute);font-size:13px;margin-top:2px}
+  .bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .pill{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+  .pill.ok{border-color:var(--ok);color:var(--ok)} .pill.bad{border-color:var(--bad);color:var(--bad)} .pill.warn{border-color:var(--warn);color:var(--warn)}
+  main{padding:12px 12px 90px;max-width:640px;margin:0 auto}
+  .tip{background:#22190f;border:1px solid #5a3a14;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+  .card.done{border-color:#2d5c45}
+  .row{display:flex;align-items:center;gap:10px}
+  .num{flex:none;width:28px;height:28px;border-radius:50%;background:#2a3238;display:grid;place-items:center;font-weight:700;font-size:14px}
+  .card.done .num{background:var(--ok);color:#06120c}
+  .t{font-weight:700}
+  .how{color:var(--mute);font-size:14px;margin:6px 0 8px}
+  .shot{display:block;text-align:center;background:var(--acc);color:#1b0d03;font-weight:800;border-radius:12px;padding:13px;cursor:pointer;user-select:none}
+  .shot input{display:none}
+  .count{font-size:13px;color:var(--mute);margin-top:6px}
+  .thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .th{width:84px;font-size:11px;color:var(--mute);text-align:center}
+  .th img{width:84px;height:64px;object-fit:cover;border-radius:8px;display:block;border:2px solid var(--line)}
+  .th.ok img{border-color:var(--ok)} .th.warn img{border-color:var(--warn)} .th.bad img{border-color:var(--bad)}
+  .msg{font-size:13px;margin-top:6px}
+  .msg.ok{color:var(--ok)} .msg.warn{color:var(--warn)} .msg.bad{color:var(--bad)}
+  label.f{display:block;font-size:13px;color:var(--mute);margin-bottom:4px}
+  input[type=text]{width:100%;background:#0f1214;color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:15px}
+  footer{position:fixed;bottom:0;left:0;right:0;background:#0f1214f2;border-top:1px solid var(--line);padding:10px 14px;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+  button.sm{background:#2a3238;color:var(--text);border:0;border-radius:9px;padding:6px 10px;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>סורק השטח – עולם תאום אשדוד</h1>
+  <div class="sub">כל תמונה נבדקת בטלפון ועולה ישר לדרייב, לתיקיית "צילומי שכונה – רחוב הארז"</div>
+  <div class="bar">
+    <span id="pDrive" class="pill">דרייב: מתחבר…</span>
+    <span id="pSun" class="pill">שקיעה: …</span>
+    <span id="pNext" class="pill">מספור: …</span>
+  </div>
+</header>
+<main>
+  <div class="tip">לפני שמתחילים: במצלמה של הטלפון צריך להדליק "תיוג מיקום". האפליקציה בודקת בכל תמונה אם יש בה מיקום ומסמנת לך אם אין.</div>
+
+  <div class="card">
+    <label class="f" for="where">איפה אתה עכשיו? (רחוב ומספר בית קרוב, נכנס לשם הקובץ ועוזר כשאין מיקום)</label>
+    <input id="where" type="text" placeholder="למשל: הארז 3">
+  </div>
+
+  <div id="list"></div>
+</main>
+<footer>
+  <span id="fStat">0 תמונות · 0 עלו</span>
+  <button class="sm" id="retry" hidden>נסה להעלות שוב</button>
+</footer>
+
+<script>
+(function(){
+'use strict';
+var FOLDER='1O8a2fojqZJg_XpUMOFFVZ7pRlQbakIrc';
+var SHOTS=[
+ {k:'sky',t:'שמיים בשקיעה',h:'תמונה רחבה של השמיים לכיוון מערב, ואחת לכיוון מזרח. אחר כך שוב כל 10 דקות עד שמחשיך.',n:2},
+ {k:'tower',t:'המגדל ליד הארז – חזית מלאה',h:'מהצד השני של הכביש, ישר מול הבניין, מהקרקע עד הגג. אחר כך עוד שתי פינות.',n:3,step:true},
+ {k:'tree',t:'עצי רחוב',h:'הפיקוס ליד מועדון השחמט, דקל ועוד עץ. לכל עץ: העץ כולו, גזע מקרוב, עלים מקרוב.',n:3},
+ {k:'ground',t:'משטחים',h:'מגובה מטר, ישר כלפי מטה, בצל: אספלט, מרצפות אדומות, אבן שפה, מכסה שוחה.',n:4},
+ {k:'facade',t:'חזיתות לפי סוג בניין',h:'ישר מול החזית: בית שיכון ותיק, וילה חדשה, בניין 8–10 קומות, שורת החנויות ברוגוזין עם השלטים.',n:4},
+ {k:'furniture',t:'ריהוט רחוב',h:'שני סוגי עמודי תאורה, שלט רחוב, ספסל, פח, המעקה הגלי הכחול-לבן.',n:5},
+ {k:'daynight',t:'יום מול לילה',h:'מועדון השחמט והארז 3 ביום, מאותן נקודות שצילמת אתמול בלילה.',n:2},
+ {k:'free',t:'צילום חופשי',h:'כל דבר אחר ששווה להכניס לעולם.',n:0}
+];
+var STEP_TXT=['תמונה 1 מתוך 3. עכשיו צעד אחד ימינה וצלם שוב.','תמונה 2 מתוך 3. עוד צעד ימינה וצלם שוב.','3 מתוך 3 – הנקודה הזאת מוכנה לתלת-ממד.'];
+
+var state={next:null,total:0,up:0,queue:[],drive:null,busy:false};
+var counts={};
+
+// ---------- UI ----------
+var list=document.getElementById('list');
+SHOTS.forEach(function(s,i){
+  counts[s.k]=0;
+  var c=document.createElement('div');c.className='card';c.id='c-'+s.k;
+  var row=document.createElement('div');row.className='row';
+  var num=document.createElement('div');num.className='num';num.textContent=String(i+1);
+  var t=document.createElement('div');t.className='t';t.textContent=s.t;
+  row.appendChild(num);row.appendChild(t);c.appendChild(row);
+  var h=document.createElement('div');h.className='how';h.textContent=s.h;c.appendChild(h);
+  var lab=document.createElement('label');lab.className='shot';lab.textContent='📷 צלם';
+  var inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.setAttribute('capture','environment');
+  inp.addEventListener('change',function(){ if(inp.files&&inp.files[0]) handle(s,inp.files[0],c); inp.value=''; });
+  lab.appendChild(inp);c.appendChild(lab);
+  var cnt=document.createElement('div');cnt.className='count';cnt.id='n-'+s.k;cnt.textContent=s.n?('0 מתוך '+s.n+' לפחות'):'0 תמונות';c.appendChild(cnt);
+  var m=document.createElement('div');m.className='msg';m.id='m-'+s.k;c.appendChild(m);
+  var th=document.createElement('div');th.className='thumbs';th.id='t-'+s.k;c.appendChild(th);
+  list.appendChild(c);
+});
+function setPill(id,txt,cls){var e=document.getElementById(id);e.textContent=txt;e.className='pill'+(cls?' '+cls:'');}
+function footer(){document.getElementById('fStat').textContent=state.total+' תמונות · '+state.up+' עלו לדרייב';
+  document.getElementById('retry').hidden=!state.queue.some(function(q){return q.failed;});}
+document.getElementById('retry').addEventListener('click',function(){state.queue.forEach(function(q){q.failed=false;});pump();});
+
+// ---------- sunset (NOAA approx) for Ashdod ----------
+function sunset(d){var lat=31.80,lon=34.65;var rad=Math.PI/180;
+  var start=Date.UTC(d.getUTCFullYear(),0,0);var N=Math.floor((d-start)/864e5);
+  var g=2*Math.PI/365*(N-1+0.5);
+  var eq=229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g));
+  var dec=0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g);
+  var ha=Math.acos(Math.cos(90.833*rad)/(Math.cos(lat*rad)*Math.cos(dec))-Math.tan(lat*rad)*Math.tan(dec))/rad;
+  var minUTC=720-4*(lon-ha)-eq; var s=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate())+minUTC*6e4);return s;}
+function tickSun(){var now=new Date();var s=sunset(now);var m=Math.round((s-now)/6e4);
+  var hh=s.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  if(m>0) setPill('pSun','שקיעה '+hh+' · עוד '+m+' דק׳',m<20?'warn':''); else setPill('pSun','אחרי השקיעה ('+hh+')','bad');}
+tickSun();setInterval(tickSun,30000);
+
+// ---------- EXIF (GPS + time) ----------
+function readExif(buf){
+  try{var v=new DataView(buf);if(v.getUint16(0)!==0xFFD8)return null;var o=2;
+    while(o<v.byteLength-4){var mk=v.getUint16(o);if((mk&0xFF00)!==0xFF00)return null;var len=v.getUint16(o+2);
+      if(mk===0xFFE1&&v.getUint32(o+4)===0x45786966){return parseTiff(v,o+10);} o+=2+len;}
+  }catch(e){}return null;}
+function parseTiff(v,t){var le=v.getUint16(t)===0x4949;
+  function u16(p){return v.getUint16(p,le);} function u32(p){return v.getUint32(p,le);}
+  function ifd(p){var n=u16(p),r={};for(var i=0;i<n;i++){var e=p+2+i*12;r[u16(e)]={type:u16(e+2),count:u32(e+4),off:e+8};}return r;}
+  function rat(p){var d=u32(p+4);return d?u32(p)/d:0;}
+  function val(en){if(!en)return null;var p=(en.type===5||en.type===10||en.count*({1:1,2:1,3:2,4:4,5:8}[en.type]||1)>4)?t+u32(en.off):en.off;
+    if(en.type===5){var a=[];for(var i=0;i<en.count;i++)a.push(rat(p+i*8));return a;}
+    if(en.type===2){var s='';for(var j=0;j<en.count-1;j++)s+=String.fromCharCode(v.getUint8(p+j));return s;}
+    if(en.type===3)return u16(p); if(en.type===4)return u32(p); return null;}
+  var res={};var i0=ifd(t+u32(t+4));
+  if(i0[0x8769]){var ex=ifd(t+val(i0[0x8769]));res.time=val(ex[0x9003]);}
+  if(i0[0x8825]){var g=ifd(t+val(i0[0x8825]));var la=val(g[2]),lo=val(g[4]);
+    if(la&&lo&&la.length===3&&lo.length===3){var lat=la[0]+la[1]/60+la[2]/3600,lon=lo[0]+lo[1]/60+lo[2]/3600;
+      if(val(g[1])==='S')lat=-lat; if(val(g[3])==='W')lon=-lon; if(lat||lon){res.lat=lat;res.lon=lon;}}
+    var dir=val(g[17]); if(dir&&dir.length)res.dir=dir[0];}
+  return res;}
+
+// ---------- quality ----------
+function quality(img){var W=480,sc=W/Math.max(img.width,img.height);var w=Math.round(img.width*sc),h=Math.round(img.height*sc);
+  var cv=document.createElement('canvas');cv.width=w;cv.height=h;var x=cv.getContext('2d');x.drawImage(img,0,0,w,h);
+  var d=x.getImageData(0,0,w,h).data;var g=new Float32Array(w*h),sum=0;
+  for(var i=0;i<w*h;i++){var y=0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2];g[i]=y;sum+=y;}
+  var mean=sum/(w*h),lv=0,lm=0,n=0;
+  for(var yy=1;yy<h-1;yy++)for(var xx=1;xx<w-1;xx++){var p=yy*w+xx;var L=4*g[p]-g[p-1]-g[p+1]-g[p-w]-g[p+w];lm+=L;lv+=L*L;n++;}
+  lm/=n;var varL=lv/n-lm*lm;return {sharp:varL,bright:mean};}
+
+// ---------- capture ----------
+function pad(n,l){n=String(n);while(n.length<l)n='0'+n;return n;}
+function handle(s,file,card){
+  var url=URL.createObjectURL(file);var img=new Image();
+  var msg=document.getElementById('m-'+s.k);msg.className='msg';msg.textContent='בודק…';
+  file.arrayBuffer().then(function(buf){
+    var ex=readExif(buf)||{};
+    img.onload=function(){
+      var q=quality(img);var issues=[];var cls='ok';
+      if(q.sharp<60){issues.push('מטושטש – כדאי לצלם שוב ולהחזיק יציב');cls='bad';}
+      else if(q.sharp<120){issues.push('חדות גבולית');cls='warn';}
+      if(q.bright<45){issues.push('חשוך');if(cls==='ok')cls='warn';}
+      if(q.bright>225){issues.push('שרוף מאור');if(cls==='ok')cls='warn';}
+      if(ex.lat==null){issues.push('אין מיקום בתמונה – תדליק תיוג מיקום במצלמה');if(cls==='ok')cls='warn';}
+      counts[s.k]++;state.total++;
+      var c=counts[s.k];
+      var cnt=document.getElementById('n-'+s.k);cnt.textContent=s.n?(c+' מתוך '+s.n+' לפחות'):(c+' תמונות');
+      if(s.n&&c>=s.n)card.classList.add('done');
+      var main=issues.length?issues.join(' · '):'מצוין: חד, מואר ויש מיקום';
+      if(s.step) main+=' — '+STEP_TXT[(c-1)%3];
+      msg.className='msg '+cls;msg.textContent=main;
+      var th=document.createElement('div');th.className='th '+cls;var im=document.createElement('img');im.src=url;im.alt='';
+      var st=document.createElement('div');st.textContent='ממתין להעלאה';th.appendChild(im);th.appendChild(st);
+      document.getElementById('t-'+s.k).appendChild(th);
+      state.queue.push({file:file,shot:s.k,ex:ex,where:document.getElementById('where').value.trim(),when:new Date(),el:st,done:false,failed:false});
+      footer();pump();
+    };
+    img.onerror=function(){msg.className='msg bad';msg.textContent='לא הצלחתי לפתוח את התמונה';};
+    img.src=url;
+  });
+}
+
+// ---------- upload ----------
+function b64(blob){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]);};r.onerror=rej;r.readAsDataURL(blob);});}
+function shrink(file){return new Promise(function(res){var img=new Image();img.onload=function(){var M=3000,sc=Math.min(1,M/Math.max(img.width,img.height));
+  var cv=document.createElement('canvas');cv.width=Math.round(img.width*sc);cv.height=Math.round(img.height*sc);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+  cv.toBlob(function(b){res(b);},'image/jpeg',0.9);};img.src=URL.createObjectURL(file);});}
+function nameFor(q){var d=q.when;var n=state.next!=null?pad(state.next++,3):('x'+d.getTime());
+  var parts=[n,d.getFullYear()+pad(d.getMonth()+1,2)+pad(d.getDate(),2),pad(d.getHours(),2)+pad(d.getMinutes(),2),q.shot];
+  if(q.ex.lat!=null)parts.push(q.ex.lat.toFixed(6)+'N',q.ex.lon.toFixed(6)+'E');
+  if(q.where)parts.push(q.where.replace(/[\\\/:*?"<>|]/g,'').replace(/\s+/g,'-'));
+  return parts.join('_')+'.jpg';}
+function pump(){
+  if(state.busy||!state.drive)return;var q=state.queue.find(function(x){return !x.done&&!x.failed;});if(!q)return;
+  state.busy=true;q.el.textContent='עולה…';
+  var p=q.file.size<=4*1024*1024?Promise.resolve(q.file):shrink(q.file);
+  p.then(b64).then(function(data){
+    if(!q.name)q.name=nameFor(q);
+    return state.drive.callTool('Google Drive','create_file',{title:q.name,parentId:FOLDER,contentMimeType:'image/jpeg',base64Content:data,disableConversionToGoogleType:true});
+  }).then(function(){q.done=true;state.up++;q.el.textContent='✓ בדרייב';q.el.style.color='var(--ok)';},
+         function(e){q.failed=true;q.el.textContent='נכשל';q.el.style.color='var(--bad)';
+           var m=document.getElementById('m-'+q.shot);m.className='msg bad';m.textContent='ההעלאה נכשלה ('+((e&&e.code)||'שגיאה')+'). התמונה שמורה בטלפון שלך; לחץ "נסה להעלות שוב".';})
+   .then(function(){state.busy=false;footer();pump();});
+}
+
+// ---------- connect ----------
+function findNext(mcp){
+  return mcp.callTool('Google Drive','search_files',{query:"'"+FOLDER+"' in ancestors and mimeType contains 'image/'",pageSize:100,orderBy:'modifiedTime desc',excludeContentSnippets:true})
+   .then(function(r){var p=r&&r.payload;var files=(p&&p.files)||[];var mx=0;
+     files.forEach(function(f){var m=/^(\d{3})_/.exec(f.title||'');if(m)mx=Math.max(mx,+m[1]);});
+     state.next=mx+1;setPill('pNext','הבאה: '+pad(state.next,3),'ok');})
+   .catch(function(){setPill('pNext','מספור לפי שעה','warn');});
+}
+if(window.claude&&window.claude.use){
+  window.claude.use('mcp').then(function(mcp){
+    if(!mcp){setPill('pDrive','דרייב לא זמין – פתח את הדף באפליקציית קלוד','bad');return;}
+    state.drive=mcp;window.__esh27drive=mcp;setPill('pDrive','דרייב מחובר','ok');
+    findNext(mcp).then(pump);
+  });
+}else{setPill('pDrive','דרייב לא זמין','bad');}
+})();
+</script>
+<script>
+// ===== מודול מדידה: מישור משבצות (הומוגרפיה) + גובה מצלמה/אופק, עם סטיית תקן מחושבת וכיול עצמי =====
+(function(){
+'use strict';
+var $=function(id){return document.getElementById(id);};
+var LOGF='13A1TiHDNsDw5nZTgVupR9qvYBxJXZaTG';
+var M={img:null,iw:0,ih:0,f35:26,fSrc:'ברירת מחדל',pts:[],mode:'plane',file:null,res:null};
+var cal=loadCal();
+
+// ---------- מתמטיקה ----------
+function gauss(){var u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function solve(A,b){var n=b.length,i,j,k;for(i=0;i<n;i++){var p=i;for(j=i+1;j<n;j++)if(Math.abs(A[j][i])>Math.abs(A[p][i]))p=j;
+  var t=A[i];A[i]=A[p];A[p]=t;t=b[i];b[i]=b[p];b[p]=t;if(Math.abs(A[i][i])<1e-12)return null;
+  for(j=i+1;j<n;j++){var f=A[j][i]/A[i][i];for(k=i;k<n;k++)A[j][k]-=f*A[i][k];b[j]-=f*b[i];}}
+  var x=new Array(n);for(i=n-1;i>=0;i--){var s=b[i];for(k=i+1;k<n;k++)s-=A[i][k]*x[k];x[i]=s/A[i][i];}return x;}
+function homog(src,dst){var A=[],b=[];for(var i=0;i<4;i++){var x=src[i][0],y=src[i][1],X=dst[i][0],Y=dst[i][1];
+  A.push([x,y,1,0,0,0,-x*X,-y*X]);b.push(X);A.push([0,0,0,x,y,1,-x*Y,-y*Y]);b.push(Y);}
+  var h=solve(A,b);return h?h.concat(1):null;}
+function apply(H,p){var w=H[6]*p[0]+H[7]*p[1]+1;return[(H[0]*p[0]+H[1]*p[1]+H[2])/w,(H[3]*p[0]+H[4]*p[1]+H[5])/w];}
+function stats(a){var n=a.length,m=0,s=0,i;for(i=0;i<n;i++)m+=a[i];m/=n;for(i=0;i<n;i++)s+=(a[i]-m)*(a[i]-m);return{m:m,s:Math.sqrt(s/(n-1))};}
+function fpx(){return M.f35*Math.hypot(M.iw,M.ih)/43.27;}   // מוקד בפיקסלים מאורך מוקד שקול 35 מ"מ (אלכסון 43.27 מ"מ)
+
+// מונטה-קרלו: מרעיד כל נקודה בסטיית ההקשה, ואת הערכים הידועים בסטיית התקן שלהם
+function mc(fn,N){var out=[],i;for(i=0;i<(N||400);i++){var r=fn(function(p){var s=sigPx();return[p[0]+gauss()*s,p[1]+gauss()*s];});if(r!=null&&isFinite(r))out.push(r);}
+  return out.length>20?stats(out):null;}
+function sigPx(){return (+$('mSigTap').value||2)*M.iw/Math.max(1,$('mCv').clientWidth);}   // שגיאת הקשה במסך → פיקסלים בתמונה
+function num(id){return +$(id).value;}
+
+function computePlane(){
+  var P=M.pts;if(P.length<4)return null;var W=num('mW')/100,H=num('mH')/100,sW=num('mWs')/100,sH=num('mHs')/100;
+  var ref=P.slice(0,4),meas=P.slice(4),rows=[],i,j;
+  function Hm(jit,w,h){var s=ref.map(jit);return homog(s,[[0,0],[w,0],[w,h],[0,h]]);}
+  for(i=0;i<meas.length;i++)for(j=i+1;j<meas.length;j++)(function(a,b){
+    var st=mc(function(jit){var w=W+gauss()*sW,h=H+gauss()*sH,Hh=Hm(jit,w,h);if(!Hh)return null;var A=apply(Hh,jit(a)),B=apply(Hh,jit(b));return Math.hypot(A[0]-B[0],A[1]-B[1]);});
+    rows.push({a:i+1,b:j+1,st:st});})(meas[i],meas[j]);
+  // בדיקת עקביות: המלבן הייחוס עצמו
+  return{type:'plane',rows:rows,n:meas.length};
+}
+function computeHeight(){
+  var P=M.pts;if(P.length<3)return null;var hz=P[0],h=num('mCam'),sh=num('mCams'),f0=fpx(),sf=f0*(num('mFs')/100),cy=M.ih/2,rows=[],k;
+  for(k=1;k+1<P.length;k+=2)(function(base,top,idx){
+    function geo(jit){var f=f0+gauss()*sf,hc=h+gauss()*sh,z=jit(hz),b=jit(base),t=jit(top);
+      var pitch=Math.atan((cy-z[1])/f);   // זווית המצלמה מתחת/מעל לאופק
+      var aB=Math.atan((b[1]-cy)/f)+pitch;if(aB<=0.001)return null;var d=hc/Math.tan(aB);
+      var aT=Math.atan((cy-t[1])/f)-pitch;return{d:d,H:hc+d*Math.tan(aT)};}
+    var sd=mc(function(j){var g=geo(j);return g&&g.d;}),sH=mc(function(j){var g=geo(j);return g&&g.H;});
+    rows.push({i:idx,d:sd,H:sH});})(P[k],P[k+1],(k+1)/2);
+  return{type:'height',rows:rows};
+}
+// ---------- כיול עצמי ----------
+function loadCal(){try{return JSON.parse(localStorage.getItem('esh27cal')||'{"plane":[],"height":[]}');}catch(e){return{plane:[],height:[]};}}
+function saveCal(){try{localStorage.setItem('esh27cal',JSON.stringify(cal));}catch(e){}}
+function calStat(t){var a=cal[t]||[];if(a.length<2)return{b:0,s:0,n:a.length};var st=stats(a.map(function(x){return x.err;}));return{b:st.m,s:st.s,n:a.length};}
+function corr(t,st){if(!st)return null;var c=calStat(t),m=st.m/(1+c.b),s=Math.sqrt(st.s*st.s+Math.pow(c.s*m,2));return{m:m,s:s};}
+function fmt(st,u){if(!st)return'—';var cm=u==='cm';var m=cm?st.m*100:st.m,s=cm?st.s*100:st.s;var d=s<0.1?3:s<1?2:s<10?1:0;return m.toFixed(d)+' ± '+s.toFixed(d)+(cm?' ס"מ':' מ\'');}
+
+// ---------- ציור ----------
+function draw(){var cv=$('mCv');if(!M.img)return;var W=cv.clientWidth,sc=W/M.iw;cv.width=W*devicePixelRatio;cv.height=M.ih*sc*devicePixelRatio;cv.style.height=(M.ih*sc)+'px';
+  var g=cv.getContext('2d');g.setTransform(devicePixelRatio*sc,0,0,devicePixelRatio*sc,0,0);g.drawImage(M.img,0,0);
+  var r=6/sc;g.lineWidth=2/sc;
+  if(M.mode==='plane'&&M.pts.length>=2){g.strokeStyle='#ff8a3d';g.beginPath();M.pts.slice(0,4).forEach(function(p,i){i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);});if(M.pts.length>=4)g.closePath();g.stroke();}
+  if(M.mode==='height'&&M.pts[0]){g.strokeStyle='#3ecf8e';g.setLineDash([10/sc,8/sc]);g.beginPath();g.moveTo(0,M.pts[0][1]);g.lineTo(M.iw,M.pts[0][1]);g.stroke();g.setLineDash([]);
+    for(var k=1;k+1<M.pts.length;k+=2){g.strokeStyle='#5ab0ff';g.beginPath();g.moveTo(M.pts[k][0],M.pts[k][1]);g.lineTo(M.pts[k+1][0],M.pts[k+1][1]);g.stroke();}}
+  M.pts.forEach(function(p,i){var ref=M.mode==='plane'?i<4:i===0;g.fillStyle=ref?'#ff8a3d':'#5ab0ff';g.beginPath();g.arc(p[0],p[1],r,0,7);g.fill();
+    g.fillStyle='#fff';g.font=(14/sc)+'px sans-serif';g.fillText(label(i),p[0]+r*1.4,p[1]-r*1.4);});
+  hint();}
+function label(i){if(M.mode==='plane')return i<4?('ר'+(i+1)):String(i-3);if(i===0)return'אופק';var o=Math.ceil(i/2);return(i%2?'בסיס ':'ראש ')+o;}
+function hint(){var n=M.pts.length,t;
+  if(M.mode==='plane')t=n<4?('הקש פינה '+(n+1)+' מתוך 4 של מלבן ידוע (משבצת/מרצפת), לפי הסדר מסביב.'):'עכשיו הקש נקודות למדידה. כל זוג נמדד – מקבלים מטריצת מרחקים.';
+  else t=n<1?'הקש על קו האופק (או נקודה בגובה העיניים שלך רחוק).':((n%2)?'הקש על בסיס העצם (איפה שהוא נוגע בקרקע).':'הקש על ראש העצם.');
+  $('mHint').textContent=t;}
+function loupe(p){var L=$('mLoupe'),g=L.getContext('2d'),z=4,R=L.width/2;g.clearRect(0,0,L.width,L.height);g.save();g.beginPath();g.arc(R,R,R,0,7);g.clip();
+  var sw=140/z*(M.iw/$('mCv').clientWidth);
+  g.drawImage(M.img,p[0]-sw/2,p[1]-sw/2,sw,sw,0,0,L.width,L.height);g.restore();g.strokeStyle='#ff8a3d';g.beginPath();g.moveTo(R-10,R);g.lineTo(R+10,R);g.moveTo(R,R-10);g.lineTo(R,R+10);g.stroke();L.style.display='block';}
+
+// ---------- קלט ----------
+function evPt(e){var cv=$('mCv'),r=cv.getBoundingClientRect(),t=e.touches?e.touches[0]:e,sc=M.iw/r.width;return[(t.clientX-r.left)*sc,(t.clientY-r.top)*sc];}
+var drag=-1;
+function near(p){var best=-1,bd=18*M.iw/$('mCv').clientWidth;M.pts.forEach(function(q,i){var d=Math.hypot(q[0]-p[0],q[1]-p[1]);if(d<bd){bd=d;best=i;}});return best;}
+function down(e){if(!M.img)return;e.preventDefault();var p=evPt(e);drag=near(p);if(drag<0){M.pts.push(p);drag=M.pts.length-1;}loupe(M.pts[drag]);draw();}
+function move(e){if(drag<0)return;e.preventDefault();M.pts[drag]=evPt(e);loupe(M.pts[drag]);draw();}
+function up(){if(drag<0)return;drag=-1;$('mLoupe').style.display='none';calc();}
+
+function exifF(buf){try{var v=new DataView(buf),o=2;if(v.getUint16(0)!==0xFFD8)return null;
+  while(o<v.byteLength){var mk=v.getUint16(o);if(mk===0xFFE1){var t=o+10,le=v.getUint16(t)===0x4949;var u16=function(p){return v.getUint16(p,le);},u32=function(p){return v.getUint32(p,le);};
+    var find=function(p,tag){var n=u16(p);for(var i=0;i<n;i++){var e=p+2+i*12;if(u16(e)===tag)return e;}return-1;};
+    var ifd0=t+u32(t+4),ex=find(ifd0,0x8769);if(ex<0)return null;var sub=t+u32(ex+8);
+    var e35=find(sub,0xA405);if(e35>=0)return{f35:u16(e35+8),src:'EXIF (שקול 35 מ"מ)'};
+    return null;}o+=2+v.getUint16(o+2);}}catch(e){}return null;}
+
+function load(file){M.file=file;M.pts=[];M.res=null;var fr=new FileReader();fr.onload=function(){var f=exifF(fr.result);if(f&&f.f35){M.f35=f.f35;M.fSrc=f.src;}else{M.f35=+$('mF').value||26;M.fSrc='ברירת מחדל – תקן לפי הטלפון';}
+    $('mF').value=M.f35;$('mFsrc').textContent=M.fSrc;};fr.readAsArrayBuffer(file);
+  createImageBitmap(file,{imageOrientation:'from-image'}).catch(function(){return createImageBitmap(file);}).then(function(bm){M.img=bm;M.iw=bm.width;M.ih=bm.height;$('mOut').innerHTML='';draw();});}
+
+function calc(){M.f35=+$('mF').value||M.f35;var r=M.mode==='plane'?computePlane():computeHeight();M.res=r;var o=$('mOut');if(!r){o.innerHTML='';return;}
+  var c=calStat(M.mode),h='';
+  if(r.type==='plane'){if(!r.rows.length){o.textContent='הוסף לפחות 2 נקודות מדידה.';return;}
+    h='<table><tr><th>זוג</th><th>מרחק (מתוקן)</th><th>בדיקה</th></tr>'+r.rows.map(function(x,i){return'<tr><td>'+x.a+'↔'+x.b+'</td><td>'+fmt(corr('plane',x.st),x.st&&x.st.m<2?'cm':'m')+'</td><td><button class="sm" data-k="'+i+'">ערך ידוע</button></td></tr>';}).join('')+'</table>';}
+  else{h='<table><tr><th>עצם</th><th>מרחק (עומק)</th><th>גובה</th><th>בדיקה</th></tr>'+r.rows.map(function(x,i){return'<tr><td>'+x.i+'</td><td>'+fmt(corr('height',x.d))+'</td><td>'+fmt(corr('height',x.H))+'</td><td><button class="sm" data-k="'+i+'">גובה ידוע</button></td></tr>';}).join('')+'</table>';}
+  h+='<div class="msg">כיול עצמי: '+c.n+' בדיקות'+(c.n>=2?(' · הטיה '+(c.b*100).toFixed(1)+'% · פיזור '+(c.s*100).toFixed(1)+'%'):' · עוד אין מספיק בדיקות – סטיית התקן היא מההקשות והייחוס בלבד')+'</div>';
+  o.innerHTML=h;
+  Array.prototype.forEach.call(o.querySelectorAll('button[data-k]'),function(b){b.onclick=function(){var x=r.rows[+b.dataset.k],st=r.type==='plane'?x.st:x.H;if(!st)return;
+    var v=prompt('מה הערך האמיתי? ('+(r.type==='plane'?'ס"מ':'מטרים')+')');if(!v)return;var tv=+v/(r.type==='plane'?100:1);if(!(tv>0))return;
+    cal[M.mode].push({err:(st.m-tv)/tv,t:Date.now()});saveCal();calc();};});}
+
+function save(){if(!M.res||!window.__esh27drive){$('mSave').textContent='אין חיבור לדרייב';return;}var d=new Date(),ts=d.toISOString().replace(/[:.]/g,'-');
+  var rec={when:d.toISOString(),mode:M.mode,image:{w:M.iw,h:M.ih,f35:M.f35,fSrc:M.fSrc},points:M.pts,inputs:{W_cm:num('mW'),H_cm:num('mH'),sW_cm:num('mWs'),sH_cm:num('mHs'),cam_m:num('mCam'),scam_m:num('mCams'),f_sigma_pct:num('mFs'),tap_px:num('mSigTap')},
+    result:M.res,calibration:calStat(M.mode),note:$('mNote').value,method:'מונטה-קרלו 400 דגימות; מישור: הומוגרפיה מ-4 פינות; גובה: גובה מצלמה + קו אופק + מוקד'};
+  var mcp=window.__esh27drive,b='';var u8=new TextEncoder().encode(JSON.stringify(rec,null,1));for(var i=0;i<u8.length;i++)b+=String.fromCharCode(u8[i]);
+  $('mSave').textContent='שומר…';
+  mcp.callTool('Google Drive','create_file',{title:'מדידה_'+ts+'.json',parentId:LOGF,contentMimeType:'application/json',base64Content:btoa(b),disableConversionToGoogleType:true})
+   .then(function(){var fr=new FileReader();fr.onload=function(){mcp.callTool('Google Drive','create_file',{title:'מדידה_'+ts+'.jpg',parentId:LOGF,contentMimeType:'image/jpeg',base64Content:String(fr.result).split(',')[1],disableConversionToGoogleType:true})
+     .then(function(){$('mSave').textContent='✓ נשמר בדרייב';},function(){$('mSave').textContent='התמונה לא עלתה';});};fr.readAsDataURL(M.file);},function(){$('mSave').textContent='השמירה נכשלה';});}
+
+// ---------- בניית הממשק ----------
+var css=document.createElement('style');css.textContent='#mWrap table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}#mWrap td,#mWrap th{border-bottom:1px solid var(--line);padding:5px;text-align:right}'+
+ '#mCv{width:100%;touch-action:none;border-radius:10px;background:#000;display:block}#mLoupe{position:fixed;top:70px;left:12px;width:140px;height:140px;border-radius:50%;border:2px solid #ff8a3d;display:none;z-index:9;background:#000}'+
+ '.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700}.tabs button.on{background:var(--acc);color:#1b0d03}'+
+ '.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.g2 input,.g1 input{width:100%;background:#0f1214;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px}';
+document.head.appendChild(css);
+var main=document.querySelector('main'),tabs=document.createElement('div');tabs.className='tabs';
+tabs.innerHTML='<button id="tShot" class="on">📷 צילום</button><button id="tMeas">📏 מדידה</button>';main.parentNode.insertBefore(tabs,main);
+var w=document.createElement('div');w.id='mWrap';w.hidden=true;w.style.cssText='padding:0 12px 90px;max-width:640px;margin:0 auto';
+w.innerHTML='<div class="tip">📏 <b>קטן וקרוב</b> (משבצת, עובי, מדרכה): מצב "מישור" – מסמנים מלבן ידוע ומודדים כל דבר על אותו משטח.<br>🏢 <b>גדול ורחוק</b> (עמוד, עץ, בניין): מצב "גובה" – מחזיקים את הטלפון בגובה ידוע, מסמנים אופק, בסיס וראש.<br>כל תוצאה מגיעה עם ± מחושב. "ערך ידוע" מלמד את הסורק לתקן את עצמו.</div>'+
+ '<div class="tabs"><button id="mmP" class="on">מישור משבצות</button><button id="mmH">גובה ומרחק</button></div>'+
+ '<label class="shot">📷 צלם או בחר תמונה למדידה<input id="mFile" type="file" accept="image/*" capture="environment"></label>'+
+ '<div class="card" style="margin-top:10px"><div id="mHint" class="msg"></div><canvas id="mCv"></canvas><div class="bar"><button class="sm" id="mUndo">↩ בטל נקודה</button><button class="sm" id="mClear">נקה</button></div></div>'+
+ '<div class="card" id="mPlaneIn"><div class="g2"><label class="f">רוחב ייחוס (ס"מ)<input id="mW" type="number" value="30"></label><label class="f">± (ס"מ)<input id="mWs" type="number" value="0.2" step="0.1"></label>'+
+ '<label class="f">גובה ייחוס (ס"מ)<input id="mH" type="number" value="30"></label><label class="f">± (ס"מ)<input id="mHs" type="number" value="0.2" step="0.1"></label></div></div>'+
+ '<div class="card" id="mHgtIn" hidden><div class="g2"><label class="f">גובה המצלמה מהקרקע (מ\')<input id="mCam" type="number" value="1.5" step="0.01"></label><label class="f">± (מ\')<input id="mCams" type="number" value="0.05" step="0.01"></label>'+
+ '<label class="f">מוקד שקול 35 מ"מ<input id="mF" type="number" value="26"></label><label class="f">± (%)<input id="mFs" type="number" value="3"></label></div><div class="msg" id="mFsrc"></div></div>'+
+ '<div class="card"><div class="g2"><label class="f">דיוק הקשה (פיקסלי מסך)<input id="mSigTap" type="number" value="2" step="0.5"></label><label class="f">הערה<input id="mNote" type="text" placeholder="מה מדדת ואיפה"></label></div></div>'+
+ '<div class="card"><div id="mOut"></div><button class="sm" id="mSave" style="margin-top:8px">💾 שמור לדרייב</button></div><canvas id="mLoupe" width="280" height="280"></canvas>';
+main.parentNode.insertBefore(w,main.nextSibling);
+function tab(m){$('tShot').className=m?'':'on';$('tMeas').className=m?'on':'';main.hidden=!!m;w.hidden=!m;if(m)draw();}
+$('tShot').onclick=function(){tab(0);};$('tMeas').onclick=function(){tab(1);};
+function mode(m){M.mode=m;M.pts=[];$('mmP').className=m==='plane'?'on':'';$('mmH').className=m==='height'?'on':'';$('mPlaneIn').hidden=m!=='plane';$('mHgtIn').hidden=m!=='height';$('mOut').innerHTML='';draw();hint();}
+$('mmP').onclick=function(){mode('plane');};$('mmH').onclick=function(){mode('height');};
+$('mFile').onchange=function(){if(this.files&&this.files[0])load(this.files[0]);this.value='';};
+$('mUndo').onclick=function(){M.pts.pop();draw();calc();};$('mClear').onclick=function(){M.pts=[];draw();calc();};$('mSave').onclick=save;
+['mW','mH','mWs','mHs','mCam','mCams','mF','mFs','mSigTap'].forEach(function(id){$(id).oninput=calc;});
+var cv=$('mCv');cv.addEventListener('touchstart',down,{passive:false});cv.addEventListener('touchmove',move,{passive:false});cv.addEventListener('touchend',up);
+cv.addEventListener('mousedown',down);window.addEventListener('mousemove',function(e){if(drag>=0)move(e);});window.addEventListener('mouseup',up);
+window.addEventListener('resize',draw);hint();
+// חשיפה לבדיקות
+window.__esh27measure={homog:homog,apply:apply,M:M,computePlane:computePlane,computeHeight:computeHeight};
+})();
+</script>
+</body>
+</html>
