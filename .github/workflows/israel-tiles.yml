@@ -39,7 +39,7 @@ jobs:
       - name: בנייה
         run: |
           BBOX=$(python3 -c "import json;c=[c for c in json.load(open('twin/pipeline/israel_regions.json'))['cells'] if c['id']=='${{ matrix.cell }}'][0];print(','.join(map(str,c['bbox'])))")
-          cd twin/pipeline && python3 build_city.py --bbox "$BBOX" --slug "${{ matrix.cell }}" --osm pbf --pbf ../../il.osm.pbf --dem cop30 --no-green --out ../../out
+          cd twin/pipeline && python3 build_city.py --bbox "$BBOX" --slug "${{ matrix.cell }}" --osm pbf --pbf ../../il.osm.pbf --dem cop30 --no-green --out ../../out || (mkdir -p ../../out && echo '{"nodata":true}' > ../../out/_nodata.json)   # תא בלי נתונים (ים / מחוץ לקובץ) – לא נכשל, מסומן
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: 'out-${{ matrix.cell }}', path: out, retention-days: 3, if-no-files-found: ignore }

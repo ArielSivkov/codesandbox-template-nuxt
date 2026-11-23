@@ -29,7 +29,7 @@ for d in sorted(glob.glob(os.path.join(SRC, 'out-*'))):
         if k not in T: T[k] = [raw[:20], z, raw[20 + NT * NT * 2:]]
         else:
             cur = T[k][1]; m = (cur == OUTV) & (z != OUTV); cur[m] = z[m]
-    stat[rid] = nb
+    stat[rid] = nb if not (os.path.exists(os.path.join(d, '_nodata.json')) and not vs) else -1
 for k, t in V.items():
     t.pop('_rd', None)
     open(os.path.join(OUT, 'tiles/v', k + '.json.gz'), 'wb').write(gzip.compress(json.dumps(t, ensure_ascii=False, separators=(',', ':')).encode(), mtime=0))
@@ -37,7 +37,7 @@ for k, (h, z, rest) in T.items():
     open(os.path.join(OUT, 'tiles/t', k + '.bin.gz'), 'wb').write(gzip.compress(h + z.astype('<i2').tobytes() + rest, mtime=0))
 R = json.load(open(REG))
 for c in R['cells']:
-    if c['id'] in stat: c['status'] = 'done' if stat[c['id']] else 'empty'; c['buildings'] = stat[c['id']]
+    if c['id'] in stat: c['status'] = 'nodata' if stat[c['id']] < 0 else ('done' if stat[c['id']] else 'empty'); c['buildings'] = max(0, stat[c['id']])
     # בלי תוצר = נכשל או לא רץ → נשאר todo וייבנה שוב בריצה הבאה
 json.dump(R, open(REG, 'w'), ensure_ascii=False, indent=0)
 print('אריחים', len(V), 'קרקע', len(T), 'בניינים', sum(len(t['b']) for t in V.values()), 'אזורים', len(stat))
