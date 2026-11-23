@@ -1,0 +1,23 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({viewport:{width:420,height:860},isMobile:true,hasTouch:true});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+let ok=true;const check=(c,m)=>{console.log((c?'ok   ':'FAIL ')+m);if(!c)ok=false;};
+const URL='http://127.0.0.1:8940/preview/world/index.html?auto&acct=http://127.0.0.1:8950';
+p.on('dialog',d=>d.accept(d.type()==='prompt'?'נהג מונית':undefined));
+await p.goto(URL);await p.waitForTimeout(9000);
+check(!!await p.$('#yzAcct'),'כפתור 👤 בסרגל');
+await p.click('#yzAcct');await p.fill('#acU','ariel_test');await p.fill('#acP','Secret-pass-1');await p.click('[data-a=signup]');await p.waitForTimeout(1500);
+check((await p.textContent('.ac-in')).includes('הפרופילים שלי'),'הרשמה ונכנס');
+await p.click('[data-a=set][data-k=beard]');await p.$eval('input[data-k=top]',e=>{e.value='#00aa44';e.dispatchEvent(new Event('input',{bubbles:true}));});
+await p.$eval('input[data-k=height]',e=>{e.value='1.95';e.dispatchEvent(new Event('input',{bubbles:true}));});
+let info=await p.evaluate(()=>G27.avatarInfo());check(info.top==='#00aa44'&&Math.abs(info.scale/info.s0-1.95/1.78)<0.01,'תצוגה חיה: חולצה '+info.top+', גובה ×'+(info.scale/info.s0).toFixed(3));
+await p.click('[data-a=save]');await p.waitForTimeout(1200);check((await p.textContent('#acS')).includes('נשמר'),'שמירה בחשבון');
+await p.click('[data-a=new]');await p.waitForTimeout(1200);check((await p.$$('.ac-pl [data-a=pick]')).length===2,'פרופיל שני נוצר');
+await p.click('[data-a=set][data-k=base][data-v=f]');await p.waitForTimeout(4000);info=await p.evaluate(()=>G27.avatarInfo());check(info.base==='f','החלפה לדמות אישה');
+await p.click('[data-a=save]');await p.waitForTimeout(2500);await p.screenshot({path:'/tmp/acct.png'});
+// טעינה מחדש: עדיין מחובר, הפרופיל הפעיל והדמות חוזרים
+await p.reload();await p.waitForTimeout(10000);info=await p.evaluate(()=>G27.avatarInfo());
+check(info.av&&info.av.base==='f','אחרי רענון: מחובר והדמות חזרה ('+(info.av&&info.av.base)+')');
+await p.click('#yzAcct');await p.click('[data-a=pick] >> nth=0');await p.waitForTimeout(4000);info=await p.evaluate(()=>G27.avatarInfo());
+check(info.base==='m'&&info.av.beard===true&&info.top==='#00aa44','מעבר לפרופיל הראשון: גבר עם זקן וחולצה ירוקה');
+await p.click('[data-a=close]');await p.waitForTimeout(500);await p.screenshot({path:'/tmp/acct2.png'});
+check(errs.length===0,'בלי שגיאות JS '+errs.join('|'));console.log(ok?'בדיקת החשבונות במשחק עברה':'נכשל');await b.close();process.exit(ok?0:1);})();

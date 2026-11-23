@@ -138,16 +138,16 @@ function clothes(mesh) {
   const B = {}; for (const b of mesh.skeleton.bones) B[b.name] = b; const loc = b => new T.Vector3().setFromMatrixPosition(b.matrixWorld).applyMatrix4(mesh.bindMatrixInverse);
   const pel = loc(B.pelvis), up = loc(B.Head).sub(pel).normalize(), side = loc(B.thigh_l).sub(loc(B.thigh_r)); side.addScaledVector(up, -side.dot(up)).normalize();
   const pa = mesh.geometry.attributes.position, v = new T.Vector3(); let lo = 1e9, hi = -1e9; for (let i = 0; i < pa.count; i++) { v.fromBufferAttribute(pa, i); const h = v.dot(up); if (h < lo) lo = h; if (h > hi) hi = h; }
-  const m = mesh.material.clone(); const U = { uUp: { value: up }, uSide: { value: side }, uLo: { value: lo }, uH: { value: hi - lo }, uMid: { value: pel.dot(side) } };
+  const m = mesh.material.clone(); const U = { uUp: { value: up }, uSide: { value: side }, uLo: { value: lo }, uH: { value: hi - lo }, uMid: { value: pel.dot(side) }, uTop: { value: new T.Color(0.86, 0.50, 0.20) }, uBot: { value: new T.Color(0.16, 0.25, 0.42) }, uShoe: { value: new T.Color(0.12, 0.11, 0.10) } }; AN.U = U;
   m.onBeforeCompile = sh => { Object.assign(sh.uniforms, U);
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vB;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvB = position;');
-    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vB; uniform vec3 uUp, uSide; uniform float uLo, uH, uMid;')
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vB; uniform vec3 uUp, uSide, uTop, uBot, uShoe; uniform float uLo, uH, uMid;')
       .replace('#include <map_fragment>', `#include <map_fragment>
 { float h = (dot(vB, uUp) - uLo) / uH; float s = abs(dot(vB, uSide) - uMid) / uH;
   float L = dot(diffuseColor.rgb, vec3(0.3,0.59,0.11)); float n = 0.85 + 0.3 * L;
-  if (h < 0.045) diffuseColor.rgb = vec3(0.12,0.11,0.10);
-  else if (h < 0.475 && s < 0.2) diffuseColor.rgb = vec3(0.16,0.25,0.42) * n;
-  else if (h < 0.815 && (s < 0.125 || (h > 0.66 && s < 0.21))) diffuseColor.rgb = vec3(0.86,0.50,0.20) * n; }`); };
+  if (h < 0.045) diffuseColor.rgb = uShoe;
+  else if (h < 0.475 && s < 0.2) diffuseColor.rgb = uBot * n;
+  else if (h < 0.815 && (s < 0.125 || (h > 0.66 && s < 0.21))) diffuseColor.rgb = uTop * n; }`); };
   m.customProgramCacheKey = () => 'w27_clothes'; return m;
 }
 /** דגם רכב CC0 (assets/pack: car_sedan.glb, 440 משולשים, 11KB) במקום קופסה. הלוגיקה (תנועה, התנגשות) לא משתנה. */
@@ -161,20 +161,36 @@ async function loadCarModel() {
     for (const c of car.children) c.visible = false; car.add(m); car.userData.model = m;
   } catch (e) { console.warn('car model', e); }
 }
-async function loadCharacter() {
+/** דמות לפי פרופיל: צבעי בגדים, שיער, זקן, גובה. נקרא מהמודול 60-account. */
+function applyAvatar(av) {
+  av = av || {}; AN.av = av; const base = av.base === 'f' ? 'f' : 'm';
+  if (AN.model && base !== (AN.base || 'm') && !AN.loading) { AN.loading = true; player.remove(AN.model); AN.model = null; loadCharacter(base).then(() => { AN.loading = false; }); return true; }
+  const r = AN.model; if (!r) return false;
+  const c = (k, d) => new T.Color(/^#[0-9a-f]{6}$/i.test(av[k] || '') ? av[k] : d);
+  if (AN.U) { AN.U.uTop.value.copy(c('top', '#db8033')); AN.U.uBot.value.copy(c('bottom', '#29406b')); AN.U.uShoe.value.copy(c('shoes', '#1f1c1a')); }
+  const style = av.hairStyle || 'parted';
+  r.traverse(o => { if (!o.isMesh) return; const n = o.name;
+    if (/^Hair_SimpleParted/.test(n)) o.visible = style === 'parted'; else if (/^Hair_Buzzed/.test(n)) o.visible = style === 'buzzed';
+    else if (/^Hair_Beard/.test(n)) o.visible = !!av.beard; else if (/^Hair_Long/.test(n)) o.visible = style === 'long'; else if (/^Hair_Buns/.test(n)) o.visible = style === 'buns';
+    if (/^Hair_/.test(n) && o.material) { if (!o.userData.m0) { o.userData.m0 = o.material; o.material = o.material.clone(); } o.material.color = c('hair', '#ffffff'); }
+    if (o.material && /Superhero/i.test((o.userData.mat0 || o.material).name || '') && av.skin) { o.material.color = c('skin', '#ffffff'); } });
+  const k = (av.height || 1.75) / 1.78; r.scale.setScalar(AN.s0 * k); return true;
+}
+async function loadCharacter(base) {
+  AN.base = base === 'f' ? 'f' : 'm';
   try {
     if (!window.ESH_GLTF) await loadScript('vendor/loaders.js');
     const G = window.ESH_GLTF; const L = new G.GLTFLoader(); L.setMeshoptDecoder(G.MeshoptDecoder);
-    const [m, a] = await Promise.all([L.loadAsync('assets/ubc_male.glb'), L.loadAsync('assets/ual_anims.glb')]);
+    const [m, a] = await Promise.all([L.loadAsync(AN.base === 'f' ? 'assets/ubc_female.glb' : 'assets/ubc_male.glb'), L.loadAsync('assets/ual_anims.glb')]);
     const root = m.scene; root.updateMatrixWorld(true); const box = new T.Box3().setFromObject(root); const h = box.max.y - box.min.y; const s = 1.78 / h;
-    root.scale.setScalar(s); root.position.y = -box.min.y * s;
+    root.scale.setScalar(s); root.position.y = -box.min.y * s; AN.s0 = s;
     root.traverse(o => { if (o.isMesh) { o.frustumCulled = false; o.castShadow = true; if (o.material && /Superhero/i.test(o.material.name)) o.material = clothes(o); } });
     AN.model = root; player.add(root); player.remove(ph);
     AN.mixer = new T.AnimationMixer(root);
     for (const c of a.animations) { // בלי תנועת שורש אופקית (המשחק מזיז את הדמות)
       c.tracks = c.tracks.filter(tr => !(/^(root|pelvis)\.position$/.test(tr.name) && /Loop/.test(c.name) && false));
       AN.acts[c.name] = AN.mixer.clipAction(c); }
-    playAnim('Idle_Loop', 0);
+    playAnim('Idle_Loop', 0); if (AN.av) applyAvatar(AN.av);
   } catch (e) { console.warn('character', e); }
 }
 
@@ -889,5 +905,5 @@ function start() { $('load').style.display = 'none'; S.started = true; S.t = 0; 
 requestAnimationFrame(frame); boot();
 
 // ---------- ממשק לבדיקות אוטומטיות
-window.G27 = { phys: { moveFoot, moveCar }, spawnAtLatLon, SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
+window.G27 = { applyAvatar, avatarInfo: () => ({ av: AN.av, base: AN.base, top: AN.U && '#' + AN.U.uTop.value.getHexString(), scale: AN.model && +AN.model.scale.x.toFixed(4), s0: AN.s0 }), phys: { moveFoot, moveCar }, spawnAtLatLon, SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
 })();

@@ -1,12 +1,12 @@
 // בדיקת עשן של העולם המשולב: node tools/smoke.js [url]   (קוד יציאה 1 בכישלון)
 // טעינה · כל המצבים הזמינים · מצבים בעבודה מסומנים · מצלמה 3 מבטים · מצב יזם (שכבה, שרטוט תקין/פסול) · זמן/מזג אוויר/שבת/איכות
-// · בידוד כשלים: תוסף שבור בכוונה (?) לא מפיל את העולם · אין שגיאות JS.
+// · בידוד כשלים: תוסף שבור בכוונה (?) לא מפיל את העולם · אין שגיאות JS. (חסימת רשת של סביבת הבדיקה – ERR_TUNNEL_CONNECTION_FAILED לשרתים חיצוניים כמו שרת החשבונות – לא נספרת)
 const { chromium } = require('/tmp/pw/node_modules/playwright');
 (async () => {
   const url = process.argv[2] || 'http://localhost:8940/world/index.html?auto';
   const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   const p = await (await b.newContext({ viewport: { width: 360, height: 800 }, hasTouch: true, isMobile: true })).newPage();
-  const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/favicon|GL Driver/.test(m.text())) errs.push(m.text().slice(0, 200)); });
+  const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/favicon|GL Driver|ERR_TUNNEL_CONNECTION_FAILED/.test(m.text())) errs.push(m.text().slice(0, 200)); });
   // תוסף שבור בכוונה – נרשם לפני הטעינה, זורק בעדכון השלישי
   await p.addInitScript(() => { const t = setInterval(() => { if (window.YZW) { clearInterval(t); let n = 0; YZW.register({ id: 'broken-test', name: 'תוסף שבור (בדיקה)', dept: 'test', order: 99, init() {}, update() { if (++n > 3) throw new Error('boom'); } }); } }, 5); });
   let fail = 0; const ok = (c, m) => { console.log((c ? 'ok   ' : 'FAIL ') + m); if (!c) fail++; };
