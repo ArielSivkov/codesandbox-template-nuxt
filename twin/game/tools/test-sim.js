@@ -75,11 +75,11 @@ const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).
 (async () => {
   const { createWind } = await import('../../physics/src/wind.js');
   let maxRel = 0, under = true, eq60 = 0;
-  for (const H of [0, 6, 12, 20, 35, 60]) {
+  for (const H of [0, 6, 12, 20, 35, 60, 100]) {
     const C = createWind(H ? { speed10: 7, meanHeight: H, gusts: false } : { speed10: 7, z0: 0.03, d: 0, gusts: false });   // H=0: שטח פתוח (ברירת המחדל הקנונית בלי גבהים היא עיר z0=1)
     for (let z = 0.5; z <= 150; z += 0.5) { const g = SIM.meanWind(7, z, H), c = C.meanSpeed(z); maxRel = Math.max(maxRel, Math.abs(g - c) / Math.max(c, 0.05));
-      if (H > 0 && z < 60 && g > SIM.meanWind(7, z, 0) + 1e-9) under = false; }
-    if (H > 0) eq60 = Math.max(eq60, Math.abs(SIM.meanWind(7, 60, H) - SIM.meanWind(7, 60, 0)));
+      if (H > 0 && z < Math.max(60, 2 * H) && g > SIM.meanWind(7, z, 0) + 1e-9) under = false; }
+    if (H > 0) { const zb = Math.max(60, 2 * H); eq60 = Math.max(eq60, Math.abs(SIM.meanWind(7, zb, H) - SIM.meanWind(7, zb, 0))); }   // גובה ערבוב ≥ 2H
   }
   ok(maxRel < 1e-9, `פרופיל רוח במשחק = המודול הקנוני (סטייה יחסית מרבית ${maxRel.toExponential(1)}, 6 גובהי עיר × 300 גבהים)`);
   ok(under && eq60 < 1e-9, `עיר מאטה את הרוח: מתחת ל-60 מ' רוח עירונית ≤ שטח פתוח, ובגובה הערבוב שוות (הפרש ${eq60.toExponential(1)})`);

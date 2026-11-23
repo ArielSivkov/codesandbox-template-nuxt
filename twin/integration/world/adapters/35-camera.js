@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   const NAMES = ['גוף ראשון', 'מאחור', 'מלפנים'], ICONS = ['👁', '🎥', '🤳'];
-  const C = { view: 1, pos: null, look: null, blend: 1, hidden: false, fov0: null };
+  const C = { view: 0, pos: null, look: null, blend: 1, hidden: false, fov0: null };
   const EYE = 1.6;
   function cycle() { C.view = (C.view + 1) % 3; C.blend = 0; const b = document.getElementById('yzCam'); if (b) b.textContent = ICONS[C.view]; YZW.notice('מצלמה: ' + NAMES[C.view], { kind: 'info', ms: 1200 }); }
   function target(world) {

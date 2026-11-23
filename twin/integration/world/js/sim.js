@@ -141,7 +141,7 @@ const lawLog = (z, us, z0, d) => (z - d <= z0 ? 0 : us / KAPPA * Math.log((z - d
 SIM.meanWind = function (u10, z, hm) {
   const usO = u10 * KAPPA / Math.log(10 / Z0_OPEN);
   if (!(hm > 0)) return lawLog(Math.max(z, Z0_OPEN * 1.0001), usO, Z0_OPEN, 0);
-  const z0 = Math.max(0.1 * hm, Z0_OPEN), d = 0.7 * hm, us = lawLog(ZB, usO, Z0_OPEN, 0) * KAPPA / Math.log((ZB - d) / z0);
+  const z0 = Math.max(0.1 * hm, Z0_OPEN), d = 0.7 * hm, zb = Math.max(ZB, 2 * hm), us = lawLog(zb, usO, Z0_OPEN, 0) * KAPPA / Math.log((zb - d) / z0);   // גובה ערבוב ≥ 2H (Grimmond & Oke 1999) – ליד מגדלים d>60 נתן לוג של שלילי = NaN
   const Hc = Math.max(hm, d + 1.5 * z0);
   if (z >= Hc) return lawLog(z, us, z0, d);
   return lawLog(Hc, us, z0, d) * Math.exp(CANOPY_A * (Math.max(z, 0) / Hc - 1));

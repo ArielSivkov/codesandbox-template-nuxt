@@ -53,7 +53,7 @@ const { chromium } = require('/tmp/pw/node_modules/playwright');
   ok(/physics/.test(r.sunSrc) && r.golden > -1 && r.golden < 12, `שמש מהפיזיקה, שעת זהב (${r.golden.toFixed(1)}°)`);
   for (const [m, s] of Object.entries(r.modes)) ok(s === 'ok' || s === 'pending', `מצב ${m}: ${s === 'ok' ? 'עובד' : 'בעבודה (מסומן כלא זמין)'}`);
   ok(r.present && r.presentIframe && r.paused && r.presentClosed, 'מצגת יזם נפתחת מעל עולם מושהה ונסגרת');
-  ok(r.cam[0][0] === 2 && r.cam[1][0] === 0 && r.cam[2][0] === 1 && r.cam[1][1] < 0.6, `מצלמה: מלפנים → גוף ראשון (מרחק מהעיניים ${r.cam[1][1]} מ') → מאחור`);
+  ok(r.cam[0][0] === 1 && r.cam[1][0] === 2 && r.cam[2][0] === 0 && r.cam[2][1] < 0.6, `מצלמה: ברירת מחדל גוף ראשון → מאחור → מלפנים → חזרה לגוף ראשון (מרחק מהעיניים ${r.cam[2][1]} מ')`);
   ok(r.droneAlt > 2, `רחפן פיזיקלי המריא (${r.droneAlt.toFixed(1)} מ')`);
   ok(r.overlay > 0, `שכבת גובה במצב יזם: ${r.overlay} אריחים`);
   ok(r.drawAdded && r.drawFinish && Math.abs(r.plotArea - 2400) < 5, `מגרש 60×40 = ${r.plotArea} מ"ר`);

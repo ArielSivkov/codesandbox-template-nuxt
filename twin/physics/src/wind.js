@@ -105,7 +105,7 @@ export function createWind(o = {}) {
   };
   const hs = W.buildings.map((b) => b.h);
   const Hm = o.meanHeight ?? (hs.length ? hs.reduce((a, b) => a + b, 0) / hs.length : 0);
-  W.Hm = Hm;
+  W.Hm = Hm; W.zb = Math.max(W.zb, 2 * Hm);   // blending height >= 2H (Grimmond & Oke 1999); with tall towers d > 60 m gave log(negative) = NaN
   W.z0 = o.z0 ?? (Hm > 0 ? Math.max(0.1 * Hm, 0.03) : 1.0);
   W.d = o.d ?? (Hm > 0 ? 0.7 * Hm : 0);
   const rng = makeRng(o.seed ?? 12345);
