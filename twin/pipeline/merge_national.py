@@ -48,8 +48,8 @@ for f in nat_files:
         if b['i'] in ours:
             p = dec(flat(b['r']), d['o']); c = (sum(q[0] for q in p) / len(p), sum(q[1] for q in p) / len(p))
             dx.append(c[0] - ours[b['i']][0]); dy.append(c[1] - ours[b['i']][1])
-DX, DY = statistics.median(dx), statistics.median(dy)
-SX, SY = statistics.pstdev(dx), statistics.pstdev(dy)
+if len(dx) >= 50: DX, DY = statistics.median(dx), statistics.median(dy); SX, SY = statistics.pstdev(dx), statistics.pstdev(dy)
+else: DX, DY, SX, SY = 1507.82, 757.76, 0.40, 0.38   # מדידה של 23.11.2026 (7,427 בניינים) – כשאין מספיק בניינים משותפים
 print(f'היסט (ITM − sample): dE={DX:.2f} dN={DY:.2f} מ\', פיזור {SX:.2f}/{SY:.2f} מ\', לפי {len(dx)} בניינים משותפים')
 
 # ---------- 2. חלוקה מחדש
@@ -105,7 +105,7 @@ for k, t in newt.items():
     dist, idx = tree.query(np.c_[E, N]); h = 1.0 + np.maximum(hs[idx] - 1.0, 0) * np.exp(-dist / L)
     for i in range(NT * NT):
         v = nat_val(E[i] + DX, N[i] + DY)
-        z[i] = SEA if v == SEA else int(round(h[i] * 10))
+        z[i] = SEA if v == SEA else (int(v) if (v is not None and v > 5) else int(round(h[i] * 10)))   # גובה אמיתי מהמקור אם יש (DEM), אחרת דעיכה משוערת
     hdr = bytearray(hdr_src); struct.pack_into('<ii', hdr, 6, tx, ty)
     with open(os.path.join(OUT, 'tiles/t', k + '.bin.gz'), 'wb') as fh: fh.write(gzip.compress(bytes(hdr) + z.tobytes(), mtime=0))
     with open(os.path.join(OUT, 'tiles/v', k + '.json.gz'), 'wb') as fh: fh.write(gzip.compress(json.dumps(t, ensure_ascii=False, separators=(',', ':')).encode(), mtime=0))
@@ -113,5 +113,5 @@ keys = sorted(newt)
 xs = [int(k.split('_')[0]) for k in keys]; ys = [int(k.split('_')[1]) for k in keys]
 json.dump({'v': 1, 'source': 'national-v1 (TAMA/Geofabrik, ITM) → מסגרת sample', 'offset_itm_minus_sample': [round(DX, 2), round(DY, 2)], 'offset_sigma_m': [round(SX, 2), round(SY, 2)],
            'matched_buildings': len(dx), 'tiles': keys, 'buildings': nb, 'roads': nr, 'bbox_sample': [min(xs) * TILE, min(ys) * TILE, (max(xs) + 1) * TILE, (max(ys) + 1) * TILE],
-           'terrain': 'אין גבהים בארצי: ים מהארצי, יבשה דועכת מקצה אשדוד ל-1 מ\' (משוער, L=600 מ\')'}, open(os.path.join(OUT, 'nat.json'), 'w'), ensure_ascii=False, indent=1)
+           'terrain': 'גובה מהמקור כשיש (Copernicus GLO-30); כשאין – ים מהמקור, יבשה דועכת מקצה אשדוד ל-1 מ\' (משוער, L=600 מ\')'}, open(os.path.join(OUT, 'nat.json'), 'w'), ensure_ascii=False, indent=1)
 print('נכתב', OUT)

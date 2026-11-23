@@ -1,0 +1,67 @@
+# בניית אריחי המשחק לכל הארץ: OpenStreetMap (גאופבריק israel-and-palestine) + גבהים Copernicus GLO-30.
+# רץ כשדוחפים לענף israel-build. כל תא בצ'קליסט twin/pipeline/israel_regions.json = משימה נפרדת.
+# התוצר נדחף לענף israel-data (תיקייה il/), כדי שענף העבודה לא יתנפח; המשחק טוען משם.
+name: israel-tiles
+on:
+  push:
+    branches: [israel-build]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  prep:
+    runs-on: ubuntu-latest
+    outputs:
+      cells: ${{ steps.c.outputs.cells }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: c
+        run: echo "cells=$(python3 -c "import json;print(json.dumps([c['id'] for c in json.load(open('twin/pipeline/israel_regions.json'))['cells'] if c['status'] in ('todo','failed')]))")" >> $GITHUB_OUTPUT
+      - run: curl -sSLf -o il.osm.pbf https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf && ls -l il.osm.pbf
+      - uses: actions/upload-artifact@v4
+        with: { name: pbf, path: il.osm.pbf, retention-days: 2 }
+  build:
+    needs: prep
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        cell: ${{ fromJSON(needs.prep.outputs.cells) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/download-artifact@v4
+        with: { name: pbf }
+      - run: pip install -q -r twin/pipeline/requirements.txt
+      - name: בנייה
+        run: |
+          BBOX=$(python3 -c "import json;c=[c for c in json.load(open('twin/pipeline/israel_regions.json'))['cells'] if c['id']=='${{ matrix.cell }}'][0];print(','.join(map(str,c['bbox'])))")
+          cd twin/pipeline && python3 build_city.py --bbox "$BBOX" --slug "${{ matrix.cell }}" --osm pbf --pbf ../../il.osm.pbf --dem cop30 --no-green --out ../../out
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: 'out-${{ matrix.cell }}', path: out, retention-days: 3, if-no-files-found: ignore }
+  combine:
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: pip install -q numpy scipy
+      - uses: actions/download-artifact@v4
+        with: { pattern: 'out-*', path: arts }
+      - name: איחוד והתאמה למסגרת המשחק
+        run: |
+          python3 twin/pipeline/combine_regions.py arts itm twin/pipeline/israel_regions.json
+          python3 twin/pipeline/merge_national.py itm/tiles twin/integration/world/data il
+          cp twin/pipeline/israel_regions.json il/
+      - name: דחיפה לענף israel-data
+        run: |
+          git config user.name "israel-tiles bot"; git config user.email "actions@github.com"
+          mv il /tmp/il && git fetch origin israel-data || true
+          if git rev-parse --verify origin/israel-data >/dev/null 2>&1; then git checkout -B israel-data origin/israel-data; else git checkout --orphan israel-data && git rm -rfq .; fi
+          rm -rf il && cp -r /tmp/il il && git add il && git commit -qm "אריחי כל הארץ – ריצה ${{ github.run_number }}" && git push -q origin israel-data
