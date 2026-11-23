@@ -142,6 +142,17 @@ function clothes(mesh) {
   else if (h < 0.815 && (s < 0.125 || (h > 0.66 && s < 0.21))) diffuseColor.rgb = vec3(0.86,0.50,0.20) * n; }`); };
   m.customProgramCacheKey = () => 'w27_clothes'; return m;
 }
+/** דגם רכב CC0 (assets/pack: car_sedan.glb, 440 משולשים, 11KB) במקום קופסה. הלוגיקה (תנועה, התנגשות) לא משתנה. */
+async function loadCarModel() {
+  try {
+    if (!window.ESH_GLTF) await loadScript('vendor/loaders.js');
+    const G = window.ESH_GLTF, L = new G.GLTFLoader(); if (G.MeshoptDecoder) L.setMeshoptDecoder(G.MeshoptDecoder);
+    const m = (await L.loadAsync('assets/models/car_sedan.glb')).scene, box = new T.Box3().setFromObject(m), sz = box.getSize(new T.Vector3());
+    const k = 4.3 / Math.max(sz.x, sz.z); m.scale.setScalar(k); if (sz.x > sz.z) m.rotation.y = Math.PI / 2;
+    box.setFromObject(m); m.position.y -= box.min.y; m.traverse(o => { if (o.isMesh) o.castShadow = true; });
+    for (const c of car.children) c.visible = false; car.add(m); car.userData.model = m;
+  } catch (e) { console.warn('car model', e); }
+}
 async function loadCharacter() {
   try {
     if (!window.ESH_GLTF) await loadScript('vendor/loaders.js');
@@ -806,7 +817,7 @@ function frame(now) {
   if (bizObj.pin) bizObj.pin.position.y = bizObj.b.top + 9 + Math.sin(S.t * 2) * 0.8;
   W.MAT.sea.normalMap.offset.set(S.t * (0.006 + SIM.weather.windSpeed * 0.0015), S.t * 0.007); skyMat.uniforms.time.value = S.t * (1 + SIM.weather.windSpeed * 0.3); rainUpdate(dt);
   updateCam(dt);
-  const p = curPos(); W.update(p.x, p.z, Q.level >= 2 ? 6 : 9);
+  const p = curPos(); W.update(p.x, p.z, Q.level >= 2 ? 6 : 9); if (W.updatePalms) W.updatePalms(p.x, p.z, scene);
   // אוטומטי: ירידה באיכות אם קצב הפריימים נמוך לאורך זמן
   if (Q.auto && S.t > 6) { if (fpsAvg < 27) fpsLow += dt; else fpsLow = Math.max(0, fpsLow - dt * 0.5); if (fpsLow > 3 && Q.level < 2) { setQuality(Q.level + 1); fpsLow = 0; toast('איכות הותאמה לביצועי המכשיר', 1.6); } }
   proxT -= dt; if (proxT <= 0) { proxT = 0.2; proximity(); }
@@ -836,7 +847,7 @@ async function boot() {
     await W.init(scene, { base: 'data/' }); applyEnv();
     const sp = W.toScene(SPAWN_ITM.E, SPAWN_ITM.N); S.p.set(sp.x, 30, sp.z);
     camera.position.set(sp.x - 40, 60, sp.z + 40); camera.lookAt(sp.x, 0, sp.z);
-    loadCharacter();
+    loadCharacter(); loadCarModel();
     // מחכים לאריחים הקרובים
     const t0 = performance.now();
     await new Promise(res => { const tick = () => { W.update(sp.x, sp.z, 40); const near = [...W.tiles.values()].filter(t => t.blds).length; bar.style.width = Math.min(95, 15 + near * 6) + '%'; msg.textContent = `טוען אריחים… ${near}`;

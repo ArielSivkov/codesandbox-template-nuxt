@@ -101,6 +101,7 @@ function makeMaterials() {
   MAT.panel = new T.MeshLambertMaterial({ color: 0x1f3550 });
   MAT.trunk = new T.MeshLambertMaterial({ color: 0x8a6a48 });
   MAT.leaf = new T.MeshLambertMaterial({ color: 0x4f7d34 });
+  MAT.palm = new T.MeshLambertMaterial({ vertexColors: true, side: T.DoubleSide });   // דקל: גזע + כפות בגאומטריה אחת (קריאת ציור אחת לאריח)
 }
 
 // ---------- גבהים
@@ -172,7 +173,8 @@ function decodeBuildings(t, v) {
   }
   return out;
 }
-const PAL = [[0.95, 0.93, 0.88], [0.97, 0.96, 0.93], [0.92, 0.88, 0.80], [0.90, 0.86, 0.78], [0.88, 0.88, 0.86], [0.94, 0.90, 0.84], [0.85, 0.80, 0.72], [0.93, 0.86, 0.80], [0.82, 0.84, 0.86]];
+const PAL = [[0.95, 0.93, 0.88], [0.97, 0.96, 0.93], [0.92, 0.88, 0.80], [0.90, 0.86, 0.78], [0.88, 0.88, 0.86], [0.94, 0.90, 0.84], [0.85, 0.80, 0.72], [0.93, 0.86, 0.80], [0.82, 0.84, 0.86],
+  [0.88, 0.80, 0.66], [0.93, 0.83, 0.72], [0.80, 0.81, 0.80], [0.90, 0.84, 0.70], [0.86, 0.87, 0.90], [0.92, 0.88, 0.76]];   // + אבן חולית, אפרסק, אפור, חול, כחלחל – גוונים נפוצים בבנייה בעיר החוף (אסתטי, לא נתון)
 const IND_PAL = [[0.78, 0.80, 0.82], [0.70, 0.74, 0.78], [0.82, 0.78, 0.70], [0.62, 0.68, 0.72]];
 
 function buildBuildingGeo(list, lo) {
@@ -287,6 +289,39 @@ function buildRoadMeshes(t) {
   mk(P2, U2, N2, MAT.walk); mk(P, U, N, MAT.road);
   return g;
 }
+// דקל פרוצדורלי (~180 משולשים): גזע מתחדד עם טבעות, "חצאית" כפות יבשות, 9 כפות מתעקלות עם עורק מרכזי. צבעים בקודקודים.
+function palmGeo(lo) {
+  const P = [], C = [], I = []; const v = (x, y, z, r, g, b) => { P.push(x, y, z); C.push(r, g, b); return P.length / 3 - 1; };
+  const H = 7, SEG = lo ? 5 : 7, RING = lo ? 2 : 6;
+  for (let j = 0; j <= RING; j++) { const u = j / RING, y = u * H, rad = 0.3 - 0.11 * u + 0.03 * Math.sin(u * 9), dk = j % 2 ? 0.86 : 1;
+    for (let k = 0; k < SEG; k++) { const a = k / SEG * Math.PI * 2; v(Math.cos(a) * rad, y, Math.sin(a) * rad, 0.52 * dk, 0.40 * dk, 0.28 * dk); } }
+  for (let j = 0; j < RING; j++) for (let k = 0; k < SEG; k++) { const a = j * SEG + k, b = j * SEG + (k + 1) % SEG; I.push(a, b, a + SEG, b, b + SEG, a + SEG); }
+  const NF = lo ? 6 : 9, NS = lo ? 2 : 4, L = 3.4;
+  for (let f = 0; f < NF; f++) {
+    const ang = f / NF * Math.PI * 2 + (f % 2) * 0.2, ca = Math.cos(ang), sa = Math.sin(ang), dry = f >= NF - 2, up = 0.55 - (f % 3) * 0.18 - (dry ? 0.5 : 0);
+    let base = -1;
+    for (let s = 0; s <= NS; s++) { const u = s / NS, r = u * L, y = H + 0.15 + up * u * 2.2 - 1.9 * u * u, w = 0.62 * Math.sin(Math.PI * Math.min(1, u * 1.08 + 0.04)), rib = 0.14 * (1 - u);
+      const g0 = dry ? [0.55, 0.47, 0.30] : [0.20 + 0.10 * u, 0.36 + 0.14 * u, 0.13 + 0.03 * u];
+      const cx = ca * r, cz = sa * r, px = -sa * w, pz = ca * w;
+      const m = v(cx, y + rib, cz, g0[0], g0[1], g0[2]), l = v(cx + px, y - 0.12 * w, cz + pz, g0[0] * 0.8, g0[1] * 0.8, g0[2] * 0.8), rr = v(cx - px, y - 0.12 * w, cz - pz, g0[0] * 0.8, g0[1] * 0.8, g0[2] * 0.8);
+      if (base >= 0) { const pm = base, pl = base + 1, pr = base + 2; I.push(pm, pl, m, pl, l, m, pm, m, pr, m, rr, pr); }
+      base = m; }
+  }
+  const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(P, 3)); g.setAttribute('color', new T.Float32BufferAttribute(C, 3)); g.setIndex(I); g.computeVertexNormals(); return g;
+}
+/** הדקלים הקרובים (עד 48, רדיוס 140 מ'): גאומטריה מלאה + צל. מתעדכן כשזזים 12 מ'. העותק הזול באריח מוקטן לאפס במקומם. */
+let NEARP = null, nearHidden = [], lastNP = null; const _pm = new T.Matrix4(), _p0 = new T.Matrix4().makeScale(0, 0, 0);
+W.updatePalms = function (px, pz, scene) {
+  if (lastNP && Math.hypot(px - lastNP.x, pz - lastNP.z) < 12) return; lastNP = { x: px, z: pz };
+  if (!NEARP) { NEARP = new T.InstancedMesh(palmGeo(false), MAT.palm, 48); NEARP.castShadow = true; NEARP.frustumCulled = false; NEARP.count = 0; scene.add(NEARP); }
+  for (const [im, i, m] of nearHidden) { im.setMatrixAt(i, m); im.instanceMatrix.needsUpdate = true; } nearHidden = [];
+  const cand = [];
+  for (const t of W.tiles.values()) { if (!t.palms || !t.palms.visible) continue; const im = t.palms.children[0], P = t.palms.userData.xz;
+    for (let i = 0; i < P.length / 2; i++) { const d = (P[i * 2] - px) ** 2 + (P[i * 2 + 1] - pz) ** 2; if (d < 140 * 140) cand.push([d, im, i]); } }
+  cand.sort((a, b) => a[0] - b[0]); let k = 0;
+  for (const [, im, i] of cand) { if (k >= 48) break; im.getMatrixAt(i, _pm); NEARP.setMatrixAt(k++, _pm); nearHidden.push([im, i, _pm.clone()]); im.setMatrixAt(i, _p0); im.instanceMatrix.needsUpdate = true; }
+  NEARP.count = k; NEARP.instanceMatrix.needsUpdate = true;
+};
 // עצי דקל לאורך שדרות (c≥3)
 let TRUNK_GEO = null, CROWN_GEO = null;
 function palms(t) {
@@ -298,11 +333,11 @@ function palms(t) {
       acc = (acc - L) % 22; if (acc < 0) acc += 22; } }
   const ok = []; for (let i = 0; i < pos.length; i += 2) { const x = pos[i], z = pos[i + 1]; if (!W.buildingAt(x, z, 1.5)) ok.push(x, z); }
   const n = ok.length / 2; if (!n) return null;
-  if (!TRUNK_GEO) { TRUNK_GEO = new T.CylinderGeometry(0.18, 0.28, 7, 6); TRUNK_GEO.translate(0, 3.5, 0); CROWN_GEO = new T.ConeGeometry(2.6, 1.6, 7, 1, true); CROWN_GEO.rotateX(Math.PI); CROWN_GEO.translate(0, 7.3, 0); }
-  const a = new T.InstancedMesh(TRUNK_GEO, MAT.trunk, n), b = new T.InstancedMesh(CROWN_GEO, MAT.leaf, n); const m = new T.Matrix4(), q = new T.Quaternion(), s = new T.Vector3(), e = new T.Euler();
+  if (!TRUNK_GEO) TRUNK_GEO = palmGeo(true);   // דקלי האריח: גרסה זולה (~70 משולשים) בלי הטלת צל; הקרובים מתחלפים בגרסה המלאה (W.updatePalms)
+  const a = new T.InstancedMesh(TRUNK_GEO, MAT.palm, n); const m = new T.Matrix4(), q = new T.Quaternion(), s = new T.Vector3(), e = new T.Euler();
   for (let i = 0; i < n; i++) { const x = ok[i * 2], z = ok[i * 2 + 1], hs = hash32(x.toFixed(1) + z.toFixed(1)), sc = 0.8 + (hs % 50) / 100; e.set(((hs >> 3) % 10 - 5) / 100, (hs % 628) / 100, ((hs >> 7) % 10 - 5) / 100); q.setFromEuler(e); s.set(sc, sc, sc);
-    m.compose(new T.Vector3(x, tileH(t, x + W.OX, W.OY - z) - 0.2, z), q, s); a.setMatrixAt(i, m); b.setMatrixAt(i, m); }
-  a.castShadow = b.castShadow = true; const g = new T.Group(); g.add(a, b); g.userData.n = n; return g;
+    m.compose(new T.Vector3(x, tileH(t, x + W.OX, W.OY - z) - 0.2, z), q, s); a.setMatrixAt(i, m); }
+  a.castShadow = false; const g = new T.Group(); g.add(a); g.userData.xz = ok; g.userData.n = n; return g;
 }
 
 // ---------- קרקע
