@@ -10,3 +10,4 @@
 - 23.11.2026 – מחלקת הבניינים: חזיתות פרוצדורליות + ציוד גג + ציוני דרך מצוטטים + פנים "הנכסים שלי"; +5 קריאות ציור קבועות; ממתין למדידה בטלפון
 - 23.11.2026 – מצגת יזם: שתילת פרויקט, לפני/אחרי, הצללה לוועדה, מבט מחלון, מצב סיפור, קישור שיתוף; גבהי שכנים משוערים
 - 2026-11-23T00:36:35Z integration: unified world (eye⇄char, plugin host, 10/12 red-team fixes) → twin/integration/index.html
+- 2026-11-23T00:40:35Z npc: crowd sim (Shabbat schedules, 4 Hebrew talkers, 3 draw calls) → twin/npc/demo.html

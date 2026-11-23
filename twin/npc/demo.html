@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1420">
+<title>27wrld · אשדוד — מחלקת הדמויות (הדגמה)</title>
+<style>
+:root{--panel:rgba(12,20,32,.86);--line:rgba(255,255,255,.16);--acc:#f2b84b;--mut:#a3b3c5}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0d1420;color:#eef3f8;font-family:system-ui,-apple-system,"Segoe UI","Noto Sans Hebrew",Arial,sans-serif;overflow:hidden;touch-action:none;user-select:none}
+#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+#top{position:fixed;top:calc(env(safe-area-inset-top) + 6px);right:6px;left:6px;display:flex;gap:5px;flex-wrap:wrap;z-index:10;align-items:center}
+.b{font:inherit;font-size:12.5px;color:#fff;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:6px 9px;min-height:34px;cursor:pointer;white-space:nowrap}
+.b.on{border-color:var(--acc);color:var(--acc);font-weight:700}
+#clock{font-weight:700;font-size:13px;background:var(--panel);border:1px solid var(--acc);border-radius:11px;padding:6px 10px;white-space:nowrap}
+#go{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 8px);right:8px;display:flex;gap:5px;flex-wrap:wrap;z-index:10;max-width:62vw;justify-content:flex-end}
+#stats{position:fixed;left:8px;top:calc(env(safe-area-inset-top) + 92px);z-index:9;font:10.5px/1.35 ui-monospace,monospace;color:#fff;text-shadow:0 1px 2px #000;direction:ltr;white-space:pre;pointer-events:none}
+#joy{position:fixed;left:calc(env(safe-area-inset-left) + 14px);bottom:calc(env(safe-area-inset-bottom) + 14px);width:112px;height:112px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);z-index:9;touch-action:none}
+#joy i{position:absolute;left:33px;top:33px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.55)}
+#load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 35%,#21364d,#0d1420 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:20px}
+#load h1{margin:0;font-size:24px}#load h1 em{font-style:normal;color:var(--acc)}#load p{margin:0;color:var(--mut);font-size:13px;max-width:440px}
+#hint{position:fixed;left:50%;transform:translateX(-50%);top:calc(env(safe-area-inset-top) + 92px);z-index:9;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:4px 10px;font-size:12px;color:var(--mut);white-space:nowrap}
+@media (max-width:480px){#go{max-width:100vw;left:8px;bottom:136px}#stats{top:auto;bottom:136px;display:none}}
+@media (max-height:420px){#joy{width:96px;height:96px}#joy i{left:27px;top:27px}#hint{display:none}#stats{top:52px}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="top">
+  <span id="clock">—</span>
+  <button class="b" data-p="morning">☀️ בוקר</button>
+  <button class="b" data-p="evening">🌇 ערב</button>
+  <button class="b" data-p="shabbat">🕯️ שבת</button>
+  <button class="b" data-p="rain">🌧️ גשם</button>
+  <button class="b" id="fast">⏩ ×30</button>
+  <button class="b" id="car">🚗 מעבר מהיר</button>
+</div>
+<div id="hint">הקש על דמות כדי לדבר · גרירה לסיבוב המצלמה</div>
+<div id="go">
+  <button class="b" data-at="contractor">🏗️ אבי הקבלן</button>
+  <button class="b" data-at="resident">🏠 רחל הדיירת</button>
+  <button class="b" data-at="shop">🛒 יוסי מהחנות</button>
+  <button class="b" data-at="lifeguard">🏖️ נועה המצילה</button>
+  <button class="b" data-at="busy">👥 איפה שיש אנשים</button>
+  <button class="b" data-at="synagogue">🕍 בית הכנסת</button>
+</div>
+<div id="stats"></div>
+<div id="joy"><i></i></div>
+<div id="load"><h1>27<em>wrld</em> · אנשי העיר</h1><p>מחלקת הדמויות: תושבים עם שגרת יום, שבת, מזג אוויר ושיחה. טוען עולם ודמויות…</p><p id="lmsg">…</p>
+<p style="font-size:11px">© תורמי OpenStreetMap (ODbL) · דמויות ואנימציות: Quaternius (CC0) · three.js (MIT)</p></div>
+<script>
+// נתיב לתיקיית המשחק (three, sim, world, נכסים ונתונים). ברירת מחדל: מבנה התיקיות בשרת הפיתוח
+window.GAME = new URLSearchParams(location.search).get('g') || '../game/';   // כשהתיקייה יושבת ליד twin/game
+for (const s of ['vendor/three.min.js', 'js/sim.js', 'js/world.js']) document.write(`<script src="${GAME}${s}"><\/script>`);
+</script>
+<script src="js/life.js"></script>
+<script src="js/dialogue.js"></script>
+<script src="js/crowd.js"></script>
+<script src="js/npc.js"></script>
+<script>
+(async function () {
+'use strict';
+const T = THREE, W = W27, Q = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+const TOUCH = matchMedia('(pointer:coarse)').matches;
+const renderer = new T.WebGLRenderer({ canvas: $('cv'), antialias: !TOUCH, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, TOUCH ? 1.25 : 1.5)); renderer.outputColorSpace = T.SRGBColorSpace;
+renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+const scene = new T.Scene(); scene.fog = new T.Fog(0xcfe0ec, 260, 1000); scene.background = new T.Color(0xcfe0ec);
+const camera = new T.PerspectiveCamera(60, 1, 0.3, 2400);
+const hemi = new T.HemisphereLight(0xdcecff, 0xa08f70, 1.1); scene.add(hemi);
+const sun = new T.DirectionalLight(0xfff1dc, 2.2); scene.add(sun); scene.add(sun.target);
+function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize); resize();
+
+// ---------- תרחישים (שבוע ביוני: אור ערב ועונת רחצה; גשם – נובמבר)
+const PRESET = {
+  morning: { date: '2026-06-16T05:00:00Z', rain: 0, label: 'בוקר יום ג׳' },
+  evening: { date: '2026-06-16T16:15:00Z', rain: 0, label: 'ערב יום ג׳' },
+  shabbat: { date: '2026-06-20T07:50:00Z', rain: 0, label: 'שבת בבוקר' },
+  rain: { date: '2026-11-24T06:00:00Z', rain: 3, label: 'בוקר גשום' },
+};
+const DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+const G = { base: 0, t0: performance.now() / 1000, scale: 1, rain: 0, preset: 'morning' };
+const gameDate = () => new Date(G.base + (performance.now() / 1000 - G.t0) * 1000 * G.scale);
+
+// ---------- שחקן (נקודת מבט) – גם הוא דמות בהמון
+const SPAWN = { E: 165120, N: 633640 };
+const P = { x: 0, z: 0, y: 0, h: 0, speed: 0, mode: 'foot', vx: 0, vz: 0, car: 0, anim: 'idle', seed: 4242 };
+const cam = { yaw: Math.PI * 0.85, pitch: 0.42, dist: 12 };
+P.look = { body: 0, height: 1.78, width: 1, skin: [0.85, 0.65, 0.5], hair: [0.1, 0.08, 0.06], top: [0.95, 0.72, 0.29], bottom: [0.12, 0.14, 0.2], hairStyle: 1, longBottom: true, longSleeve: false, kippa: false };
+const carMesh = new T.Mesh(new T.BoxGeometry(1.9, 1.4, 4.4), new T.MeshLambertMaterial({ color: 0xd2342c })); carMesh.visible = false; scene.add(carMesh);
+
+// ---------- גשם (קווים סביב המצלמה, קריאת ציור אחת)
+const rainGeo = new T.BufferGeometry(); const RN = 1400, rp = new Float32Array(RN * 6); rainGeo.setAttribute('position', new T.BufferAttribute(rp, 3));
+const rain = new T.LineSegments(rainGeo, new T.LineBasicMaterial({ color: 0xaab8c8, transparent: true, opacity: 0.45 })); rain.frustumCulled = false; rain.visible = false; scene.add(rain);
+for (let i = 0; i < RN; i++) { const x = (Math.random() - 0.5) * 60, y = Math.random() * 30, z = (Math.random() - 0.5) * 60; rp.set([x, y, z, x + 0.05, y - 0.7, z], i * 6); }
+
+// ---------- תאורה לפי השמש האמיתית
+const LAT = 31.8014, LON = 34.6435;
+let light = 1;
+function applySky() {
+  const d = gameDate(), sp = SIM.sunPosition(d, LAT, LON), v = SIM.sunVector(sp, SIM.itmConvergence(LAT, LON));
+  const el = sp.elevation, day = Math.max(0, Math.min(1, (el + 4) / 14)), set = Math.max(0, 1 - Math.abs(el - 3) / 9) * (el > -4 ? 1 : 0), cl = G.rain ? 0.85 : 0.15;
+  const hor = new T.Color(0x1b2638).lerp(new T.Color(0xcfe0ec), day).lerp(new T.Color(0xf0b27a), set * 0.5 * (1 - cl)); if (G.rain) hor.lerp(new T.Color(0x8b939b), 0.55);
+  scene.background.copy(hor); scene.fog.color.copy(hor); scene.fog.near = G.rain ? 120 : 260; scene.fog.far = G.rain ? 600 : 1000;
+  sun.position.set(P.x + v.x * 200, Math.max(5, v.y * 200), P.z + v.z * 200); sun.target.position.set(P.x, 0, P.z);
+  sun.intensity = 2.4 * Math.pow(Math.max(0, Math.sin(Math.max(0, el) * Math.PI / 180)), 0.6) * (1 - 0.75 * Math.pow(cl, 3.4)); sun.color.setHSL(0.09, 0.55, 0.62 + 0.3 * Math.min(1, Math.max(0, el / 30)));
+  hemi.intensity = 0.2 + 1.0 * day; light = 0.35 + 0.75 * day; renderer.toneMappingExposure = G.rain ? 0.95 : 1.05;
+}
+
+// ---------- טעינה
+const lmsg = t => $('lmsg').textContent = t;
+lmsg('עולם…'); await W.init(scene, { base: GAME + 'data/' });
+const s0 = W.toScene(SPAWN.E, SPAWN.N); P.x = s0.x; P.z = s0.z;
+for (let i = 0; i < 400 && (W.tiles.size < 4 || W.pending() > 0); i++) { W.update(P.x, P.z, 40); await new Promise(r => setTimeout(r, 30)); }
+W.update(P.x, P.z, 200);
+lmsg('דמויות (אפיית אנימציות)…');
+const t0 = performance.now();
+const npc = await NPC.create({ scene, camera, renderer, W, assets: GAME + 'assets/', vendor: GAME + 'vendor/', data: 'data/dialogues.json',
+  maxAgents: +Q.get('n') || (TOUCH ? 700 : 1100), player: () => P, clock: gameDate, weather: () => ({ rain: G.rain }), light: () => light,
+  extra: () => [P], openLink: url => { window.__lastLink = url; if (!Q.has('auto')) window.open(url, '_blank', 'noopener'); } });
+const loadMs = performance.now() - t0;
+window.NPCDEMO = { npc, P, G, W, camera, renderer, scene, setPreset, jumpTo, cam, loadMs };
+
+function setPreset(name) {
+  const p = PRESET[name]; G.preset = name; G.base = Date.parse(p.date); G.t0 = performance.now() / 1000; G.rain = p.rain; rain.visible = !!p.rain;
+  npc._weather = { rain: p.rain }; const info = npc.spawnAround(P.x, P.z);
+  const wm = npc.warmup(20, 5);
+  document.querySelectorAll('[data-p]').forEach(b => b.classList.toggle('on', b.dataset.p === name));
+  console.log('preset', name, JSON.stringify(info), 'warmup ms', wm.toFixed(0));
+  applySky();
+}
+function jumpTo(key) {
+  if (key === 'busy') { const s = npc.sim.busiest(P.x, P.z, 300); if (!s) return false;
+    // עומדים 9 מ' מהמרכז, והמצלמה מאחור – מסתכלת אל האנשים
+    // מחפשים כיוון שבו גם השחקן וגם המצלמה מחוץ לבניינים
+    const free = (x, z) => !W.buildingAt(x, z, 1.5);
+    let a0 = Math.atan2(P.x - s.x, P.z - s.z), ok = false;
+    for (const d of [9, 13, 6]) { for (let k = 0; k < 16 && !ok; k++) { const a = a0 + k * Math.PI / 8; if (free(s.x + Math.sin(a) * d, s.z + Math.cos(a) * d) && free(s.x + Math.sin(a) * (d + 10), s.z + Math.cos(a) * (d + 10))) { a0 = a; ok = true; P.x = s.x + Math.sin(a) * d; P.z = s.z + Math.cos(a) * d; } } if (ok) break; }
+    if (!ok) { P.x = s.x + Math.sin(a0) * 9; P.z = s.z + Math.cos(a0) * 9; }
+    P.h = a0 + Math.PI; cam.yaw = a0; cam.dist = 12; cam.pitch = 0.42;
+    for (let i = 0; i < 10; i++) W.update(P.x, P.z, 60); return true; }
+  if (key === 'synagogue') { const syn = npc.sim.nearestOf(npc.sim.places.synagogue, P.x, P.z, null, 2000); if (!syn) return false; const d = npc.sim.door(syn, null);
+    P.x = d.x + d.nx * 16; P.z = d.z + d.nz * 16; P.h = Math.atan2(-d.nx, -d.nz); cam.yaw = Math.atan2(d.nx, d.nz) + 0.35; cam.dist = 11; cam.pitch = 0.4; settleAt(); return true; }
+  const n = npc.named[key]; if (!n) return false;
+  const back = key === 'lifeguard' ? -1 : 1;   // את המצילה רואים מאחור, עם הים
+  P.x = n.x + Math.sin(n.heading) * 4.5 * back; P.z = n.z + Math.cos(n.heading) * 4.5 * back; P.h = Math.atan2(n.x - P.x, n.z - P.z); cam.yaw = P.h + Math.PI + 0.85; cam.dist = 6.5; cam.pitch = 0.32;
+  settleAt();
+  return true;
+}
+// אחרי קפיצה: מחכים לאריחים ומאכלסים את השכונה החדשה מיד (settle – בלי עצירה)
+async function settleAt() {
+  for (let i = 0; i < 100; i++) { W.update(P.x, P.z, 60); if (i > 3 && W.pending() === 0) break; await new Promise(r => setTimeout(r, 50)); }
+  const key = Object.keys(npc.named).find(k => npc.talking && npc.talking.n === npc.named[k]);
+  const c = npc.center(); if (!c || Math.hypot(P.x - c.x, P.z - c.z) > 150) npc.spawnAround(P.x, P.z);   // קפיצה קצרה – שומרים על המצב החי
+  if (key) { npc.endTalk(); npc.talk(key); }
+}
+document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => setPreset(b.dataset.p));
+document.querySelectorAll('[data-at]').forEach(b => b.onclick = () => { jumpTo(b.dataset.at) || alert('הדמות לא נמצאה בטווח'); });
+$('fast').onclick = () => { G.base = gameDate().getTime(); G.t0 = performance.now() / 1000; G.scale = G.scale === 1 ? 30 : 1; npc.o.timeScale = G.scale; $('fast').classList.toggle('on', G.scale > 1); };
+$('car').onclick = () => { P.car = 4; P.mode = 'car'; };
+
+// ---------- קלט: ג'ויסטיק, גרירה, הקשה
+const inp = { x: 0, y: 0, keys: new Set() };
+addEventListener('keydown', e => inp.keys.add(e.code)); addEventListener('keyup', e => inp.keys.delete(e.code));
+const joy = $('joy'), knob = joy.querySelector('i'); let jid = null, jc = null;
+joy.addEventListener('pointerdown', e => { jid = e.pointerId; joy.setPointerCapture(jid); const r = joy.getBoundingClientRect(); jc = { x: r.left + r.width / 2, y: r.top + r.height / 2, R: r.width / 2 }; jmove(e); });
+function jmove(e) { if (e.pointerId !== jid) return; let dx = (e.clientX - jc.x) / jc.R, dy = (e.clientY - jc.y) / jc.R; const l = Math.hypot(dx, dy); if (l > 1) { dx /= l; dy /= l; } inp.x = dx; inp.y = -dy; knob.style.transform = `translate(${dx * 30}px,${dy * 30}px)`; }
+joy.addEventListener('pointermove', jmove); const jend = () => { jid = null; inp.x = inp.y = 0; knob.style.transform = ''; }; joy.addEventListener('pointerup', jend); joy.addEventListener('pointercancel', jend);
+const cv = $('cv'); let drag = null;
+cv.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY }; cv.setPointerCapture(e.pointerId); });
+cv.addEventListener('pointermove', e => { if (!drag) return; cam.yaw -= (e.clientX - drag.x) * 0.006; cam.pitch = Math.max(0.05, Math.min(1.3, cam.pitch + (e.clientY - drag.y) * 0.004)); drag.x = e.clientX; drag.y = e.clientY; });
+cv.addEventListener('pointerup', e => { if (drag && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 8) npc.tap(e.clientX, e.clientY); drag = null; });
+cv.addEventListener('wheel', e => { cam.dist = Math.max(3, Math.min(80, cam.dist * (e.deltaY > 0 ? 1.1 : 0.9))); }, { passive: true });
+
+// ---------- לולאה
+let last = performance.now(), fps = 60, frames = 0;
+function frame(now) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, (now - last) / 1000); last = now; frames++; fps = fps * 0.95 + (1 / Math.max(dt, 1e-3)) * 0.05;
+  // תנועת השחקן
+  let ix = inp.x + (inp.keys.has('KeyD') || inp.keys.has('ArrowRight') ? 1 : 0) - (inp.keys.has('KeyA') || inp.keys.has('ArrowLeft') ? 1 : 0);
+  let iy = inp.y + (inp.keys.has('KeyW') || inp.keys.has('ArrowUp') ? 1 : 0) - (inp.keys.has('KeyS') || inp.keys.has('ArrowDown') ? 1 : 0);
+  if (P.car > 0) { P.car -= dt; const sp = 15; P.vx = Math.sin(P.h) * sp; P.vz = Math.cos(P.h) * sp; P.speed = sp; if (P.car <= 0) { P.mode = 'foot'; } }
+  else { const il = Math.min(1, Math.hypot(ix, iy)); const fwdX = -Math.sin(cam.yaw), fwdZ = -Math.cos(cam.yaw);
+    const mx = fwdX * iy - fwdZ * ix, mz = fwdZ * iy + fwdX * ix;
+    const sp = il * (inp.keys.has('ShiftLeft') ? 4 : 1.6); const ml = Math.hypot(mx, mz) || 1; P.vx = mx / ml * sp; P.vz = mz / ml * sp; P.speed = sp; if (sp > 0.1) P.h = Math.atan2(P.vx, P.vz); }
+  P.x += P.vx * dt; P.z += P.vz * dt; P.y = W.H(P.x, P.z); P.anim = P.mode === 'car' ? 'idle' : P.speed > 3 ? 'run' : P.speed > 0.1 ? 'walk' : 'idle'; P.heading = P.h;
+  carMesh.visible = P.mode === 'car'; if (carMesh.visible) { carMesh.position.set(P.x, P.y + 0.75, P.z); carMesh.rotation.y = P.h; }
+  W.update(P.x, P.z, TOUCH ? 6 : 10);
+  // מצלמה
+  const ty = P.y + 1.5, cd = cam.dist; camera.position.set(P.x + Math.sin(cam.yaw) * Math.cos(cam.pitch) * cd, ty + Math.sin(cam.pitch) * cd, P.z + Math.cos(cam.yaw) * Math.cos(cam.pitch) * cd);
+  // המצלמה לא נכנסת לבניינים: מקרבים עד שהיא בחוץ
+  for (let k = 0; k < 12; k++) { const b = W.buildingAt(camera.position.x, camera.position.z, 0.8); if (!b || camera.position.y > b.top + 1) break; camera.position.lerp(new T.Vector3(P.x, ty, P.z), 0.2); }
+  camera.position.y = Math.max(camera.position.y, W.H(camera.position.x, camera.position.z) + 0.6); camera.lookAt(P.x, ty, P.z);
+  if (frames % 30 === 0) applySky();
+  if (rain.visible) { rain.position.set(camera.position.x, camera.position.y - 12, camera.position.z); for (let i = 0; i < RN; i++) { let y = rp[i * 6 + 1] - dt * 22; if (y < 0) y += 30; rp[i * 6 + 1] = y; rp[i * 6 + 4] = y - 0.7; } rainGeo.attributes.position.needsUpdate = true; }
+  npc.update(dt);
+  renderer.render(scene, camera);
+  if (now - (frame.hud || 0) > 400) { frame.hud = now;
+    const d = gameDate(), c = NPCLife.clock(d), sh = NPCLife.shabbat(c), hh = String(Math.floor(c.min / 60)).padStart(2, '0'), mm = String(Math.floor(c.min % 60)).padStart(2, '0');
+    const dt2 = { weekday: 'חול', friday: 'ערב שבת', shabbat: 'שבת', motzash: 'מוצאי שבת' }[NPCLife.dayType(c)];
+    $('clock').textContent = `יום ${DAYS[c.dow]} ${hh}:${mm} · ${dt2}${G.rain ? ' · גשם' : ''}`;
+    const s = npc.stats, den = npc.density(), ri = renderer.info.render;
+    $('stats').textContent = `fps ${fps.toFixed(0)}  sim ${s.simMs}ms\nagents ${s.agents} out ${s.outdoor}\nnear ${s.near} far ${s.far} groups ${s.groups}\ncrowd draws ${s.crowdDraws} total ${ri.calls}\ntiers ${s.tiers.join('/')}\nped×${den.pedestrians} car×${den.cars}`;
+  }
+}
+setPreset(Q.get('preset') || 'morning');
+jumpTo(Q.get('at') || 'busy'); await settleAt();
+$('load').style.display = 'none';
+requestAnimationFrame(frame);
+if (Q.get('talk')) setTimeout(() => npc.talk(Q.get('talk')), 400);
+window.NPCDEMO.ready = true;
+})().catch(e => { document.getElementById('lmsg').textContent = 'שגיאה: ' + e.message; console.error(e); });
+</script>
+</body>
+</html>
