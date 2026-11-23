@@ -30,9 +30,11 @@ async function examples(env, type) {
 }
 
 async function runPhoto(env, t) {
-  const r = await fetch(t.input.url, { headers: { 'user-agent': 'esh27-vision' } });
-  if (!r.ok) throw new Error('fetch ' + r.status);
-  const uri = 'data:image/jpeg;base64,' + Buffer.from(await r.arrayBuffer()).toString('base64');
+  let buf;
+  if (t.input.kv) { buf = await env.SCAN.get(t.input.kv, 'arrayBuffer'); if (!buf) throw new Error('kv missing'); }
+  else { const r = await fetch(t.input.url, { headers: { 'user-agent': 'esh27-vision' } }); if (!r.ok) throw new Error('fetch ' + r.status); buf = await r.arrayBuffer(); }
+  if (buf.byteLength > 9e6) throw new Error('too big');
+  const uri = 'data:image/jpeg;base64,' + Buffer.from(buf).toString('base64');
   const ex = await examples(env, 'photo');
   const s = await env.AI.run(M.vision, { messages: [{ role: 'user', content: [{ type: 'text', text: PHOTO_PROMPT + (ex ? '\nLessons from review:\n' + ex : '') }, { type: 'image_url', image_url: { url: uri } }] }], max_tokens: 1200 });
   let txt = (s.response || '').replace(/^```(json)?|```$/gm, '').trim(), parsed = null;
@@ -72,10 +74,28 @@ async function syncPhotos(env) {   // כל תמונה חדשה בתיקיית ה
   return n;
 }
 
+async function syncScan(env) {   // תמונות מהסורק באתר scan.esh27.com נכנסות לתור לבד
+  if (!env.SCAN) return 'no scan';
+  let n = 0, cursor;
+  do {
+    const l = await env.SCAN.list({ prefix: 'img/', cursor }); cursor = l.list_complete ? null : l.cursor;
+    for (const k of l.keys) {
+      if (!/\.jpe?g$/i.test(k.name)) continue;
+      const id = 'scan-' + k.name.slice(4).replace(/[^\w.-]/g, '_');
+      if (await env.KV.get('t:' + id)) continue;
+      const meta = await env.SCAN.get('meta/' + k.name.slice(4) + '.json');
+      await env.KV.put('t:' + id, JSON.stringify({ id, type: 'photo', status: 'pending', prio: 2, created: now(), input: { name: k.name, kv: k.name, sensors: meta ? JSON.parse(meta) : null } }));
+      n++;
+    }
+  } while (cursor && n < 50);
+  return n;
+}
+
 async function tick(env) {
   const st = await getJ(env.KV, 'status', { runs: 0 });
   st.runs++; st.t = now();
   if (st.runs % 10 === 1) st.sync = await syncPhotos(env);
+  if (st.runs % 2 === 0) st.scan = await syncScan(env);
   const list = await env.KV.list({ prefix: 't:' });
   const tasks = [];
   for (const k of list.keys) { const t = await getJ(env.KV, k.name, null); if (t && t.status === 'pending') tasks.push(t); if (tasks.length >= 12) break; }
