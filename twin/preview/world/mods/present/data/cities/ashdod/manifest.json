@@ -1,0 +1,82 @@
+{
+ "v": 1,
+ "slug": "ashdod",
+ "name_he": "אשדוד",
+ "crs": "EPSG:2039",
+ "tile_m": 1000,
+ "terrain_step": 25,
+ "mask_step": 10,
+ "coord_q": 10,
+ "bbox_itm": [
+  161860,
+  629338,
+  170669,
+  639473
+ ],
+ "tiles": [
+  "162_630",
+  "162_631",
+  "162_632",
+  "163_630",
+  "163_631",
+  "163_632",
+  "164_630",
+  "164_631",
+  "164_632",
+  "165_630",
+  "165_631",
+  "165_632",
+  "166_630",
+  "166_631",
+  "166_632"
+ ],
+ "boundary_kind": "estimated_from_buildings",
+ "stats": {
+  "buildings": 7427,
+  "tiles": 79,
+  "area_km2": 20.83,
+  "height_primary_source": {
+   "R": 7427
+  },
+  "confidence": {
+   "נמוך": 6312,
+   "בינוני": 1115
+  },
+  "h_median_m": 13.0,
+  "sigma_median_m": 6.0,
+  "distinct_heights_dm": 8,
+  "land_qa": {
+   "sea_components": 1,
+   "buildings_in_sea": 8,
+   "sea_km2": 38.63
+  },
+  "calibration": {
+   "anchors": 0
+  },
+  "seconds": 6.0
+ },
+ "sources": {
+  "osm": "sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+  "dem": "SRTM grid embedded in current map (DSM, 2000)"
+ },
+ "sigma_m": {
+  "M_laser": 0.3,
+  "M_lidar": 0.5,
+  "M_floors": null,
+  "O_3d": 1.0,
+  "H_osm": 1.5,
+  "L_osm": null,
+  "V_overture": 4.0,
+  "S_ai": null,
+  "P_plan": null,
+  "G_gba": 8.9,
+  "F_globfp": 14.6,
+  "D_ndsm": 6.92,
+  "B_ghsl": 8.0,
+  "N_knn": null,
+  "R_rule": 6.0
+ },
+ "built_at": "2026-11-22T22:00:24Z",
+ "attribution": "SRTM grid embedded in current map (DSM, 2000) | sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+ "note": "subset of twin/pipeline/sample-out-ashdod (5x3 tiles around the demo site, incl. the coast); same data contract v1. NOTE: coastline in this sample is SYNTHETIC (see attribution)."
+}
