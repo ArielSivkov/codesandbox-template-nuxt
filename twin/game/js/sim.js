@@ -102,6 +102,21 @@ SIM.windAt = function (x, y, z, t, world, out) {
 
 // ---------------- 3. רחפן
 SIM.DRONE = { mass: 0.9, tw: 2.2, cdaH: 0.018, cdaV: 0.035, rho: 1.225, maxTilt: 35 * D2R, tau: 0.12, yawRate: 120 * D2R, vUp: 5, vDn: 3.5, vMaxGPS: 14, kv: 0.09, kz: 4, r: 0.35, cRotor: 0.12, ki: 0.12 };   // cRotor: גרר רוטור ליניארי (blade flapping) נ'·ש'/מ' בריחוף
+/** כיוון הדחף (ציר "מעלה" של הגוף) אחרי pitch ואז roll – וקטור יחידה מדויק (כמו rotateX(−pitch)·rotateZ(roll) בציור).
+ *  f = רכיב קדימה, r = ימינה, y = מעלה. f² + r² + y² = 1 לכל זווית. */
+SIM.tiltUp = (p, r) => ({ f: -Math.sin(p) * Math.cos(r), r: Math.sin(r), y: Math.cos(p) * Math.cos(r) });
+/** הגבלת הטיה כוללת: θ = acos(cos p · cos r) ≤ max, באותו כיוון (כמו בבקרי טיסה – מגבלה על הזווית הכוללת, לא לכל ציר בנפרד). */
+SIM.limitTilt = function (p, r, max) {
+  const u = SIM.tiltUp(p, r); if (u.y >= Math.cos(max)) return [p, r];
+  const hl = Math.hypot(u.f, u.r) || 1, k = Math.sin(max) / hl, uf = u.f * k, ur = u.r * k, uy = Math.cos(max);
+  return [Math.atan2(-uf, uy), Math.asin(ur)];
+};
+/** ATTI: הטיה כוללת = |מקל|·max בכיוון המקל (ix ימינה, iy קדימה) → [pitch, roll]. */
+SIM.tiltFromStick = function (ix, iy, max) {
+  const m = Math.hypot(ix, iy); if (m < 1e-9) return [0, 0];
+  const th = Math.min(1, m) * max, uf = Math.sin(th) * iy / m, ur = Math.sin(th) * ix / m;
+  return [Math.atan2(-uf, Math.cos(th)), Math.asin(ur)];
+};
 SIM.newDrone = (x, y, z, yaw) => ({ x, y, z, vx: 0, vy: 0, vz: 0, yaw: yaw || 0, pitch: 0, roll: 0, thrust: 0, landed: true, gps: true, wind: { x: 0, y: 0, z: 0, speed: 0 }, air: 0, hit: 0, acc: 0 });
 /** צעד רחפן. inp: {x,y (−1..1 מקל), up, down, yawIn}. world כמו ב-windAt + collide(x,z,r,y0,y1), floor(x,z,y) */
 SIM.stepDrone = function (s, inp, dt, t, world) {
@@ -109,16 +124,19 @@ SIM.stepDrone = function (s, inp, dt, t, world) {
   s.acc += Math.min(dt, 0.1);
   while (s.acc >= h) { s.acc -= h; t += h;
     SIM.windAt(s.x, s.y, s.z, t, world, s.wind);
+    // מקל עגול: עוצמה ≤ 1 (אלכסון במקלדת לא נותן √2)
+    const sm = Math.hypot(inp.x || 0, inp.y || 0), sk = sm > 1 ? 1 / sm : 1, ix = (inp.x || 0) * sk, iy = (inp.y || 0) * sk;
     // יעדי זווית: GPS = בקר מהירות (כמו מצב "רגיל" ברחפנים מסחריים), ATTI = המקל קובע זווית ישירות (הרוח מסיחה)
     const cy = Math.cos(s.yaw), sy = Math.sin(s.yaw);
     let tp, tr;
-    if (s.gps) { const vfT = inp.y * P.vMaxGPS, vrT = inp.x * P.vMaxGPS;   // מהירות יעד במסגרת הרחפן
+    if (s.gps) { const vfT = iy * P.vMaxGPS, vrT = ix * P.vMaxGPS;   // מהירות יעד במסגרת הרחפן
       const vf = s.vx * sy + s.vz * cy, vr = -s.vx * cy + s.vz * sy;
       const ef = vfT - vf, er = vrT - vr; if (!s.landed) { s.iF = Math.max(-3, Math.min(3, (s.iF || 0) + ef * h)); s.iR = Math.max(-3, Math.min(3, (s.iR || 0) + er * h)); }   // PI: מבטל סחיפה ברוח קבועה
       tp = -Math.max(-P.maxTilt, Math.min(P.maxTilt, P.kv * ef * 3 + P.ki * (s.iF || 0))); tr = Math.max(-P.maxTilt, Math.min(P.maxTilt, P.kv * er * 3 + P.ki * (s.iR || 0))); }
     else { s.iF = s.iR = 0; }
     if (!s.gps) {
-      tp = -inp.y * P.maxTilt; tr = inp.x * P.maxTilt; }
+      [tp, tr] = SIM.tiltFromStick(ix, iy, P.maxTilt); }
+    [tp, tr] = SIM.limitTilt(tp, tr, P.maxTilt);
     const a = 1 - Math.exp(-h / P.tau); s.pitch += (tp - s.pitch) * a; s.roll += (tr - s.roll) * a;   // תגובת זווית מסדר ראשון
     s.yaw -= (inp.yawIn || 0) * P.yawRate * h;
     // דחף: בקר מהירות אנכית, מוגבל ל-T/W
@@ -129,7 +147,7 @@ SIM.stepDrone = function (s, inp, dt, t, world) {
     s.thrust = T;
     // וקטור הדחף: ציר "מעלה" של הגוף אחרי yaw→pitch→roll. pitch<0 = אף למטה → תאוצה קדימה
     const fwdX = sy, fwdZ = cy, rtX = -cy, rtZ = sy;
-    const ux = -Math.sin(s.pitch) * fwdX + Math.sin(s.roll) * rtX, uz = -Math.sin(s.pitch) * fwdZ + Math.sin(s.roll) * rtZ, uy = cosT;
+    const U = SIM.tiltUp(s.pitch, s.roll), ux = U.f * fwdX + U.r * rtX, uz = U.f * fwdZ + U.r * rtZ, uy = U.y;
     // גרר ריבועי על המהירות היחסית לאוויר
     const rx = s.vx - s.wind.x, ry = s.vy - s.wind.y, rz = s.vz - s.wind.z, rh = Math.hypot(rx, rz);
     const kr = P.cRotor * T / (P.mass * g);   // גרר רוטור יחסי לדחף

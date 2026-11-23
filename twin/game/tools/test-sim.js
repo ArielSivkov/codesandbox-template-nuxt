@@ -33,6 +33,20 @@ ok(q.vx > 0 && Math.abs(q.vx - w.x) < 1.0, `ATTI ברוח: סחיפה מזרחה
 // GPS ברוח: מחזיק מיקום (סחיפה קטנה)
 q = SIM.newDrone(0, 40, 0, 0); q.landed = false; q.gps = true; for (let i = 0; i < 1800; i++) SIM.stepDrone(q, { x: 0, y: 0 }, 1 / 60, 50 + i / 60, flat);
 ok(Math.hypot(q.vx, q.vz) < 1.0, `GPS ברוח: מהירות קרקע ${Math.hypot(q.vx, q.vz).toFixed(2)} מ'/ש', הטיה ${(q.pitch * 57.3).toFixed(1)}°/${(q.roll * 57.3).toFixed(1)}°`);
+// 3) דיוק גאומטרי של הדחף ומגבלת הטיה כוללת (אלכסון לא נותן מהירות √2)
+let worstN = 0; for (let p = -0.8; p <= 0.8; p += 0.1) for (let r = -0.8; r <= 0.8; r += 0.1) { const u = SIM.tiltUp(p, r); worstN = Math.max(worstN, Math.abs(Math.hypot(u.f, u.r, u.y) - 1)); }
+ok(worstN < 1e-12, `וקטור הדחף הוא וקטור יחידה (סטייה מרבית ${worstN.toExponential(1)})`);
+SIM.weather.windSpeed = 0; SIM.weather.gust = 1;
+const fly = (gps, sx, sy) => { const d = SIM.newDrone(0, 50, 0, 0.3); d.landed = false; d.gps = gps; let mt = 0;
+  for (let i = 0; i < 2400; i++) { SIM.stepDrone(d, { x: sx, y: sy }, 1 / 60, i / 60, flat); mt = Math.max(mt, Math.acos(Math.cos(d.pitch) * Math.cos(d.roll))); }
+  return { v: Math.hypot(d.vx, d.vz), tilt: mt / D2R_, alt: d.y }; };
+const D2R_ = Math.PI / 180, aS = fly(false, 0, 1), aD = fly(false, 1, 1), gD = fly(true, 1, 1);
+ok(Math.abs(aD.v - aS.v) / aS.v < 0.01 && aD.tilt <= P.maxTilt / D2R_ + 0.05, `ATTI באלכסון: ${aD.v.toFixed(2)} מ'/ש' = ישר ${aS.v.toFixed(2)}, הטיה כוללת ${aD.tilt.toFixed(1)}° ≤ ${(P.maxTilt / D2R_).toFixed(0)}° (היה 24.0 מ'/ש' ו-47.9°)`);
+ok(gD.v <= P.vMaxGPS + 0.1 && gD.tilt <= P.maxTilt / D2R_ + 0.05 && Math.abs(gD.alt - 50) < 0.2, `GPS באלכסון: ${gD.v.toFixed(2)} ≤ ${P.vMaxGPS} מ'/ש', הטיה ${gD.tilt.toFixed(1)}°, גובה נשמר ${gD.alt.toFixed(1)} מ' (היה 19.3 מ'/ש')`);
+// חוזה: העותקים בעולם המאוחד ובתצוגה המקדימה זהים למקור
+const fs = require('fs'), path = require('path'), src = fs.readFileSync(path.join(__dirname, '../js/sim.js'), 'utf8');
+for (const c of ['../../integration/world/js/sim.js', '../../preview/world/js/sim.js']) { const f = path.join(__dirname, c); if (fs.existsSync(f)) ok(fs.readFileSync(f, 'utf8') === src, `העותק ${c.replace('../../', '')} זהה ל-game/js/sim.js`); }
 // פרופיל רוח: חזק יותר בגובה
+SIM.weather.windSpeed = 8; SIM.weather.gust = 1.5;
 const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).speed; ok(b > a, `רוח ב-60 מ' (${b.toFixed(1)}) > ב-2 מ' (${a.toFixed(1)})`);
 console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); process.exit(fail ? 1 : 0);
