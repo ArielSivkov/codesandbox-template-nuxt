@@ -25,7 +25,7 @@
 #yzMap .tb{position:absolute;top:calc(env(safe-area-inset-top) + 8px);right:8px;left:8px;display:flex;gap:6px;align-items:center;direction:rtl;pointer-events:none}
 #yzMap .tb>*{pointer-events:auto}
 #yzMap .tb h2{margin:0;font-size:15px;flex:1;color:#0d1420;text-shadow:0 1px 0 #fff8}
-#yzMap .zm{position:absolute;left:10px;bottom:calc(env(safe-area-inset-bottom) + 120px);display:flex;flex-direction:column;gap:6px}
+#yzMap .zm{position:absolute;left:10px;top:calc(env(safe-area-inset-top) + 64px);display:flex;flex-direction:column;gap:6px}
 #yzMap .zm .btn{width:46px;height:46px;font-size:22px;padding:0}
 #yzMap .at{position:absolute;left:6px;bottom:calc(env(safe-area-inset-bottom) + 4px);font-size:10px;color:#333;background:#fffb;border-radius:6px;padding:1px 6px;direction:ltr}
 #yzMap .pk{position:absolute;right:8px;left:8px;bottom:calc(env(safe-area-inset-bottom) + 24px);max-width:440px;margin-inline-start:auto;background:rgba(12,20,32,.95);color:#eef3f8;border:1px solid #ffffff26;border-radius:14px;padding:8px 10px;display:none;direction:rtl;box-shadow:0 8px 24px #0008}
@@ -84,7 +84,8 @@
       cx.save(); cx.translate(p.x, p.y); cx.rotate(Math.PI - hd); cx.fillStyle = '#1e88e5'; cx.strokeStyle = '#fff'; cx.lineWidth = 3; cx.beginPath(); cx.moveTo(0, -13); cx.lineTo(10, 10); cx.lineTo(0, 4); cx.lineTo(-10, 10); cx.closePath(); cx.stroke(); cx.fill(); cx.restore(); }
   }
 
-  function loop() { if (!M.open) return; if (M.dirty) draw(); requestAnimationFrame(loop); }
+  function loop() { if (!M.open) { M.looping = false; return; } if (M.dirty) draw(); requestAnimationFrame(loop); }
+  function startLoop() { if (M.looping) return; M.looping = true; requestAnimationFrame(loop); }
 
   function zoomAt(nz, px, py) {
     nz = Math.max(MINZ, Math.min(MAXZ, nz)); const w = cv.clientWidth, h = cv.clientHeight;
@@ -98,22 +99,24 @@
   function choose(ll) {
     M.pick = ll; M.dirty = true; const s = llToSample(ll.lat, ll.lon);
     const inIL = s && s.trueE > IL.E0 && s.trueE < IL.E1 && s.trueN > IL.N0 && s.trueN < IL.N1;
+    const sc = inIL && W.coords.toScene ? W.coords.toScene(s.E, s.N) : null, B = W.G27 && W.G27.W && W.G27.W.bounds;
+    const inWorld = !!(sc && B && sc.x >= B.minx && sc.x <= B.maxx && sc.z >= B.minz && sc.z <= B.maxz);   // אותה בדיקה כמו GPS (game.js spawnAtLatLon)
     pk.innerHTML = `<div class="c">${ll.lat.toFixed(5)}, ${ll.lon.toFixed(5)}${s && inIL ? ` · ITM ${Math.round(s.trueE)}/${Math.round(s.trueN)}` : ''}</div>
       <div class="r"><button class="btn pri" id="yzMapGo">🚶 ללכת לכאן</button><button class="btn" id="yzMapEye">👁 מבט מלמעלה</button>
       <a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${ll.lat.toFixed(6)},${ll.lon.toFixed(6)}" style="text-decoration:none;display:inline-flex;align-items:center">🧭 גוגל מפות</a><button class="btn" id="yzMapPkX">✕</button></div>
-      ${inIL ? '' : '<div class="n">🌍 כאן עוד אין עולם תלת־ממד – יגיע עם המנוע הגלובלי. המפה עצמה מכסה את כל העולם.</div>'}`;
+      ${inWorld ? '' : `<div class="n">🌍 ${inIL ? 'כאן עוד לא נטען עולם תלת־ממד (מחוץ לאזור הנתונים)' : 'כאן עוד אין עולם תלת־ממד – יגיע עם המנוע הגלובלי'}. המפה עצמה מכסה את כל העולם.</div>`}`;
     pk.style.display = 'block';
     pk.querySelector('#yzMapPkX').onclick = () => { M.pick = null; pk.style.display = 'none'; M.dirty = true; };
     const go = pk.querySelector('#yzMapGo'), eye = pk.querySelector('#yzMapEye');
-    if (!inIL) { go.disabled = true; eye.disabled = true; return; }
-    go.onclick = () => { close(); const G = W.G27; if (G.S.inside) G.exitInterior(); YZW.setMode('walk', YZW.mode() !== 'walk'); YZW.placeAt(s.E, s.N, G.S.heading); YZW.syncURL && YZW.syncURL(); YZW.notice('🚶 קפצת לנקודה במפה', { kind: 'info', ms: 1800 }); };
+    if (!inWorld) { go.disabled = true; eye.disabled = true; return; }
+    go.onclick = () => { close(); const G = W.G27; if (G.S.inside) G.exitInterior(); if (YZW.mode() !== 'walk') YZW.setMode('walk', true, { x: sc.x, y: 0, z: sc.z }); YZW.placeAt(s.E, s.N, G.S.heading); YZW.syncURL && YZW.syncURL(); YZW.notice('🚶 קפצת לנקודה במפה', { kind: 'info', ms: 1800 }); };
     eye.onclick = () => { close(); const p = W.coords.toScene(s.E, s.N); YZW.setMode('dev'); setTimeout(() => { if (window.YZDev) { YZDev.D.tx = p.x; YZDev.D.tz = p.z; YZDev.D.dist = Math.max(YZDev.D.dist || 0, 300); } if (W.G27.W.update) W.G27.W.update(p.x, p.z, 40); }, 60); };
   }
 
   function open() {
     if (!W || !W.coords || !W.coords.itmToWgs84) { YZW.notice('המפה עוד נטענת…', { kind: 'info', ms: 1500 }); return; }
     const me = sceneToLL(W.player.pos.x, W.player.pos.z); if (me) { M.lat = me.lat; M.lon = me.lon; }
-    M.open = true; el.classList.add('open'); pk.style.display = M.pick ? 'block' : 'none'; M.dirty = true; requestAnimationFrame(loop);
+    M.open = true; el.classList.add('open'); pk.style.display = M.pick ? 'block' : 'none'; M.dirty = true; startLoop();
   }
   function close() { M.open = false; el.classList.remove('open'); M.ptrs.clear(); M.drag = M.pinch = null; }
   M.openMap = open; M.close = close; M.choose = choose; M.sceneToLL = sceneToLL; M.llToSample = llToSample; M.pxToLL = pxToLL; M.zoomAt = zoomAt;
@@ -137,6 +140,7 @@
         pan(mx - M.pinch.mx, my - M.pinch.my); M.pinch.mx = mx; M.pinch.my = my; zoomAt(M.pinch.z + Math.log2(Math.max(d, 1) / Math.max(M.pinch.d, 1)), mx, my); }
       else if (M.drag) { const d = M.drag; if (Math.hypot(e.offsetX - d.x0, e.offsetY - d.y0) > 8) d.moved = true; if (d.moved) pan(e.offsetX - d.x, e.offsetY - d.y); d.x = e.offsetX; d.y = e.offsetY; } });
     const up = e => { const d = M.drag; M.ptrs.delete(e.pointerId); if (M.ptrs.size < 2) M.pinch = null;
+      if (M.ptrs.size === 1 && d) { const r = [...M.ptrs.values()][0]; d.x = r.x; d.y = r.y; d.moved = true; }
       if (M.ptrs.size === 0) { if (d && !d.moved && performance.now() - d.t < 500 && e.type === 'pointerup') { const now = performance.now();
           const dbl = now - lastTap < 300, ll = pxToLL(e.offsetX, e.offsetY);
           if (!(M.onTap && M.onTap(ll, e.offsetX, e.offsetY, dbl))) { if (dbl) zoomAt(M.z + 1, e.offsetX, e.offsetY); else choose(ll); } lastTap = now; }   // וו הקשה (68-map-layers)
