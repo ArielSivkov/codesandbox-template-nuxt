@@ -5,7 +5,10 @@
  */
 (function () {
   'use strict';
-  const API = (new URLSearchParams(location.search).get('acct')) || 'https://esh27-accounts.ariel-sivkov.workers.dev';
+  // אבטחה (צוות אדום C2): ?acct= מתקבל רק בפיתוח מקומי – אחרת קישור זדוני היה שולח סוד מכשיר וסיסמה לשרת זר
+  const ACCT_Q = new URLSearchParams(location.search).get('acct'), LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const API = (LOCAL && ACCT_Q && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(ACCT_Q)) ? ACCT_Q : 'https://esh27-accounts.ariel-sivkov.workers.dev';
+  const HEX = c => (/^#[0-9a-fA-F]{6}$/.test(String(c)) ? c : '#808080');
   const LS = 'w27.acct', DEF = { style: 'real', base: 'm', hairStyle: 'parted', beard: false, skin: '#ffffff', hair: '#3a2a1e', top: '#2f6db5', bottom: '#2b3340', shoes: '#1f1c1a', height: 1.75 };
   const A = { token: null, me: null, active: null, guest: null, google: false, el: null, edit: null };
   const store = { get() { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) { return {}; } }, set(o) { try { localStorage.setItem(LS, JSON.stringify(Object.assign(store.get(), o))); } catch (e) { /* */ } } };
@@ -27,11 +30,11 @@
     const el = A.el; if (!el || el.hidden) return; let h = '<div class="ac-head"><b>👤 ' + (A.me ? esc(A.me.user.username || A.me.user.email || 'החשבון של הטלפון הזה') : 'אורח') + '</b><button class="ac-x" data-a="close">✕</button></div>';
     if (!A.me) h += '<div class="ac-card"><div class="ac-t">כניסה או הרשמה</div><input id="acU" placeholder="שם משתמש" autocomplete="username"><input id="acP" type="password" placeholder="סיסמה (8+ תווים)" autocomplete="current-password">' +
       '<div class="ac-row"><button data-a="login">כניסה</button><button data-a="signup">הרשמה</button></div>' + (A.google ? '<div id="acG"></div>' : '<div class="ac-m">התחברות עם גוגל – בקרוב</div>') + '<div class="ac-m" id="acMsg"></div></div>';
-    else h += '<div class="ac-card"><div class="ac-t">הפרופילים שלי</div><div class="ac-pl">' + A.me.profiles.map(p => '<button class="' + (p.id === A.active ? 'on' : '') + '" data-a="pick" data-id="' + p.id + '">' + esc(p.name) + '</button>').join('') +
+    else h += '<div class="ac-card"><div class="ac-t">הפרופילים שלי</div><div class="ac-pl">' + A.me.profiles.map(p => '<button class="' + (p.id === A.active ? 'on' : '') + '" data-a="pick" data-id="' + esc(p.id) + '">' + esc(p.name) + '</button>').join('') +
       (A.me.profiles.length < 5 ? '<button data-a="new">➕ חדש</button>' : '') + '</div><div class="ac-row">' + (A.me.user.username ? '<button data-a="logout" class="ghost">יציאה</button>' : '') + (A.me.profiles.length > 1 ? '<button data-a="del" class="ghost">מחק פרופיל</button>' : '') + '</div></div>';
     if (A.me && !A.me.user.username) h += '<div class="ac-card"><div class="ac-t">🔗 להיכנס גם מטלפון או מחשב אחר</div><div class="ac-m">החשבון שמור בטלפון הזה. כדי להגיע אליו ממקום אחר – קבע שם משתמש וסיסמה' + (A.google ? ' או חבר לגוגל' : ' (חיבור לגוגל – בקרוב)') + '.</div>' +
       '<input id="acU" placeholder="שם משתמש" autocomplete="username"><input id="acP" type="password" placeholder="סיסמה (8+ תווים)" autocomplete="new-password"><div class="ac-row"><button data-a="claim">שמור שם וסיסמה</button><button data-a="other" class="ghost">יש לי כבר חשבון</button></div><div class="ac-m" id="acMsg"></div></div>';
-    const v = avatar(), col = (k, l) => '<label>' + l + '<input type="color" data-k="' + k + '" value="' + v[k] + '"></label>';
+    const v = avatar(), col = (k, l) => '<label>' + l + '<input type="color" data-k="' + k + '" value="' + HEX(v[k]) + '"></label>';
     h += '<div class="ac-card"><div class="ac-t">הדמות' + (profile() ? ' – ' + esc(profile().name) : '') + '</div>' + (profile() ? '<input id="acN" value="' + esc(profile().name) + '" maxlength="40">' : '') +
       '<div class="ac-seg">' + [['real', '🧍 מציאותי'], ['toon', '🎨 מצויר']].map(([k, l]) => '<button data-a="set" data-k="style" data-v="' + k + '" class="' + ((v.style || 'real') === k ? 'on' : '') + '">' + l + '</button>').join('') + '</div>' +
       '<div class="ac-seg">' + [['m', 'גבר'], ['f', 'אישה']].map(([k, l]) => '<button data-a="set" data-k="base" data-v="' + k + '" class="' + (v.base === k ? 'on' : '') + '">' + l + '</button>').join('') + '</div>' +
