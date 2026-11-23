@@ -105,6 +105,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-vis
 .line-grid label{font-size:.78rem}
 .line-total{text-align:left}
 .line-total span{display:block;font-size:.78rem;color:var(--muted);font-weight:600}
+/* N10: בטלפון צר – כמות ומחיר ליחידה בשתי עמודות רחבות, וסה"כ השורה בשורה משלו (999999.99 נראה במלואו) */
+@media (max-width:440px){
+  .line-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .line-total{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .line-total b{min-height:36px}
+}
 .line-total b{display:flex;align-items:center;justify-content:flex-end;min-height:46px;line-height:1.2;font-size:1.05rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;text-align:left}
 .line-foot{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:space-between;margin-top:6px;font-size:.8rem;color:var(--muted)}
 .optl{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:.88rem;color:var(--ink);font-weight:600;min-height:44px;cursor:pointer}
@@ -307,6 +313,7 @@ input.mod:focus-visible,input.opt:focus-visible,#rangeMode:focus-visible{outline
         <div class="optrow" id="rowOpt"><span>אופציות – לא בסה"כ (לפני מע"מ)</span><span id="tOpt"></span></div>
       </div>
       <div class="status" id="status" role="status" aria-live="polite" hidden></div>
+      <div class="status" id="zeroWarn" role="status" hidden></div>
       <button type="button" class="btn primary wide" id="toSend" style="margin-top:12px">המשך לשליחה</button>
       <p class="note">הכלי מחשב לפי מה שהזנת: הוא לא מודד, לא מזהה תמונות ולא בודק מחירים. כל שורה והמע"מ מעוגלים לשקל שלם, ומחיר אחרי תנאי אתר מעוגל לשקל. הפירוט של רמת המחיר ותנאי האתר מוצג רק לך – ללקוח מגיע מחיר אחד לכל שורה. בדוק כל שורה לפני שליחה. ההצעה נשמרת רק בדפדפן הזה ולא נשלחת לשום מקום.</p>
     </div>
@@ -884,14 +891,14 @@ var LuachCalc = (function () {
     var dv = defs();
     return { client: '', address: '', clientPhone: '', markup: String(D.config.costMarkupPercent), discType: 'amount', discValue: '',
              validity: dv.validity, notIncluded: dv.notIncluded, payTerms: dv.payTerms, lines: [], seq: 1, basis: '', addrHint: '',
-             qid: null, tier: 'mid', rangeMode: false, num: null, updated: 0, frozen: null, lb: null, mapDraft: false, draft: false };
+             qid: null, tier: 'mid', rangeMode: false, num: null, updated: 0, frozen: null, lb: null, mapDraft: false, draft: false, mapSig: null };
   }
   /* טקסט בלבד: אובייקט/מערך משובש לא הופך ל-"[object Object]" */
   function str(v) { return (typeof v === 'string') ? v : (typeof v === 'number' && isFinite(v)) ? String(v) : ''; }
   function strOrNull(v) { return (v === null || v === undefined) ? null : (typeof v === 'string' || (typeof v === 'number' && isFinite(v))) ? String(v) : null; }
   function validNum(n) { return (typeof n === 'number' && isFinite(n) && n >= 1 && n <= 9999999 && Math.floor(n) === n) ? n : null; }
   var KNOWN_Q = ['client', 'address', 'clientPhone', 'markup', 'discType', 'discValue', 'validity', 'notIncluded', 'payTerms', 'lines', 'seq', 'basis', 'addrHint',
-                 'qid', 'tier', 'rangeMode', 'num', 'updated', 'frozen', 'lb', 'mapDraft', 'draft'];
+                 'qid', 'tier', 'rangeMode', 'num', 'updated', 'frozen', 'lb', 'mapDraft', 'draft', 'mapSig'];
   function clean(o) {
     var src = (o && typeof o === 'object' && !Array.isArray(o)) ? o : {}, q = blank();
     KNOWN_Q.forEach(function (f) { if (own.call(src, f)) q[f] = src[f]; });
@@ -903,15 +910,19 @@ var LuachCalc = (function () {
     q.draft = q.draft === true;   /* טיוטה: רשומה ברשימה שעוד לא "נשמרה" (לא קפואה, בלי מספר) */
     q.num = validNum(q.num);
     q.updated = Math.max(0, Number(q.updated) || 0);
-    q.frozen = (typeof q.frozen === 'number' && isFinite(q.frozen) && q.frozen > 0) ? q.frozen : null;
+    /* N7: תאריך הקפאה בעתיד (גיבוי מזויף / שעון שגוי) – לא יותר מעכשיו */
+    q.frozen = (typeof q.frozen === 'number' && isFinite(q.frozen) && q.frozen > 0) ? Math.min(q.frozen, Date.now()) : null;
+    q.mapSig = typeof q.mapSig === 'string' ? q.mapSig : null;
     q.lb = (typeof q.lb === 'string' && /^[a-z0-9]{6,24}$/.test(q.lb)) ? q.lb : null;
     q.qid = (typeof q.qid === 'string') ? q.qid : null;
     if (!Array.isArray(q.lines)) q.lines = [];
-    var mx = 0, lines = [];
+    var mx = 0, lines = [], seenK = {};
     q.lines.forEach(function (l) { if (l && typeof l === 'object' && typeof l.k === 'number' && isFinite(l.k) && l.k > mx) mx = l.k; });
     q.lines.forEach(function (l0) {
       if (!l0 || typeof l0 !== 'object' || Array.isArray(l0)) return;
       var k = (typeof l0.k === 'number' && isFinite(l0.k)) ? l0.k : ++mx;
+      if (seenK[k]) k = ++mx;   /* N6: שתי שורות עם אותו מזהה (גיבוי מזויף) – השנייה מקבלת מזהה חדש, קבוע (לא אקראי) */
+      seenK[k] = 1;
       var fz = (l0.fz && typeof l0.fz === 'object') ? { p: strOrNull(l0.fz.p), lo: strOrNull(l0.fz.lo), hi: strOrNull(l0.fz.hi) } : null;
       var id = typeof l0.id === 'string' ? l0.id : '';
       if (!l0.custom && !(id && byId[id] && !IS_VAR[id])) {
@@ -943,6 +954,13 @@ var LuachCalc = (function () {
     return q.lines.length > 0 || !!(q.client + q.address + q.discValue + q.clientPhone).trim() ||
       (q.notIncluded.trim() !== '' && q.notIncluded.trim() !== dv.notIncluded.trim()) || (q.payTerms.trim() !== '' && q.payTerms.trim() !== dv.payTerms.trim());
   }
+  /* N1/N2: "חתימת תוכן" – כל מה שהמשתמש יכול לשנות בהצעה. טיוטה מהמפה נחשבת "לא נגעו בה" רק אם החתימה זהה בדיוק
+     לחתימה שנשמרה כשהיא הגיעה מהמפה (כמויות, מחירים, סעיפים חופשיים, הערות, לקוח, תנאים – הכול). */
+  function contentSig(q) {
+    return JSON.stringify([q.client, q.address, q.clientPhone, q.markup, q.discType, q.discValue, q.validity, q.notIncluded, q.payTerms, q.basis, q.tier, q.rangeMode,
+      (q.lines || []).map(function (l) { return [l.custom ? 1 : 0, l.id || '', l.name || '', l.unit || '', l.qty, l.price === undefined ? null : l.price, !!l.opt, l.tier || null, (l.mods || []).join(',')]; })]);
+  }
+  function untouchedMapDraft(q) { return !!(q && q.mapDraft && q.draft && !q.num && q.mapSig && contentSig(q) === q.mapSig); }
   function readList() {
     var a = getJSON(KEY_LIST);
     return Array.isArray(a) ? a.filter(function (e) { return e && typeof e.id === 'string' && e.q && typeof e.q === 'object'; }) : [];
@@ -966,11 +984,14 @@ var LuachCalc = (function () {
       a.unshift(e);
     });
   }
-  /* מחיקת רשומה מהרשימה (עם סימון מחיקה, כדי שלשונית ישנה לא תחזיר אותה) + הרשומות שלה ביומן המחירים */
-  function removeEntry(id) {
+  /* מחיקת רשומה מהרשימה + הרשומות שלה ביומן המחירים.
+     מחיקה של המשתמש (auto=false): עם סימון מחיקה, כדי שלשונית ישנה לא תחזיר אותה.
+     ניקוי אוטומטי (auto=true – טיוטה ריקה, או טיוטה מהמפה שלא נגעו בה): בלי סימון מחיקה. אם הטיוטה פתוחה בלשונית אחרת
+     והמשתמש ממשיך לעבוד בה – היא נוצרת מחדש בשמירה הבאה, ולא מוצגת הודעה ש"נמחקה". */
+  function removeEntry(id, auto) {
     var e0 = entry(id), lb = e0 && e0.q && e0.q.lb;
-    var dl = readDel(); dl.push(id); if (dl.length > 500) dl = dl.slice(dl.length - 500);
-    setJSON(KEY_DEL, dl); setPend(id, null);
+    if (!auto) { var dl = readDel(); dl.push(id); if (dl.length > 500) dl = dl.slice(dl.length - 500); setJSON(KEY_DEL, dl); }
+    setPend(id, null);
     var ok = commit(function (a) { for (var i = a.length - 1; i >= 0; i--) if (a[i].id === id) a.splice(i, 1); });
     if (ok && lb) { var log = getJSON(KEY_LOG); if (Array.isArray(log)) setJSON(KEY_LOG, log.filter(function (r) { return !r || r.q !== lb; })); }
     return ok;
@@ -1105,14 +1126,14 @@ var LuachCalc = (function () {
   function usedNums() { var u = {}; list.forEach(function (e) { if (e.id !== st.qid && e.q && validNum(e.q.num)) u[e.q.num] = 1; }); return u; }
   function freshNum() { var u = usedNums(), n; do { n = nextNum(); } while (u[n]); return n; }
   /* שליחה/העתקה/הדפסה: מספר הצעה + הקפאת מחירים */
-  function ensureNum() { var ch = false; if (!st.num) { st.num = freshNum(); ch = true; } if (!st.frozen || st.lines.some(function (l) { return !l.custom && !l.fz; })) { freezeMissing(st); ch = true; } if (ch) { save(); refresh(); } }
   function storeCurrent() {   /* "שמירה": טיוטה הופכת להצעה שמורה – מוקפאת ומקבלת מספר. מחזיר true רק אם נשמר באמת. */
     if (!st.num) st.num = freshNum();
     freezeMissing(st);
-    st.mapDraft = false; st.draft = false;
+    st.mapDraft = false; st.draft = false; st._noDraft = false;
     if (st.qid && entry(st.qid)) { st.updated = Date.now(); setJSON(KEY, st); return syncNow(); }
     st.updated = Date.now();
-    var e = { id: uid(), created: Date.now(), updated: st.updated, q: snap(st), sum: summary(st) };
+    /* אותו מזהה אם הרשומה רק נעלמה (ניקוי אוטומטי); מזהה חדש אם המשתמש מחק אותה */
+    var e = { id: (st.qid && readDel().indexOf(st.qid) < 0) ? st.qid : uid(), created: Date.now(), updated: st.updated, q: snap(st), sum: summary(st) };
     if (!upsert(e, true)) return false;
     st.qid = e.id; setBase(st, e.updated);
     logPrices();
@@ -1282,7 +1303,7 @@ var LuachCalc = (function () {
   }
 
   /* מילוי מוקדם ממפת לוח היזם: #pre=<JSON מקודד>. רק סעיפים קיימים, כמויות חיוביות, טקסט קצר. */
-  var fromMap = false;
+  var fromMap = false, mapPrevKept = false;
   (function () {
     var m = /[#&]pre=([^&]+)/.exec(location.hash || ''); if (!m) return;
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
@@ -1295,22 +1316,34 @@ var LuachCalc = (function () {
     });
     if (!lines.length) return;
     try { localStorage.setItem(KEY + '_prev', JSON.stringify(st)); } catch (e) {}
-    /* D6: טיוטה מהמפה שלא נשמרה ושלא הוקלד בה דבר – מוחלפת במקום (לא מצטברות טיוטות) */
-    /* ההצעה הקודמת כבר ברשימה (שמורה או טיוטה) ולא נוגעים בה. רק טיוטה מהמפה שלא נגעו בה מוחלפת (לא מצטברות). */
-    var draftOnly = st.mapDraft && st.draft && st.qid && !(st.client + st.address + st.clientPhone + st.discValue).trim();
-    if (draftOnly) removeEntry(st.qid);
-    var keep = { markup: st.markup, validity: st.validity, tier: st.tier };
+    /* N1/N2: ההצעה הקודמת לא נמחקת אף פעם אם נגעו בה. רק טיוטה מהמפה שזהה בדיוק למה שהגיע מהמפה מוחלפת
+       (ניקוי אוטומטי בלי סימון מחיקה – אם היא פתוחה בלשונית אחרת וממשיכים לעבוד בה, היא נוצרת מחדש).
+       כל דבר אחר – כמות, מחיר, סעיף חופשי, הערה, לקוח – נשאר ברשימה כטיוטה (או כהצעה השמורה שהוא כבר). */
+    var prev = st;
+    if (hasContent(prev)) {
+      if (untouchedMapDraft(prev)) {
+        if (prev.qid && entry(prev.qid)) removeEntry(prev.qid, true);
+      } else {
+        if ((!prev.qid || !entry(prev.qid)) && !(prev.qid && readDel().indexOf(prev.qid) >= 0)) {
+          if (!prev.qid) prev.draft = true;   /* לא היה ברשימה (למשל אחסון שנכשל) – נכנס עכשיו כטיוטה */
+          upsert({ id: prev.qid || ('d' + uid()), created: Date.now(), updated: prev.updated || Date.now(), q: snap(prev), sum: summary(prev) }, true);
+        }
+        mapPrevKept = true;
+      }
+    }
+    var keep = { markup: prev.markup, validity: prev.validity, tier: prev.tier };
     st = Object.assign(blank(), keep);
     st.mapDraft = true;
     st.lines = lines.map(function (l) { return { k: newK(), id: l.id, qty: l.qty, price: null, opt: false, tier: null, mods: [] }; });
     st.basis = typeof p.basis === 'string' ? p.basis.slice(0, 400) : '';
     st.addrHint = typeof p.hint === 'string' ? p.hint.slice(0, 80) : '';
+    st.mapSig = contentSig(st);   /* מה שהגיע מהמפה – כדי לדעת בפעם הבאה אם נגעו בטיוטה */
     fromMap = true;
     save();
   })();
 
   /* ---------- טקסט ללקוח ---------- */
-  function dmy(d) { function p(n) { return (n < 10 ? '0' : '') + n; } return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear(); }
+  function dmy(d) { if (!(d instanceof Date) || isNaN(d.getTime())) return '—'; function p(n) { return (n < 10 ? '0' : '') + n; } return p(d.getDate()) + '.' + p(d.getMonth() + 1) + '.' + d.getFullYear(); }
   function today() { return dmy(new Date()); }
   function meta() {
     return { business: biz.name.trim(), client: st.client.trim(), address: st.address.trim(), dateText: today(),
@@ -1498,11 +1531,17 @@ var LuachCalc = (function () {
       save(); renderLines(); updateRow(id, true, 'inc'); pulseBadge();
       toast('נוסף להצעה. המחיר נשמר גם כ"המחיר שלך" לסעיף הזה (אפשר לשנות בהגדרות).');
     } else if (act === 'add' || act === 'inc') {
-      if (l) { c = C.scaled(normNum(l.qty), 2); l.qty = C.plain((c === null ? 0 : c) + 100, 2); }
+      if (l) {
+        c = C.scaled(normNum(l.qty), 2);
+        /* N8: כמות לא ברורה/לא תקינה – לא מאפסים אותה; מסבירים ומשאירים כמו שהיא */
+        if (c === null && String(l.qty || '').trim()) { toast(ambig(l.qty) ? AMBIG : 'הכמות בשורה לא תקינה – תקנו אותה בלשונית ההצעה.', 'לתיקון', function () { goToLine(l.k, '.qty'); }); return; }
+        l.qty = C.plain((c === null ? 0 : c) + 100, 2);
+      }
       else { l = newLine(id); st.lines.push(l); }
       save(); renderLines(); updateRow(id, true, 'inc'); pulseBadge();   /* האישור: הבהוב השורה, מונה הכמות והמונה בלשונית – בלי הודעה שמכסה את המסך */
     } else if (act === 'dec') {
       c = C.scaled(normNum(l.qty), 2);
+      if (c === null && String(l.qty || '').trim()) { toast(ambig(l.qty) ? AMBIG : 'הכמות בשורה לא תקינה – תקנו אותה בלשונית ההצעה.', 'לתיקון', function () { goToLine(l.k, '.qty'); }); return; }
       if (c === null || c <= 100) {
         var idx = st.lines.indexOf(l), q0 = st;
         st.lines.splice(idx, 1); save(); renderLines(); updateRow(id, false, 'add');
@@ -1641,6 +1680,9 @@ var LuachCalc = (function () {
     var errHtml = r.canIssue ? '' : '<ul>' + hints.map(function (h) { return '<li>' + esc(h) + '</li>'; }).join('') + r.errors.map(function (e) { return '<li>' + esc(ERR[e] || e) + '</li>'; }).join('') + '</ul>';
     var s = $('#status');
     s.hidden = r.canIssue;
+    /* N7: סה"כ 0 ₪ (למשל הנחה של 100%) – אזהרה; השליחה תבקש אישור */
+    var zw = $('#zeroWarn'), zero = r.canIssue && r.total <= 0;
+    if (zw) { zw.hidden = !zero; setHTML(zw, zero ? '<b>שימו לב:</b> סה"כ ההצעה 0 ₪ – ההנחה מכסה את כל הסכום. לפני שליחה או הדפסה תופיע שאלת אישור.' : ''); }
     setHTML(s, r.canIssue ? '' : '<b>כדי להפיק הצעה חסר:</b>' + errHtml);
 
     var dr = drift(), dbox = $('#drift');
@@ -1669,7 +1711,8 @@ var LuachCalc = (function () {
     setText($('#saveBtn'), saved ? 'נשמרה ✓' : 'שמור הצעה');
     setText($('#saveState'), anyFail() ? 'לא נשמר – האחסון בדפדפן נכשל. השתמשו ב"גיבוי – ייצוא לקובץ" או העתיקו את ההצעה.' :
       saved ? 'ההצעה הפתוחה שמורה ברשימה, וכל שינוי בה נשמר אוטומטית.' :
-      st.qid ? 'ההצעה הפתוחה היא טיוטה: היא כבר ברשימה ולא תאבד, אבל המחירים בה לא קפואים ואין לה מספר עד שלוחצים "שמור הצעה".' : 'ההצעה הפתוחה עוד לא שמורה ברשימה.');
+      st.qid ? 'ההצעה הפתוחה היא טיוטה: היא כבר ברשימה ולא תאבד. ' + (st.frozen ? 'המחירים בה קפואים כמו בהצעה שממנה היא הועתקה. ' : 'המחירים בה מתעדכנים לפי המחירון וההגדרות. ') +
+        'מספר הצעה יינתן כשלוחצים "שמור הצעה" – או כששולחים, מעתיקים או מדפיסים (שליחה היא גם שמירה).' : 'ההצעה הפתוחה עוד לא שמורה ברשימה.');
   }
   function refreshSend(r) {
     var t = r.canIssue ? fullText(r) : null, n0 = st.lines.length;
@@ -1679,7 +1722,8 @@ var LuachCalc = (function () {
     rd.hidden = r.canIssue; ok.hidden = !r.canIssue;
     setHTML(rd, r.canIssue ? '' : '<b>ההצעה עוד לא מוכנה לשליחה. חסר:</b>' + errHtml + '<button type="button" class="btn" data-go="fix">לתיקון בהצעה</button>');
     var rg = rangeTotals();
-    if (r.canIssue) setText(ok, 'ההצעה מוכנה: ' + (n0 === 1 ? 'שורה אחת' : n0 + ' שורות') + ' · ' + (rg ? 'טווח ' + between(rg.totLo, rg.totHi) : C.money(r.total) + ' ₪') + ' כולל מע"מ');
+    if (r.canIssue && r.total <= 0) setText(ok, 'ההצעה מוכנה, אבל הסה"כ 0 ₪ (ההנחה מכסה את כל הסכום) – בדקו לפני שליחה.');
+    else if (r.canIssue) setText(ok, 'ההצעה מוכנה: ' + (n0 === 1 ? 'שורה אחת' : n0 + ' שורות') + ' · ' + (rg ? 'טווח ' + between(rg.totLo, rg.totHi) : C.money(r.total) + ' ₪') + ' כולל מע"מ');
     var dr = drift(), ds = $('#driftSend');
     ds.hidden = !dr;
     setHTML(ds, dr ? 'שימו לב: המחירים בהצעה קפואים מאז ' + dmy(new Date(st.frozen)) + ', ומשהו במחירון או בהגדרות השתנה מאז. ללקוח יישלח הסה"כ הקפוא (' + C.money(dr.now) + ' ₪)' +
@@ -1766,14 +1810,30 @@ var LuachCalc = (function () {
     else return;
     listDirty = true; save(); refresh();
   });
+  /* N9: בהצעה קפואה, כל פעולה על שורה שמחשבת את המחיר שלה מחדש (תנאי אתר, רמה לשורה, חזרה למחיר המחושב, המחיר שלי)
+     – אם המחיר ליחידה משתנה, רק באישור, עם המחיר לפני ואחרי. ביטול מחזיר את השורה בדיוק כמו שהייתה. */
+  function confirmLine(l, what, mut) {
+    if (!st.frozen || l.custom) { mut(l); refz(l); return true; }
+    var keep = JSON.stringify(l), before = effAg(l, st), r0 = compute();
+    mut(l); refz(l);
+    var after = effAg(l, st);
+    if (before === after) return true;
+    var r1 = compute(), it = byId[l.id], ag = function (a) { return a === null ? '—' : C.moneyAg(a) + ' ₪'; };
+    if (window.confirm(what + ' המחיר ליחידה בשורה "' + (it ? it[2] : '') + '" ישתנה מ-' + ag(before) + ' ל-' + ag(after) + ' (לפי המחירים וההגדרות של היום).' +
+        (r0.canIssue && r1.canIssue ? ' הסה"כ ישתנה מ-' + C.money(r0.total) + ' ₪ ל-' + C.money(r1.total) + ' ₪.' : '') +
+        (st.num ? ' שימו לב: הצעה מס\' ' + st.num + ' כבר נשמרה או נשלחה.' : ''))) return true;
+    var old = JSON.parse(keep); Object.keys(l).forEach(function (k) { delete l[k]; }); Object.assign(l, old);
+    return false;
+  }
   $('#lines').addEventListener('change', function (e) {
     var x = lineOf(e); if (!x) return;
     if (e.target.classList.contains('opt')) {
       x.line.opt = e.target.checked; x.node.classList.toggle('isopt', x.line.opt);
     } else if (e.target.classList.contains('mod')) {
-      var id = e.target.value, ms = x.line.mods.filter(function (m) { return m !== id; });
-      if (e.target.checked) ms.push(id);
-      x.line.mods = ms; listDirty = true; refz(x.line);
+      var id = e.target.value, on = e.target.checked, ms = x.line.mods.filter(function (m) { return m !== id; });
+      if (on) ms.push(id);
+      if (!confirmLine(x.line, (on ? 'לסמן' : 'לבטל') + ' את התנאי "' + (MODBY[id] ? MODBY[id].label : id) + '"?', function (l) { l.mods = ms; })) { e.target.checked = !on; return; }
+      listDirty = true;
       if (VAR_OF[x.line.id] && id === 'nodisp') renderLines();   /* שם הסעיף ללקוח משתנה ("ללא פינוי") */
     } else return;
     save(); refresh();
@@ -1789,24 +1849,26 @@ var LuachCalc = (function () {
       if (myb.getAttribute('data-my') === 'clear') { setMy(x.line.id, null); toast('המחיר שלך לסעיף הוסר'); return; }
       var mv = x.node.querySelector('.mypi').value;
       if (!validPrice(mv)) { toast(ambig(mv) ? AMBIG : 'הזן מחיר ליחידה (מספר גדול מאפס).'); return; }
-      var keepManual = isManual(x.line) && !window.confirm('בשורה הזו יש מחיר ידני (' + x.line.price + ' ₪). להחליף אותו גם כאן במחיר שלך? ("ביטול" = המחיר הידני נשאר בשורה, והמחיר שלך ישמש בשורות ובהצעות אחרות)');
-      if (!keepManual) { x.line.price = null; x.line.tier = null; }
-      var okMy = setMy(x.line.id, mv);
-      if (!keepManual) refz(x.line);
+      var line = x.line, wasManual = isManual(line), manualTxt = line.price, applied;
+      var okMy = setMy(line.id, mv);   /* נשמר לכל ההצעות; השאלה היא רק אם להחיל גם על השורה הזו */
+      if (st.frozen) applied = confirmLine(line, 'המחיר שלך נשמר לכל ההצעות. להחיל אותו גם על השורה הזו בהצעה הקפואה?', function (l) { l.price = null; l.tier = null; });
+      else if (wasManual) { applied = window.confirm('בשורה הזו יש מחיר ידני (' + manualTxt + ' ₪). להחליף אותו גם כאן במחיר שלך? ("ביטול" = המחיר הידני נשאר בשורה, והמחיר שלך ישמש בשורות ובהצעות אחרות)'); if (applied) { line.price = null; line.tier = null; } }
+      else { line.tier = null; applied = true; }
       save(); renderLines();
-      toast(!okMy ? 'לא נשמר – האחסון נכשל' : keepManual ? 'נשמר כמחיר שלך. המחיר הידני בשורה הזו לא שונה.' : 'נשמר כמחיר שלך – הוא הבסיס של "ממוצע" בכל ההצעות');
+      toast(!okMy ? 'לא נשמר – האחסון נכשל' : applied ? 'נשמר כמחיר שלך – הוא הבסיס של "ממוצע" בכל ההצעות' : 'נשמר כמחיר שלך. המחיר בשורה הזו לא שונה.');
       return;
     }
     if (tb) { x = lineOf(e); if (!x) return;
       var tv = tb.getAttribute('data-lt'); if (!isManual(x.line) && (x.line.tier || st.tier) === tv) return;   /* הרמה שכבר נבחרה – לא עושה כלום */
-      x.line.tier = tv; x.line.price = null; refz(x.line); listDirty = true; save(); refresh(); return; }
+      if (!confirmLine(x.line, 'לשנות את רמת המחיר בשורה ל"' + TIER[tv] + '"?', function (l) { l.tier = tv; l.price = null; })) { refresh(); return; }
+      listDirty = true; save(); refresh(); return; }
     if (e.target.closest('.del')) {
       x = lineOf(e); if (!x) return;
       var gone = x.line, at = x.index, q0 = st;
       st.lines.splice(at, 1); listDirty = true; save(); renderLines();
       toast('השורה הוסרה', 'ביטול', function () { if (st !== q0) return; st.lines.splice(Math.min(at, st.lines.length), 0, gone); listDirty = true; save(); renderLines(); });
     }
-    else if (e.target.closest('.reset')) { x = lineOf(e); if (!x) return; x.line.price = null; refz(x.line); listDirty = true; save(); renderLines(); }
+    else if (e.target.closest('.reset')) { x = lineOf(e); if (!x) return; if (!confirmLine(x.line, 'לחזור מהמחיר הידני למחיר המחושב?', function (l) { l.price = null; })) return; listDirty = true; save(); renderLines(); }
   });
   $('#addCustom').addEventListener('click', function () { addCustom(''); });
   document.addEventListener('click', function (e) {
@@ -1857,25 +1919,29 @@ var LuachCalc = (function () {
   /* שדות מספר (תוספת, הנחה): שדה טקסט עם אותו נרמול כמו בשורות ("28,5" -> 28.5, "0,500" -> 0.5) */
   ['markup', 'discValue', 'lowPct', 'highPct'].forEach(function (id) { var el = $('#' + id); if (el) { try { el.type = 'text'; } catch (e) {} el.setAttribute('inputmode', 'decimal'); el.setAttribute('autocomplete', 'off'); } });
   function costLine(l) { var it = !l.custom && byId[l.id]; return !!it && it[5] !== 'c' && myAg(l.id) === null && !OVERLAY.ranges[l.id]; }
-  var markupAtFocus = null;
+  /* בהצעה קפואה עם סעיפי עלות, התוספת שמוקלדת לא נכנסת להצעה עד שמסיימים את השדה ומאשרים (N9):
+     הקלדה בלי יציאה מהשדה, ואז סגירה/רענון – לא משנה כלום. */
+  function markupGuarded() { return !!st.frozen && st.lines.some(costLine); }
   FIELDS.forEach(function (id) {
     var el = $('#' + id);
     el.addEventListener(id === 'discType' ? 'change' : 'input', function () {
+      if (id === 'markup' && markupGuarded()) return;   /* ממתין לסיום השדה ולאישור */
       st[id] = (id === 'discValue' || id === 'markup') ? normNum(el.value) : el.value; save();
-      if (id === 'markup') { listDirty = true; renderLines(); return; }   /* בהצעה קפואה: לא מחשבים מחדש בזמן הקלדה */
+      if (id === 'markup') { listDirty = true; renderLines(); return; }
       refresh();
     });
   });
-  $('#markup').addEventListener('focus', function () { markupAtFocus = st.markup; });
   /* V1: בסיום עריכת התוספת – בהצעה קפואה, רק סעיפי עלות מתעדכנים, ורק באישור */
   $('#markup').addEventListener('change', function () {
-    var was = markupAtFocus === null ? st.markup : markupAtFocus; markupAtFocus = st.markup;
-    if (!st.frozen || C.scaled(st.markup, 2) === C.scaled(was, 2) || !st.lines.some(costLine)) return;
-    var after = trial(function () { st.lines.forEach(function (l) { if (costLine(l)) refz(l); }); });
-    if (confirmReprice('לעדכן את סעיפי העלות לפי תוספת של ' + st.markup + '%?', after)) {
-      st.lines.forEach(function (l) { if (costLine(l)) refz(l); });
+    if (!markupGuarded()) return;
+    var was = st.markup, val = normNum(this.value), cv = C.scaled(val, 2);
+    if (cv === null) { this.value = was; toast((ambig(this.value) ? AMBIG : 'אחוז התוספת לא תקין.') + ' התוספת נשארה ' + was + '%.'); return; }
+    if (cv === C.scaled(was, 2)) { this.value = was; return; }
+    var after = trial(function () { st.markup = val; st.lines.forEach(function (l) { if (costLine(l)) refz(l); }); });
+    if (confirmReprice('לעדכן את סעיפי העלות לפי תוספת של ' + val + '%?', after)) {
+      st.markup = val; st.lines.forEach(function (l) { if (costLine(l)) refz(l); });
       toast('סעיפי העלות עודכנו לפי התוספת החדשה');
-    } else { st.markup = was; this.value = was; toast('התוספת הוחזרה ל-' + was + '%'); }
+    } else { this.value = was; toast('התוספת הוחזרה ל-' + was + '%'); }
     listDirty = true; save(); renderLines();
   });
   function showBasis() {
@@ -1887,19 +1953,31 @@ var LuachCalc = (function () {
   }
 
   /* ---------- שליחה ---------- */
+  /* N7: הצעה על 0 ₪ (למשל הנחה של 100%) – לא נחסמת, אבל נשלחת רק אחרי אישור */
+  function zeroOk(r) { return !(r.total <= 0) || window.confirm('סה"כ ההצעה 0 ₪ – ההנחה מכסה את כל הסכום. לשלוח/להדפיס אותה בכל זאת?'); }
+  /* N3: שליחה, העתקה, הדפסה ו-PDF הן גם "שמירה": מספר הצעה, הקפאת מחירים, סוף מצב טיוטה, ורישום ביומן */
+  function finalize() {
+    var wasDraft = !!st.draft || !st.qid, ok = storeCurrent();
+    refresh(); if (tab === 'send') renderSaved();
+    return { ok: ok, wasDraft: wasDraft };
+  }
+  function finMsg(f) { return !f.ok ? ' שימו לב: השמירה בדפדפן נכשלה.' : f.wasDraft ? ' ההצעה נשמרה ב"ההצעות שלי" (מס\' ' + st.num + ').' : ''; }
   $('#waBtn').addEventListener('click', function (e) {
     var r = compute();
     if (!r.canIssue) { e.preventDefault(); flagErrors(r); return; }
-    ensureNum();
+    if (!zeroOk(r)) { e.preventDefault(); return; }
+    var f = finalize(); r = compute();
+    if (f.wasDraft || !f.ok) toast(finMsg(f).trim());
     var t = fullText(r), ph = waPhone(st.clientPhone);
     this.href = 'https://wa.me/' + (ph || '') + '?text=' + encodeURIComponent(t);
   });
   $('#copyBtn').addEventListener('click', function () {
     var r = compute();
     if (!r.canIssue) { flagErrors(r); return; }
-    ensureNum(); refreshSend(r);
+    if (!zeroOk(r)) return;
+    var f = finalize(); r = compute(); refreshSend(r);
     var t = fullText(r);
-    function ok() { toast('ההצעה הועתקה. אפשר להדביק בוואטסאפ או בכל מקום אחר.'); }
+    function ok() { toast('ההצעה הועתקה. אפשר להדביק בוואטסאפ או בכל מקום אחר.' + finMsg(f)); }
     function manual() { toast('ההעתקה לא הצליחה. סמן את הטקסט והעתק ידנית.'); }
     function fallback() {
       $('#prevBox').open = true;
@@ -1914,7 +1992,9 @@ var LuachCalc = (function () {
   $('#pdfBtn').addEventListener('click', function () {
     var r = compute();
     if (!r.canIssue) { flagErrors(r); return; }
-    ensureNum(); refresh(); renderSheet(r);
+    if (!zeroOk(r)) return;
+    var f = finalize(); r = compute(); renderSheet(r);
+    if (f.wasDraft || !f.ok) toast(finMsg(f).trim());
     /* הדפדפן מציע את כותרת הדף כשם הקובץ ב"שמור כ-PDF" */
     document.title = ('הצעת מחיר ' + st.num + (st.client.trim() ? ' - ' + st.client.trim() : '')).replace(/[\\/:*?"<>|]/g, ' ').slice(0, 80);
     window.print();
@@ -1923,7 +2003,9 @@ var LuachCalc = (function () {
   $('#printBtn').addEventListener('click', function () {
     var r = compute();
     if (!r.canIssue) { flagErrors(r); return; }
-    ensureNum(); refresh();
+    if (!zeroOk(r)) return;
+    var f = finalize(); r = compute();
+    if (f.wasDraft || !f.ok) toast(finMsg(f).trim());
     renderSheet(r);
     window.print();
   });
@@ -2003,13 +2085,14 @@ var LuachCalc = (function () {
       if (id !== st.qid) {
         syncNow();
         if (hasContent(st) && !st.qid) { if (!window.confirm('ההצעה הפתוחה לא נשמרה (האחסון נכשל). לפתוח בכל זאת? השינויים בה יאבדו.')) return; }
-        if (st.qid && st.draft && !hasContent(st)) removeEntry(st.qid);
+        if (st.qid && st.draft && !hasContent(st)) removeEntry(st.qid, true);   /* טיוטה ריקה – ניקוי אוטומטי */
         e = entry(id) || e;
         loadQuote(e.q, id);
         toast('נפתחה ההצעה: ' + who);
       }
       show('quote'); window.scrollTo(0, 0);
     } else if (act === 'dup') {
+      if (id === st.qid) { syncNow(); e = entry(id) || e; }   /* N5: שכפול ההצעה הפתוחה – קודם מסנכרנים את השינויים האחרונים */
       var q2 = JSON.parse(JSON.stringify(e.q)); delete q2.num; delete q2.lb; q2.draft = true;   /* עותק = טיוטה חדשה (עם אותם מחירים קפואים) */
       var c = { id: uid(), created: Date.now(), updated: Date.now(), q: q2, sum: e.sum };
       if (!upsert(c)) return;
@@ -2038,7 +2121,7 @@ var LuachCalc = (function () {
     syncNow();
     var had = hasContent(st), kept = had && !!st.qid && !anyFail(), entry_is_draft_last = st.draft;
     if (had && !kept && !window.confirm('ההצעה הנוכחית לא נשמרה (האחסון נכשל). לפתוח הצעה חדשה בכל זאת? ההצעה הנוכחית תאבד.')) return;
-    if (st.qid && st.draft && !had) removeEntry(st.qid);
+    if (st.qid && st.draft && !had) removeEntry(st.qid, true);   /* טיוטה ריקה – ניקוי אוטומטי */
     st = blankKeep();
     save(); setFields(); listDirty = true; renderItems(); renderLines(); renderSaved(); show('list'); window.scrollTo(0, 0);
     toast('נפתחה הצעה חדשה' + (kept ? '. הקודמת נמצאת ב"ההצעות שלי"' + (entry_is_draft_last ? ' כטיוטה.' : '.') : ''));
@@ -2104,47 +2187,62 @@ var LuachCalc = (function () {
       if (!inc.length) { toast('אין הצעות בקובץ הגיבוי.'); return; }
       var hasMy = d.myprices && typeof d.myprices === 'object', hasSet = d.settings && typeof d.settings === 'object';
       if (!window.confirm('לייבא ' + inc.length + ' הצעות מהגיבוי?' + ((hasMy || hasSet) ? ' גם "המחירון שלי" וההגדרות מהגיבוי ייובאו.' : '') + ' הצעה שכבר קיימת תוחלף רק אם הגרסה בגיבוי חדשה יותר.')) return;
+      /* N4: ייבוא "הכול או כלום". קודם מחשבים הכול בזיכרון, ורק אז כותבים לאחסון. אם כתיבה אחת נכשלת (אחסון מלא/חסום) –
+         כל המפתחות חוזרים לערך שלפני הייבוא, וגם המחירון, ההגדרות ופרטי העסק בזיכרון. */
+      var TX = [KEY_LIST, KEY_DEL, KEY_MYP, KEY_SET, KEY_NUM, KEY_BIZ], raw = {};
+      TX.forEach(function (k) { try { raw[k] = localStorage.getItem(k); } catch (e) { raw[k] = null; } });
+      var mem = { myp: myp, settings: settings, biz: JSON.parse(JSON.stringify(biz)) }, mypCh = false, setCh = false, bizCh = false;
       /* B2: "המחירון שלי" וההגדרות. במכשיר ריק – נלקחים מהגיבוי; אם כבר יש כאן ערכים – רק באישור */
       if (hasMy) {
         var nm = cleanMyp(d.myprices), localMy = Object.keys(myp).length;
-        if (Object.keys(nm).length && (!localMy || window.confirm('יש כאן כבר "מחירון שלי". לאחד עם המחירים מהגיבוי? (מחיר מהגיבוי גובר)'))) { myp = Object.assign({}, myp, nm); setJSON(KEY_MYP, myp); }
+        if (Object.keys(nm).length && (!localMy || window.confirm('יש כאן כבר "מחירון שלי". לאחד עם המחירים מהגיבוי? (מחיר מהגיבוי גובר)'))) { myp = Object.assign({}, myp, nm); mypCh = true; }
       }
       if (hasSet) {
         var ns = cleanSettings(d.settings), localSet = settings.lowPct !== undefined || settings.highPct !== undefined || Object.keys(settings.mods).length;
-        if (!localSet || window.confirm('להחליף את הגדרות המחירים כאן בהגדרות מהגיבוי?')) { settings = ns; setJSON(KEY_SET, settings); }
+        if (!localSet || window.confirm('להחליף את הגדרות המחירים כאן בהגדרות מהגיבוי?')) { settings = ns; setCh = true; }
       }
-      /* V8: הצעה שמורה בלי מחירים קפואים מוקפאת רק עכשיו – אחרי ש"המחירון שלי" וההגדרות מהגיבוי נטענו – ובתאריך העדכון שלה */
+      /* V8: הצעה שמורה בלי מחירים קפואים מוקפאת רק עכשיו – לפי "המחירון שלי" וההגדרות מהגיבוי – ובתאריך העדכון שלה */
       inc.forEach(function (e) { if (!e.q.draft && e.q.lines.length && !e.q.frozen) { freezeMissing(e.q); e.q.frozen = e.updated; } });
-      /* מספרי הצעה: מספר שכבר תפוס (כאן או בקובץ) מקבל מספר חדש */
+      /* מספרי הצעה: מספר שכבר תפוס (כאן או בקובץ) מקבל מספר חדש. המונה מחושב בזיכרון ונכתב רק בסוף. */
       var used = Object.create(null); list.forEach(function (e) { if (!seenId[e.id] && validNum(e.q && e.q.num)) used[e.q.num] = 1; });
       var mxn = 0; inc.forEach(function (e) { if (e.q.num && e.q.num > mxn && e.q.num < 1000000) mxn = e.q.num; });
-      try { var cn = Number(localStorage.getItem(KEY_NUM)) || 1000, bn = validNum(d.qnum) || 0; if (Math.max(mxn, bn) > cn && Math.max(mxn, bn) < 1000000) localStorage.setItem(KEY_NUM, String(Math.max(mxn, bn))); } catch (e) {}
-      var renum = 0;
+      var cnt0 = Number(raw[KEY_NUM]) || 1000, bn = validNum(d.qnum) || 0, counter = Math.max(cnt0, mxn, bn < 1000000 ? bn : 0), renum = 0;
       inc.forEach(function (e) {
-        if (e.q.num && (used[e.q.num] || e.q.num >= 1000000)) { e.q.num = (function () { var n; do { n = nextNum(); } while (used[n]); return n; })(); renum++; }
+        if (e.q.num && (used[e.q.num] || e.q.num >= 1000000)) { do { counter++; } while (used[counter]); e.q.num = counter; renum++; }
         if (e.q.num) used[e.q.num] = 1;
         e.sum = summary(e.q); e.q = snap(e.q);
       });
-      var ids = inc.map(function (e) { return e.id; });
-      setJSON(KEY_DEL, readDel().filter(function (x) { return ids.indexOf(x) < 0; }));
-      var ok = commit(function (a) {
-        inc.forEach(function (e) {
-          for (var i = 0; i < a.length; i++) if (a[i].id === e.id) { if ((a[i].updated || 0) < e.updated) a[i] = e; return; }
-          a.push(e);
-        });
-      });
       if (d.biz && typeof d.biz === 'object' && !Array.isArray(d.biz) && !biz.name && !biz.phone && !biz.taxId) {
         ['name', 'phone', 'taxId', 'taxType', 'logo', 'defNotIncluded', 'defPayTerms', 'defValidity'].forEach(function (k) { if (own.call(d.biz, k)) biz[k] = d.biz[k]; });
-        cleanBiz(); setJSON(KEY_BIZ, biz); setBizFields(); renderLogo();
+        cleanBiz(); bizCh = true;
       }
+      var ids = inc.map(function (e) { return e.id; });
+      var ok = setJSON(KEY_DEL, readDel().filter(function (x) { return ids.indexOf(x) < 0; })) &&
+        commit(function (a) {
+          inc.forEach(function (e) {
+            for (var i = 0; i < a.length; i++) if (a[i].id === e.id) { if ((a[i].updated || 0) < e.updated) a[i] = e; return; }
+            a.push(e);
+          });
+        }) &&
+        (!mypCh || setJSON(KEY_MYP, myp)) &&
+        (!setCh || setJSON(KEY_SET, settings)) &&
+        (counter <= cnt0 || (function () { try { localStorage.setItem(KEY_NUM, String(counter)); return true; } catch (e) { return false; } })()) &&
+        (!bizCh || setJSON(KEY_BIZ, biz));
+      if (!ok) {
+        TX.forEach(function (k) { try { if (raw[k] === null) localStorage.removeItem(k); else localStorage.setItem(k, raw[k]); } catch (e) {} failed[k] = false; });
+        myp = mem.myp; settings = mem.settings; biz = mem.biz; list = readList();
+        showBanner(); setBizFields(); renderLogo(); listDirty = true; renderItems(); renderLines(); renderSaved();
+        toast('הייבוא נכשל: אין מספיק מקום באחסון של הדפדפן (או שהאחסון חסום). שום דבר לא שונה – ההצעות, "המחירון שלי" וההגדרות נשארו כמו לפני הייבוא. אפשר לפנות מקום (למשל למחוק את יומן המחירים או הצעות ישנות) ולנסות שוב.');
+        return;
+      }
+      if (bizCh) { setBizFields(); renderLogo(); }
       /* ההצעה שהייתה פתוחה בגיבוי – רק אם כאן אין הצעה פתוחה עם תוכן */
       if (d.current && typeof d.current === 'object' && !hasContent(st)) {
         var cq = clean(d.current), cid = cq.qid && entry(cq.qid) ? cq.qid : null;
         if (hasContent(cq)) { cq.updated = Math.min(cq.updated || now, now); loadQuote(cid ? entry(cid).q : cq, cid); }
       }
       listDirty = true; renderItems(); renderLines(); renderSaved();
-      toast(ok ? 'יובאו ' + inc.length + ' הצעות.' + (renum ? ' ' + renum + ' קיבלו מספר הצעה חדש (המספר היה תפוס).' : '') + (conv ? ' ' + conv + ' שורות עם סעיף שלא קיים כאן הפכו לסעיף חופשי.' : '')
-               : 'הייבוא נכשל – האחסון בדפדפן מלא או חסום.');
+      toast('יובאו ' + inc.length + ' הצעות.' + (renum ? ' ' + renum + ' קיבלו מספר הצעה חדש (המספר היה תפוס).' : '') + (conv ? ' ' + conv + ' שורות עם סעיף שלא קיים כאן הפכו לסעיף חופשי.' : ''));
     };
     fr.readAsText(f);
   });
@@ -2218,7 +2316,16 @@ var LuachCalc = (function () {
       list = readList();
       if (st.qid) {
         var e = entry(st.qid);
-        if (!e || readDel().indexOf(st.qid) >= 0) { st.qid = null; st.draft = false; st._noDraft = true; setJSON(KEY, st); toast('ההצעה הפתוחה נמחקה בלשונית אחרת. היא נשארת פתוחה כאן ולא שמורה.'); }
+        if (readDel().indexOf(st.qid) >= 0) {
+          /* המשתמש מחק אותה בלשונית אחרת – לא מחזירים אותה בשקט */
+          var kq = getJSON(KEY), mine = kq && typeof kq === 'object' && kq.qid === st.qid;
+          st.qid = null; st.draft = false; st._noDraft = true; if (mine) setJSON(KEY, st);
+          toast('ההצעה הפתוחה נמחקה בלשונית אחרת. היא נשארת פתוחה כאן ולא שמורה.');
+        } else if (!e) {
+          /* N2: לא נמחקה – רק נוקתה אוטומטית בלשונית אחרת (טיוטה שנראתה שם בלי שינויים). אם יש כאן עבודה – חוזרת לרשימה מיד;
+             אחרת היא תיווצר מחדש בשינוי הבא. בלי הודעת "נמחקה". */
+          if (hasContent(st) && !untouchedMapDraft(st)) upsert({ id: st.qid, created: Date.now(), updated: st.updated || Date.now(), q: snap(st), sum: summary(st) }, true);
+        }
         else if ((e.updated || 0) > baseU && JSON.stringify(e.q) !== JSON.stringify(baseQ)) {
           var hadLocal = baseQ && JSON.stringify(snap(st)) !== JSON.stringify(baseQ);
           var m = merge3(e.q), keepT = syncT;
@@ -2254,10 +2361,14 @@ var LuachCalc = (function () {
     var p = readPend(), del = readDel(), ids = Object.keys(p);
     ids.forEach(function (id) {
       var v = p[id], e = entry(id);
-      if (v && typeof v === 'object' && v.q && typeof v.u === 'number' && e && del.indexOf(id) < 0 && v.u > (e.updated || 0)) {
-        var q = clean(v.q), u = Math.min(v.u, Date.now());
+      if (!v || typeof v !== 'object' || !v.q || typeof v.u !== 'number' || del.indexOf(id) >= 0) return;
+      var q = clean(v.q), u = Math.min(v.u, Date.now());
+      if (e && v.u > (e.updated || 0)) {
         upsert({ id: id, created: e.created, updated: u, q: snap(q), sum: summary(q) }, true);
         if (st.qid === id && (st.updated || 0) < u) { st = q; st.qid = id; st.updated = u; setJSON(KEY, st); }
+      } else if (!e && hasContent(q) && !untouchedMapDraft(q)) {
+        /* טיוטה עם עבודה שנעלמה מהרשימה בלי מחיקה של המשתמש (למשל ניקוי אוטומטי בלשונית אחרת) – חוזרת לרשימה */
+        upsert({ id: id, created: u, updated: u, q: snap(q), sum: summary(q) }, true);
       }
     });
     if (ids.length) setJSON(KEY_PEND, {});
@@ -2269,7 +2380,7 @@ var LuachCalc = (function () {
   $('#stage').hidden = !D.config.stageLabel;
   setFields(); setBizFields(); renderLogo(); renderChips(); renderItems(); renderLines(); renderSaved(); showBanner();
   if (migratedNote) { show('quote'); toast('ההצעה מהגרסה הקודמת נטענה במחירים שהיו בה. אם המחירון עודכן מאז – מוצגת אזהרה, ושום מחיר לא משתנה בלי אישור.'); }
-  if (fromMap) { show('quote'); toast('נטענו כמויות מהמפה. בדקו כל שורה ומדדו בשטח לפני שליחה.'); }
+  if (fromMap) { show('quote'); toast('נטענו כמויות מהמפה. בדקו כל שורה ומדדו בשטח לפני שליחה.' + (mapPrevKept ? ' ההצעה הקודמת נשמרה ב"ההצעות שלי".' : '')); }
 })();
 </script>
 </body>
