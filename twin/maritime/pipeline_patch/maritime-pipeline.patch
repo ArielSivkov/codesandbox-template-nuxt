@@ -1,0 +1,529 @@
+diff -ruN -x __pycache__ -x .pytest_cache a/pipeline/build_city.py b/pipeline/build_city.py
+--- a/pipeline/build_city.py	2026-11-22 23:57:32.000000000 +0200
++++ b/pipeline/build_city.py	2026-11-23 01:47:59.723810508 +0200
+@@ -78,6 +78,8 @@
+     ap.add_argument("--measurements", help="JSON from the correction loop (worker /api/corrections export)")
+     ap.add_argument("--out", default=os.path.join(HERE, "out"))
+     ap.add_argument("--context-m", type=float, default=300.0, help="buffer around city boundary")
++    ap.add_argument("--no-keep-sea", action="store_true", help="old behaviour: OUTSIDE also for open sea beyond the study area")
++    ap.add_argument("--bathy", help="bathymetry grid (ESRI ASCII .asc from EMODnet/GEBCO, WGS84) -> tiles/b/*.bin.gz")
+     args = ap.parse_args(argv)
+     t0 = time.time()
+     city = load_city(args)
+@@ -94,7 +96,7 @@
+         D = yz_sample.load(args.yz)
+         raw_b, roads, dsm_fn, yzgrid = yz_sample.to_inputs(D)
+         sea0 = landmask.clean_dem_sea_mask(yzgrid["sea"])
+-        osm = {"buildings": raw_b, "roads": roads, "water": [], "boundary": None,
++        osm = {"buildings": raw_b, "roads": roads, "water": [], "boundary": None, "maritime": [],
+                "coast": [yz_sample.synthetic_coastline(sea0, yzgrid)]}
+         args.dem = "yzsample"
+         sources_used["osm"] = "sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline"
+@@ -107,7 +109,8 @@
+     else:
+         osm = sources_osm.overpass(bbox, city.get("osm_name"))
+         sources_used["osm"] = LICENCES["osm"] + " (Overpass)"
+-    log("osm:", len(osm["buildings"]), "buildings,", len(osm["coast"]), "coast ways,", len(osm["roads"]), "roads")
++    log("osm:", len(osm["buildings"]), "buildings,", len(osm["coast"]), "coast ways,", len(osm["roads"]), "roads,",
++        len(osm.get("maritime", [])), "maritime features")
+ 
+     if args.measurements and os.path.exists(args.measurements):
+         meas = json.load(open(args.measurements, encoding="utf-8"))
+@@ -216,7 +219,12 @@
+     log("heights by primary source:", stats_src, "conf:", confs)
+ 
+     # ---------------------------------------------------------------- 7. tiles + manifest
+-    keys = tiles.write_city(args.out, city, blds, osm["roads"], land, ground_fn, study)
++    keys = tiles.write_city(args.out, city, blds, osm["roads"], land, ground_fn, study,
++                            maritime=osm.get("maritime", []), keep_sea_outside=not args.no_keep_sea)
++    if args.bathy:
++        from yazam import bathy
++        nb = bathy.write_tiles(args.out, keys, bathy.EsriAsciiGrid(args.bathy))
++        sources_used["bathy"] = bathy.LICENCE_HINT + f" ({os.path.basename(args.bathy)}, {nb} tiles)"
+     hs = np.array([b["h"] for b in blds]) if blds else np.zeros(1)
+     ss = np.array([b["sigma"] for b in blds]) if blds else np.zeros(1)
+     stats = {"buildings": len(blds), "tiles": len(keys), "area_km2": round(city_poly.area / 1e6, 2),
+diff -ruN -x __pycache__ -x .pytest_cache a/pipeline/tests/test_maritime.py b/pipeline/tests/test_maritime.py
+--- a/pipeline/tests/test_maritime.py	1970-01-01 02:00:00.000000000 +0200
++++ b/pipeline/tests/test_maritime.py	2026-11-23 01:49:19.734434211 +0200
+@@ -0,0 +1,114 @@
++"""Maritime patch tests (המחלקה הימית) – run: python -m pytest -q tests/test_maritime.py"""
++import gzip
++import json
++import os
++import struct
++import sys
++import tempfile
++
++import numpy as np
++from shapely.geometry import box
++
++sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
++from yazam import sources_osm, tiles, bathy  # noqa: E402
++
++G = lambda *pts: [{"lat": la, "lon": lo} for la, lo in pts]
++
++OVERPASS = {"elements": [
++    {"type": "way", "id": 11, "tags": {"man_made": "breakwater", "name": "שובר גלים"}, "geometry": G((31.820, 34.630), (31.830, 34.628), (31.836, 34.633))},
++    {"type": "way", "id": 12, "tags": {"man_made": "pier", "floating": "yes", "width": "2.5"}, "geometry": G((31.790, 34.628), (31.790, 34.630))},
++    {"type": "way", "id": 13, "tags": {"landuse": "port", "name": "נמל"}, "geometry": G((31.81, 34.64), (31.81, 34.65), (31.82, 34.65), (31.82, 34.64), (31.81, 34.64))},
++    {"type": "way", "id": 14, "tags": {"leisure": "marina"}, "geometry": G((31.788, 34.626), (31.788, 34.632), (31.792, 34.632), (31.792, 34.626), (31.788, 34.626))},
++    {"type": "way", "id": 15, "tags": {"waterway": "river", "name": "נחל לכיש"}, "geometry": G((31.80, 34.64), (31.805, 34.66))},
++    {"type": "node", "id": 16, "lat": 31.825, "lon": 34.645, "tags": {"man_made": "crane", "operator": "x"}},
++    {"type": "node", "id": 17, "lat": 31.838, "lon": 34.632, "tags": {"seamark:type": "buoy_lateral", "seamark:buoy_lateral:colour": "red"}},
++    {"type": "node", "id": 18, "lat": 31.837, "lon": 34.633, "tags": {"seamark:type": "light_minor", "seamark:light:colour": "green"}},
++    {"type": "way", "id": 19, "tags": {"building": "yes", "man_made": "crane"}, "geometry": G((31.8, 34.64), (31.8, 34.6402), (31.8002, 34.6402), (31.8, 34.64))},
++]}
++
++
++def test_parse_overpass_keeps_maritime_tags():
++    o = sources_osm.parse_overpass(OVERPASS)
++    kinds = sorted(m["kind"] for m in o["maritime"])
++    assert kinds == sorted(["breakwater", "pier", "port_area", "marina", "river", "crane", "buoy", "light"])
++    bw = next(m for m in o["maritime"] if m["kind"] == "breakwater")
++    assert bw["geom"].geom_type == "LineString" and bw["tags"]["name"] == "שובר גלים" and bw["geom"].length > 1000
++    port = next(m for m in o["maritime"] if m["kind"] == "port_area")
++    assert port["geom"].geom_type == "Polygon" and port["geom"].area > 1e6
++    buoy = next(m for m in o["maritime"] if m["kind"] == "buoy")
++    assert buoy["tags"]["seamark:buoy_lateral:colour"] == "red" and buoy["id"] == "n17"
++    assert len(o["buildings"]) == 1                     # crane-tagged building stays a building
++
++
++def test_maritime_kind_rules():
++    k = sources_osm.maritime_kind
++    assert k({"man_made": "groyne"}) == "groyne"
++    assert k({"seamark:type": "light_major"}) == "lighthouse"
++    assert k({"seamark:type": "beacon_lateral"}) == "beacon"
++    assert k({"harbour": "yes"}, closed=True) == "port_area" and k({"harbour": "yes"}) is None
++    assert k({"highway": "residential"}) is None
++
++
++def test_mar_layer_written_and_decodable():
++    o = sources_osm.parse_overpass(OVERPASS)
++    d = tempfile.mkdtemp()
++    bw = next(m for m in o["maritime"] if m["kind"] == "breakwater")
++    x0, y0, x1, y1 = bw["geom"].bounds
++    study = box(x0 - 500, y0 - 500, x1 + 500, y1 + 500)
++    land = box(x1 + 300, y0 - 600, x1 + 2000, y1 + 600)
++    keys = tiles.write_city(d, {"slug": "t"}, [], [], land, lambda x, y: np.full(np.shape(x), 3.0), study, maritime=o["maritime"])
++    recs = []
++    for k in keys:
++        v = json.loads(gzip.decompress(open(os.path.join(d, "tiles/v", k + ".json.gz"), "rb").read()))
++        for r in v.get("mar", []):
++            # decode exactly like swarm/maritime/maritime.js decodeMarLayer
++            x, y, pts = v["o"][0], v["o"][1], []
++            ring = r["p"] if r["g"] == "p" else r["r"]
++            for i in range(0, len(ring), 2):
++                x += ring[i] / 10; y += ring[i + 1] / 10; pts.append((x, y))
++            recs.append((sources_osm.MAR_KINDS[r["k"]], r["g"], pts, r))
++    bws = [r for r in recs if r[0] == "breakwater"]
++    assert bws and all(g == "l" for _, g, _, _ in bws)
++    total = sum(np.hypot(np.diff([p[0] for p in pts]), np.diff([p[1] for p in pts])).sum() for _, _, pts, _ in bws)
++    assert total >= bw["geom"].length * 0.98            # clipped pieces (+50 m overlap) cover the whole line
++    buoy = [r for r in recs if r[0] == "buoy"]
++    assert buoy and buoy[0][3]["t"]["seamark:buoy_lateral:colour"] == "red"
++    pier = [r for r in recs if r[0] == "pier"]
++    assert not pier or pier[0][3].get("w") == 2.5
++
++
++def test_keep_sea_outside_study_area():
++    d = tempfile.mkdtemp()
++    land = box(166500, 634000, 167000, 635000)                       # sea west of x=166500
++    study = box(166400, 634100, 166950, 634900)
++    tiles.write_city(d, {"slug": "t"}, [], [], land, lambda x, y: np.full(np.shape(x), 5.0), study, keep_sea_outside=True)
++    raw = gzip.decompress(open(os.path.join(d, "tiles/t/166_634.bin.gz"), "rb").read())
++    nt = struct.unpack("<4sHiiHHH", raw[:20])[4]
++    z = np.frombuffer(raw[20:20 + nt * nt * 2], dtype="<i2").reshape(nt, nt)
++    assert z[20, 0] == tiles.SEA                  # open sea outside the study area stays SEA (was OUTSIDE)
++    assert z[0, 40] == tiles.OUTSIDE              # land outside the study area is still OUTSIDE
++    assert z[20, 30] == 50                        # inside: 5.0 m
++
++
++def test_bathy_esri_ascii_to_tiles():
++    from yazam.geo import to_wgs
++    lon0, lat0 = to_wgs(165000, 636000)
++    p = os.path.join(tempfile.mkdtemp(), "b.asc")
++    nc, nr, cs = 40, 30, 0.002
++    xs = lon0 - 0.03 + np.arange(nc) * cs
++    rows = []
++    for j in range(nr):                       # file rows: north first
++        lat = lat0 - 0.03 + (nr - 1 - j) * cs
++        rows.append(" ".join(f"{-(34.66 - x) * 1000:.2f}" for x in xs))   # depth grows westward: 1 m per 0.001 deg
++    open(p, "w").write(f"ncols {nc}\nnrows {nr}\nxllcenter {lon0 - 0.03}\nyllcenter {lat0 - 0.03}\ncellsize {cs}\nNODATA_value -9999\n" + "\n".join(rows) + "\n")
++    g = bathy.EsriAsciiGrid(p)
++    assert abs(g.sample(34.62, lat0) - (-40.0)) < 0.01        # file values rounded to cm
++    out = tempfile.mkdtemp()
++    assert bathy.write_tiles(out, ["165_636"], g) == 1
++    raw = gzip.decompress(open(os.path.join(out, "tiles/b/165_636.bin.gz"), "rb").read())
++    magic, ver, tx, ty, nt, st = struct.unpack("<4sHiiHH", raw[:18])
++    d = np.frombuffer(raw[18:18 + nt * nt * 2], dtype="<i2").reshape(nt, nt)
++    lon, lat = to_wgs(165000, 636000)
++    assert magic == b"YZB1" and (tx, ty, nt, st) == (165, 636, 41, 25)
++    assert abs(d[40, 0] / 10 - (34.66 - lon) * 1000) < 0.2         # SW corner node = (165000, 636000)
++    assert (np.diff(d[20].astype(float)) <= 0.001).all()             # shallower toward the east
+diff -ruN -x __pycache__ -x .pytest_cache a/pipeline/yazam/bathy.py b/pipeline/yazam/bathy.py
+--- a/pipeline/yazam/bathy.py	1970-01-01 02:00:00.000000000 +0200
++++ b/pipeline/yazam/bathy.py	2026-11-23 01:49:19.934701908 +0200
+@@ -0,0 +1,91 @@
++"""Bathymetry -> per-tile depth grids (maritime patch, המחלקה הימית).
++
++Free sources for the Israeli coast (researched 23.11.2026; not downloadable from the build sandbox):
++  * GEBCO 2025 Grid (15 arc-second, ~460 m): "placed in the public domain and may be used free of charge";
++    commercial use allowed; must acknowledge the source; NOT for navigation.  https://www.gebco.net/
++  * EMODnet Digital Bathymetry DTM (1/16 arc-minute, ~115 m; Mediterranean tiles incl. the Levant):
++    Creative Commons Attribution 4.0 (CC BY 4.0); "DO NOT USE FOR NAVIGATION". https://emodnet.ec.europa.eu/
++  * Israel Oceanographic & Limnological Research (IOLR / חיא"ל) publishes higher-resolution surveys; licence
++    terms must be checked per dataset before use.
++Both GEBCO and EMODnet offer ESRI ASCII (.asc) export of a chosen box -> read here with numpy only
++(no GDAL needed in CI). Values: elevation in metres, negative below sea level.
++
++Tile layout (new, optional layer):  tiles/b/<tx>_<ty>.bin.gz
++  header  struct "<4sHiiHH" (18 bytes) = b"YZB1", version 1, tx, ty, nt (41), step (25)
++  body    nt*nt int16 little-endian, depth in decimetres (positive down), row 0 = north;
++          -32767 = no data / land.   Same lattice as tiles/t (terrain), so clients can index both alike.
++"""
++from __future__ import annotations
++
++import gzip
++import os
++import struct
++
++import numpy as np
++
++from .geo import TILE_M, TERRAIN_STEP, to_wgs
++
++LICENCE_HINT = "Bathymetry: GEBCO Compilation Group (public domain) or EMODnet Bathymetry Consortium (CC BY 4.0) - not for navigation"
++NODATA = -32767
++
++
++class EsriAsciiGrid:
++    """ESRI ASCII raster in WGS84 (lon/lat cell centres or corners). sample(lon, lat) -> elevation (m), bilinear."""
++
++    def __init__(self, path):
++        hdr = {}
++        with open(path, "r", encoding="ascii") as fh:
++            while True:
++                pos = fh.tell()
++                line = fh.readline()
++                parts = line.split()
++                if len(parts) == 2 and parts[0].lower() in ("ncols", "nrows", "xllcorner", "yllcorner", "xllcenter",
++                                                            "yllcenter", "cellsize", "nodata_value"):
++                    hdr[parts[0].lower()] = float(parts[1])
++                else:
++                    fh.seek(pos)
++                    break
++            data = np.loadtxt(fh, dtype=np.float64)
++        self.nc, self.nr, self.cs = int(hdr["ncols"]), int(hdr["nrows"]), hdr["cellsize"]
++        # cell-centre coordinates of column 0 / bottom row
++        self.x0 = hdr["xllcenter"] if "xllcenter" in hdr else hdr["xllcorner"] + self.cs / 2
++        self.y0 = hdr["yllcenter"] if "yllcenter" in hdr else hdr["yllcorner"] + self.cs / 2
++        nd = hdr.get("nodata_value", -9999)
++        z = data.reshape(self.nr, self.nc)[::-1]          # row 0 = south
++        self.z = np.where(z == nd, np.nan, z)
++
++    def sample(self, lon, lat):
++        c = (np.asarray(lon, float) - self.x0) / self.cs
++        r = (np.asarray(lat, float) - self.y0) / self.cs
++        c0 = np.clip(np.floor(c).astype(int), 0, self.nc - 2); r0 = np.clip(np.floor(r).astype(int), 0, self.nr - 2)
++        fc, fr = np.clip(c - c0, 0, 1), np.clip(r - r0, 0, 1)
++        Z = self.z
++        v = (Z[r0, c0] * (1 - fc) * (1 - fr) + Z[r0, c0 + 1] * fc * (1 - fr) + Z[r0 + 1, c0] * (1 - fc) * fr + Z[r0 + 1, c0 + 1] * fc * fr)
++        out = (c < 0) | (r < 0) | (c > self.nc - 1) | (r > self.nr - 1)
++        return np.where(out, np.nan, v)
++
++
++def tile_depth(grid, tx, ty, nt=TILE_M // TERRAIN_STEP + 1, step=TERRAIN_STEP):
++    xs = tx * TILE_M + np.arange(nt) * step
++    ys = (ty + 1) * TILE_M - np.arange(nt) * step
++    X, Y = np.meshgrid(xs, ys)
++    lon, lat = to_wgs(X, Y)
++    z = grid.sample(lon, lat)
++    d = np.where(np.isnan(z) | (z >= 0), NODATA, np.round(-z * 10)).astype("<i2")
++    return d
++
++
++def write_tiles(out_dir, keys, grid):
++    n = 0
++    for k in keys:
++        tx, ty = map(int, k.split("_"))
++        d = tile_depth(grid, tx, ty)
++        if (d == NODATA).all():
++            continue
++        hdr = struct.pack("<4sHiiHH", b"YZB1", 1, tx, ty, d.shape[0], TERRAIN_STEP)
++        p = os.path.join(out_dir, "tiles", "b", k + ".bin.gz")
++        os.makedirs(os.path.dirname(p), exist_ok=True)
++        with open(p, "wb") as fh:
++            fh.write(gzip.compress(hdr + d.tobytes(), compresslevel=9, mtime=0))
++        n += 1
++    return n
+diff -ruN -x __pycache__ -x .pytest_cache a/pipeline/yazam/sources_osm.py b/pipeline/yazam/sources_osm.py
+--- a/pipeline/yazam/sources_osm.py	2026-11-22 23:43:37.000000000 +0200
++++ b/pipeline/yazam/sources_osm.py	2026-11-23 01:47:50.356092053 +0200
+@@ -11,6 +11,8 @@
+   water:    Polygon (lakes, reservoirs, riverbanks, ponds)
+   boundary: Polygon|MultiPolygon (admin_level=8 municipality) or None
+   road:     {"geom": LineString, "cls": int, "name": str}
++  maritime: {"id": "w123", "kind": str, "geom": Point|LineString|Polygon, "tags": {kept tags}}   (maritime patch)
++            kinds: see MAR_KINDS (port / marina / breakwater / pier / crane / seamarks / river / beach …)
+ """
+ from __future__ import annotations
+ 
+@@ -37,6 +39,52 @@
+     "residential": 1, "unclassified": 1, "living_street": 1, "tertiary_link": 1,
+     "service": 0, "pedestrian": 0, "footway": 0, "path": 0, "cycleway": 0, "track": 0,
+ }
++# ---------------------------------------------------------------- maritime (המחלקה הימית)
++# order = index used in the tile 'mar' layer ("k"), mirrored in swarm/maritime/maritime.js MAR_KINDS
++MAR_KINDS = ["breakwater", "groyne", "pier", "quay_line", "port_area", "basin", "marina", "crane", "buoy", "beacon",
++             "light", "lighthouse", "river", "beach", "anchorage", "fairway"]
++MAR_KEEP = ("man_made", "harbour", "landuse", "leisure", "waterway", "natural", "name", "name:he", "name:en", "operator",
++            "floating", "width", "height", "ref", "seamark:type", "seamark:name")
++
++
++def maritime_kind(tags, closed=False):
++    """OSM tags -> maritime kind (or None). Seamark tags follow the OpenSeaMap scheme."""
++    mm, sm = tags.get("man_made", ""), tags.get("seamark:type", "")
++    if mm in ("breakwater", "groyne"):
++        return mm
++    if mm == "pier":
++        return "pier"
++    if mm == "quay" or tags.get("seamark:harbour:category") == "quay":
++        return "quay_line"
++    if mm == "crane" or tags.get("seamark:type") == "crane":
++        return "crane"
++    if mm == "lighthouse" or sm == "light_major":
++        return "lighthouse"
++    if sm.startswith("light"):
++        return "light"
++    if sm.startswith("buoy"):
++        return "buoy"
++    if sm.startswith("beacon"):
++        return "beacon"
++    if sm == "anchorage":
++        return "anchorage"
++    if sm == "fairway":
++        return "fairway"
++    if tags.get("leisure") == "marina":
++        return "marina"
++    if tags.get("landuse") in ("port", "harbour") or tags.get("industrial") == "port" or (tags.get("harbour") == "yes" and closed):
++        return "port_area"
++    if tags.get("waterway") in ("river", "stream", "canal"):
++        return "river"
++    if tags.get("natural") == "beach":
++        return "beach"
++    return None
++
++
++def _mar_tags(tags):
++    return {k: v for k, v in tags.items() if k in MAR_KEEP or k.startswith("seamark:")}
++
++
+ WATER_TAGS = {("natural", "water"), ("waterway", "riverbank"), ("landuse", "reservoir"),
+               ("landuse", "basin"), ("water", None)}
+ 
+@@ -73,6 +121,12 @@
+ );
+ out tags geom;
+ way["highway"]({b}); out tags geom;
++(
++  way["man_made"~"^(breakwater|groyne|pier|quay|crane)$"]({b}); node["man_made"~"^(crane|lighthouse)$"]({b});
++  way["landuse"~"^(port|harbour)$"]({b}); way["leisure"="marina"]({b}); relation["leisure"="marina"]({b});
++  nwr["seamark:type"]({b}); way["waterway"~"^(river|stream|canal)$"]({b}); way["natural"="beach"]({b});
++);
++out tags geom;
+ {city}"""
+ 
+ 
+@@ -115,16 +169,31 @@
+ 
+ 
+ def parse_overpass(js, city_name=None):
+-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
++    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": [], "maritime": []}
+     for el in js.get("elements", []):
+         tags = el.get("tags", {})
+         t = el["type"]
+         geom = None
++        if t == "node":
++            mk = maritime_kind(tags)
++            if mk and "lat" in el:
++                from shapely.geometry import Point
++                out["maritime"].append({"id": f"n{el['id']}", "kind": mk, "geom": _itm_geom(Point(el["lon"], el["lat"])), "tags": _mar_tags(tags)})
++            continue
+         if t == "way":
+             c = _way_coords(el)
+             if len(c) < 2:
+                 continue
+             closed = len(c) >= 4 and c[0] == c[-1]
++            mk = maritime_kind(tags, closed)
++            if mk and "building" not in tags:
++                area = closed and mk in ("port_area", "marina", "basin", "anchorage", "beach")
++                g = Polygon(c) if area else LineString(c)
++                if area and not g.is_valid:
++                    g = g.buffer(0)
++                out["maritime"].append({"id": f"w{el['id']}", "kind": mk, "geom": _itm_geom(g), "tags": _mar_tags(tags)})
++                if mk not in ("river",):
++                    continue
+             if tags.get("natural") == "coastline":
+                 out["coast"].append(_itm_geom(LineString(c)))
+                 continue
+@@ -137,6 +206,12 @@
+                 continue
+             geom = Polygon(c)
+         elif t == "relation":
++            mk = maritime_kind(tags, True)
++            if mk in ("port_area", "marina", "anchorage", "beach"):
++                g = _relation_polygon(el)
++                if g is not None:
++                    out["maritime"].append({"id": f"r{el['id']}", "kind": mk, "geom": _itm_geom(g), "tags": _mar_tags(tags)})
++                continue
+             if tags.get("boundary") == "administrative":
+                 g = _relation_polygon(el)
+                 if g is not None:
+@@ -179,15 +254,32 @@
+     src, cut = _extract_bbox(path, bbox)
+     w, s, e, n = bbox
+     fab = osmium.geom.WKBFactory()
+-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
++    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": [], "maritime": []}
+ 
+     def inside(g):
+         minx, miny, maxx, maxy = g.bounds
+         return not (maxx < w or minx > e or maxy < s or miny > n)
+ 
+     class H(osmium.SimpleHandler):
++        def node(self, nd):
++            tags = dict(nd.tags)
++            mk = maritime_kind(tags) if tags else None
++            if mk:
++                from shapely.geometry import Point
++                g = Point(nd.location.lon, nd.location.lat)
++                if inside(g):
++                    out["maritime"].append({"id": f"n{nd.id}", "kind": mk, "geom": _itm_geom(g), "tags": _mar_tags(tags)})
++
+         def way(self, wy):
+             tags = dict(wy.tags)
++            mk = maritime_kind(tags, wy.is_closed())
++            if mk in ("breakwater", "groyne", "pier", "quay_line", "crane", "river", "fairway", "light", "buoy", "beacon") and "building" not in tags:
++                try:
++                    g = swkb.loads(fab.create_linestring(wy), hex=True)
++                except Exception:
++                    g = None
++                if g is not None and inside(g):
++                    out["maritime"].append({"id": f"w{wy.id}", "kind": mk, "geom": _itm_geom(g), "tags": _mar_tags(tags)})
+             if tags.get("natural") == "coastline" or ("highway" in tags and "building" not in tags):
+                 try:
+                     g = swkb.loads(fab.create_linestring(wy), hex=True)
+@@ -206,6 +298,17 @@
+             is_b = "building" in tags
+             is_city = (tags.get("boundary") == "administrative" and tags.get("admin_level") == "8"
+                        and city_name and city_name in (tags.get("name"), tags.get("name:he"), tags.get("name:en")))
++            mk = maritime_kind(tags, True)
++            if mk in ("port_area", "marina", "anchorage", "beach"):
++                try:
++                    g = swkb.loads(fab.create_multipolygon(a), hex=True)
++                except Exception:
++                    g = None
++                if g is not None and inside(g):
++                    oid = ("w" if a.from_way() else "r") + str(a.orig_id())
++                    out["maritime"].append({"id": oid, "kind": mk, "geom": _itm_geom(g if g.is_valid else g.buffer(0)), "tags": _mar_tags(tags)})
++                if not is_b:
++                    return
+             if not (is_b or is_city or _is_water(tags)):
+                 return
+             try:
+@@ -237,7 +340,7 @@
+ def from_geojson(path):
+     """FeatureCollection in WGS84 with properties.kind in {building, coast, water, boundary, road}."""
+     fc = json.load(open(path, encoding="utf-8"))
+-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
++    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": [], "maritime": []}
+     for f in fc["features"]:
+         p = f.get("properties", {}) or {}
+         g = _itm_geom(shape(f["geometry"]))
+@@ -252,4 +355,9 @@
+             out["boundary"] = g
+         elif k == "road":
+             out["roads"].append({"geom": g, "cls": int(p.get("cls", 1)), "name": p.get("name", "")})
++        elif k == "maritime":
++            tags = p.get("tags", {})
++            mk = p.get("mar_kind") or maritime_kind(tags, g.geom_type == "Polygon")
++            if mk:
++                out["maritime"].append({"id": str(p.get("id", f.get("id"))), "kind": mk, "geom": g, "tags": _mar_tags(tags)})
+     return out
+diff -ruN -x __pycache__ -x .pytest_cache a/pipeline/yazam/tiles.py b/pipeline/yazam/tiles.py
+--- a/pipeline/yazam/tiles.py	2026-11-22 23:48:54.000000000 +0200
++++ b/pipeline/yazam/tiles.py	2026-11-23 01:47:50.369027261 +0200
+@@ -16,7 +16,11 @@
+          "r":[[dx,dy,dx,dy,...]],                                          # dm, first pair from tile origin
+          "h":154,"s":21,"f":5,"fl":4,"fh":5,"src":"L","c":1,"u":"LN"}],    # h,s dm; c: 0 verified..3 low
+    "rd":[{"c":2,"n":"הרצל","r":[...]}],
+-   "sea":[[[dx,dy,...]]]}                                                  # sea polygons clipped to tile
++   "sea":[[[dx,dy,...]]],                                                  # sea polygons clipped to tile
++   "mar":[{"i":"w123","k":0,"g":"l","r":[dx,dy,...],"t":{...},"w":26}]}      # maritime patch: k = MAR_KINDS index,
++                                                                           # g = a(rea outer ring)|l(ine)|p(oint, "p")
++Maritime patch: keep_sea_outside=True writes SEA (not OUTSIDE) for sea nodes beyond the study area, so open sea is
++not turned into land by clients that fill OUTSIDE cells (twin/game/js/world.js diffuses land into them).
+ """
+ from __future__ import annotations
+ 
+@@ -80,8 +84,38 @@
+             "u": "".join(b["used"]), "x": "".join(b.get("rejected", []))}
+ 
+ 
+-def write_city(out_dir, city, buildings, roads, land_geom, ground_fn, study_area):
+-    """city: dict(slug,name_he,...); ground_fn(x,y)->metres (vectorised); study_area: Polygon (ITM)."""
++def maritime_records(maritime, fr, x0, y0):
++    """maritime features (ITM shapely) clipped to the tile frame `fr` -> compact 'mar' records"""
++    from .sources_osm import MAR_KINDS
++    out = []
++    for m in maritime or []:
++        g = m["geom"]
++        if not g.intersects(fr):
++            continue
++        k = MAR_KINDS.index(m["kind"]) if m["kind"] in MAR_KINDS else -1
++        rec = {"i": m["id"], "k": k, "t": m.get("tags", {})}
++        try:
++            w = float(str(m.get("tags", {}).get("width", "")).split()[0])
++            rec["w"] = round(w, 1)
++        except (ValueError, IndexError):
++            pass
++        if g.geom_type == "Point":
++            out.append({**rec, "g": "p", "p": [int(round((g.x - x0) * COORD_Q)), int(round((g.y - y0) * COORD_Q))]})
++            continue
++        c = g.intersection(fr.buffer(50))           # small overlap so lines/areas join across tiles
++        for part in (c.geoms if hasattr(c, "geoms") else [c]):
++            if part.is_empty:
++                continue
++            if part.geom_type == "Polygon" and part.area > 25:
++                out.append({**rec, "g": "a", "r": _enc_ring(list(part.simplify(0.5).exterior.coords), x0, y0)})
++            elif part.geom_type == "LineString" and part.length > 1:
++                out.append({**rec, "g": "l", "r": _enc_ring(list(part.simplify(0.5).coords), x0, y0)})
++    return out
++
++
++def write_city(out_dir, city, buildings, roads, land_geom, ground_fn, study_area, maritime=None, keep_sea_outside=False):
++    """city: dict(slug,name_he,...); ground_fn(x,y)->metres (vectorised); study_area: Polygon (ITM).
++    maritime: list of maritime records (sources_osm) -> 'mar' layer; keep_sea_outside: SEA beyond the study area."""
+     import shapely
+     shapely.prepare(study_area)
+     by_tile = {}
+@@ -108,7 +142,8 @@
+             zz = np.where(land_pts, np.maximum(zz, 0.3), 0)          # land never below +0.3 m
+             q = np.round(zz * 10).astype(np.int32)
+             q = np.where(land_pts, q, SEA)
+-            q = np.where(inside, q, OUTSIDE).astype("<i2")
++            keep = (inside | ~land_pts) if keep_sea_outside else inside
++            q = np.where(keep, q, OUTSIDE).astype("<i2")
+             mask = rasterize(land_geom, x0, y0, MASK_STEP, NM, NM)
+             hdr = struct.pack("<4sHiiHHH", b"YZT1", 1, tx, ty, NT, NM, TERRAIN_STEP)
+             _write_gz(os.path.join(out_dir, "tiles/t", k + ".bin.gz"), hdr + q.tobytes() + pack_bits(mask))
+@@ -127,6 +162,8 @@
+             sea = fr.difference(land_geom) if not land_geom.is_empty else fr
+             sea = [_enc_poly(p.simplify(1.0), x0, y0) for p in _polys(sea) if p.area > 25]
+             old.update({"b": recs, "rd": rd if rd else old.get("rd", []), "sea": sea})
++            if maritime:
++                old["mar"] = maritime_records(maritime, fr, x0, y0)
+             _write_gz(vp, json.dumps(old, ensure_ascii=False, separators=(",", ":")).encode())
+     return keys
+ 

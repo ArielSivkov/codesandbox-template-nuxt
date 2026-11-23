@@ -1,0 +1,6 @@
+{
+ "derived_from": "/home/claude/codesandbox-template-nuxt/twin/game/data",
+ "change": "offshore OUTSIDE terrain nodes -> SEA (flood from SEA, west of coast fit \u2212 60 m)",
+ "nodes_changed": 11941,
+ "tool": "swarm/maritime/tools/fix_sample_sea.py"
+}

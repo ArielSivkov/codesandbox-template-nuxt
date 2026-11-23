@@ -1,0 +1,446 @@
+[
+ {
+  "name": "01-beach",
+  "ready": true,
+  "view": "beach",
+  "calls": 60,
+  "triangles": 185078,
+  "geometries": 40,
+  "textures": 10,
+  "heapMB": 37.1,
+  "stats": {
+   "gridNodes": 293174,
+   "gridMs": 816,
+   "oceanTris": 29376,
+   "oceanVerts": 15313,
+   "port": {
+    "breakwaterM": 4390.809294643432,
+    "containers": 7548,
+    "cranes": 18,
+    "moored": 186,
+    "buoys": 4,
+    "lights": 4
+   },
+   "ships": 9,
+   "yachts": 5,
+   "towers": 13,
+   "umbrellas": 313,
+   "swimmers": 39,
+   "Hs": 1.0929280119912734,
+   "Tp": 5.310255304052768,
+   "waves": 7
+  },
+  "maritime": {
+   "tris": 86119,
+   "calls": 20,
+   "shadowCasters": 6,
+   "by": {
+    "maritime-ocean": 29376,
+    "breakwaters": 10272,
+    "piers": 48,
+    "moored-sail": 7102,
+    "moored-motor": 4400,
+    "containers": 4572,
+    "port-apron": 2558,
+    "cranes": 4320,
+    "buoys": 240,
+    "lights": 992,
+    "river": 612,
+    "ships-container": 3829,
+    "ships-tanker": 422,
+    "yachts": 635,
+    "wakes": 1008,
+    "wet-sand": 5190,
+    "lifeguard-towers": 1768,
+    "umbrellas": 6260,
+    "swimmers": 2340,
+    "player-boat": 175
+   }
+  },
+  "boat": {
+   "kn": 0,
+   "planing": 0,
+   "x": -3265,
+   "z": 1741
+  },
+  "labels": {
+   "waves": "גלים: גובה משמעותי 1.09 מ' (רוח 1.02 + גל ים 0.4), מחזור 5.3 ש' · רוח 6.0 מ/ש (בופור 4) · משוער לפי CEM, גל ים מונח",
+   "ais": "AIS לא זמין – מוצג מצב לדוגמה"
+  },
+  "sunElev": 37.839667207260774,
+  "debug": null
+ },
+ {
+  "name": "02-boat",
+  "ready": true,
+  "view": "boat",
+  "calls": 32,
+  "triangles": 123647,
+  "geometries": 26,
+  "textures": 7,
+  "heapMB": 64.6,
+  "stats": {
+   "gridNodes": 293174,
+   "gridMs": 1873,
+   "oceanTris": 29376,
+   "oceanVerts": 15313,
+   "port": {
+    "breakwaterM": 4390.809294643432,
+    "containers": 7548,
+    "cranes": 18,
+    "moored": 186,
+    "buoys": 4,
+    "lights": 4
+   },
+   "ships": 9,
+   "yachts": 5,
+   "towers": 13,
+   "umbrellas": 313,
+   "swimmers": 39,
+   "Hs": 1.0929280119912734,
+   "Tp": 5.310255304052768,
+   "waves": 7
+  },
+  "maritime": {
+   "tris": 86263,
+   "calls": 20,
+   "shadowCasters": 6,
+   "by": {
+    "maritime-ocean": 29376,
+    "breakwaters": 10272,
+    "piers": 48,
+    "moored-sail": 7102,
+    "moored-motor": 4400,
+    "containers": 4572,
+    "port-apron": 2558,
+    "cranes": 4320,
+    "buoys": 240,
+    "lights": 992,
+    "river": 612,
+    "ships-container": 3829,
+    "ships-tanker": 422,
+    "yachts": 635,
+    "wakes": 1152,
+    "wet-sand": 5190,
+    "lifeguard-towers": 1768,
+    "umbrellas": 6260,
+    "swimmers": 2340,
+    "player-boat": 175
+   }
+  },
+  "boat": {
+   "kn": 45.67909530827109,
+   "planing": 1,
+   "x": -3311.620243286819,
+   "z": 1447.1151176825142
+  },
+  "labels": {
+   "waves": "גלים: גובה משמעותי 1.09 מ' (רוח 1.02 + גל ים 0.4), מחזור 5.3 ש' · רוח 6.0 מ/ש (בופור 4) · משוער לפי CEM, גל ים מונח",
+   "ais": "AIS לא זמין – מוצג מצב לדוגמה"
+  },
+  "sunElev": 37.839667207260774,
+  "debug": null,
+  "gpuCheck": {
+   "pixels": 4096,
+   "maxErrM": 0.0554,
+   "meanErrM": 0.0138,
+   "Hs": 1.09,
+   "note": "GPU rendered surface (2.5 m mesh) vs CPU analytic sampler used by the boat"
+  }
+ },
+ {
+  "name": "03-port-aerial",
+  "ready": true,
+  "view": "port",
+  "calls": 65,
+  "triangles": 180386,
+  "geometries": 53,
+  "textures": 10,
+  "heapMB": 134.1,
+  "stats": {
+   "gridNodes": 293174,
+   "gridMs": 691,
+   "oceanTris": 29376,
+   "oceanVerts": 15313,
+   "port": {
+    "breakwaterM": 4390.809294643432,
+    "containers": 7548,
+    "cranes": 18,
+    "moored": 186,
+    "buoys": 4,
+    "lights": 4
+   },
+   "ships": 9,
+   "yachts": 5,
+   "towers": 13,
+   "umbrellas": 313,
+   "swimmers": 39,
+   "Hs": 1.0929280119912734,
+   "Tp": 5.310255304052768,
+   "waves": 7
+  },
+  "maritime": {
+   "tris": 86119,
+   "calls": 20,
+   "shadowCasters": 6,
+   "by": {
+    "maritime-ocean": 29376,
+    "breakwaters": 10272,
+    "piers": 48,
+    "moored-sail": 7102,
+    "moored-motor": 4400,
+    "containers": 4572,
+    "port-apron": 2558,
+    "cranes": 4320,
+    "buoys": 240,
+    "lights": 992,
+    "river": 612,
+    "ships-container": 3829,
+    "ships-tanker": 422,
+    "yachts": 635,
+    "wakes": 1008,
+    "wet-sand": 5190,
+    "lifeguard-towers": 1768,
+    "umbrellas": 6260,
+    "swimmers": 2340,
+    "player-boat": 175
+   }
+  },
+  "boat": {
+   "kn": 0,
+   "planing": 0,
+   "x": -3265,
+   "z": 1741
+  },
+  "labels": {
+   "waves": "גלים: גובה משמעותי 1.09 מ' (רוח 1.02 + גל ים 0.4), מחזור 5.3 ש' · רוח 6.0 מ/ש (בופור 4) · משוער לפי CEM, גל ים מונח",
+   "ais": "AIS לא זמין – מוצג מצב לדוגמה"
+  },
+  "sunElev": 37.839667207260774,
+  "debug": null
+ },
+ {
+  "name": "04-sunset-glint",
+  "ready": true,
+  "view": "sunset",
+  "calls": 40,
+  "triangles": 162135,
+  "geometries": 30,
+  "textures": 10,
+  "heapMB": 58.3,
+  "stats": {
+   "gridNodes": 293174,
+   "gridMs": 289,
+   "oceanTris": 29376,
+   "oceanVerts": 15313,
+   "port": {
+    "breakwaterM": 4390.809294643432,
+    "containers": 7548,
+    "cranes": 18,
+    "moored": 186,
+    "buoys": 4,
+    "lights": 4
+   },
+   "ships": 9,
+   "yachts": 5,
+   "towers": 13,
+   "umbrellas": 313,
+   "swimmers": 39,
+   "Hs": 0.4038907137940063,
+   "Tp": 1.2452032033930924,
+   "waves": 7
+  },
+  "maritime": {
+   "tris": 86263,
+   "calls": 20,
+   "shadowCasters": 6,
+   "by": {
+    "maritime-ocean": 29376,
+    "breakwaters": 10272,
+    "piers": 48,
+    "moored-sail": 7102,
+    "moored-motor": 4400,
+    "containers": 4572,
+    "port-apron": 2558,
+    "cranes": 4320,
+    "buoys": 240,
+    "lights": 992,
+    "river": 612,
+    "ships-container": 3829,
+    "ships-tanker": 422,
+    "yachts": 635,
+    "wakes": 1152,
+    "wet-sand": 5190,
+    "lifeguard-towers": 1768,
+    "umbrellas": 6260,
+    "swimmers": 2340,
+    "player-boat": 175
+   }
+  },
+  "boat": {
+   "kn": 41.94476082001823,
+   "planing": 1,
+   "x": -3309.6855331776437,
+   "z": 1456.8528962035061
+  },
+  "labels": {
+   "waves": "גלים: גובה משמעותי 0.40 מ' (רוח 0.06 + גל ים 0.4), מחזור 1.2 ש' · רוח 1.5 מ/ש (בופור 1) · משוער לפי CEM, גל ים מונח",
+   "ais": "AIS לא זמין – מוצג מצב לדוגמה"
+  },
+  "sunElev": 1.2323117522929479,
+  "debug": null
+ },
+ {
+  "name": "05-boat-storm",
+  "ready": true,
+  "view": "boat",
+  "calls": 17,
+  "triangles": 81451,
+  "geometries": 13,
+  "textures": 4,
+  "heapMB": 59.5,
+  "stats": {
+   "gridNodes": 293174,
+   "gridMs": 1192,
+   "oceanTris": 29376,
+   "oceanVerts": 15313,
+   "port": {
+    "breakwaterM": 4390.809294643432,
+    "containers": 7548,
+    "cranes": 18,
+    "moored": 186,
+    "buoys": 4,
+    "lights": 4
+   },
+   "ships": 9,
+   "yachts": 5,
+   "towers": 13,
+   "umbrellas": 313,
+   "swimmers": 39,
+   "Hs": 3.403096999611497,
+   "Tp": 7.38428816741118,
+   "waves": 7
+  },
+  "maritime": {
+   "tris": 86263,
+   "calls": 20,
+   "shadowCasters": 6,
+   "by": {
+    "maritime-ocean": 29376,
+    "breakwaters": 10272,
+    "piers": 48,
+    "moored-sail": 7102,
+    "moored-motor": 4400,
+    "containers": 4572,
+    "port-apron": 2558,
+    "cranes": 4320,
+    "buoys": 240,
+    "lights": 992,
+    "river": 612,
+    "ships-container": 3829,
+    "ships-tanker": 422,
+    "yachts": 635,
+    "wakes": 1152,
+    "wet-sand": 5190,
+    "lifeguard-towers": 1768,
+    "umbrellas": 6260,
+    "swimmers": 2340,
+    "player-boat": 175
+   }
+  },
+  "boat": {
+   "kn": 44.45565009492101,
+   "planing": 1,
+   "x": -4636.558566412862,
+   "z": 477.425548918922
+  },
+  "labels": {
+   "waves": "גלים: גובה משמעותי 3.40 מ' (רוח 3.38 + גל ים 0.4), מחזור 7.4 ש' · רוח 12.0 מ/ש (בופור 6) · משוער לפי CEM, גל ים מונח",
+   "ais": "AIS לא זמין – מוצג מצב לדוגמה"
+  },
+  "sunElev": 37.839667207260774,
+  "debug": null,
+  "gpuCheck": {
+   "pixels": 4096,
+   "maxErrM": 0.0448,
+   "meanErrM": 0.0112,
+   "Hs": 3.4,
+   "note": "GPU rendered surface (2.5 m mesh) vs CPU analytic sampler used by the boat"
+  }
+ },
+ {
+  "name": "06-ais-fixture",
+  "ready": true,
+  "view": "ais",
+  "calls": 40,
+  "triangles": 123620,
+  "geometries": 33,
+  "textures": 10,
+  "heapMB": 56.3,
+  "stats": {
+   "gridNodes": 293174,
+   "gridMs": 1675,
+   "oceanTris": 29376,
+   "oceanVerts": 15313,
+   "port": {
+    "breakwaterM": 4390.809294643432,
+    "containers": 7548,
+    "cranes": 18,
+    "moored": 186,
+    "buoys": 4,
+    "lights": 4
+   },
+   "ships": 9,
+   "yachts": 5,
+   "towers": 13,
+   "umbrellas": 313,
+   "swimmers": 39,
+   "Hs": 0.4038907137940063,
+   "Tp": 1.2452032033930924,
+   "waves": 7
+  },
+  "maritime": {
+   "tris": 86047,
+   "calls": 20,
+   "shadowCasters": 6,
+   "by": {
+    "maritime-ocean": 29376,
+    "breakwaters": 10272,
+    "piers": 48,
+    "moored-sail": 7102,
+    "moored-motor": 4400,
+    "containers": 4572,
+    "port-apron": 2558,
+    "cranes": 4320,
+    "buoys": 240,
+    "lights": 992,
+    "river": 612,
+    "ships-container": 3282,
+    "ships-tanker": 211,
+    "yachts": 889,
+    "wakes": 1440,
+    "wet-sand": 5190,
+    "lifeguard-towers": 1768,
+    "umbrellas": 6260,
+    "swimmers": 2340,
+    "player-boat": 175
+   }
+  },
+  "boat": {
+   "kn": 0,
+   "planing": 0,
+   "x": -3265,
+   "z": 1741
+  },
+  "labels": {
+   "waves": "גלים: גובה משמעותי 0.40 מ' (רוח 0.06 + גל ים 0.4), מחזור 1.2 ש' · רוח 1.5 מ/ש (בופור 1) · משוער לפי CEM, גל ים מונח",
+   "ais": "נתוני AIS לדוגמה (קובץ קבוע) – לא חי"
+  },
+  "sunElev": 37.839667207260774,
+  "debug": null
+ }
+]
+CONSOLE [
+  'warning: [.WebGL-0x3c5c00190400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels',
+  'warning: [.WebGL-0x3c5c00190400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)'
+]
