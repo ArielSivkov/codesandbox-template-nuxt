@@ -30,7 +30,7 @@ MODS = {
 }
 
 # מודולים שיש להם מתאם פעיל – רק הם מועתקים (השאר נבדקים ומדווחים)
-WIRED = {'physics', 'weather', 'present', 'audio', 'maritime', 'atmosphere', 'sky', 'vegetation', 'aviation', 'procgen', 'assets'}
+WIRED = {'physics', 'weather', 'present', 'audio', 'maritime', 'atmosphere', 'sky', 'vegetation', 'aviation', 'procgen', 'assets', 'buildings'}
 
 def copy_item(src, dst):
     if os.path.isdir(src):
@@ -40,6 +40,10 @@ def copy_item(src, dst):
 
 def main():
     t0 = time.time()
+    import subprocess
+    for f in sorted(os.listdir(INT + '/adapters')) + ['../host/host.js']:
+        r = subprocess.run(['node', '--check', os.path.join(INT, 'adapters', f)], capture_output=True, text=True)
+        if r.returncode: sys.exit('SYNTAX ERROR in ' + f + '\n' + r.stderr[:600])
     if os.path.isdir(WORLD): shutil.rmtree(WORLD)
     shutil.copytree(SW + '/game', WORLD, ignore=SKIP)
     shutil.copytree(INT + '/host', WORLD + '/host')

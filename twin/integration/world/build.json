@@ -1,12 +1,12 @@
 {
- "built_at": "2026-11-23 02:51:36",
+ "built_at": "2026-11-23 02:55:22",
  "game_js_mtime": "00:58:17",
  "mods": {
   "physics": "copied(2)",
   "weather": "copied(1)",
   "present": "copied(6)",
   "atmosphere": "copied(1)",
-  "buildings": "present-not-wired",
+  "buildings": "copied(1)",
   "audio": "copied(6)",
   "transport": "present-not-wired",
   "vegetation": "copied(3)",
