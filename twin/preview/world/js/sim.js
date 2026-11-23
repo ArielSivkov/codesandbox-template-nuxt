@@ -1,7 +1,6 @@
 /* 27wrld — sim.js : סימולציה טהורה, בלי three.js ובלי ציור (אפשר להריץ ב-Node או מעל מנוע של גדוד 6).
    1) מיקום השמש (אלגוריתם NOAA, דיוק ~0.01° בזווית; בלי שבירת אור אטמוספרית מתחת ל-0°).
-   2) שדה רוח עירוני (קירוב! לא CFD): פרופיל חזקה לפי גובה, הסטת גובה אפס לפי בניינים, הצללה בתוך "חופת" הבניינים,
-      תיעול לאורך קירות, משבים כתהליך אקראי חלק.
+   2) שדה רוח עירוני (קירוב! לא CFD): פרופיל לוגריתמי ממוצע זהה למודול הקנוני (גובה ערבוב, חופת בניינים), תיעול לאורך קירות, משבים כתהליך אקראי חלק בממוצע 1.
    3) רחפן מרובע (quadcopter): מסה, דחף, גרר ריבועי + גרר רוטור ליניארי ביחס לאוויר (כולל רוח), בקר זווית/מהירות אנכית, אינטגרציה בצעד קבוע 1/120 ש'.
    יחידות SI. מערכת צירים כמו בעולם: x = מזרח, y = מעלה, z = דרום (−צפון). */
 (function (G) {
@@ -132,6 +131,23 @@ SIM.fromOpenMeteo = function (j) {
 };
 SIM.fetchWeather = async function (lat, lon) { const r = await fetch(SIM.openMeteoURL(lat, lon)); if (!r.ok) throw new Error('HTTP ' + r.status); return SIM.fromOpenMeteo(await r.json()); };
 
+/** פרופיל רוח ממוצע (בלי משבים ובלי השפעת קיר מקומית), מ'/ש'. u10 = רוח 10 מ' בשטח פתוח (תחנה / Open-Meteo wind_speed_10m),
+ *  z = גובה מעל הקרקע, hm = גובה בניינים ממוצע סביב (0 = שטח פתוח). אותן נוסחאות כמו physics/src/wind.js (meanSpeed):
+ *  חוק לוגריתמי u = (u*)÷κ·ln((z−d)/z0), κ=0.4; שטח פתוח z0=0.03 מ' (WMO/Davenport); עיר: d=0.7·H, z0=0.1·H (Grimmond & Oke 1999);
+ *  מעבר שטח פתוח→עיר בגובה ערבוב zb=60 מ' שבו שני הפרופילים שווים (Wieringa 1986); מתחת לגג: u(H)·e^{2(z/H−1)} (Macdonald 2000, a=2 משוער).
+ *  מקורב: ים מקבל z0 של שטח פתוח (0.03 ולא ~0.0002), יציבות ניטרלית בלבד, H הוא ממוצע הבניינים ברדיוס 40 מ' ולא שדה גבהים. */
+const KAPPA = 0.4, Z0_OPEN = 0.03, ZB = 60, CANOPY_A = 2;
+const lawLog = (z, us, z0, d) => (z - d <= z0 ? 0 : us / KAPPA * Math.log((z - d) / z0));
+SIM.meanWind = function (u10, z, hm) {
+  const usO = u10 * KAPPA / Math.log(10 / Z0_OPEN);
+  if (!(hm > 0)) return lawLog(Math.max(z, Z0_OPEN * 1.0001), usO, Z0_OPEN, 0);
+  const z0 = Math.max(0.1 * hm, Z0_OPEN), d = 0.7 * hm, us = lawLog(ZB, usO, Z0_OPEN, 0) * KAPPA / Math.log((ZB - d) / z0);
+  const Hc = Math.max(hm, d + 1.5 * z0);
+  if (z >= Hc) return lawLog(z, us, z0, d);
+  return lawLog(Hc, us, z0, d) * Math.exp(CANOPY_A * (Math.max(z, 0) / Hc - 1));
+};
+// ממוצע זמן של max(−0.35, gustSignal) – חושב נומרית (5.6M דגימות, 50 נקודות): 0.0489. מחסירים אותו כדי שממוצע המשב יהיה 1.
+const GUST_MEAN = 0.0489;
 // משבים: סכום סינוסים בתדרים לא-רציונליים + פאזה מרחבית (אורך מערבולת ~40–120 מ'), ממוצע ≈ 0
 function gustSignal(t, x, z) {
   return 0.45 * Math.sin(0.37 * t + x * 0.011 + z * 0.007) + 0.3 * Math.sin(1.13 * t + 1.7 - x * 0.023 + z * 0.019) + 0.25 * Math.sin(2.71 * t + 0.4 + x * 0.041 - z * 0.037);
@@ -147,15 +163,11 @@ SIM.windAt = function (x, y, z, t, world, out) {
   let hs = 0, n = 0, hmax = 0, nearB = null, nearD = 1e9;
   const list = world.near(x, z, 40);
   for (const b of list) { const h = b.top - Math.max(g, 0); hs += h; n++; if (h > hmax) hmax = h; }
-  const hm = n ? hs / n : 0, d = 0.7 * hm;
-  // פרופיל חזקה עירוני (α≈0.30 מרכז עיר, 0.14 שטח פתוח/ים); רוח הייחוס = 10 מ' בשטח פתוח
-  const alpha = n ? 0.30 : 0.14;
-  const zeff = Math.max(0.5, zag - d);
-  let U = w.windSpeed * Math.pow(zeff / 10, alpha);
+  const hm = n ? hs / n : 0;
+  let U = SIM.meanWind(w.windSpeed, zag, hm);                              // פרופיל ממוצע – זהה למודול הקנוני physics/src/wind.js
   let canopy = 0;
-  if (n && zag < hmax) {                                                   // בתוך חופת הבניינים
+  if (n && zag < hmax) {                                                   // בתוך חופת הבניינים (ההאטה כבר בפרופיל החופה)
     canopy = 1;
-    U *= 0.35 + 0.65 * Math.min(1, zag / Math.max(hm, 1));                 // הצללה
     for (const b of list) { if (y > b.top) continue; const e = world.edge(b, x, z); if (e.d < nearD) { nearD = e.d; nearB = e; } }
     if (nearB && nearD < 14) {                                             // תיעול לאורך הקיר הקרוב
       let tx = x - nearB.px, tz = z - nearB.pz; const l = Math.hypot(tx, tz) || 1; const nx = tx / l, nz = tz / l;   // נורמל מהקיר
@@ -164,8 +176,8 @@ SIM.windAt = function (x, y, z, t, world, out) {
       const fl = Math.hypot(fx, fz) || 1; const mag = Math.hypot(par * (1 + 0.3 * k), perp * (1 - 0.65 * k)); ux = fx / fl; uz = fz / fl; U *= mag;
     }
   }
-  const s = gustSignal(t, x, z);                                           // משב: U·(1 + (G−1)·s⁺) − חלק קטן שלילי
-  const gm = 1 + (w.gust - 1) * Math.max(-0.35, s);
+  const s = gustSignal(t, x, z);                                           // משב: U·(1 + (G−1)·(s' − ממוצע s')), s' = max(−0.35, s)
+  const gm = 1 + (w.gust - 1) * (Math.max(-0.35, s) - GUST_MEAN);          // ממוצע לאורך זמן = 1 (הרוח הממוצעת לא מתנפחת)
   U *= gm;
   const vert = canopy ? 0 : 0.08 * U * gustSignal(t * 1.3 + 7, z, x);     // מערבולות אנכיות קטנות מעל הגגות
   out.x = ux * U; out.z = uz * U; out.y = vert; out.speed = Math.hypot(out.x, out.y, out.z); out.canopy = canopy; out.hm = hm;

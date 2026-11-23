@@ -71,4 +71,27 @@ for (const c of ['../../integration/world/js/itm.js', '../../preview/world/js/it
 // פרופיל רוח: חזק יותר בגובה
 SIM.weather.windSpeed = 8; SIM.weather.gust = 1.5;
 const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).speed; ok(b > a, `רוח ב-60 מ' (${b.toFixed(1)}) > ב-2 מ' (${a.toFixed(1)})`);
-console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); process.exit(fail ? 1 : 0);
+// פרופיל רוח ממוצע: זהה למודול הקנוני physics/src/wind.js (חוק לוגריתמי, גובה ערבוב 60 מ' – Wieringa 1986, d=0.7H/z0=0.1H – Grimmond & Oke 1999, חופה – Macdonald 2000)
+(async () => {
+  const { createWind } = await import('../../physics/src/wind.js');
+  let maxRel = 0, under = true, eq60 = 0;
+  for (const H of [0, 6, 12, 20, 35, 60]) {
+    const C = createWind(H ? { speed10: 7, meanHeight: H, gusts: false } : { speed10: 7, z0: 0.03, d: 0, gusts: false });   // H=0: שטח פתוח (ברירת המחדל הקנונית בלי גבהים היא עיר z0=1)
+    for (let z = 0.5; z <= 150; z += 0.5) { const g = SIM.meanWind(7, z, H), c = C.meanSpeed(z); maxRel = Math.max(maxRel, Math.abs(g - c) / Math.max(c, 0.05));
+      if (H > 0 && z < 60 && g > SIM.meanWind(7, z, 0) + 1e-9) under = false; }
+    if (H > 0) eq60 = Math.max(eq60, Math.abs(SIM.meanWind(7, 60, H) - SIM.meanWind(7, 60, 0)));
+  }
+  ok(maxRel < 1e-9, `פרופיל רוח במשחק = המודול הקנוני (סטייה יחסית מרבית ${maxRel.toExponential(1)}, 6 גובהי עיר × 300 גבהים)`);
+  ok(under && eq60 < 1e-9, `עיר מאטה את הרוח: מתחת ל-60 מ' רוח עירונית ≤ שטח פתוח, ובגובה הערבוב שוות (הפרש ${eq60.toExponential(1)})`);
+  ok(Math.abs(SIM.meanWind(7, 10, 0) - 7) < 1e-9, `שטח פתוח ב-10 מ' = רוח התחנה (${SIM.meanWind(7, 10, 0).toFixed(3)})`);
+  // בשכונה של בניינים בגובה 20 מ' (שני בלוקים 20×20 מ' במרחק 30 מ'), בלי משבים: windAt בגגות = meanWind
+  const sq = (cx, cz, h) => ({ top: h, base: 0, p: [cx - 10, cz - 10, cx + 10, cz - 10, cx + 10, cz + 10, cx - 10, cz + 10], n: 4, cx, cz, minx: cx - 10, maxx: cx + 10, minz: cz - 10, maxz: cz + 10 });
+  const bs = [sq(30, 0, 20), sq(-30, 0, 20)], town = { H: () => 0, near: () => bs, edge: (b, x, z) => ({ d: 20, px: x + 20, pz: z }) };
+  SIM.weather.windSpeed = 6; SIM.weather.gust = 1; const o30 = SIM.windAt(0, 30, 0, 0, town), r30 = Math.hypot(o30.x, o30.z);   // אופקי (מעל הגגות יש רכיב אנכי קטן)
+  ok(Math.abs(r30 - SIM.meanWind(6, 30, 20)) < 1e-9 && r30 < 6.91 * 0.8, `שכונה 20 מ', רוח 6 מ'/ש': ב-30 מ' ${r30.toFixed(2)} מ'/ש' (היה 6.91 – העיר הגבירה רוח במקום להאט)`);
+  // משבים: ממוצע זמן = 1 (לפני התיקון +2.5% ב-G=1.5)
+  for (const G of [1.5, 2.5]) { SIM.weather.gust = G; let s = 0, N = 0; const open = { H: () => 0, near: () => [] };
+    for (let k = 0; k < 8; k++) for (let t = 0; t < 4000; t += 0.05) { s += SIM.windAt(k * 173.1, 10, k * 91.7, t, open).speed / 6; N++; }
+    ok(Math.abs(s / N - 1) < 0.01, `משבים G=${G}: ממוצע רוח / רוח ממוצעת = ${(s / N).toFixed(4)} (יעד 1 ±1%)`); }
+  console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); process.exit(fail ? 1 : 0);
+})();
