@@ -15,7 +15,7 @@ const W = window.W27 = {
   ready: false, OX: 0, OY: 0, manifest: null, tiles: new Map(), stats: { tris: 0, tiles: 0, builds: 0, buildMs: 0 },
   radius: 1150, hiRadius: 650, onTile: null,
 };
-let BASE = 'data/', scene = null, root = null, TILESET = new Set();
+let BASE = 'data/', scene = null, root = null, TILESET = new Set(), EXTRA = new Set(), EXTRA_BASE = '';   // EXTRA: אריחי הכיסוי הארצי (נטענים מתיקייה משותפת)
 const hash = new Map();
 const queue = [];          // אריחים שממתינים לבנייה (נתונים כבר הורדו)
 const fetching = new Set();
@@ -551,7 +551,7 @@ W.nearestStreet = function (x, z, maxD) {
 async function fetchTile(key) {
   if (fetching.has(key) || W.tiles.has(key)) return; fetching.add(key);
   try {
-    const [v, tb] = await Promise.all([fetchJSON(BASE + 'tiles/v/' + key + '.json.gz'), fetchBuf(BASE + 'tiles/t/' + key + '.bin.gz')]);
+    const [v, tb] = await Promise.all([fetchJSON((EXTRA.has(key) ? EXTRA_BASE : BASE) + 'tiles/v/' + key + '.json.gz'), fetchBuf((EXTRA.has(key) ? EXTRA_BASE : BASE) + 'tiles/t/' + key + '.bin.gz')]);
     queue.push({ key, v, tb });
   } catch (e) { console.warn('tile', key, e.message); W.tiles.set(key, { key, failed: true }); }
   finally { fetching.delete(key); }
@@ -633,12 +633,19 @@ W.init = async function (sc, opts) {
   W.manifest = m; TILESET = new Set(m.tiles);
   const [x0, y0, x1, y1] = m.bbox_itm; W.OX = Math.round((x0 + x1) / 2); W.OY = Math.round((y0 + y1) / 2);
   W.bounds = { minx: x0 - W.OX - 300, maxx: x1 - W.OX + 300, minz: -(y1 - W.OY) - 300, maxz: -(y0 - W.OY) + 300 };
+  // כיסוי מורחב: אריחי הארצי (מרכז הארץ) – ?nat=0 מכבה
+  if (m.extra && !/[?&]nat=0/.test(location.search)) try {
+    const x = await fetchJSON(BASE + m.extra.index); EXTRA_BASE = BASE + m.extra.base; EXTRA = new Set(x.tiles.filter(k => !TILESET.has(k)));
+    for (const k of EXTRA) TILESET.add(k); W.extra = x;
+    const [a0, b0, a1, b1] = x.bbox_sample; W.bounds = { minx: Math.min(W.bounds.minx, a0 - W.OX), maxx: Math.max(W.bounds.maxx, a1 - W.OX), minz: Math.min(W.bounds.minz, -(b1 - W.OY)), maxz: Math.max(W.bounds.maxz, -(b0 - W.OY)) };
+  } catch (e) { console.warn('כיסוי ארצי לא נטען', e.message); }
   // ים: מישור אחד גדול בגובה 0 שעוקב אחרי השחקן (היבשה תמיד ≥ +0.6 מ', קרקעית הים −2.5 מ')
   const sg = new T.PlaneGeometry(16000, 16000, 1, 1); sg.rotateX(-Math.PI / 2);
   const uv = sg.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 800, uv.getY(i) * 800);
   W.sea = new T.Mesh(sg, MAT.sea); W.sea.position.y = -0.05; W.sea.renderOrder = 2; scene.add(W.sea);
   W.ready = true; return m;
 };
+W.isExtra = k => EXTRA.has(k); W.tileBase = k => (EXTRA.has(k) ? EXTRA_BASE : BASE);
 W.toScene = (E, N) => ({ x: E - W.OX, z: -(N - W.OY) });
 W.toITM = (x, z) => ({ E: x + W.OX, N: W.OY - z });
 })();

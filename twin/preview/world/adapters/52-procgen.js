@@ -26,7 +26,7 @@
   function stripeTex() { const c = document.createElement('canvas'); c.width = 4; c.height = 4; const x = c.getContext('2d'); x.fillStyle = '#f2f2ee'; x.fillRect(0, 0, 4, 4); const t = new THREE.CanvasTexture(c); return t; }
   async function addTile(world, t) {
     if (!t.blds || G.per.has(t.key)) return; G.per.set(t.key, null);
-    try { const v = await fetchJSON('data/tiles/v/' + t.key + '.json.gz'); if (!world.data.tiles.has(t.key)) { G.per.delete(t.key); return; }
+    try { const v = await fetchJSON((window.W27 && W27.tileBase ? W27.tileBase(t.key) : 'data/') + 'tiles/v/' + t.key + '.json.gz'); if (!world.data.tiles.has(t.key)) { G.per.delete(t.key); return; }
       const res = window.ESH_PROCGEN.generateTile(v, G.rules, {}); const W = world.data.W, out = { lamps: [], cw: [] };
       for (const k of LAMPS) { const d = res.kinds[k] && res.kinds[k].data; if (!d) continue;
         for (let i = 0; i < d.length; i += 6) { const s = W.toScene(res.origin[0] + d[i], res.origin[1] + d[i + 1]); out.lamps.push({ x: s.x, z: s.z, a: d[i + 2], h: 8 * (d[i + 3] || 1), kind: k }); } }
