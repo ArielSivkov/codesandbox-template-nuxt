@@ -51,7 +51,7 @@
     return [sign * H.tx + k * (x - rz * y + ry * z), sign * H.ty + k * (rz * x + y - rx * z), sign * H.tz + k * (-ry * x + rx * y + z)];
   }
   const ITM = {
-    SAMPLE_OFFSET: { dE: 1524.6, dN: 753.6 },
+    SAMPLE_OFFSET: { dE: 1507.82, dN: 757.76 },   // נמדד מ-7,427 בניינים משותפים לאריחי הדגימה ול-national-v1 (EPSG:2039), ±0.56 מ'; אומת מול מפ"י (ג'מיני 23.11). הקודם 1524.6/753.6 כויל מעוגן מעוגל
     wgs84ToItm(lat, lon) { const P = helmert(toECEF(lat * D2R, lon * D2R, fW), -1), g = fromECEF(P[0], P[1], P[2], fG); return geoToTM(g.phi, g.lam); },
     itmToWgs84(E, N) { const g = tmToGeo(E, N), P = helmert(toECEF(g.phi, g.lam, fG), +1), w = fromECEF(P[0], P[1], P[2], fW); return { lat: w.phi / D2R, lon: w.lam / D2R }; },
     sampleToItm(E, N) { return { E: E + ITM.SAMPLE_OFFSET.dE, N: N + ITM.SAMPLE_OFFSET.dN }; },

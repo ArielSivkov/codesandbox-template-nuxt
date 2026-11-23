@@ -1,14 +1,14 @@
 /* ESH27 · מחלקת הבניינים — landmarks.js
    ציוני דרך באשדוד: רק עובדות עם מקור. גובה/קומות 'data' = מצוטט; צורה/מידה 'proc' = הנחה חזותית מסומנת.
    מזהי OSM מתייחסים לאריחי הדגימה (twin/pipeline/sample-out-ashdod = b6/map/data), כפי שהותאמו ב-twin/groundtruth.
-   קואורדינטות: ITM של אריחי הדגימה = ITM אמיתי − (1524.6, 753.6) (היסט הגאורפרנס, groundtruth/README.txt). */
+   קואורדינטות: ITM של אריחי הדגימה = ITM אמיתי − (1507.82, 757.76) (היסט הגאורפרנס, groundtruth/README.txt). */
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
   else { root.ESHBuildings = root.ESHBuildings || {}; root.ESHBuildings.landmarks = api; }
 })(typeof self !== 'undefined' ? self : this, function () {
 'use strict';
-const GEOREF = { dx: 1524.6, dy: 753.6 };   // twin/groundtruth/ashdod_reference.json → georef_offset_itm_m
+const GEOREF = { dx: 1507.82, dy: 757.76 };   // twin/groundtruth/ashdod_reference.json → georef_offset_itm_m
 
 // על בניין קיים באריח (לפי מזהה OSM): תיקון גובה + תווית + צורה מיוחדת אופציונלית
 const ON_TILE = [
