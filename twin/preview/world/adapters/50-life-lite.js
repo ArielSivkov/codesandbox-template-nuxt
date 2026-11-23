@@ -57,7 +57,7 @@
       const mk = (col, size) => { const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXC * 2 * 3), 3)); const p = new THREE.Points(geo, new THREE.PointsMaterial({ color: col, size, map: dot, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));   /* נקודות עגולות (לא ריבועים אדומים ליד המצלמה) */ p.frustumCulled = false; g.add(p); return p; };
       L.heads = mk(0xfff4d6, 0.9); L.tails = mk(0xff2a1a, 0.45);
       for (let i = 0; i < MAXC; i++) L.cars.push({}); for (let i = 0; i < MAXP; i++) L.peds.push({});
-      collectRoads(world); L.cars.forEach(c2 => spawnCar(world, c2)); L.peds.forEach(q => spawnPed(world, q)); recolorPeds(world);
+      window.YZTraffic = L; collectRoads(world); L.cars.forEach(c2 => spawnCar(world, c2)); L.peds.forEach(q => spawnPed(world, q)); recolorPeds(world);
       api.on('shabbat', () => recolorPeds(world)); api.on('env', () => { L.night = Math.max(0, Math.min(1, (2 - world.sun.elevation) / 8)); });
       L.night = Math.max(0, Math.min(1, (2 - world.sun.elevation) / 8));
     },
@@ -69,11 +69,23 @@
       for (let i = 0; i < nc; i++) { const c = L.cars[i]; if (!c.r) { spawnCar(world, c); if (!c.r) { M.makeScale(0, 0, 0); L.carMesh.setMatrixAt(i, M); continue; } }
         // עצירה לפני השחקן/רכב השחקן
         const a0 = at(c.r, c.s), dpx = P.x - a0.x, dpz = P.z - a0.z, ahead = (dpx * a0.fx + dpz * a0.fz) * c.dir, side = Math.abs(dpx * a0.fz - dpz * a0.fx);
-        const stop = ahead > 0 && ahead < 9 && side < 3;
-        c.s += c.dir * (stop ? 0 : c.v) * dt;
-        if (c.s < 0 || c.s > c.r.len || Math.hypot(a0.x - P.x, a0.z - P.z) > 750) { spawnCar(world, c); continue; }
+        let stop = ahead > 0 && ahead < 9 && side < 3;
+        // שמירת מרחק: רכב אחר לפניי (באותו נתיב/צומת) עד 8 מ' → עוצרים; עד 16 מ' → מאטים. כך רכבים לא עוברים זה דרך זה.
+        let slow = 1;
+        if (c.px != null) for (let j = 0; j < nc; j++) { if (j === i) continue; const o = L.cars[j]; if (o.px == null || !o.r) continue;
+          const ex = o.px - c.px, ez = o.pz - c.pz; if (Math.abs(ex) > 17 || Math.abs(ez) > 17) continue;
+          const fx0 = a0.fx * c.dir, fz0 = a0.fz * c.dir, ah = ex * fx0 + ez * fz0, sd = Math.abs(ex * fz0 - ez * fx0);
+          if (ah > 0 && sd < 2.6) { if (ah < 8) { stop = true; break; } if (ah < 16) slow = Math.min(slow, (ah - 8) / 8); } }
+        // תאונה: רכב השחקן נכנס ברכב בתנועה מעל ~11 קמ"ש
+        if (c.crash > 0) { c.crash -= dt; stop = true; }
+        else if (world.player.mode === 'car' && c.px != null) { const SC = world.G27.S.car; if (Math.hypot(SC.x - c.px, SC.z - c.pz) < 2.6 && Math.abs(SC.v) > 3) {
+          c.crash = 10; c.yaw = (Math.random() - 0.5) * 0.9; const kmh = Math.round(Math.abs(SC.v) * 3.6); SC.v *= -0.25;
+          if (navigator.vibrate) navigator.vibrate([60, 40, 120]); try { YZW.notice('💥 תאונה! פגעת ברכב ב-' + kmh + ' קמ"ש', { kind: 'warn' }); } catch (e) { /* */ } } }
+        c.s += c.dir * (stop ? 0 : c.v * slow) * dt;
+        if (c.s < 0 || c.s > c.r.len || Math.hypot(a0.x - P.x, a0.z - P.z) > 750) { spawnCar(world, c); c.px = null; c.crash = 0; continue; }
         const a = at(c.r, c.s), fx = a.fx * c.dir, fz = a.fz * c.dir, x = a.x - fz * c.lane, z = a.z + fx * c.lane, y = Math.max(0, H(x, z));
-        Q.setFromAxisAngle(UP, Math.atan2(fx, fz)); V.set(x, y, z); M.compose(V, Q, S1); L.carMesh.setMatrixAt(i, M);
+        c.px = x; c.pz = z; if (!(c.crash > 0)) c.yaw = 0;
+        Q.setFromAxisAngle(UP, Math.atan2(fx, fz) + (c.yaw || 0)); V.set(x, y, z); M.compose(V, Q, S1); L.carMesh.setMatrixAt(i, M);
         if (L.night > 0.05) { hp.setXYZ(i * 2, x + fx * 2.2 + fz * 0.6, y + 0.65, z + fz * 2.2 - fx * 0.6); hp.setXYZ(i * 2 + 1, x + fx * 2.2 - fz * 0.6, y + 0.65, z + fz * 2.2 + fx * 0.6);
           tp.setXYZ(i * 2, x - fx * 2.2 + fz * 0.6, y + 0.7, z - fz * 2.2 - fx * 0.6); tp.setXYZ(i * 2 + 1, x - fx * 2.2 - fz * 0.6, y + 0.7, z - fz * 2.2 + fx * 0.6); } }
       L.carMesh.instanceMatrix.needsUpdate = true;

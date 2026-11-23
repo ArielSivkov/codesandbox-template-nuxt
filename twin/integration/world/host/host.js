@@ -517,12 +517,12 @@ function onWorldReady() {
     buildingById(id) { for (const t of W.tiles.values()) for (const b of t.blds || []) if (b.id === id) return b; return null; } };
   const prevOn = W.onTile; W.onTile = (t, k) => { if (prevOn) prevOn(t, k); bus.emit('tile', { tile: t, kind: k }); };
   world.scene.traverse(o => { if (o.isMesh && o.material && o.material.uniforms && o.material.uniforms.sun && !world.sky) world.sky = o; if (o.isDirectionalLight && !world.sunLight) world.sunLight = o; if (o.isHemisphereLight && !world.hemi) world.hemi = o; });
-  // שעון: ברירת מחדל = שעת זהב היום (רושם ראשוני), אלא אם ביקשו אחרת
+  // שעון: ברירת מחדל = השעה האמיתית בישראל; ?t=HH:MM לשעה קבועה; בבדיקות (?auto) שעת זהב
   world.clock.date = new Date(G.ENV.date); world.clock.rate = 1;
   const t = qs.get('t'), d = qs.get('d');
   world.shabbat.setting = LS.get('shabbat', 'auto');
   if (d) setTime({ ymd: d });
-  if (t === 'now') setTime({ preset: 'now' }); else if (t && /^\d{1,2}:\d{2}$/.test(t)) { const [a, b] = t.split(':').map(Number); setTime({ min: a * 60 + b }); } else setTime({ preset: 'golden' });
+  if (t === 'now') setTime({ preset: 'now' }); else if (t && /^\d{1,2}:\d{2}$/.test(t)) { const [a, b] = t.split(':').map(Number); setTime({ min: a * 60 + b }); } else setTime({ preset: qs.has('auto') ? 'golden' : 'now' });   // שעון אמיתי כברירת מחדל (משוב: "צריך לכוון כמו שעון"); ?t=17:30 לשעה קבועה, ?auto לבדיקות
   // מזג אוויר פתיחה: בריזת ים, מעט עננים, אובך קל
   setWeather({ windSpeed: 4.5, windFrom: 285, gust: 1.4, cloud: 0.22, rain: 0, aqi: 45 });
   setTier(qs.get('tier') || LS.get('tier', 'auto'), true);

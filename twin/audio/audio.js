@@ -492,7 +492,7 @@ export function createAudio(opts = {}) {
       wind: { level: wp.gain, wp }, rain: { level: C.rainGain(w.rain) },
       waves: { level: wv.gain, cutoff: wv.cutoff, t: eng.t },
       traffic: { level: 0.32 * A.traffic * (w.day ? 1 : 0.55), mod: trafficMod },
-      birds: { level: w.day && w.rain < 0.3 ? 0.5 * A.park * (1 - C.clamp(w.wind / 14, 0, 1)) : 0 },
+      birds: { level: w.day && w.rain < 0.3 ? (0.16 + 0.4 * A.park) * (1 - C.clamp(w.wind / 14, 0, 1)) : 0 },   // ציוץ עדין בכל העיר ביום, יותר בפארקים
       port: { level: 0.4 * A.port, point: env.portPoint || null },
     };
     for (const [k, v] of Object.entries(eng.amb)) { v.score = ambAllowed * 3 * ambState[k].level; candidates.push({ id: v.id, score: v.score }); }
@@ -544,7 +544,7 @@ export function createAudio(opts = {}) {
       const surf = C.surfaceOf(st.surface || eng.env.surface || 'asphalt'), vv = Math.floor(eng.rand() * 3);
       const gain = (e.opts.gain ?? 1) * C.clamp(0.55 + hs / 8, 0.5, 1.1) * C.occlusionGain(e.occ);
       const rate = 0.94 + 0.12 * eng.rand();
-      if (e.opts.player) eng._oneShot(`step:${surf}:${vv}`, 'ambience', { gain, pan: e.foot ? 0.12 : -0.12, priority: 6, rate });
+      if (e.opts.player) eng._oneShot(`step:${surf}:${vv}`, 'ambience', { gain: gain * 0.4, pan: e.foot ? 0.12 : -0.12, priority: 6, rate });
       else eng._oneShot(`step:${surf}:${vv}`, 'ambience', { gain, pos: st, ref: 1.5, max: 60, priority: 1, rate });
     }
   }
