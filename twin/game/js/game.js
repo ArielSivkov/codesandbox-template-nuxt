@@ -147,7 +147,7 @@ function clothes(mesh) {
   float L = dot(diffuseColor.rgb, vec3(0.3,0.59,0.11)); float n = 0.85 + 0.3 * L;
   if (h < 0.045) diffuseColor.rgb = uShoe;
   else if (h < 0.475 && s < 0.2) diffuseColor.rgb = uBot * n;
-  else if (h < 0.815 && (s < 0.125 || (h > 0.66 && s < 0.21))) diffuseColor.rgb = uTop * n; }`); };
+  else if (h < 0.83 && (s < 0.13 || (h > 0.6 && s < 0.27))) diffuseColor.rgb = uTop * n; }`); };
   m.customProgramCacheKey = () => 'w27_clothes'; return m;
 }
 /** דגם רכב CC0 (assets/pack: car_sedan.glb, 440 משולשים, 11KB) במקום קופסה. הלוגיקה (תנועה, התנגשות) לא משתנה. */
@@ -166,6 +166,7 @@ function applyAvatar(av) {
   av = av || {}; AN.av = av; const base = av.base === 'f' ? 'f' : 'm';
   if (AN.model && base !== (AN.base || 'm') && !AN.loading) { AN.loading = true; player.remove(AN.model); AN.model = null; loadCharacter(base).then(() => { AN.loading = false; }); return true; }
   const r = AN.model; if (!r) return false;
+  setStyle(r, 'real');   // צבעים מוחלים על החומרים המקוריים, ואז הסגנון מוחל מחדש
   const c = (k, d) => new T.Color(/^#[0-9a-f]{6}$/i.test(av[k] || '') ? av[k] : d);
   if (AN.U) { AN.U.uTop.value.copy(c('top', '#db8033')); AN.U.uBot.value.copy(c('bottom', '#29406b')); AN.U.uShoe.value.copy(c('shoes', '#1f1c1a')); }
   const style = av.hairStyle || 'parted';
@@ -174,7 +175,27 @@ function applyAvatar(av) {
     else if (/^Hair_Beard/.test(n)) o.visible = !!av.beard; else if (/^Hair_Long/.test(n)) o.visible = style === 'long'; else if (/^Hair_Buns/.test(n)) o.visible = style === 'buns';
     if (/^Hair_/.test(n) && o.material) { if (!o.userData.m0) { o.userData.m0 = o.material; o.material = o.material.clone(); } o.material.color = c('hair', '#ffffff'); }
     if (o.material && /Superhero/i.test((o.userData.mat0 || o.material).name || '') && av.skin) { o.material.color = c('skin', '#ffffff'); } });
-  const k = (av.height || 1.75) / 1.78; r.scale.setScalar(AN.s0 * k); return true;
+  const k = (av.height || 1.75) / 1.78; r.scale.setScalar(AN.s0 * k);
+  setStyle(r, av.style === 'toon' ? 'toon' : 'real'); return true;
+}
+/** סגנון דמות: מציאותי (חומרים מקוריים) או מצויר (הצללה בשלבים + קו מתאר שחור). אותו גוף, אותה הנפשה, אותם צבעים. */
+let TOON_GRAD = null;
+function setStyle(r, style) {
+  if (r.userData.style === style) return; r.userData.style = style;
+  if (!TOON_GRAD) { TOON_GRAD = new T.DataTexture(new Uint8Array([90, 90, 90, 255, 170, 170, 170, 255, 255, 255, 255, 255]), 3, 1); TOON_GRAD.minFilter = TOON_GRAD.magFilter = T.NearestFilter; TOON_GRAD.needsUpdate = true; }
+  r.traverse(o => { if (!o.isMesh || o.userData.outline) return;
+    if (!o.userData.realMat) o.userData.realMat = o.material;
+    if (style === 'toon') {
+      if (!o.userData.toonMat) { const m0 = o.userData.realMat, t = new T.MeshToonMaterial({ map: m0.map || null, color: m0.color ? m0.color.clone() : new T.Color(1, 1, 1), gradientMap: TOON_GRAD, transparent: m0.transparent, alphaTest: m0.alphaTest || 0 });
+        if (m0.customProgramCacheKey() === 'w27_clothes') { t.onBeforeCompile = m0.onBeforeCompile; t.customProgramCacheKey = () => 'w27_toon_clothes'; } o.userData.toonMat = t; }
+      o.userData.toonMat.color.copy(o.material.color || new T.Color(1, 1, 1)); o.material = o.userData.toonMat;
+      if (o.isSkinnedMesh && !o.userData.ol) {   // קו מתאר: עותק הפוך מנופח מעט, באותו שלד
+        const om = new T.MeshBasicMaterial({ color: 0x111111, side: T.BackSide });
+        om.onBeforeCompile = sh => { sh.vertexShader = sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += normalize(objectNormal) * 0.012;'); };
+        const ol = new T.SkinnedMesh(o.geometry, om); ol.userData.outline = true; ol.frustumCulled = false; ol.bind(o.skeleton, o.bindMatrix); o.parent.add(ol); o.userData.ol = ol; }
+      if (o.userData.ol) o.userData.ol.visible = o.visible;
+    } else { o.material = o.userData.realMat; if (o.userData.ol) o.userData.ol.visible = false; }
+  });
 }
 async function loadCharacter(base) {
   AN.base = base === 'f' ? 'f' : 'm';

@@ -28,7 +28,7 @@ const USER_RE = /^[\p{L}\p{N}_.-]{3,24}$/u;
 function cleanAvatar(a) {   // רק שדות מוכרים, ערכים מוגבלים
   a = a && typeof a === 'object' ? a : {}; const col = v => /^#[0-9a-f]{6}$/i.test(v || '') ? v : undefined;
   const pick = (v, list) => list.includes(v) ? v : undefined;
-  return JSON.stringify({ base: pick(a.base, ['m', 'f']) || 'm', skin: col(a.skin), hair: col(a.hair), top: col(a.top), bottom: col(a.bottom), shoes: col(a.shoes),
+  return JSON.stringify({ style: pick(a.style, ['real', 'toon']) || 'real', base: pick(a.base, ['m', 'f']) || 'm', skin: col(a.skin), hair: col(a.hair), top: col(a.top), bottom: col(a.bottom), shoes: col(a.shoes),
     hairStyle: pick(a.hairStyle, ['parted', 'buzzed', 'long', 'buns', 'none']) || 'parted', beard: !!a.beard, height: Math.min(2.05, Math.max(1.45, +a.height || 1.75)) });
 }
 let READY = false;

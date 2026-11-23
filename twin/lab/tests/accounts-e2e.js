@@ -8,6 +8,10 @@ check(t.includes('החשבון של הטלפון הזה')&&t.includes('הפרו�
 await p.click('[data-a=set][data-k=beard]');await p.$eval('input[data-k=top]',e=>{e.value='#00aa44';e.dispatchEvent(new Event('input',{bubbles:true}));});
 await p.$eval('input[data-k=height]',e=>{e.value='1.95';e.dispatchEvent(new Event('input',{bubbles:true}));});
 let info=await p.evaluate(()=>G27.avatarInfo());check(info.top==='#00aa44'&&Math.abs(info.scale/info.s0-1.95/1.78)<0.01,'תצוגה חיה של הדמות');
+await p.click('[data-a=set][data-k=style][data-v=toon]');await p.waitForTimeout(800);
+const toon=await p.evaluate(()=>{let n=0,ol=0;YZW.world.scene.getObjectByName('player').traverse(o=>{if(o.isMesh&&o.material&&o.material.isMeshToonMaterial)n++;if(o.userData&&o.userData.outline&&o.visible)ol++;});return {n,ol};});
+check(toon.n>0&&toon.ol>0,'סגנון מצויר: '+toon.n+' חומרי צל מדורג, '+toon.ol+' קווי מתאר');
+await p.screenshot({path:'/tmp/toon.png'});
 await p.click('[data-a=save]');await p.waitForTimeout(1200);check((await p.textContent('#acS')).includes('נשמר'),'שמירה בחשבון הטלפון');
 await p.click('[data-a=new]');await p.waitForTimeout(1200);check((await p.$$('.ac-pl [data-a=pick]')).length===2,'פרופיל שני');
 await p.click('[data-a=set][data-k=base][data-v=f]');await p.waitForTimeout(4000);check((await p.evaluate(()=>G27.avatarInfo())).base==='f','דמות אישה');
@@ -17,5 +21,5 @@ await p.click('#yzAcct');await p.fill('#acU','ariel_phone');await p.fill('#acP',
 check((await p.textContent('.ac-head')).includes('ariel_phone'),'שם משתמש וסיסמה נוספו לחשבון הטלפון');
 const q=await phone();await q.click('#yzAcct');await q.click('[data-a=other]');await q.fill('#acU','ariel_phone');await q.fill('#acP','Secret-pass-9');await q.click('[data-a=login]');await q.waitForTimeout(2000);
 check((await q.$$('.ac-pl [data-a=pick]')).length===2,'טלפון שני נכנס ורואה את 2 הפרופילים');
-await q.click('[data-a=pick] >> nth=0');await q.waitForTimeout(4000);info=await q.evaluate(()=>G27.avatarInfo());check(info.av.beard===true&&info.top==='#00aa44','בטלפון השני: אותה דמות (זקן, חולצה ירוקה)');
+await q.click('[data-a=pick] >> nth=0');await q.waitForTimeout(4000);info=await q.evaluate(()=>G27.avatarInfo());check(info.av.beard===true&&info.top==='#00aa44'&&info.av.style==='toon','בטלפון השני: אותה דמות (זקן, חולצה ירוקה, מצויר)');
 check(errs.length===0,'בלי שגיאות JS '+errs.join('|'));console.log(ok?'בדיקת החשבונות במשחק עברה':'נכשל');await b.close();process.exit(ok?0:1);})();

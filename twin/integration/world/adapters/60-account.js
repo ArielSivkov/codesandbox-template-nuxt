@@ -6,7 +6,7 @@
 (function () {
   'use strict';
   const API = (new URLSearchParams(location.search).get('acct')) || 'https://esh27-accounts.ariel-sivkov.workers.dev';
-  const LS = 'w27.acct', DEF = { base: 'm', hairStyle: 'parted', beard: false, skin: '#ffffff', hair: '#3a2a1e', top: '#2f6db5', bottom: '#2b3340', shoes: '#1f1c1a', height: 1.75 };
+  const LS = 'w27.acct', DEF = { style: 'real', base: 'm', hairStyle: 'parted', beard: false, skin: '#ffffff', hair: '#3a2a1e', top: '#2f6db5', bottom: '#2b3340', shoes: '#1f1c1a', height: 1.75 };
   const A = { token: null, me: null, active: null, guest: null, google: false, el: null, edit: null };
   const store = { get() { try { return JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) { return {}; } }, set(o) { try { localStorage.setItem(LS, JSON.stringify(Object.assign(store.get(), o))); } catch (e) { /* */ } } };
   async function call(method, path, body) {
@@ -33,6 +33,7 @@
       '<input id="acU" placeholder="שם משתמש" autocomplete="username"><input id="acP" type="password" placeholder="סיסמה (8+ תווים)" autocomplete="new-password"><div class="ac-row"><button data-a="claim">שמור שם וסיסמה</button><button data-a="other" class="ghost">יש לי כבר חשבון</button></div><div class="ac-m" id="acMsg"></div></div>';
     const v = avatar(), col = (k, l) => '<label>' + l + '<input type="color" data-k="' + k + '" value="' + v[k] + '"></label>';
     h += '<div class="ac-card"><div class="ac-t">הדמות' + (profile() ? ' – ' + esc(profile().name) : '') + '</div>' + (profile() ? '<input id="acN" value="' + esc(profile().name) + '" maxlength="40">' : '') +
+      '<div class="ac-seg">' + [['real', '🧍 מציאותי'], ['toon', '🎨 מצויר']].map(([k, l]) => '<button data-a="set" data-k="style" data-v="' + k + '" class="' + ((v.style || 'real') === k ? 'on' : '') + '">' + l + '</button>').join('') + '</div>' +
       '<div class="ac-seg">' + [['m', 'גבר'], ['f', 'אישה']].map(([k, l]) => '<button data-a="set" data-k="base" data-v="' + k + '" class="' + (v.base === k ? 'on' : '') + '">' + l + '</button>').join('') + '</div>' +
       '<div class="ac-seg">' + (v.base === 'f' ? [['long', 'ארוך'], ['buns', 'קוקו'], ['none', 'בלי']] : [['parted', 'קלאסי'], ['buzzed', 'קצוץ'], ['none', 'קרחת']]).map(([k, l]) => '<button data-a="set" data-k="hairStyle" data-v="' + k + '" class="' + (v.hairStyle === k ? 'on' : '') + '">' + l + '</button>').join('') +
       (v.base === 'm' ? '<button data-a="set" data-k="beard" data-v="' + (!v.beard) + '" class="' + (v.beard ? 'on' : '') + '">זקן</button>' : '') + '</div>' +
