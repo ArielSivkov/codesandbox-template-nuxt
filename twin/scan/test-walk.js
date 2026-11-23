@@ -16,6 +16,10 @@ const { chromium } = require('playwright');
   await p.evaluate(async () => { const sl = ms => new Promise(r => setTimeout(r, ms)); const ev = (x, y, z, rot) => window.dispatchEvent(Object.assign(new Event('devicemotion'), { accelerationIncludingGravity: { x, y, z }, rotationRate: { alpha: rot, beta: 5, gamma: 5 } }));
     const gaps = [250, 900, 400, 1500, 350, 700, 1200, 300];
     for (const gp of gaps) { for (let k = 0; k < 8; k++) ev(0.5, 9.5, -2, 120); ev(1.5, 12.3, -2, 120); await sl(gp); } });
+  // תיקון ראשון גרוע (±40 מ', 35 מ' מהמקום) ואז תיקון טוב – הנקודה חייבת לקפוץ למקום הנכון
+  await p.evaluate(() => { const T = window.__esh27test; T.S.pos = null; T.S.track = []; T.onGps({ latitude: 31.7905 + 35 / 111195, longitude: 34.6402, accuracy: 40 }, Date.now()); T.onGps({ latitude: 31.7905, longitude: 34.6402, accuracy: 4 }, Date.now()); });
+  const snap = await p.evaluate(() => { const T = window.__esh27test, d = T.enu({ lat: 31.7905, lon: 34.6402 }, T.S.pos); return Math.hypot(d.x, d.y); });
+  check(snap < 1, 'תיקון GPS מדויק מחליף תיקון גרוע: ' + snap.toFixed(1) + ' מ\' מהמקום האמיתי');
   // עמידה במקום עם רעש GPS של ±3 מ' – המהירות חייבת להישאר אפס
   for (let i = 0; i < 8; i++) { await ctx.setGeolocation({ latitude: 31.7905 + (Math.random() - .5) * 5 / 111195, longitude: 34.6402 + (Math.random() - .5) * 5 / 94600, accuracy: 3 }); await p.waitForTimeout(400); }
   const still = await p.evaluate(() => window.__esh27test.S.speed);
@@ -29,7 +33,7 @@ const { chromium } = require('playwright');
   for (let i = 0; i < 14; i++) {
     lat += 1.2 / 111195; await ctx.setGeolocation({ latitude: lat, longitude: 34.6402, accuracy: 5 });
     await p.evaluate(() => { const ev = (x, y, z) => window.dispatchEvent(Object.assign(new Event('devicemotion'), { accelerationIncludingGravity: { x, y, z }, rotationRate: { alpha: 1, beta: 1, gamma: 1 } }));
-      for (let k = 0; k < 20; k++) ev(0.2, 9.7, -0.4); ev(0.2, 12.5, -0.4);
+      for (let k = 0; k < 20; k++) ev(0.2, 9.7, -0.4); ev(0.2, 11.3, -0.4);
       window.dispatchEvent(Object.assign(new Event('deviceorientationabsolute'), { absolute: true, alpha: 360, beta: 90, gamma: 0 })); });
     await p.waitForTimeout(600);
   }
