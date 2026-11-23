@@ -50,7 +50,8 @@ SRC_CODE = {"M_laser": "M", "M_lidar": "M", "M_floors": "M", "O_3d": "O", "H_osm
             "D_ndsm": "D", "B_ghsl": "B", "N_knn": "N", "R_rule": "R"}
 SRC_HE = {"M": "נמדד/אושר בשטח", "O": "מודל תלת־ממד רשמי", "H": "גובה מ-OSM", "L": "קומות מ-OSM",
           "V": "Overture", "S": "צילום חזית + AI", "P": "תב\"ע מאושרת", "G": "GlobalBuildingAtlas",
-          "F": "3D-GloBFP", "D": "מודל פני שטח פחות קרקע", "B": "GHSL", "N": "בניינים שכנים", "R": "כלל אצבע"}
+          "F": "3D-GloBFP", "D": "מודל פני שטח פחות קרקע", "B": "GHSL", "N": "בניינים שכנים", "R": "כלל אצבע",
+          "Q": "מקור מתועד (רשימה/CTBUH)"}  # Q: נכתב לאריחים רק דרך integration/tools/apply_height_overrides.py
 # Native support for twin/imint methods (sigma comes per estimate).
 IMINT_KEYS = {"I_stereo": "T", "I_relief": "E", "I_floors": "K", "I_svm": "W", "I_shadow": "C"}
 IMINT_NATIVE = True

@@ -1,0 +1,20 @@
+{
+  "v": 1,
+  "date": "2026-11-23",
+  "frame": "אריחי הדגימה של אשדוד (tiles/v/164_632); הזיהוי לפי מזהה OSM מתוך twin/groundtruth/ashdod_reference.csv – לא לפי קואורדינטות",
+  "units": "h, s במטרים; בכתיבה לאריח – דצימטרים",
+  "src_code": "Q = מקור מתועד (רשימה/CTBUH) – לא נמדד בשטח",
+  "origin": "משימה 3 בלוח התיאום; חבילת Gemini twin_ashdod_towers_geoint_v1 נבדקה – רק 3 מגדלים עם מקור מאומת ועם טביעה מזוהה נכנסו",
+  "buildings": [
+    { "id": "w358974561", "ref": "ASH-001", "name": "K Tower 1", "h": 142, "s": 6, "f": 40, "fl": 40, "fh": 42, "c": 1,
+      "sources": ["https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Israel (142 m, 40 fl – נבדק 23.11.2026)"],
+      "sigma_basis": "aroundus.com / Gemini: 148 מ' → σ = ההפרש בין המקורות", "before": { "h": 60, "s": 20, "f": 20, "src": "R" } },
+    { "id": "w358974559", "ref": "ASH-002", "name": "K Tower 2", "h": 138, "s": 10, "f": 40, "fl": 40, "fh": 42, "c": 1,
+      "sources": ["https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Israel (138 m, 40 fl – נבדק 23.11.2026)"],
+      "sigma_basis": "aroundus.com / Gemini: 148 מ' → σ = ההפרש", "before": { "h": 25, "s": 9, "f": 8, "src": "R" } },
+    { "id": "w189733330", "ref": "ASH-003", "name": "Dimri Tower (מגדלי דמארי)", "h": 157, "s": 6, "f": 45, "fl": 44, "fh": 46, "c": 2,
+      "sources": ["https://www.skyscrapercenter.com/building/dimri-tower/49478 (CTBUH: 160 m, 46 fl)", "https://en.wikipedia.org/wiki/List_of_tallest_buildings_in_Israel (154 m, 44 fl – נבדק 23.11.2026)"],
+      "sigma_basis": "אמצע 154–160 מ', σ מכסה את שני המקורות; c=בינוני כי טביעת OSM מתויגת building=construction (3,337 מ\"ר) וייתכן שהיא כל המגרש", "before": { "h": 60, "s": 20, "f": 20, "src": "R" } }
+  ],
+  "rejected_from_gemini": "14 שורות: גובה מחושב מקומות × גובה קומה (משוער) ו/או נקודה שאינה נופלת על טביעת OSM מזוהה (8–147 מ' מהבניין הקרוב); ITM בטבלה שגוי למגדלי K (401 מ' מהמרת הקואורדינטות שבאותה שורה); 148 מ' / 141.52 מ' מצוטטים מדפי ויקיפדיה בעברית שאינם קיימים (url_not_found). פירוט: build-assets-report.md"
+}

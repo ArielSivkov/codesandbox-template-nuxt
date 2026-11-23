@@ -22,7 +22,7 @@ if (MAN.crs !== 'EPSG:2039') console.warn('crs', MAN.crs);
 const TILE = MAN.tile_m;
 const [GX0, GY0, GX1, GY1] = MAN.bbox_itm;
 const VO = { x: Math.round((GX0 + GX1) / 2), n: Math.round((GY0 + GY1) / 2) };   // ראשית תצוגה: מרכז התחום (ITM אמיתי נשאר מחוץ ל-Float32)
-const SRC_HE = { M: 'נמדד/אושר בשטח', O: 'מודל תלת־ממד רשמי', H: 'גובה מ-OSM', L: 'קומות מ-OSM', V: 'Overture', S: 'צילום חזית + AI', P: 'תב"ע מאושרת', G: 'GlobalBuildingAtlas', F: '3D-GloBFP', D: 'פני שטח פחות קרקע', B: 'GHSL', N: 'בניינים שכנים', R: 'כלל אצבע' };
+const SRC_HE = { M: 'נמדד/אושר בשטח', O: 'מודל תלת־ממד רשמי', H: 'גובה מ-OSM', L: 'קומות מ-OSM', V: 'Overture', S: 'צילום חזית + AI', P: 'תב"ע מאושרת', G: 'GlobalBuildingAtlas', F: '3D-GloBFP', D: 'פני שטח פחות קרקע', B: 'GHSL', N: 'בניינים שכנים', R: 'כלל אצבע', Q: 'מקור מתועד (רשימה/CTBUH)' };
 const CONF_HE = ['מאומת', 'גבוה', 'בינוני', 'נמוך'];
 
 // ---------- מדידות שטח (אותו מפתח כמו המפה המקורית – המדידות עוברות) ----------
