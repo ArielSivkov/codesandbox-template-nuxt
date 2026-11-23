@@ -19,6 +19,8 @@ const { chromium } = require('playwright');
   // עמידה במקום עם רעש GPS של ±3 מ' – המהירות חייבת להישאר אפס
   for (let i = 0; i < 8; i++) { await ctx.setGeolocation({ latitude: 31.7905 + (Math.random() - .5) * 5 / 111195, longitude: 34.6402 + (Math.random() - .5) * 5 / 94600, accuracy: 3 }); await p.waitForTimeout(400); }
   const still = await p.evaluate(() => window.__esh27test.S.speed);
+  const drift = await p.evaluate(() => { const S = window.__esh27test.S, d = window.__esh27test.enu({ lat: 31.7905, lon: 34.6402 }, S.pos); return { m: Math.hypot(d.x, d.y), n: S.track.length, dist: S.dist }; });
+  check(drift.m < 1.5 && drift.n <= 2 && drift.dist < 0.5, 'עמידה: הנקודה לא זזה במפה (' + drift.m.toFixed(2) + ' מ\', ' + drift.n + ' נקודות מסלול, ' + drift.dist.toFixed(1) + ' מ\' מרחק)');
   check(still < 0.3, 'עמידה עם רעש GPS: מהירות ' + still.toFixed(2) + ' מ/ש (צריך ≈0)');
   const sitSteps = await p.evaluate(() => window.__esh27test.S.steps);
   check(sitSteps === 0, 'ישיבה וסיבוב: ' + sitSteps + ' צעדים (צריך 0)');

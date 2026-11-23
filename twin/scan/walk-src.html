@@ -135,6 +135,9 @@ function hold(){var g0=S.grav;if(!g0)return null;var an=((screen.orientation&&sc
 function onGps(c,t){
   var p={lat:c.latitude,lon:c.longitude,acc:c.accuracy||50};S.gps={lat:p.lat,lon:p.lon,acc:p.acc,alt:c.altitude,altAcc:c.altitudeAccuracy,heading:c.heading,speed:c.speed,t:t};S.gpsT=Date.now();
   if(!S.pos){S.pos={lat:p.lat,lon:p.lon,acc:p.acc};S.track.push({lat:p.lat,lon:p.lon});return;}
+  // עמידה במקום: כל עוד לא הולכים, קפיצות GPS בתוך טווח הדיוק לא מזיזות את הנקודה (עדכון מהירות-אפס)
+  var still=!S.walking&&!(c.speed>0.5);var jd=enu(S.pos,p),jm=Math.hypot(jd.x,jd.y);
+  if(still&&jm<Math.max(4,1.5*p.acc)){S.pos.acc=Math.max(2,Math.min(S.pos.acc,p.acc));return;}
   // מסנן משולב: משקל לפי הדיוק של כל מקור
   var k=Math.min(1,Math.max(0.15,(S.pos.acc*S.pos.acc)/(S.pos.acc*S.pos.acc+p.acc*p.acc)));
   var d=enu(S.pos,p);var np=moveLL(S.pos,d.x*k,d.y*k);np.acc=Math.sqrt((1-k))*S.pos.acc+0.5;np.acc=Math.max(Math.min(np.acc,p.acc),2);
@@ -142,8 +145,8 @@ function onGps(c,t){
   if(c.speed!=null&&c.speed>0.4&&c.heading!=null&&!isNaN(c.heading)){S.course=c.heading;S.speed=c.speed;}
 }
 function advance(np){var last=S.track[S.track.length-1];var d=enu(last,np),m=Math.hypot(d.x,d.y);
-  S.pos=np;var now=Date.now();S.mv=(S.mv||[]).concat([[now,m]]).filter(function(x){return now-x[0]<4000;});S.trk=(S.trk||[]).concat([[now,np.lat,np.lon]]).filter(function(x){return now-x[0]<5000;});if(!S.gps||S.gps.speed==null||isNaN(S.gps.speed)){var f0=S.trk[0],dsp=enu({lat:f0[1],lon:f0[2]},np),dt=Math.max(1,(now-f0[0])/1000),dm=Math.hypot(dsp.x,dsp.y);S.speed=dm>Math.max(2,np.acc*0.8)?dm/dt:0;}   // מהירות מהתזוזה נטו (לא מסכום הקפיצות של ה-GPS), ורק מעל רעש הדיוק
-if(m>=0.8){S.track.push({lat:np.lat,lon:np.lon});if(S.on&&(S.walking||S.speed>0.4))S.dist+=m;if(m>1.5&&!S.course)S.course=(Math.atan2(d.x,d.y)/R+360)%360;if(S.track.length>2000)S.track.shift();}}
+  S.pos=np;var now=Date.now();if(!S.on){S.track=[{lat:np.lat,lon:np.lon}];return;}S.mv=(S.mv||[]).concat([[now,m]]).filter(function(x){return now-x[0]<4000;});S.trk=(S.trk||[]).concat([[now,np.lat,np.lon]]).filter(function(x){return now-x[0]<5000;});if(!S.gps||S.gps.speed==null||isNaN(S.gps.speed)){var f0=S.trk[0],dsp=enu({lat:f0[1],lon:f0[2]},np),dt=Math.max(1,(now-f0[0])/1000),dm=Math.hypot(dsp.x,dsp.y);S.speed=dm>Math.max(2,np.acc*0.8)?dm/dt:0;}   // מהירות מהתזוזה נטו (לא מסכום הקפיצות של ה-GPS), ורק מעל רעש הדיוק
+if(m>=0.8){S.track.push({lat:np.lat,lon:np.lon});if(S.walking||S.speed>0.4)S.dist+=m;if(m>1.5&&!S.course)S.course=(Math.atan2(d.x,d.y)/R+360)%360;if(S.track.length>2000)S.track.shift();}}
 function onStep(){S.steps++;if(!S.pos||S.head==null)return;var L=0.72;   // אורך צעד משוער
   var np=moveLL(S.pos,Math.sin(S.head*R)*L,Math.cos(S.head*R)*L);np.acc=S.pos.acc+0.3;advance(np);}
 // צעד אמיתי: שיא תאוצה + קצב קבוע (0.3–1 ש') של לפחות 4 שיאים ברצף, ובלי סיבוב מהיר של הטלפון. ישיבה וסיבוב בכיסא לא נספרים.
@@ -178,7 +181,7 @@ function frame(){
   if(h){var okP=Math.abs(h.pitch)<20,okR=Math.abs(h.roll)<12;dot('dHold',okP&&okR?'✓ אחיזה טובה':'הטיה '+Math.round(h.pitch)+'°',okP&&okR?'ok':'warn');}
   // שורת "איפה אני"
   if(S.pos&&Date.now()-lastPlaceT>1500){lastPlaceT=Date.now();var near=nearest(S.pos);
-    $('place').textContent=near?(near.d<60?'ליד '+near.n:near.n+' · '+Math.round(near.d)+' מ\' '+dirName(near.b)):'אשדוד';
+    $('place').textContent=near&&near.d<800?(near.d<60?'ליד '+near.n:near.n+' · '+Math.round(near.d)+' מ\' '+dirName(near.b)):'אשדוד';
     var T=S.track,a0=T[Math.max(0,T.length-6)],a1=T[T.length-1];if(a0&&a1){var dd=enu(a0,a1);if(Math.hypot(dd.x,dd.y)>2)S.course=(Math.atan2(dd.x,dd.y)/R+360)%360;}
     var mv=S.on&&S.speed>0.3?'הולך '+dirName(S.course)+' · '+(S.speed*3.6).toFixed(1)+' קמ"ש':(S.on?'עומד':'מוכן');
     $('sub').textContent=mv+' · '+S.pos.lat.toFixed(5)+', '+S.pos.lon.toFixed(5);}
@@ -256,7 +259,7 @@ $('begin').onclick=function(){if(!S.key&&$('key').value)S.key=$('key').value.tri
   Promise.all(ask).catch(function(){}).then(function(){sensors();return startCam();})
   .then(function(){$('intro').style.display='none';guide('לחץ התחל והתחל ללכת');},function(e){$('introMsg').textContent='לא הצלחתי לפתוח מצלמה: '+e.message;sensors();setTimeout(function(){$('intro').style.display='none';},1500);});
   if(S.key)fetch('/api/ping',{headers:{'X-Key':S.key}}).then(function(r){return r.json();}).then(function(j){if(!j.key_ok){dot('dUp','⚠️ מפתח שגוי','bad');}}).catch(function(){});};
-$('go').onclick=function(){S.on=!S.on;this.textContent=S.on?'עצור':'התחל';this.className=S.on?'on':'';if(S.on){S.lastShotPos=null;guide('הולכים 🚶 – הסורק מצלם לבד');setTimeout(function(){guide('');},2500);}else guide('נעצר ✋');log(S.on?'התחלה':'עצירה');};
+$('go').onclick=function(){S.on=!S.on;this.textContent=S.on?'עצור':'התחל';this.className=S.on?'on':'';if(S.on){S.lastShotPos=null;S.track=S.pos?[{lat:S.pos.lat,lon:S.pos.lon}]:[];S.dist=0;guide('הולכים 🚶 – הסורק מצלם לבד');setTimeout(function(){guide('');},2500);}else guide('נעצר ✋');log(S.on?'התחלה':'עצירה');};
 $('openTools').onclick=function(){$('tools').className='open';if(window.__esh27measure)window.__esh27measure.redraw();};$('closeTools').onclick=function(){$('tools').className='';};
 $('tbM').onclick=function(){$('tbM').className='on';$('tbS').className='';$('paneM').hidden=false;$('paneS').hidden=true;};
 $('tbS').onclick=function(){$('tbS').className='on';$('tbM').className='';$('paneS').hidden=false;$('paneM').hidden=true;};
