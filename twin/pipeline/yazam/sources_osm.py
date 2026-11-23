@@ -11,6 +11,9 @@ Normalised record shapes (geometry already in ITM metres, shapely objects):
   water:    Polygon (lakes, reservoirs, riverbanks, ponds)
   boundary: Polygon|MultiPolygon (admin_level=8 municipality) or None
   road:     {"geom": LineString, "cls": int, "name": str}
+  green:    {"geom": Polygon|MultiPolygon, "tags": {...}, "cls": int}   (vegetation.classify; parks, wood, sand, beach ...)
+  trees:    {"x": float, "y": float, "tags": {...}}                    (natural=tree nodes; species/genus/leaf_type kept)
+  tree_rows:{"geom": LineString, "tags": {...}}                        (natural=tree_row)
 """
 from __future__ import annotations
 
@@ -25,6 +28,7 @@ from shapely.geometry import LineString, Polygon, MultiPolygon, shape
 from shapely.ops import polygonize, unary_union, transform as shp_transform
 
 from .geo import to_itm, _tf
+from . import vegetation as veg
 
 OVERPASS_URLS = [
     os.environ.get("OVERPASS_URL", "https://overpass-api.de/api/interpreter"),
@@ -73,6 +77,17 @@ way["natural"="coastline"]({b}); out geom;
 );
 out tags geom;
 way["highway"]({b}); out tags geom;
+(
+  way["natural"~"^(wood|scrub|heath|sand|beach|dune|grassland|tree_row)$"]({b});
+  relation["natural"~"^(wood|scrub|heath|sand|beach|dune|grassland)$"]["type"="multipolygon"]({b});
+  way["landuse"~"^(grass|meadow|forest|cemetery|orchard|farmland|village_green|recreation_ground)$"]({b});
+  relation["landuse"~"^(grass|meadow|forest|cemetery|orchard|farmland)$"]["type"="multipolygon"]({b});
+  way["leisure"~"^(park|garden|pitch|golf_course|nature_reserve)$"]({b});
+  relation["leisure"~"^(park|garden|nature_reserve)$"]["type"="multipolygon"]({b});
+  way["amenity"="grave_yard"]({b});
+);
+out tags geom;
+node["natural"="tree"]({b}); out body;
 {city}"""
 
 
@@ -114,12 +129,22 @@ def _relation_polygon(el):
     return g if not g.is_empty else None
 
 
+def _empty():
+    return {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": [],
+            "green": [], "trees": [], "tree_rows": []}
+
+
 def parse_overpass(js, city_name=None):
-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
+    out = _empty()
     for el in js.get("elements", []):
         tags = el.get("tags", {})
         t = el["type"]
         geom = None
+        if t == "node":
+            if tags.get("natural") == "tree" and "lon" in el:
+                x, y = to_itm(el["lon"], el["lat"])
+                out["trees"].append({"x": x, "y": y, "tags": tags})
+            continue
         if t == "way":
             c = _way_coords(el)
             if len(c) < 2:
@@ -132,6 +157,9 @@ def parse_overpass(js, city_name=None):
                 out["roads"].append({"geom": _itm_geom(LineString(c)),
                                      "cls": ROAD_CLASS.get(tags["highway"], 0),
                                      "name": tags.get("name:he") or tags.get("name", "")})
+                continue
+            if tags.get("natural") == "tree_row":
+                out["tree_rows"].append({"geom": _itm_geom(LineString(c)), "tags": tags})
                 continue
             if not closed:
                 continue
@@ -152,6 +180,8 @@ def parse_overpass(js, city_name=None):
             out["buildings"].append({"id": f"{t[0]}{el['id']}", "geom": geom, "tags": tags})
         elif _is_water(tags):
             out["water"].append(geom)
+        elif veg.classify(tags) is not None:
+            out["green"].append({"geom": geom, "tags": tags, "cls": veg.classify(tags)})
     return out
 
 
@@ -179,15 +209,30 @@ def pbf(path, bbox, city_name=None):
     src, cut = _extract_bbox(path, bbox)
     w, s, e, n = bbox
     fab = osmium.geom.WKBFactory()
-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
+    out = _empty()
 
     def inside(g):
         minx, miny, maxx, maxy = g.bounds
         return not (maxx < w or minx > e or maxy < s or miny > n)
 
     class H(osmium.SimpleHandler):
+        def node(self, nd):
+            if nd.tags.get("natural") == "tree":
+                lon, lat = nd.location.lon, nd.location.lat
+                if w <= lon <= e and s <= lat <= n:
+                    x, y = to_itm(lon, lat)
+                    out["trees"].append({"x": x, "y": y, "tags": dict(nd.tags)})
+
         def way(self, wy):
             tags = dict(wy.tags)
+            if tags.get("natural") == "tree_row":
+                try:
+                    g = swkb.loads(fab.create_linestring(wy), hex=True)
+                except Exception:
+                    return
+                if inside(g):
+                    out["tree_rows"].append({"geom": _itm_geom(g), "tags": tags})
+                return
             if tags.get("natural") == "coastline" or ("highway" in tags and "building" not in tags):
                 try:
                     g = swkb.loads(fab.create_linestring(wy), hex=True)
@@ -206,7 +251,8 @@ def pbf(path, bbox, city_name=None):
             is_b = "building" in tags
             is_city = (tags.get("boundary") == "administrative" and tags.get("admin_level") == "8"
                        and city_name and city_name in (tags.get("name"), tags.get("name:he"), tags.get("name:en")))
-            if not (is_b or is_city or _is_water(tags)):
+            green_cls = None if (is_b or is_city or _is_water(tags)) else veg.classify(tags)
+            if not (is_b or is_city or _is_water(tags) or green_cls is not None):
                 return
             try:
                 g = swkb.loads(fab.create_multipolygon(a), hex=True)
@@ -224,6 +270,8 @@ def pbf(path, bbox, city_name=None):
                     g = g.geoms[0]
                 oid = ("w" if a.from_way() else "r") + str(a.orig_id())
                 out["buildings"].append({"id": oid, "geom": g, "tags": tags})
+            elif green_cls is not None:
+                out["green"].append({"geom": g, "tags": tags, "cls": green_cls})
             else:
                 out["water"].append(g)
 
@@ -235,9 +283,10 @@ def pbf(path, bbox, city_name=None):
 
 # ---------------------------------------------------------------- GeoJSON (tests / any provider)
 def from_geojson(path):
-    """FeatureCollection in WGS84 with properties.kind in {building, coast, water, boundary, road}."""
+    """FeatureCollection in WGS84 with properties.kind in {building, coast, water, boundary, road,
+    green, tree, tree_row} (green/tree/tree_row carry OSM tags in properties.tags)."""
     fc = json.load(open(path, encoding="utf-8"))
-    out = {"buildings": [], "coast": [], "water": [], "boundary": None, "roads": []}
+    out = _empty()
     for f in fc["features"]:
         p = f.get("properties", {}) or {}
         g = _itm_geom(shape(f["geometry"]))
@@ -252,4 +301,12 @@ def from_geojson(path):
             out["boundary"] = g
         elif k == "road":
             out["roads"].append({"geom": g, "cls": int(p.get("cls", 1)), "name": p.get("name", "")})
+        elif k == "green":
+            tags = p.get("tags", {})
+            if veg.classify(tags) is not None:
+                out["green"].append({"geom": g, "tags": tags, "cls": veg.classify(tags)})
+        elif k == "tree":
+            out["trees"].append({"x": g.x, "y": g.y, "tags": p.get("tags", {})})
+        elif k == "tree_row":
+            out["tree_rows"].append({"geom": g, "tags": p.get("tags", {})})
     return out

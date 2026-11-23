@@ -2,7 +2,8 @@
 // הרצה: node tests/procgen.test.js
 const fs = require('fs'), zlib = require('zlib'), path = require('path'), assert = require('assert');
 const PG = require('../js/procgen.js'), I = require('../js/itm.js');
-const TD = '/home/claude/swarm/b6/map/data/tiles/v/';
+// מקור אמת אחד: פלט הצינור (twin/pipeline/sample-out-ashdod) – זהה בבתים לעותק במנוע
+const TD = path.join(__dirname, '../../pipeline/sample-out-ashdod/tiles/v/');
 const rules = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/style_rules.json'), 'utf8'));
 const load = k => JSON.parse(zlib.gunzipSync(fs.readFileSync(TD + k + '.json.gz')));
 let n = 0; const t = (name, fn) => { fn(); n++; console.log('✓', name); };

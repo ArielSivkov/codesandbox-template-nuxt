@@ -17,7 +17,7 @@ const sp = c => V.SPECIES_DB.species.find(s => s.code === c);
 test('species.data.js is generated from species.json (one source of truth)', () => {
   const j = JSON.parse(fs.readFileSync(HERE + 'species.json', 'utf8'));
   assert.deepEqual(V.SPECIES_DB, j);
-  const pj = JSON.parse(fs.readFileSync(HERE + 'pipeline_work/yazam/species_veg.json', 'utf8'));
+  const pj = JSON.parse(fs.readFileSync(HERE + '../pipeline/yazam/species_veg.json', 'utf8'));
   assert.deepEqual(pj, j);
 });
 

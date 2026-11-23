@@ -78,6 +78,9 @@ def main(argv=None):
     ap.add_argument("--measurements", help="JSON from the correction loop (worker /api/corrections export)")
     ap.add_argument("--out", default=os.path.join(HERE, "out"))
     ap.add_argument("--context-m", type=float, default=300.0, help="buffer around city boundary")
+    ap.add_argument("--no-green", action="store_true", help="skip the vegetation layer (tiles/g)")
+    ap.add_argument("--tree-slots", help="street-tree slots JSON from the transport team [{x,y,cls,street}] ITM")
+    ap.add_argument("--ndvi", help="Sentinel-2 NDVI .npz on the ITM 10 m grid (see vegetation.load_ndvi_npz)")
     args = ap.parse_args(argv)
     t0 = time.time()
     city = load_city(args)
@@ -227,6 +230,22 @@ def main(argv=None):
     m = tiles.write_manifest(args.out, city, keys, study, stats, sources_used, heights.SIGMA,
                              extra={"attribution": " | ".join(sorted(set(sources_used.values())))})
     tiles.update_index(args.out, m)
+
+    # ---------------------------------------------------------------- 8. vegetation layer (tiles/g)
+    if not args.no_green:
+        from yazam import vegetation
+        slots = json.load(open(args.tree_slots, encoding="utf-8")) if args.tree_slots else None
+        nd = vegetation.load_ndvi_npz(args.ndvi) if args.ndvi else None
+        gsrc = {"osm_green": f"{len(osm.get('green', []))} polygons, {len(osm.get('trees', []))} trees, "
+                             f"{len(osm.get('tree_rows', []))} tree rows"}
+        if slots:
+            gsrc["slots"] = f"transport: {len(slots)} slots"
+        if nd:
+            gsrc["ndvi"] = ("SYNTHETIC FIXTURE " if nd["synthetic"] else "Sentinel-2 L2A ") + nd["scene"]
+        gt = vegetation.build_green(args.out, keys, osm.get("green", []), osm.get("trees", []),
+                                    osm.get("tree_rows", []), slots, nd)
+        gs = vegetation.write_green(args.out, gt, city["slug"], gsrc)
+        log("green:", gs["plants"], "plants by source", gs["by_src"])
     log("done:", json.dumps(stats, ensure_ascii=False))
     return m
 

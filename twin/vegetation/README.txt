@@ -6,12 +6,12 @@
 -----
 species.json               מקור אמת אחד: 20 מינים + קרקע (מדשאה/שטח פתוח/חולית/חוף), גובה, קוטר, נשיר/ירוק-עד,
                            עלווה ופריחה חודשית, צבעים, מקורות (src) ומה משוער (est). משקלות שיבוץ (palettes) משוערים.
-species.data.js            נוצר מ-species.json (tools/gen_species_js.py) – גם מעתיק ל-pipeline_work/yazam/species_veg.json
+species.data.js            נוצר מ-species.json (tools/gen_species_js.py) – גם מעתיק ל-twin/pipeline/yazam/species_veg.json
 vegetation.js              מודול ES ל-three r186 (מקבל THREE מבחוץ). מודלים פרוצדורליים, אינסטנסים, רוח, עונות, LOD, קרקע.
 demo.html                  הדגמה על דגימת אשדוד: רחוב/פארק/חולות/חוף/מסוק, בורר חודש, מחוון רוח, מונה ביצועים.
 data/                      עותק דגימת אשדוד + השכבה החדשה tiles/g (79 אריחים, 1.5MB gz) + cities/ashdod/green.json
 vegetation-pipeline.patch  טלאי לצינור twin/pipeline (git apply --check עובר; 46 בדיקות עוברות אחרי החלה)
-pipeline_work/             עותק הצינור עם הטלאי מוחל (yazam/vegetation.py, sources_osm.py, build_city.py, tests/test_vegetation.py)
+pipeline_work/ (בוטל)       הטלאי הוחל על twin/pipeline ב-23.11.2026 – הקבצים שם (yazam/vegetation.py, sources_osm.py, build_city.py, tests/test_vegetation.py)
 test/vegetation.test.mjs   9 בדיקות JS  →  cd /home/claude/swarm/vegetation && node --test test/*.test.mjs
 fixtures/ndvi_SYNTHETIC_ashdod_4tiles.npz   NDVI סינתטי (מסומן) להרצת מסלול ה-NDVI. NDVI-DESIGN.txt – התכנון האמיתי.
 tools/shoot.cjs            צילומי Playwright 360x800 → shots/   (PORT=8771, שרת סטטי בתיקייה)
