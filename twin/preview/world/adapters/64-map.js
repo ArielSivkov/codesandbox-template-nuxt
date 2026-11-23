@@ -4,6 +4,10 @@
  * קואורדינטות: סצנה → מסגרת הדגימה (toITM) → ITM אמיתי (+sampleOffset) → WGS84 (itm.js). בכיוון ההפוך לקפיצה.
  * מחוץ לישראל: אין עדיין עולם תלת־ממד – המפה מראה, הקפיצה מודיעה (שלב המנוע הגלובלי).
  * ?maptiles=<url עם {z}/{x}/{y}> מחליף מקור אריחים. ?map=0 מכבה.
+ * ווים להרחבה (נוספו 23.11.2026 עבור 68-map-layers.js, שינוי מינימלי):
+ *   M.layers = [f(ctx, view)] – נקראות אחרי ציור האריחים ולפני הסיכות; view = { w, h, zi, sc, cxp, cyp, toPx(lat, lon) }.
+ *   M.onTap(ll, px, py, dbl) – נקרא בכל הקשה; מחזיר true = ההקשה טופלה (בלי בחירת נקודה/זום כפול).
+ *   M.pxToLL, M.zoomAt, M.el – גישה לקריאה/הזזה מהמודול המרחיב.
  */
 (function () {
   if (/[?&]map=0\b/.test(location.search)) return;
@@ -30,7 +34,7 @@
 #yzMap .pk .n{font-size:11px;color:#f6cf7f;margin-top:4px}
 `; document.head.appendChild(css);
 
-  const M = { lat: 31.80, lon: 34.65, z: 15, open: false, pick: null, tiles: new Map(), ptrs: new Map(), drag: null, pinch: null, dirty: true };
+  const M = { lat: 31.80, lon: 34.65, z: 15, open: false, pick: null, tiles: new Map(), ptrs: new Map(), drag: null, pinch: null, dirty: true, layers: [], onTap: null };
   window.YZMap = M;
   let W, el, cv, cx, pk;
 
@@ -69,6 +73,7 @@
       else { const p = parentImg(zi, ((tx % 2 ** zi) + 2 ** zi) % 2 ** zi, ty); if (p) cx.drawImage(p.t.img, p.sx, p.sy, TS / 2 ** p.d, TS / 2 ** p.d, sx, sy, sz, sz); }
     }
     const toPx = (lat, lon) => ({ x: (lon2x(lon, zi) - cxp) * sc + w / 2, y: (lat2y(lat, zi) - cyp) * sc + h / 2 });
+    for (const f of M.layers) { try { cx.save(); f(cx, { w, h, zi, sc, cxp, cyp, toPx }); } catch (e) { console.warn('map layer', e); } finally { cx.restore(); } }   // וו שכבות (68-map-layers)
     // בית
     if (W.home && W.coords.toScene) { const s = W.coords.toScene(W.home.E, W.home.N), ll = sceneToLL(s.x, s.z); if (ll) { const p = toPx(ll.lat, ll.lon); cx.font = '20px system-ui'; cx.textAlign = 'center'; cx.fillText('🏠', p.x, p.y + 7); } }
     // נקודה שנבחרה
@@ -111,13 +116,13 @@
     M.open = true; el.classList.add('open'); pk.style.display = M.pick ? 'block' : 'none'; M.dirty = true; requestAnimationFrame(loop);
   }
   function close() { M.open = false; el.classList.remove('open'); M.ptrs.clear(); M.drag = M.pinch = null; }
-  M.openMap = open; M.close = close; M.choose = choose; M.sceneToLL = sceneToLL; M.llToSample = llToSample;
+  M.openMap = open; M.close = close; M.choose = choose; M.sceneToLL = sceneToLL; M.llToSample = llToSample; M.pxToLL = pxToLL; M.zoomAt = zoomAt;
 
   function ui() {
     el = document.createElement('div'); el.id = 'yzMap'; el.setAttribute('role', 'dialog'); el.setAttribute('aria-label', 'מפה');
     el.innerHTML = `<canvas></canvas><div class="tb"><button class="btn" id="yzMapX" aria-label="סגירה">✕</button><h2>🗺 מפה · הקישו על נקודה</h2><button class="btn" id="yzMapMe" aria-label="למיקום שלי">◎</button></div>
       <div class="zm"><button class="btn" id="yzMapZi" aria-label="הגדלה">＋</button><button class="btn" id="yzMapZo" aria-label="הקטנה">－</button></div><div class="pk"></div><div class="at">${esc(ATTR)}</div>`;
-    document.body.appendChild(el); cv = el.querySelector('canvas'); cx = cv.getContext('2d'); pk = el.querySelector('.pk');
+    document.body.appendChild(el); M.el = el; cv = el.querySelector('canvas'); cx = cv.getContext('2d'); pk = el.querySelector('.pk');
     el.querySelector('#yzMapX').onclick = close;
     el.querySelector('#yzMapMe').onclick = () => { const me = sceneToLL(W.player.pos.x, W.player.pos.z); if (me) { M.lat = me.lat; M.lon = me.lon; if (M.z < 15) M.z = 15; M.dirty = true; } };
     el.querySelector('#yzMapZi').onclick = () => zoomAt(Math.round(M.z) + 1, cv.clientWidth / 2, cv.clientHeight / 2);
@@ -133,7 +138,8 @@
       else if (M.drag) { const d = M.drag; if (Math.hypot(e.offsetX - d.x0, e.offsetY - d.y0) > 8) d.moved = true; if (d.moved) pan(e.offsetX - d.x, e.offsetY - d.y); d.x = e.offsetX; d.y = e.offsetY; } });
     const up = e => { const d = M.drag; M.ptrs.delete(e.pointerId); if (M.ptrs.size < 2) M.pinch = null;
       if (M.ptrs.size === 0) { if (d && !d.moved && performance.now() - d.t < 500 && e.type === 'pointerup') { const now = performance.now();
-          if (now - lastTap < 300) zoomAt(M.z + 1, e.offsetX, e.offsetY); else choose(pxToLL(e.offsetX, e.offsetY)); lastTap = now; }
+          const dbl = now - lastTap < 300, ll = pxToLL(e.offsetX, e.offsetY);
+          if (!(M.onTap && M.onTap(ll, e.offsetX, e.offsetY, dbl))) { if (dbl) zoomAt(M.z + 1, e.offsetX, e.offsetY); else choose(ll); } lastTap = now; }   // וו הקשה (68-map-layers)
         M.drag = null; } };
     cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     addEventListener('resize', () => { M.dirty = true; });
