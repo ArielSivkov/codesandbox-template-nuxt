@@ -14,8 +14,7 @@ MODS = {
     'physics':    (SW + '/physics',    ['dist/esh27-physics.js', 'src']),
     'weather':    (SW + '/weather',    ['weather.js']),
     'present':    (SW + '/present',    ['*']),
-    'atmosphere': (SW + '/atmosphere', ['dist/esh27-atmosphere.mjs']),
-    'shaders':    (SW + '/shaders',    ['look-pro.js']),
+    'atmosphere': (SW + '/atmosphere', ['src']),
     'buildings':  (SW + '/buildings',  ['*']),
     'audio':      (SW + '/audio',      ['*']),
     'transport':  (SW + '/transport',  ['*']),
@@ -26,13 +25,12 @@ MODS = {
     'procgen':    (SW + '/procgen',    ['js/procgen.js', 'data/style_rules.json']),
     'npc':        (SW + '/npc',        ['js', 'data']),
     'buildings':  (SW + '/buildings',  ['src']),
-    'plugins':    (SW + '/plugins',    ['buildings', '_common']),
     'sky':        (SW + '/sky',        ['dist/esh27-sky.js']),
     'assets':     (SW + '/assets/pack', ['models']),
 }
 
 # מודולים שיש להם מתאם פעיל – רק הם מועתקים (השאר נבדקים ומדווחים)
-WIRED = {'physics', 'weather', 'present', 'audio', 'maritime', 'atmosphere', 'sky', 'vegetation', 'aviation', 'procgen', 'assets', 'buildings', 'npc', 'plugins', 'shaders'}
+WIRED = {'physics', 'weather', 'present', 'audio', 'maritime', 'atmosphere', 'sky', 'vegetation', 'aviation', 'procgen', 'assets', 'buildings'}
 
 def copy_item(src, dst):
     if os.path.isdir(src):
@@ -80,8 +78,7 @@ def main():
     inj = '\n'.join(tags)
     if '<script src="js/game.js"></script>' not in html: sys.exit('game.js tag not found in index.html')
     # המארח נטען לפני game.js כדי ללכוד את הרנדרר מוקדם; המתאמים אחרי
-    EXTERNAL = [x for x in ['mods/plugins/buildings/plugin.js'] if os.path.exists(os.path.join(WORLD, x))]   # תוספים של מחלקות אחרות (נרשמים בעצמם)
-    html = html.replace('<script src="js/game.js"></script>', '<script src="host/host.js"></script>\n<script src="js/game.js"></script>\n' + '\n'.join(tags[2:] + ['<script src="%s"></script>' % x for x in EXTERNAL]))
+    html = html.replace('<script src="js/game.js"></script>', '<script src="host/host.js"></script>\n<script src="js/game.js"></script>\n' + '\n'.join(tags[2:]))
     html = html.replace('</head>', tags[0] + '\n</head>')
     html = re.sub(r'<title>.*?</title>', '<title>לוח היזם · עולם תאום · אשדוד</title>', html)
     open(ip, 'w', encoding='utf-8').write(html)
