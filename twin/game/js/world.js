@@ -635,7 +635,9 @@ W.init = async function (sc, opts) {
   W.bounds = { minx: x0 - W.OX - 300, maxx: x1 - W.OX + 300, minz: -(y1 - W.OY) - 300, maxz: -(y0 - W.OY) + 300 };
   // כיסוי מורחב: אריחי הארצי (מרכז הארץ) – ?nat=0 מכבה
   if (m.extra && !/[?&]nat=0/.test(location.search)) try {
-    const x = await fetchJSON(BASE + m.extra.index); EXTRA_BASE = BASE + m.extra.base; EXTRA = new Set(x.tiles.filter(k => !TILESET.has(k)));
+    const ov = (location.search.match(/[?&]natbase=([^&]+)/) || [])[1], abs = u => /^https?:|^\//.test(u);   // natbase= לבדיקות
+    const xb = ov ? decodeURIComponent(ov) : (abs(m.extra.base) ? m.extra.base : BASE + m.extra.base);
+    const x = await fetchJSON(ov ? xb + 'nat.json' : (abs(m.extra.index) ? m.extra.index : BASE + m.extra.index)); EXTRA_BASE = xb; EXTRA = new Set(x.tiles.filter(k => !TILESET.has(k)));
     for (const k of EXTRA) TILESET.add(k); W.extra = x;
     const [a0, b0, a1, b1] = x.bbox_sample; W.bounds = { minx: Math.min(W.bounds.minx, a0 - W.OX), maxx: Math.max(W.bounds.maxx, a1 - W.OX), minz: Math.min(W.bounds.minz, -(b1 - W.OY)), maxz: Math.max(W.bounds.maxz, -(b0 - W.OY)) };
   } catch (e) { console.warn('כיסוי ארצי לא נטען', e.message); }
