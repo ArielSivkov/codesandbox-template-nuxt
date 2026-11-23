@@ -132,5 +132,25 @@ const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).
     ok(s10 > l10 && Math.abs(s60 - l60) < 1e-9 && seaZ0(0.25) < 0.001, `ים: רוח תחנה 6 מ'/ש' → מעל הים ב-10 מ' ${s10.toFixed(2)} (יבשה ${l10.toFixed(2)}, z0 ים ≈ ${(seaZ0(0.25) * 1000).toFixed(2)} מ"מ מול 30 מ"מ), בגובה הערבוב שווה ${s60.toFixed(2)}`);
     SIM.weather.windSpeed = 6; SIM.weather.gust = 1; const seaW = { H: () => -5, near: () => [], isSea: () => true }, o = SIM.windAt(0, 10, 0, 0, seaW);
     ok(o.sea && Math.abs(Math.hypot(o.x, o.z) - s10) < 1e-9, `windAt מעל הים משתמש בפרופיל הימי (${Math.hypot(o.x, o.z).toFixed(2)} מ'/ש')`); }
+  // משימה 1: מקור אחד – סקריפט הסנכרון מחזיר 0 הבדלים בין המקור לכל העותקים
+  { const sc = require('../../integration/tools/sync-copies.js').run(true);
+    ok(sc.diffs.length === 0, `איחוד העותקים: ${sc.pairs} עותקים, ${sc.diffs.length} הבדלים${sc.diffs.length ? ' (' + sc.diffs.join(', ') + ') – הריצו node integration/tools/sync-copies.js' : ''}`); }
+  // שמש במשחק מול NREL SPA (Reda & Andreas 2008, 812 מיקומים) ומול המודול הקנוני physics/src/sun.js
+  { const REF = require('../../physics/test/spa_reference.json'), C = await import('../../physics/src/sun.js'); let eg = 0, ec = 0, ea = 0;
+    for (const q of REF.positions) { const g = SIM.sunPosition(new Date(q.ms), q.lat, q.lon, { refraction: false }), a = SIM.sunPosition(new Date(q.ms), q.lat, q.lon), c = C.sunPosition(q.ms, q.lat, q.lon);
+      const dAz = Math.abs(((g.azimuth - q.azimuth) % 360 + 540) % 360 - 180);
+      eg = Math.max(eg, Math.hypot(g.elevation - q.elevation, dAz * Math.cos(q.elevation * Math.PI / 180)));
+      ec = Math.max(ec, Math.abs(a.elevation - c.elevation)); ea = Math.max(ea, Math.abs(((a.azimuth - c.azimuth) % 360 + 540) % 360 - 180)); }
+    ok(eg < 0.02, `שמש גאומטרית מול NREL SPA: סטייה זוויתית מרבית ${eg.toFixed(4)}° ב-${REF.positions.length} מיקומים (סף 0.02°; בלי פרלקסה)`);
+    ok(ec < 0.01 && ea < 0.03, `שמש נראית (עם שבירה) מול המודול הקנוני: גובה ${ec.toFixed(4)}°, אזימוט ${ea.toFixed(4)}° (היה 0.576° באופק)`);
+    // רציפות באופק: אין קפיצה בגובה הנראה סביב −0.575° (לפני התיקון: 0.57°)
+    let jump = 0; for (let h = -2; h < 2; h += 0.001) jump = Math.max(jump, Math.abs((h + 0.001 + SIM.refraction(h + 0.001)) - (h + SIM.refraction(h))));
+    ok(jump < 0.005, `שבירה רציפה באופק: קפיצה מרבית ${jump.toFixed(4)}° לצעד 0.001° (היה 0.575°); באופק הגאומטרי ${SIM.refraction(0).toFixed(3)}° (NOAA 1735″)`);
+    let es = 0, ns = 0; for (const t of REF.sunTimes || []) { const day = `${t.y}-${String(t.m).padStart(2, '0')}-${String(t.d).padStart(2, '0')}`;
+      const off = SIM.israelOffsetMin(new Date(Date.UTC(t.y, t.m - 1, t.d, 12))), t0 = Date.UTC(t.y, t.m - 1, t.d) - off * 60000, r = SIM.sunRiseSet(day, t.lat, t.lon);
+      if (r.rise == null || r.set == null) continue; es = Math.max(es, Math.abs(t0 + r.rise * 60000 - t.sunrise), Math.abs(t0 + r.set * 60000 - t.sunset)) ; ns++; }
+    ok(ns > 50 && es < 20000, `זריחה ושקיעה במשחק מול NREL SPA: סטייה מרבית ${(es / 1000).toFixed(1)} ש' ב-${ns} ימים (סף 20 ש')`);
+    const rs = SIM.sunRiseSet('2026-06-21', LAT, LON), hm = m => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, '0')}`;
+    ok(rs.rise > 5 * 60 + 25 && rs.rise < 5 * 60 + 40 && rs.set > 19 * 60 + 40 && rs.set < 19 * 60 + 55, `זריחה/שקיעה 21.6 באשדוד (גאומטרי −0.833°): ${hm(rs.rise)} / ${hm(rs.set)}`); }
   console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); process.exit(fail ? 1 : 0);
 })();

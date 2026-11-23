@@ -9,8 +9,9 @@ const D2R = Math.PI / 180, R2D = 180 / Math.PI;
 const SIM = {};
 
 // ---------------- 1. שמש
-/** @returns {azimuth: מעלות מצפון אמיתי עם כיוון השעון, elevation: מעלות מעל האופק (כולל שבירה מעל −1°)} */
-SIM.sunPosition = function (date, latDeg, lonDeg) {
+/** @returns {azimuth: מעלות מצפון אמיתי עם כיוון השעון, elevation: גובה נראה במעלות (כולל שבירה – אותה נוסחת NOAA כמו physics/src/sun.js), elevationGeometric: בלי שבירה}
+ *  o.refraction === false → elevation גאומטרי. */
+SIM.sunPosition = function (date, latDeg, lonDeg, o) {
   const jd = date.getTime() / 86400000 + 2440587.5, T = (jd - 2451545) / 36525;
   const L0 = ((280.46646 + T * (36000.76983 + T * 0.0003032)) % 360 + 360) % 360;
   const M = 357.52911 + T * (35999.05029 - 0.0001537 * T);
@@ -26,12 +27,20 @@ SIM.sunPosition = function (date, latDeg, lonDeg) {
   const tst = ((utcMin + eot + 4 * lonDeg) % 1440 + 1440) % 1440;
   const ha = (tst / 4 - 180) * D2R, lat = latDeg * D2R;
   const cz = Math.min(1, Math.max(-1, Math.sin(lat) * Math.sin(decl) + Math.cos(lat) * Math.cos(decl) * Math.cos(ha)));
-  let el = 90 - Math.acos(cz) * R2D;
-  // שבירה אטמוספרית (NOAA, קירוב)
-  if (el > -0.575) { const te = Math.tan(el * D2R); el += (el > 5 ? 58.1 / te - 0.07 / te ** 3 + 0.000086 / te ** 5 : 1735 + el * (-518.2 + el * (103.4 + el * (-12.79 + el * 0.711)))) / 3600; }
+  const elGeo = 90 - Math.acos(cz) * R2D;
+  const el = o && o.refraction === false ? elGeo : elGeo + SIM.refraction(elGeo);
   let az = Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(lat) - Math.tan(decl) * Math.cos(lat)) * R2D + 180;
   az = (az % 360 + 360) % 360;
-  return { azimuth: az, elevation: el, declination: decl * R2D, eot };
+  return { azimuth: az, elevation: el, elevationGeometric: elGeo, declination: decl * R2D, eot };
+};
+/** שבירה אטמוספרית (מעלות, להוסיף לגובה הגאומטרי) – נוסחת NOAA המלאה (gml.noaa.gov/grad/solcalc/calcdetails.html), 1010 hPa, 10°C.
+ *  כולל הענף מתחת ל-−0.575° (−20.774/tan h): בלעדיו השמש 'קפצה' 0.57° בדיוק באופק (באג שתוקן 24.11.2026). מקורב: אטמוספרה תקנית, בלי תלות במזג האוויר. */
+SIM.refraction = function (h) {
+  if (h > 85) return 0;
+  let r; if (h > 5) { const t = Math.tan(h * D2R); r = 58.1 / t - 0.07 / t ** 3 + 0.000086 / t ** 5; }
+  else if (h > -0.575) r = 1735 + h * (-518.2 + h * (103.4 + h * (-12.79 + h * 0.711)));
+  else r = -20.774 / Math.tan(h * D2R);
+  return r / 3600;
 };
 /** וקטור יחידה לשמש בצירי העולם. gamma = התכנסות רשת ITM (מעלות): אזימוט רשת = אמיתי − gamma */
 SIM.sunVector = function (sp, gammaDeg) {
@@ -93,10 +102,11 @@ SIM.sunHours = function (o) {
   const h = c => c * step / 60;
   return { hours: h(cnt[1]), lo: h(cnt[2]), hi: h(cnt[0]), first: first < 0 ? null : first - step / 2, last: last < 0 ? null : last + step / 2, dayHours: h(day) };
 };
-/** זריחה ושקיעה (דקות מחצות שעון ישראל): השפה העליונה באופק = גובה גאומטרי של המרכז −0.833° (חצי קוטר 0.267° + שבירה תקנית 0.567°; מתחת ל-−0.575° NOAA לא מוסיף שבירה). חיפוש בינארי. */
+/** זריחה ושקיעה (דקות מחצות שעון ישראל): השפה העליונה באופק = גובה גאומטרי של המרכז −0.833° (חצי קוטר 0.267° + שבירה תקנית 0.567°, הגדרת NOAA/USNO). חיפוש בינארי. */
+const GEO = { refraction: false };
 SIM.sunRiseSet = function (day, lat, lon) {
   const [Y, M, D] = day.split('-').map(Number), off = SIM.israelOffsetMin(new Date(Date.UTC(Y, M - 1, D, 12))), t0 = Date.UTC(Y, M - 1, D) - off * 60000;
-  const f = m => SIM.sunPosition(new Date(t0 + m * 60000), lat, lon).elevation + 0.833;
+  const f = m => SIM.sunPosition(new Date(t0 + m * 60000), lat, lon, GEO).elevation + 0.833;
   let noon = 0, best = -99; for (let m = 0; m < 1440; m += 10) { const e = f(m); if (e > best) { best = e; noon = m; } }
   if (best < 0) return { rise: null, set: null, noon };
   const bis = (a, b) => { const up = f(a) < f(b); for (let i = 0; i < 40; i++) { const c = (a + b) / 2; if ((f(c) < 0) === up) a = c; else b = c; } return (a + b) / 2; };
