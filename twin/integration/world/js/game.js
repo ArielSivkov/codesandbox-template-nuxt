@@ -21,7 +21,7 @@ const BIZ = { id: (() => { try { return localStorage.getItem('w27.bizId') || '';
 const YAZAM = 'https://yazam.esh27.com/#pre=';
 const OPEN = 0.2; // חלק החזית שהוא פתחים – כמו במפת לוח היזם
 const TYPE_HE = { '': 'לא מסווג', apartments: 'בניין דירות', residential: 'מגורים', house: 'בית', detached: 'בית צמוד קרקע', semidetached_house: 'דו־משפחתי', roof: 'גגון', commercial: 'מסחרי', retail: 'קמעונאות', industrial: 'תעשייה', warehouse: 'מחסן', school: 'בית ספר', kindergarten: 'גן ילדים', university: 'אקדמיה', college: 'מכללה', public: 'ציבורי', civic: 'מבנה עירוני', synagogue: 'בית כנסת', townhall: 'בניין עירייה', hospital: 'בית חולים', office: 'משרדים', construction: 'בבנייה', hotel: 'מלון', train_station: 'תחנת רכבת', manufacture: 'ייצור', sports_centre: 'מרכז ספורט', cowshed: 'רפת' };
-const SRC_HE = { M: 'נמדד/אושר בשטח', O: 'מודל תלת־ממד רשמי', H: 'גובה מ-OSM', L: 'קומות מ-OSM', V: 'Overture', S: 'צילום חזית + AI', P: 'תב"ע מאושרת', G: 'GlobalBuildingAtlas', F: '3D-GloBFP', D: 'מודל פני שטח', B: 'GHSL', N: 'בניינים שכנים', R: 'כלל אצבע' };
+const SRC_HE = { M: 'נמדד/אושר בשטח', O: 'מודל תלת־ממד רשמי', H: 'גובה מ-OSM', L: 'קומות מ-OSM', V: 'Overture', S: 'צילום חזית + AI', P: 'תב"ע מאושרת', G: 'GlobalBuildingAtlas', F: '3D-GloBFP', D: 'מודל פני שטח', B: 'GHSL', N: 'בניינים שכנים', R: 'כלל אצבע', Q: 'מקור מתועד (רשימה/CTBUH)' };
 const CONF_HE = [['מאומת', 'ok'], ['גבוה', 'ok'], ['בינוני', 'mid'], ['נמוך', 'low']];
 const MODES = ['foot', 'car', 'heli', 'jet', 'drone'];
 const MODE_UI = { foot: ['🚶', 'רגלי'], car: ['🚗', 'רכב'], heli: ['🚁', 'מסוק'], jet: ['🎒', 'תרמיל סילון'], drone: ['🛸', 'רחפן'] };
