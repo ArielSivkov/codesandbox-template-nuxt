@@ -1,0 +1,117 @@
+"""ESH27 · מחלקת הבניינים — שדות חזית לאריחי הצינור (גדוד 5).
+
+אותם כללים כמו src/typology.js (classify) כדי שהלקוח והצינור יסכימו. מוסיף לכל רשומת בניין שדות קצרים
+(רק כשיש להם ערך, כדי לא לנפח את האריח):
+
+  ty  קוד טיפולוגיה (0..10, ראו T)                      – מכללים על תג/שם/צורה/קומות
+  gf  1 = חזית חנויות בקומת הקרקע                        – רק מנתון: נקודת shop=* / amenity מסחרית בתוך הטביעה, או building=retail/commercial
+  m   חומר חזית 0 טיח, 1 אבן, 2 בטון, 3 זכוכית            – רק מתג building:material / building:facade:material
+  e   שנת בנייה (int)                                    – רק מתג start_date / building:year / year_of_construction
+  q   שם רובע                                            – רק אם סופקו מצולעי רובעים (OSM place=quarter|neighbourhood, ODbL)
+  rs  roof:shape (המנוע כבר קורא אותו)                   – רק מתג
+  fs  מקור לכל שדה: אותיות D (נתון) / S (צורה) / R (כלל אצבע), באותו סדר כמו השדות שנכתבו
+
+ללא שדה = לא ידוע → הלקוח ממלא פרוצדורלית ומסמן זאת.
+"""
+from __future__ import annotations
+
+import math
+import re
+
+T = dict(GROUND=0, VILLA=1, WALKUP=2, RAKEVET=3, BLOCK=4, TOWER=5, COMMERCIAL=6, PUBLIC=7, INDUSTRIAL=8, ANNEX=9, LANDMARK=10)
+RE_PUBLIC = re.compile(r'בית ?כנסת|בית ?ספר|גן ילדים|היכל|מוזיאון|מתנ"?ס|בית ?חולים|מכללה|ישיבה|עירי|מונארט|synagog|school|museum', re.I)
+RE_COMM = re.compile(r'קניון|מרכז מסחרי|מרכזון|mall|seamall|סי טאוור', re.I)
+RE_TOWER = re.compile(r'טאוו?ר|tower|מגדל', re.I)
+TYP_VILLA = {'house', 'detached', 'semidetached_house', 'bungalow', 'terrace', 'villa'}
+TYP_IND = {'industrial', 'warehouse', 'manufacture', 'cowshed', 'hangar', 'storage_tank'}
+TYP_COMM = {'retail', 'commercial', 'supermarket', 'kiosk'}
+TYP_PUB = {'school', 'kindergarten', 'university', 'college', 'synagogue', 'civic', 'townhall', 'public', 'hospital',
+           'sports_centre', 'train_station', 'government', 'religious', 'museum'}
+TYP_ANNEX = {'roof', 'shed', 'garage', 'garages', 'carport', 'hut', 'service', 'transformer_tower'}
+MATERIAL = {'stone': 1, 'limestone': 1, 'sandstone': 1, 'plaster': 0, 'render': 0, 'stucco': 0, 'concrete': 2, 'cement_block': 2,
+            'metal': 2, 'steel': 2, 'glass': 3, 'mirror': 3}
+
+
+def classify(typ='', name='', area=0.0, floors=0, h=None, length=0.0, width=0.0, floors_src='R'):
+    """→ (code, basis) ; basis: 'D' data, 'S' shape, 'R' rule-of-thumb floors."""
+    typ = (typ or '').lower(); name = name or ''; f = floors or 0; h = h if h is not None else f * 3.0
+    elong = length / max(width, 0.5) if length and width else 1.0
+    est = (not floors_src) or floors_src == 'R'
+    if typ in TYP_VILLA: return T['VILLA'], 'D'
+    if typ in TYP_IND: return T['INDUSTRIAL'], 'D'
+    if typ in TYP_ANNEX: return T['ANNEX'], 'D'
+    if typ == 'office' and h >= 35: return T['TOWER'], 'D'
+    if typ in TYP_COMM or typ == 'office' or RE_COMM.search(name): return T['COMMERCIAL'], 'D'
+    if typ in TYP_PUB or RE_PUBLIC.search(name): return T['PUBLIC'], 'D'
+    if 0 < area < 40: return T['ANNEX'], 'S'
+    if f >= 11 or h >= 35 or (RE_TOWER.search(name) and f >= 8): return T['TOWER'], ('R' if est and not RE_TOWER.search(name) else 'D')
+    if 0 < f <= 2 and area < 300: return T['VILLA'], 'R' if est else 'D'
+    if 3 <= f <= 9 and elong >= 2.6 and length >= 40: return T['RAKEVET'], 'S'
+    if f >= 5: return T['BLOCK'], 'R' if est else 'D'
+    if area >= 3000 and f <= 3: return T['COMMERCIAL'], 'S'
+    return T['WALKUP'], 'R' if est else 'D'
+
+
+def oriented_dims(geom):
+    """אורך/רוחב של המלבן החוסם המינימלי (shapely) — אותה כוונה כמו footprintDims ב-JS (שם: לפי הקיר הארוך)."""
+    r = geom.minimum_rotated_rectangle
+    xs = list(r.exterior.coords)
+    if len(xs) < 4: return 0.0, 0.0
+    a = math.dist(xs[0], xs[1]); b = math.dist(xs[1], xs[2])
+    return max(a, b), min(a, b)
+
+
+def _year(tags):
+    for k in ('start_date', 'building:year', 'year_of_construction', 'construction_date'):
+        v = tags.get(k)
+        if v:
+            m = re.search(r'(1[89]\d\d|20\d\d)', str(v))
+            if m: return int(m.group(1))
+    return None
+
+
+def facade_fields(b, shop_points=None, quarters=None):
+    """b: בניין מנורמל של build_city (geom, tags, type, name, area, floors, h, src). מחזיר dict של שדות קצרים."""
+    tags = b.get('tags') or {}
+    length, width = oriented_dims(b['geom'])
+    code, basis = classify(b.get('type'), b.get('name'), b.get('area', 0.0), b.get('floors') or 0, b.get('h'), length, width, b.get('src', 'R'))
+    out, src = {'ty': code}, [basis]
+    shop = None
+    if (b.get('type') or '') in ('retail', 'commercial'): shop = 1
+    elif shop_points is not None:
+        g = b['geom']
+        if any(g.contains(p) for p in shop_points.query(g)) if hasattr(shop_points, 'query') else any(g.contains(p) for p in shop_points):
+            shop = 1
+    if shop: out['gf'] = 1; src.append('D')
+    mat = tags.get('building:facade:material') or tags.get('building:material')
+    if mat and mat.lower() in MATERIAL: out['m'] = MATERIAL[mat.lower()]; src.append('D')
+    y = _year(tags)
+    if y: out['e'] = y; src.append('D')
+    if quarters:
+        c = b['geom'].representative_point()
+        for qname, qpoly in quarters:
+            if qpoly.contains(c): out['q'] = qname; src.append('D'); break
+    if tags.get('roof:shape'): out['rs'] = tags['roof:shape']; src.append('D')
+    out['fs'] = ''.join(src)
+    return out
+
+
+def attach_facades(blds, shop_points=None, quarters=None):
+    """מוסיף b['facade'] לכל בניין; מחזיר מונה טיפולוגיות לדוח."""
+    try:
+        from shapely.strtree import STRtree
+        idx = STRtree(shop_points) if shop_points else None
+    except Exception:  # noqa: BLE001
+        idx = shop_points
+    if idx is not None and not hasattr(idx, 'query'):
+        idx = list(idx)
+    counts = {}
+    for b in blds:
+        if idx is not None and hasattr(idx, 'query') and hasattr(idx, 'geometries'):
+            pts = [idx.geometries[i] for i in idx.query(b['geom'])]
+            f = facade_fields(b, pts, quarters)
+        else:
+            f = facade_fields(b, idx, quarters)
+        b['facade'] = f
+        counts[f['ty']] = counts.get(f['ty'], 0) + 1
+    return counts

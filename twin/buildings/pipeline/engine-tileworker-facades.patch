@@ -1,0 +1,20 @@
+diff -ruN a/b6map/js/tileworker.js b/b6map/js/tileworker.js
+--- a/b6map/js/tileworker.js	2026-11-23 02:08:20.602983729 +0200
++++ b/b6map/js/tileworker.js	2026-11-23 02:08:20.698715849 +0200
+@@ -44,6 +44,7 @@
+   v.b.forEach((b, k) => {
+     M.ids[k] = b.i; M.area[k] = b.a; M.base[k] = b.z / Q; M.h[k] = b.h / Q; M.sg[k] = b.s / Q; M.f[k] = b.f; M.flo[k] = b.fl; M.fhi[k] = b.fh; M.conf[k] = b.c == null ? -1 : b.c;
+     M.src[k] = b.src || ''; M.used[k] = b.u || ''; M.typ[k] = b.t || ''; M.names[k] = b.n || '';
++    if (b.ty != null || b.gf || b.m != null || b.e || b.q) (M.fac || (M.fac = new Array(n)))[k] = { ty: b.ty, gf: b.gf || 0, m: b.m, e: b.e, q: b.q, fs: b.fs };   // מחלקת הבניינים
+     M.roof[k] = b.rs === 'gabled' || b.rs === 'gable' ? 2 : b.rs === 'hipped' || b.rs === 'hip' ? 3 : b.t === 'roof' ? 1 : 0;   // rs = roof:shape (הצעה לגדוד 5); אחרת שטוח + מעקה
+     const rings = b.r.map((r, i) => orient(dedupe(decodeRing(r, Q)), i === 0)).filter(r => r.length >= 6);
+     M.rings[k] = rings; let cx = 0, cy = 0; const o = rings[0], m = o.length / 2; for (let i = 0; i < m; i++) { cx += o[i * 2]; cy += o[i * 2 + 1]; } M.cen[2 * k] = cx / m; M.cen[2 * k + 1] = cy / m;
+@@ -242,7 +243,7 @@
+     if (m.wantMeta) {
+       const hh = new Float32Array(M.n), ff = new Uint8Array(M.n), ss = new Float32Array(M.n), pp = new Float32Array(M.n);
+       let hmax = 0; for (let k = 0; k < M.n; k++) { const I = heightFor(M, k); hh[k] = I.h; ff[k] = I.f; ss[k] = I.sg; pp[k] = I.par; hmax = Math.max(hmax, M.base[k] + I.h + I.par + I.sg); }
+-      res.meta = { n: M.n, ids: M.ids, area: M.area, base: M.base, h: hh, par: pp, sg: ss, f: ff, flo: M.flo, fhi: M.fhi, conf: M.conf, src: M.src, used: M.used, typ: M.typ, names: M.names, roof: M.roof, cen: M.cen,
++      res.meta = { n: M.n, ids: M.ids, area: M.area, base: M.base, h: hh, par: pp, sg: ss, f: ff, flo: M.flo, fhi: M.fhi, conf: M.conf, src: M.src, used: M.used, typ: M.typ, names: M.names, roof: M.roof, cen: M.cen, fac: M.fac || null,
+         terr: M.terr.slice(), N: M.N, step: M.step, hmax, seaEdge: seaEdge(M), idx: names(M, tx * CFG.tile, ty * CFG.tile) };
+     }
+     // בניינים + קרקע + ים בגאומטריה אחת → קריאת ציור אחת לאריח (אותו חומר; לקרקע afl = 0 → אין קווי קומות)

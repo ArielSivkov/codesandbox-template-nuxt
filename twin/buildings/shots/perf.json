@@ -1,0 +1,414 @@
+{
+ "aerial_day": {
+  "calls": 21,
+  "tris": 69234,
+  "heapMB": 29.6,
+  "gpuVerts": 222599,
+  "geoms": 38,
+  "textures": 3,
+  "tilesLoaded": 32,
+  "lod": [
+   12,
+   17,
+   3
+  ],
+  "buildings": 5466,
+  "instances": {
+   "solar": 0,
+   "tank": 0,
+   "ac": 0,
+   "stair": 0
+  },
+  "byBasis": {
+   "rule": 4907,
+   "shape": 452,
+   "data": 107
+  },
+  "frameMs": 4457,
+  "loadS": 70.9,
+  "errors": [
+   "Failed to load resource: the server responded with a status of 404 (File not found)",
+   "[.WebGL-0x22e400907000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x22e400907000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x22e400907000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x22e400907000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+ },
+ "aerial_night": {
+  "calls": 19,
+  "tris": 66962,
+  "heapMB": 21.6,
+  "gpuVerts": 214273,
+  "geoms": 29,
+  "textures": 3,
+  "tilesLoaded": 26,
+  "lod": [
+   6,
+   17,
+   3
+  ],
+  "buildings": 5232,
+  "instances": {
+   "solar": 0,
+   "tank": 0,
+   "ac": 0,
+   "stair": 0
+  },
+  "byBasis": {
+   "rule": 4720,
+   "data": 100,
+   "shape": 412
+  },
+  "frameMs": 4272.9,
+  "loadS": 55.3,
+  "errors": []
+ },
+ "street_day": {
+  "calls": 40,
+  "tris": 80301,
+  "heapMB": 35.2,
+  "gpuVerts": 248110,
+  "geoms": 42,
+  "textures": 3,
+  "tilesLoaded": 30,
+  "lod": [
+   18,
+   4,
+   8
+  ],
+  "buildings": 4287,
+  "instances": {
+   "solar": 534,
+   "tank": 59,
+   "ac": 296,
+   "stair": 48
+  },
+  "byBasis": {
+   "rule": 3705,
+   "shape": 511,
+   "data": 71
+  },
+  "frameMs": 3770.4,
+  "loadS": 60.5,
+  "errors": [
+   "Failed to load resource: the server responded with a status of 404 (File not found)",
+   "[.WebGL-0x358c008f6000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x358c008f6000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x358c008f6000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x358c008f6000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+ },
+ "street_night": {
+  "calls": 40,
+  "tris": 80301,
+  "heapMB": 32.5,
+  "gpuVerts": 248110,
+  "geoms": 47,
+  "textures": 3,
+  "tilesLoaded": 30,
+  "lod": [
+   18,
+   4,
+   8
+  ],
+  "buildings": 4287,
+  "instances": {
+   "solar": 534,
+   "tank": 59,
+   "ac": 296,
+   "stair": 48
+  },
+  "byBasis": {
+   "rule": 3705,
+   "shape": 511,
+   "data": 71
+  },
+  "frameMs": 3037.3,
+  "loadS": 45.7,
+  "errors": []
+ },
+ "towers_day": {
+  "calls": 39,
+  "tris": 89516,
+  "heapMB": 30.1,
+  "gpuVerts": 274475,
+  "geoms": 60,
+  "textures": 3,
+  "tilesLoaded": 33,
+  "lod": [
+   22,
+   2,
+   9
+  ],
+  "buildings": 5093,
+  "instances": {
+   "solar": 37,
+   "tank": 4,
+   "ac": 32,
+   "stair": 0
+  },
+  "byBasis": {
+   "rule": 4687,
+   "shape": 305,
+   "data": 101
+  },
+  "frameMs": 3463.9,
+  "loadS": 70.7,
+  "errors": [
+   "Failed to load resource: the server responded with a status of 404 (File not found)",
+   "[.WebGL-0x34c0095a000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x34c0095a000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x34c0095a000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x34c0095a000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+ },
+ "towers_night": {
+  "calls": 39,
+  "tris": 89516,
+  "heapMB": 28.1,
+  "gpuVerts": 259582,
+  "geoms": 54,
+  "textures": 3,
+  "tilesLoaded": 28,
+  "lod": [
+   17,
+   2,
+   9
+  ],
+  "buildings": 4637,
+  "instances": {
+   "solar": 37,
+   "tank": 4,
+   "ac": 32,
+   "stair": 0
+  },
+  "byBasis": {
+   "rule": 4289,
+   "shape": 270,
+   "data": 78
+  },
+  "frameMs": 1855.6,
+  "loadS": 43.2,
+  "errors": []
+ },
+ "landmarks_day": {
+  "calls": 22,
+  "tris": 32684,
+  "heapMB": 22.7,
+  "gpuVerts": 202378,
+  "geoms": 41,
+  "textures": 3,
+  "tilesLoaded": 42,
+  "lod": [
+   18,
+   24,
+   0
+  ],
+  "buildings": 5905,
+  "instances": {
+   "solar": 0,
+   "tank": 0,
+   "ac": 0,
+   "stair": 0
+  },
+  "byBasis": {
+   "rule": 5214,
+   "shape": 573,
+   "data": 118
+  },
+  "frameMs": 2380.8,
+  "loadS": 31.3,
+  "errors": []
+ },
+ "property_before": {
+  "calls": 18,
+  "tris": 107839,
+  "heapMB": 28.5,
+  "gpuVerts": 220258,
+  "geoms": 52,
+  "textures": 3,
+  "tilesLoaded": 28,
+  "lod": [
+   24,
+   0,
+   4
+  ],
+  "buildings": 5286,
+  "instances": {
+   "solar": 1078,
+   "tank": 102,
+   "ac": 555,
+   "stair": 74
+  },
+  "byBasis": {
+   "rule": 4768,
+   "shape": 418,
+   "data": 100
+  },
+  "frameMs": 3338,
+  "loadS": 47.9,
+  "errors": []
+ },
+ "property_after": {
+  "calls": 18,
+  "tris": 84099,
+  "heapMB": 30,
+  "gpuVerts": 185382,
+  "geoms": 39,
+  "textures": 3,
+  "tilesLoaded": 20,
+  "lod": [
+   16,
+   0,
+   4
+  ],
+  "buildings": 3938,
+  "instances": {
+   "solar": 1078,
+   "tank": 102,
+   "ac": 555,
+   "stair": 74
+  },
+  "byBasis": {
+   "rule": 3586,
+   "shape": 270,
+   "data": 82
+  },
+  "frameMs": 3798.3,
+  "loadS": 56.7,
+  "errors": []
+ },
+ "aerial_day_baseline": {
+  "calls": 18,
+  "tris": 66665,
+  "heapMB": 14.5,
+  "gpuVerts": 211079,
+  "geoms": 24,
+  "textures": 0,
+  "tilesLoaded": 24,
+  "lod": [
+   6,
+   15,
+   3
+  ],
+  "buildings": null,
+  "instances": null,
+  "byBasis": null,
+  "frameMs": 285.8,
+  "loadS": 12.8,
+  "errors": []
+ },
+ "street_day_baseline": {
+  "calls": 35,
+  "tris": 54168,
+  "heapMB": 16.6,
+  "gpuVerts": 294038,
+  "geoms": 65,
+  "textures": 0,
+  "tilesLoaded": 41,
+  "lod": [
+   29,
+   4,
+   8
+  ],
+  "buildings": null,
+  "instances": null,
+  "byBasis": null,
+  "frameMs": 1867.2,
+  "loadS": 39.9,
+  "errors": []
+ },
+ "light_day": {
+  "calls": 15,
+  "tris": 79167,
+  "heapMB": 23.4,
+  "gpuVerts": 176857,
+  "geoms": 51,
+  "textures": 3,
+  "tilesLoaded": 30,
+  "lod": [
+   24,
+   2,
+   4
+  ],
+  "buildings": 5063,
+  "instances": {
+   "solar": 2158,
+   "tank": 212,
+   "ac": 1082,
+   "stair": 155
+  },
+  "byBasis": {
+   "rule": 4592,
+   "shape": 373,
+   "data": 98
+  },
+  "frameMs": 2622.6,
+  "loadS": 48.5,
+  "errors": [
+   "Failed to load resource: the server responded with a status of 404 (File not found)",
+   "[.WebGL-0x211400979400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x211400979400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x211400979400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "[.WebGL-0x211400979400]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+ },
+ "fort_day": {
+  "calls": 11,
+  "tris": 30174,
+  "heapMB": 17.4,
+  "gpuVerts": 149381,
+  "geoms": 41,
+  "textures": 3,
+  "tilesLoaded": 24,
+  "lod": [
+   21,
+   0,
+   3
+  ],
+  "buildings": 4377,
+  "instances": {
+   "solar": 0,
+   "tank": 0,
+   "ac": 0,
+   "stair": 0
+  },
+  "byBasis": {
+   "rule": 4031,
+   "shape": 253,
+   "data": 93
+  },
+  "frameMs": 1353.4,
+  "loadS": 25.1,
+  "errors": []
+ },
+ "street_day_lite": {
+  "calls": 40,
+  "tris": 80301,
+  "heapMB": 31.6,
+  "gpuVerts": 294038,
+  "geoms": 61,
+  "textures": 0,
+  "tilesLoaded": 41,
+  "lod": [
+   29,
+   4,
+   8
+  ],
+  "buildings": 5807,
+  "instances": {
+   "solar": 534,
+   "tank": 59,
+   "ac": 296,
+   "stair": 48
+  },
+  "byBasis": {
+   "rule": 5105,
+   "shape": 590,
+   "data": 112
+  },
+  "frameMs": 869.5,
+  "loadS": 23.4,
+  "errors": []
+ }
+}

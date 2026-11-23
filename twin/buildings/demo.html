@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>מחלקת הבניינים · הדגמה · לוח היזם</title>
+<style>
+  @font-face { font-family: Heebo; src: url(../assets/pack/fonts/heebo-hebrew-400-normal.woff2) format('woff2'); }
+  @font-face { font-family: Heebo; font-weight: 700; src: url(../assets/pack/fonts/heebo-hebrew-700-normal.woff2) format('woff2'); }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #111; font-family: Heebo, system-ui, sans-serif; }
+  #fr { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+  #bar { position: fixed; z-index: 5; left: 6px; right: 6px; bottom: calc(40px + env(safe-area-inset-bottom)); display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
+  #bar button { font: 600 13px Heebo, sans-serif; padding: 7px 10px; border-radius: 18px; border: 0; background: rgba(20, 24, 30, .82); color: #fff; }
+  #bar button.on { background: #ff7a1a; }
+  #lbl { position: fixed; inset: 0; pointer-events: none; z-index: 4; }
+  .lb { position: absolute; transform: translate(-50%, -100%); white-space: nowrap; font: 700 11px Heebo, sans-serif; color: #fff; background: rgba(15, 20, 28, .78); padding: 2px 7px; border-radius: 9px; }
+  .lb small { font-weight: 400; opacity: .8; }
+  .lb.proc { border: 1px dashed #ffb36b; }
+  #hud { position: fixed; z-index: 5; top: calc(54px + env(safe-area-inset-top)); left: 6px; max-width: 62%; font: 11px/1.35 ui-monospace, monospace; color: #fff; background: rgba(0, 0, 0, .55); padding: 5px 7px; border-radius: 8px; direction: ltr; white-space: pre; display: none; }
+  #note { position: fixed; z-index: 5; bottom: calc(118px + env(safe-area-inset-bottom)); right: 6px; left: 6px; text-align: center; font: 11px/1.4 Heebo, sans-serif; color: #fff; background: rgba(0, 0, 0, .55); padding: 5px 8px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<iframe id="fr" title="מפת תלת־ממד"></iframe>
+<div id="lbl"></div>
+<div id="hud"></div>
+<div id="note">חזיתות, מרפסות, עמודים וציוד גג – <b>פרוצדורליים</b> (לא צילום). גובה מגדלים מסומנים – ממקור מצוטט.</div>
+<div id="bar">
+  <button data-v="aerial">אוויר</button><button data-v="street">רחוב</button><button data-v="towers">מגדלים</button><button data-v="landmarks">ציוני דרך</button><button data-v="property">הנכס שלי</button>
+  <button id="bNight">🌙 לילה</button><button id="bState">אחרי שיפוץ</button><button id="bFac">חזיתות</button><button id="bHud">ביצועים</button>
+</div>
+<script>
+(async function () {
+'use strict';
+const qs = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+const fr = $('fr');
+// המנוע של גדוד 6 כפי שהוא (בלי שינוי); הנתונים: אריחי הדגימה של אשדוד
+fr.src = (qs.get('engine') || '../b6/map/index.html') + '?dpr=' + (qs.get('dpr') || '1.5') + (qs.has('fps') ? '&fps' : '');
+await new Promise(r => fr.onload = r);
+const W = fr.contentWindow;
+for (let i = 0; i < 400 && !(W.YZ && W.YZ.ready && W.YZ.engine); i++) await new Promise(r => setTimeout(r, 50));
+// טוענים את המודולים לתוך חלון המנוע (אותו THREE, אותו realm של מערכים טיפוסיים)
+for (const f of ['typology', 'landmarks', 'facades', 'interiors']) await new Promise((res, rej) => { const s = W.document.createElement('script'); s.src = new URL('src/' + f + '.js', location.href).href; s.onload = res; s.onerror = rej; W.document.head.appendChild(s); });
+const YZ = W.YZ, E = YZ.engine, T = W.THREE, B = W.ESHBuildings;
+W.document.querySelectorAll('#layers,#legend,#rtools,#nav').forEach(e => e.style.display = 'none');
+const api = qs.get('facades') === '0' ? null : B.attach(T, YZ, { lite: qs.has('lite'), texBase: new URL('../assets/pack/textures/', location.href).href });
+window.API = api; window.YZ = YZ; window.B = B;
+let night = qs.get('t') === 'night', state = qs.get('state') === 'after' ? 'after' : 'before', view = qs.get('view') || 'aerial', prop = null;
+const date = h => new Date(Date.UTC(2026, 10, 23, h - 2, 0, 0));   // שעון ישראל (UTC+2 בנובמבר)
+function applyTime() { if (api) api.setTime(date(night ? 21 : 11)); else E.setTime(date(night ? 21 : 11)); $('bNight').classList.toggle('on', night); }
+const GH = (x, n) => E.groundHeight(x, n);
+async function streetCam(x, n, lookX, lookN, eye = 1.7, lookUp = 9) {
+  await E.loadAround(x, n, 700, 2);
+  const g = GH(x, n), p = E.toScene(x, n, g + eye), l = E.toScene(lookX, lookN, GH(lookX, lookN) + lookUp);
+  E.camera.near = 0.5; E.camera.far = 20000; E.camera.position.copy(p); E.camera.lookAt(l); E.camera.updateProjectionMatrix(); E.requestRender();
+  await E.loadAround(x, n, 900, 2); E.camera.position.copy(p); E.camera.lookAt(l); E.requestRender();
+}
+async function orbit(x, n, dist, phi, theta) {
+  Object.assign(YZ.cam, { tx: x - E.VO.x, tz: -(n - E.VO.n), dist, phi, theta }); YZ.applyCam(); await E.loadAround(x, n, Math.min(3000, dist * 1.6), dist < 900 ? 2 : 1); YZ.applyCam();
+}
+const VIEWS = {
+  aerial: () => orbit(164500, 632700, 1100, 0.92, -0.6),                 // הסיטי: מגדלי K, מגדל דמרי, מונארט
+  street: () => streetCam(165985, 633110, 166030, 633175, 1.7, 7),       // רחוב בשיכון: בניין רכבת w547641959 (רובע לא מזוהה בנתונים)
+  towers: () => streetCam(164190, 632930, 164480, 632870, 1.7, 45),      // משדרות משה דיין אל מגדלי הסיטי
+  landmarks: () => orbit(164900, 634200, 2600, 0.9, 0.35),               // מגדלור גבעת יונה + מצודה + הסיטי
+  light: () => orbit(165092, 635063, 260, 1.12, 0.5),                     // מגדלור אשדוד (42 מ', 1966) – מודל מפושט
+  fort: () => orbit(162705, 631349, 230, 0.85, -0.9),                     // מצודת אשדוד-ים (35×55 מ') – מודל מפושט
+  property: async () => {
+    // "הנכס שלי": בניין רכבת אמיתי מהאריח (w547641959) – מוסתר בחתך, ובמקומו תבנית לובי + דירת 4 חדרים מיושרת לקיר הארוך
+    const ID = qs.get('prop') || 'w547641959';
+    await E.loadAround(166020, 633160, 500, 2); for (let i = 0; i < 40 && !(api && api.findBuilding(ID)); i++) await new Promise(r => setTimeout(r, 100));
+    if (!prop) { prop = new T.Group(); E.scene.add(prop); }
+    while (prop.children.length) { const c = prop.children.pop(); c.traverse(o => o.geometry && o.geometry.dispose()); }
+    const host = api && api.findBuilding(ID), P = B.interiors.buildProperty(T, { rooms: +(qs.get('rooms') || 4), state, floor: 2 });
+    const cx = host ? host.dims.cx : 166020, cn = host ? host.dims.cn : 633160, base = host ? host.base : GH(cx, cn), ang = host ? host.dims.ang : 0;
+    const holder = new T.Group(); holder.position.copy(E.toScene(cx, cn, base)); holder.rotation.y = ang;
+    P.group.position.set(-(P.plan.W + 5.6) / 2, 0, -P.plan.D / 2); holder.add(P.group); prop.add(holder); prop.updateMatrixWorld(true);
+    if (api) api.hideBuilding(host ? ID : null);
+    const v = new T.Vector3(); prop.userData.labels = P.labels.map(l => { v.set(l.x, l.y, l.z); P.group.localToWorld(v); return Object.assign({}, l, { x: v.x, y: v.y, z: v.z }); });
+    prop.userData.plan = P.plan; prop.userData.tris = P.tris;
+    const c = holder.position, dir = new T.Vector3(Math.sin(ang), 0, Math.cos(ang));   // ניצב לקיר הארוך, לצד הרחוב (z שלילי מקומי)
+    E.camera.near = 0.3; E.camera.position.set(c.x - dir.x * 20 + Math.cos(ang) * 6, c.y + 26, c.z - dir.z * 20 - Math.sin(ang) * 6); E.camera.lookAt(c.x, c.y + 4.5, c.z); E.camera.updateProjectionMatrix(); E.requestRender();
+  },
+};
+async function go(v) { view = v; document.querySelectorAll('#bar [data-v]').forEach(b => b.classList.toggle('on', b.dataset.v === v)); if (prop && v !== 'property') { prop.visible = false; api && api.hideBuilding(null); } else if (prop) prop.visible = true; await VIEWS[v](); applyTime(); }
+document.querySelectorAll('#bar [data-v]').forEach(b => b.onclick = () => go(b.dataset.v));
+$('bNight').onclick = () => { night = !night; applyTime(); };
+$('bState').onclick = () => { state = state === 'after' ? 'before' : 'after'; $('bState').textContent = state === 'after' ? 'לפני שיפוץ' : 'אחרי שיפוץ'; if (view === 'property') go('property'); };
+$('bFac').onclick = () => { if (!api) return; const on = api.uniforms.uDetail.value < 0.5; api.setDetail(on); $('bFac').classList.toggle('on', on); };
+$('bHud').onclick = () => { const h = $('hud'); h.style.display = h.style.display === 'block' ? 'none' : 'block'; };
+if (qs.has('hud')) $('hud').style.display = 'block';
+$('bFac').classList.add('on');
+// תוויות DOM (0 קריאות ציור) + HUD
+function tick() {
+  const L = $('lbl'), w = innerWidth, h = innerHeight; let html = '';
+  if (api && view !== 'property') for (const l of api.labels(w, h).slice(0, 8)) html += `<div class="lb${l.conf === 'label' ? '' : ''}" style="left:${l.x}px;top:${l.y}px">${l.he}${l.h ? ` <small>${l.h} מ'</small>` : ''}</div>`;
+  if (prop && prop.visible && prop.userData.labels) { const v = new T.Vector3(); for (const l of prop.userData.labels) { v.set(l.x, l.y, l.z).project(E.camera); if (v.z > 1) continue; html += `<div class="lb proc" style="left:${(v.x + 1) / 2 * w}px;top:${(1 - v.y) / 2 * h}px">${l.he}</div>`; } }
+  L.innerHTML = html;
+  if ($('hud').style.display === 'block') { const s = api ? api.stats() : E.info(); $('hud').textContent = `calls ${s.calls} · tris ${s.tris}\nheap ${s.heapMB || s.heap}MB · verts ${s.gpuVerts}\n` + (api ? `bldg ${s.buildings} · inst ${JSON.stringify(s.instances)}` : 'facades off'); }
+  setTimeout(tick, 250);
+}
+await go(view); tick();
+window.DEMO_READY = true;
+})().catch(e => { document.body.insertAdjacentHTML('beforeend', '<pre style="position:fixed;top:0;color:#f66;z-index:9">' + (e && e.stack || e) + '</pre>'); console.error(e); });
+</script>
+</body>
+</html>
