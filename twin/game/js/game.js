@@ -50,8 +50,16 @@ float vn(vec2 p){ vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f); return mix(mix
 void main(){ vec3 d = normalize(vD); float h = clamp(d.y,0.0,1.0); vec3 c = mix(hor, top, pow(h,0.55));
   float s = max(dot(d, sun),0.0); c += vec3(1.0,0.86,0.6)*(pow(s,600.0)*2.5 + pow(s,8.0)*0.18)*sunVis;
   if (d.y > 0.02) { vec2 uv = d.xz / (d.y + 0.15) * 1.6 + vec2(time*0.004, time*0.002);
-    float n = vn(uv)*0.5 + vn(uv*2.1)*0.3 + vn(uv*4.3)*0.2; float cv = smoothstep(1.0 - cloud*0.95 - 0.05, 1.05 - cloud*0.6, n) * smoothstep(0.02, 0.2, d.y);
-    vec3 cc = mix(vec3(1.0), vec3(0.62,0.65,0.7), cloud) * (0.35 + 0.65*clamp(sun.y*3.0+0.2,0.0,1.0)); c = mix(c, cc, cv*0.92); }
+    float n = vn(uv)*0.5 + vn(uv*2.03)*0.25 + vn(uv*4.1)*0.15 + vn(uv*8.3)*0.1;
+    float cov = 0.18 + cloud*0.8;                                          // גם בשמיים "בהירים" יש קומולוס קטנים (אסתטי)
+    float cv = smoothstep(1.0 - cov, 1.0 - cov + 0.22, n) * smoothstep(0.02, 0.22, d.y);
+    vec2 ts = normalize(sun.xz + 1e-4) * 0.06; float n2 = vn(uv + ts)*0.5 + vn((uv + ts)*2.03)*0.25 + vn((uv + ts)*4.1)*0.15;   // דגימה לכיוון השמש: צד מואר/מוצל
+    float lit = clamp(0.55 + (n - n2) * 4.0, 0.25, 1.0);
+    float dayL = 0.35 + 0.65*clamp(sun.y*3.0+0.2,0.0,1.0);
+    vec3 cc = mix(vec3(1.0,0.99,0.97), vec3(0.58,0.61,0.67), cloud*0.9) * mix(0.72, 1.08, lit) * dayL;
+    cc = mix(cc, vec3(1.0,0.78,0.55)*dayL, pow(s,4.0)*0.35*(1.0-cloud));   // שוליים זהובים ליד השמש
+    c = mix(c, cc, cv*0.95);
+    c = mix(c, hor*1.04, (1.0 - smoothstep(0.0, 0.12, d.y))*0.5); }       // אובך באופק
   if(d.y<0.0) c = hor; gl_FragColor = vec4(c,1.0);
 #include <colorspace_fragment>
 }` });
@@ -817,7 +825,7 @@ function frame(now) {
   if (bizObj.pin) bizObj.pin.position.y = bizObj.b.top + 9 + Math.sin(S.t * 2) * 0.8;
   W.MAT.sea.normalMap.offset.set(S.t * (0.006 + SIM.weather.windSpeed * 0.0015), S.t * 0.007); skyMat.uniforms.time.value = S.t * (1 + SIM.weather.windSpeed * 0.3); rainUpdate(dt);
   updateCam(dt);
-  const p = curPos(); W.update(p.x, p.z, Q.level >= 2 ? 6 : 9); if (W.updatePalms) W.updatePalms(p.x, p.z, scene);
+  const p = curPos(); W.update(p.x, p.z, Q.level >= 2 ? 6 : 9); if (W.updatePalms) W.updatePalms(p.x, p.z, scene); if (W.updateSigns) { W.updateSigns(p.x, p.z, scene); W.updateSignals(S.t); W.updateTrees(p.x, p.z, scene); W.updateStreet(p.x, p.z, scene); }
   // אוטומטי: ירידה באיכות אם קצב הפריימים נמוך לאורך זמן
   if (Q.auto && S.t > 6) { if (fpsAvg < 27) fpsLow += dt; else fpsLow = Math.max(0, fpsLow - dt * 0.5); if (fpsLow > 3 && Q.level < 2) { setQuality(Q.level + 1); fpsLow = 0; toast('איכות הותאמה לביצועי המכשיר', 1.6); } }
   proxT -= dt; if (proxT <= 0) { proxT = 0.2; proximity(); }

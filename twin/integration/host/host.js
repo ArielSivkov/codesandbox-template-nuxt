@@ -386,6 +386,7 @@ function renderSheet() {
     h += `<h3>☀ זמן · <span id="yzHH">${hhmm(p.min)}</span> <span class="mut">שעון ישראל · שמש ${world.sun.elevation.toFixed(1)}°</span></h3>
       <div class="row"><button class="yzBtn" data-time="now">עכשיו</button><button class="yzBtn" data-time="golden">🌅 שעת זהב</button><button class="yzBtn" data-time="noon">☀ צהריים</button><button class="yzBtn" data-time="night">🌙 לילה</button></div>
       <div class="row"><input type="date" id="yzDate" value="${ds}"></div>
+      <div class="row"><button class="yzBtn" id="yzSunMore" onclick="window.__yzGameEnv && window.__yzGameEnv()">🌅 זריחה, שקיעה ושעות שמש כאן</button></div>
       <label>שעה <input type="range" id="yzMin" min="0" max="1439" step="5" value="${p.min}"></label>
       <div class="row"><span class="mut">קצב הזמן</span>${seg('rate', [['0', 'עצור'], ['1', '×1'], ['60', '×60'], ['600', '×600']], c.real ? '1' : String(c.rate))}</div>`;
     h += `<h3>🌦 מזג אוויר · <span class="mut">${esc(w.source)}${w.status ? ' · ' + esc(w.status) : ''}</span></h3>${seg('wmode', [['manual', 'ידני'], ['live', 'חי (Open-Meteo)']], w.mode)}
@@ -482,7 +483,7 @@ function attach() {
   const bd = document.createElement('div'); bd.id = 'yzBadge'; document.body.appendChild(bd);
   const hp = document.createElement('div'); hp.id = 'yzHUDp'; document.body.appendChild(hp);
   const mb = $('mode'); if (mb) mb.onclick = () => openSheet('modes');
-  const eb = $('bEnv'); if (eb) eb.onclick = () => (sheetTab === 'settings' ? closeSheet() : openSheet('settings'));
+  const eb = $('bEnv'); if (eb) { const gameEnv = eb.onclick; window.__yzGameEnv = () => { closeSheet(); if (gameEnv) gameEnv(); }; eb.onclick = () => (sheetTab === 'settings' ? closeSheet() : openSheet('settings')); }
   const top = $('top'); if (top) { const b = document.createElement('button'); b.className = 'btn'; b.id = 'yzMods'; b.setAttribute('aria-label', 'מודולים וביצועים'); b.textContent = '🧩'; b.onclick = () => (sheetTab === 'modules' ? closeSheet() : openSheet('modules')); top.insertBefore(b, $('bMenu'));
     const h = document.createElement('button'); h.className = 'btn'; h.id = 'yzHome'; h.innerHTML = '🏠<span class="lbl"> השכונה שלי</span>'; h.setAttribute('aria-label', 'השכונה שלי'); h.onclick = goHome; top.insertBefore(h, $('bMine')); }
   // שתי כניסות במסך הפתיחה

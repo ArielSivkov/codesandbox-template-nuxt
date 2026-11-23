@@ -19,13 +19,20 @@ const { chromium } = require(process.env.PW || 'playwright');
   await p.waitForSelector('#mWhere', { timeout: 10000 }); await p.click('#mWhere');
   const where = await p.evaluate(() => document.getElementById('whereOut').innerText);
   const m = where.match(/GPS:\s*([\d.]+),\s*([\d.]+)/); ok(m && Math.abs(+m[1] - 31.8) < 0.1 && Math.abs(+m[2] - 34.65) < 0.1, `איפה אני: ${where.split('\n')[0]}`);
-  await p.evaluate(() => document.getElementById('bEnv').click());
+  await p.evaluate(() => { document.getElementById('bEnv').click(); const more = document.getElementById('yzSunMore'); if (more) more.click(); });   // בעולם המאוחד: דרך גיליון ההגדרות
   await p.waitForSelector('#eHere', { timeout: 10000 });
   const sunTxt = await p.evaluate(() => document.querySelector('#env .ro').innerText);
   ok(/זריחה \d\d:\d\d · 🌇 שקיעה \d\d:\d\d/.test(sunTxt), 'זריחה ושקיעה בפאנל השמש: ' + sunTxt.split('\n').pop());
   await p.click('#eHere'); const here = await p.evaluate(() => document.getElementById('eHereOut').innerText);
   ok(/מתוך/.test(here), 'שעות שמש כאן: ' + here.slice(0, 60));
   ok(await p.evaluate(() => !document.getElementById('eLive').disabled), 'כפתור מזג אוויר אמיתי זמין בלחיצה');
+  // רהוט רחוב ליד צומת ראשי: רמזורים, מעברי חציה, שלטים עם שמות OSM, עצים; מחזור צבעים
+  const st = await p.evaluate(async () => { const sleep = ms => new Promise(r => setTimeout(r, ms)); document.getElementById('env').style.display = 'none';
+    let best = null; for (const t of G27.W.tiles.values()) { if (!t.roads || !t.hi) continue; for (const e of G27.W.junctionsOf(t)) { if (!e.major) continue; const d = Math.hypot(e.x - G27.S.p.x, e.z - G27.S.p.z); if (!best || d < best.d) best = { e, d }; } }
+    if (!best) return null; const e = best.e; G27.S.p.set(e.x + e.arms[0].dx * 25, e.y, e.z + e.arms[0].dz * 25); await sleep(1500);
+    const named = new Set(); for (const t of G27.W.tiles.values()) if (t.junc) for (const j of t.junc) for (const a of j.arms) if (a.name) named.add(a.name);
+    return { ...G27.W.streetStats(), names: named.size }; });
+  ok(st && st.poles > 0 && st.zebra > 0 && st.signs > 0 && st.trees > 0 && st.names > 5, `רחוב: ${st && st.poles} רמזורים, ${st && st.zebra} פסי מעבר חציה, ${st && st.signs} שלטים (${st && st.names} שמות רחוב מ-OSM), ${st && st.trees} עצים`);
   if (shot) await p.screenshot({ path: shot });
   ok(errs.length === 0, 'אין שגיאות JS' + (errs.length ? ': ' + errs[0] : ''));
   console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); await b.close(); process.exit(fail ? 1 : 0);
