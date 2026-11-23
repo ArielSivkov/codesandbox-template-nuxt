@@ -1,6 +1,6 @@
 /* 27wrld — sim.js : סימולציה טהורה, בלי three.js ובלי ציור (אפשר להריץ ב-Node או מעל מנוע של גדוד 6).
    1) מיקום השמש (אלגוריתם NOAA, דיוק ~0.01° בזווית; בלי שבירת אור אטמוספרית מתחת ל-0°).
-   2) שדה רוח עירוני (קירוב! לא CFD): פרופיל לוגריתמי ממוצע זהה למודול הקנוני (גובה ערבוב, חופת בניינים), תיעול לאורך קירות, משבים כתהליך אקראי חלק בממוצע 1.
+   2) שדה רוח עירוני (קירוב! לא CFD): פרופיל לוגריתמי ממוצע זהה למודול הקנוני (גובה ערבוב, חופת בניינים), תיעול לאורך קירות, משבים = מערבולות דריידן (MIL-F-8785C) בסינתזה ספקטרלית, ממוצע 0.
    3) רחפן מרובע (quadcopter): מסה, דחף, גרר ריבועי + גרר רוטור ליניארי ביחס לאוויר (כולל רוח), בקר זווית/מהירות אנכית, אינטגרציה בצעד קבוע 1/120 ש'.
    יחידות SI. מערכת צירים כמו בעולם: x = מזרח, y = מעלה, z = דרום (−צפון). */
 (function (G) {
@@ -161,12 +161,56 @@ SIM.meanWind = function (u10, z, hm, sea) {
   if (z >= Hc) return lawLog(z, us, z0, d);
   return lawLog(Hc, us, z0, d) * Math.exp(CANOPY_A * (Math.max(z, 0) / Hc - 1));
 };
-// ממוצע זמן של max(−0.35, gustSignal) – חושב נומרית (5.6M דגימות, 50 נקודות): 0.0489. מחסירים אותו כדי שממוצע המשב יהיה 1.
-const GUST_MEAN = 0.0489;
-// משבים: סכום סינוסים בתדרים לא-רציונליים + פאזה מרחבית (אורך מערבולת ~40–120 מ'), ממוצע ≈ 0
-function gustSignal(t, x, z) {
-  return 0.45 * Math.sin(0.37 * t + x * 0.011 + z * 0.007) + 0.3 * Math.sin(1.13 * t + 1.7 - x * 0.023 + z * 0.019) + 0.25 * Math.sin(2.71 * t + 0.4 + x * 0.041 - z * 0.037);
-}
+// ---- משבים: מערבולות דריידן (MIL-F-8785C, נמוך: σw=0.1·W20, σu=σv=σw/(0.177+0.000823h)^0.4, Lw=h, Lu=Lv=h/(…)^1.2, h ברגל)
+// אותן נוסחאות בדיוק כמו drydenParams ב-physics/src/wind.js (נבדק ב-test-sim). שדה "קפוא" (טיילור): u'(ξ−Uc·t) – פונקציה טהורה
+// של מקום וזמן, בלי מצב, ולכן אותו משב בדיוק לרחפן, למסוק ולמחוון. סינתזה ספקטרלית (Shinozuka & Deodatis 1991):
+// u' = Σ aᵢ·cos(Kᵢ·(ξ−Uc·t) + cᵢ·Kᵢ·η + eᵢ·Kᵢ·y + φᵢ), aᵢ = √(2·Φ(Kᵢ)·ΔKᵢ), 64 מספרי גל לוגריתמיים (אורך גל 1.5 מ' – 20 ק"מ),
+// השונות מנורמלת ל-σ² בדיוק. Φu = σ²·(2L/π)/(1+(LK)²); Φv,w = σ²·(L/π)(1+3(LK)²)/(1+(LK)²)² (הצורה המלאה של דריידן, גם ל-v,w).
+// עוצמה: G (יחס משב/רוח ממוצעת, מהמחוון או Open-Meteo) → כפל עוצמה s = (G−1)/(3·Iu10), כי G ≈ 1 + g·Iu עם g≈3 למשב 3 ש'
+// (Wieringa 1973; Harper, Kepert & Ginger 2010, WMO/TD-1555). G=1 → בלי משבים. בברירת המחדל G=1.5 → s≈0.96 (דריידן כמעט כמו שהוא).
+// מקורב: Uc = רוח התחנה (לא הרוח המקומית), קוהרנטיות רוחבית/אנכית אמפירית (cᵢ∈[−1,1], eᵢ∈[−0.5,0.5]), דריידן נגזר לשטח פתוח –
+// אין מערבולות שבניינים משילים (כמו [W5][W6] במודול הקנוני), עוצמה אחידה גם בתוך חופת הבניינים.
+const FT = 0.3048;
+SIM.drydenParams = function (hMeters, W20) {
+  const hf = Math.max(10, Math.min(1000, hMeters / FT)), sw = 0.1 * W20, k = 0.177 + 0.000823 * hf, su = sw / Math.pow(k, 0.4);
+  const Lw = hf * FT, Lu = (hf / Math.pow(k, 1.2)) * FT;
+  return { sigmaU: su, sigmaV: su, sigmaW: sw, Lu, Lv: Lu, Lw };
+};
+SIM.W20 = (u10) => lawLog(20 * FT, u10 * KAPPA / Math.log(10 / Z0_OPEN), Z0_OPEN, 0);   // רוח בגובה 20 רגל בשטח פתוח
+SIM.GUST_PEAK = 3;                                                     // g – מקדם שיא למשב 3 ש' (מקורב, 2.5–3.5 בספרות)
+SIM.turbScale = function (G, u10) {
+  if (!(G > 1) || !(u10 > 0)) return 0;
+  const Iu10 = SIM.drydenParams(10, SIM.W20(u10)).sigmaU / u10;       // עוצמת מערבולות של דריידן ב-10 מ' (≈0.17, בלי תלות ב-u10)
+  return (G - 1) / (SIM.GUST_PEAK * Iu10);
+};
+const NK = 64, KMIN = 2 * Math.PI / 20000, KMAX = 2 * Math.PI / 1.5;
+const GK = new Float64Array(NK), GDK = new Float64Array(NK), GPH = [new Float64Array(NK), new Float64Array(NK), new Float64Array(NK)];
+const GC = [new Float64Array(NK), new Float64Array(NK), new Float64Array(NK)], GE = [new Float64Array(NK), new Float64Array(NK), new Float64Array(NK)];
+{ let a = 0x2f6b1e9d >>> 0; const rnd = () => { a = (a + 0x6D2B79F5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };   // mulberry32, זרע קבוע = עולם חוזר
+  const r = Math.log(KMAX / KMIN) / NK;
+  for (let i = 0; i < NK; i++) { GK[i] = KMIN * Math.exp((i + 0.5) * r); GDK[i] = KMIN * (Math.exp((i + 1) * r) - Math.exp(i * r));
+    for (let c = 0; c < 3; c++) { GPH[c][i] = 2 * Math.PI * rnd(); GC[c][i] = 2 * rnd() - 1; GE[c][i] = rnd() - 0.5; } } }
+const gAmp = [new Float64Array(NK), new Float64Array(NK), new Float64Array(NK)];
+/** משב (u לאורך הרוח, v רוחבי, w אנכי), מ'/ש', בנקודה: ξ לאורך הרוח, η רוחבי, y גובה מוחלט, zag גובה מעל הקרקע. */
+SIM.gustAt = function (xi, eta, y, zag, t, u10, scale, out) {
+  out = out || {}; out.u = out.v = out.w = 0;
+  if (!(scale > 0) || !(u10 > 0)) return out;
+  const p = SIM.drydenParams(Math.max(zag, 3), SIM.W20(u10)), Uc = Math.max(1, u10), s0 = xi - Uc * t;
+  const Ls = [p.Lu, p.Lv, p.Lw], sg = [p.sigmaU * scale, p.sigmaV * scale, p.sigmaW * scale], res = [0, 0, 0];
+  for (let c = 0; c < 3; c++) {
+    const L = Ls[c], A = gAmp[c]; let tot = 0;
+    for (let i = 0; i < NK; i++) { const x = L * GK[i], x2 = x * x;
+      const phi = c === 0 ? 2 * L / Math.PI / (1 + x2) : L / Math.PI * (1 + 3 * x2) / ((1 + x2) * (1 + x2));
+      A[i] = phi * GDK[i]; tot += A[i]; }
+    const nrm = sg[c] * Math.SQRT2 / Math.sqrt(tot); let v = 0;          // Σ aᵢ²/2 = σ² בדיוק
+    const ph = GPH[c], cc = GC[c], ee = GE[c];
+    for (let i = 0; i < NK; i++) { const K = GK[i]; v += Math.sqrt(A[i]) * Math.cos(K * (s0 + cc[i] * eta + ee[i] * y) + ph[i]); }
+    res[c] = v * nrm;
+  }
+  out.u = res[0]; out.v = res[1]; out.w = res[2] * Math.min(1, zag / 3);  // ליד הקרקע אין זרימה דרכה (כמו במודול הקנוני)
+  return out;
+};
+const gTmp = {};
 /** רוח מקומית (מ'/ש') בנקודה. world = { H(x,z), near(x,z,r) → בניינים {top,base,p,n,cx,cz,minx..}, edge(b,x,z) → {d,px,pz} }.
  *  מחזיר out = {x,y,z, speed, canopy, info} */
 SIM.windAt = function (x, y, z, t, world, out) {
@@ -192,11 +236,11 @@ SIM.windAt = function (x, y, z, t, world, out) {
       const fl = Math.hypot(fx, fz) || 1; const mag = Math.hypot(par * (1 + 0.3 * k), perp * (1 - 0.65 * k)); ux = fx / fl; uz = fz / fl; U *= mag;
     }
   }
-  const s = gustSignal(t, x, z);                                           // משב: U·(1 + (G−1)·(s' − ממוצע s')), s' = max(−0.35, s)
-  const gm = 1 + (w.gust - 1) * (Math.max(-0.35, s) - GUST_MEAN);          // ממוצע לאורך זמן = 1 (הרוח הממוצעת לא מתנפחת)
-  U *= gm;
-  const vert = canopy ? 0 : 0.08 * U * gustSignal(t * 1.3 + 7, z, x);     // מערבולות אנכיות קטנות מעל הגגות
-  out.x = ux * U; out.z = uz * U; out.y = vert; out.speed = Math.hypot(out.x, out.y, out.z); out.canopy = canopy; out.hm = hm; out.sea = sea;
+  const fx0 = Math.sin(flowAz), fz0 = -Math.cos(flowAz);                     // ξ, η לפי כיוון הרוח הכללי (לא המתועל) – השדה הקפוא לא זז עם הקיר
+  SIM.gustAt(x * fx0 + z * fz0, -x * fz0 + z * fx0, y, zag, t, w.windSpeed, SIM.turbScale(w.gust, w.windSpeed), gTmp);
+  const px = -uz, pz = ux;                                                // u' לאורך הזרימה המקומית, v' רוחבי לה
+  const gx = ux * gTmp.u + px * gTmp.v, gz = uz * gTmp.u + pz * gTmp.v, vert = gTmp.w;
+  out.x = ux * U + gx; out.z = uz * U + gz; out.y = vert; out.mean = U; out.gu = gTmp.u; out.gv = gTmp.v; out.gw = gTmp.w; out.speed = Math.hypot(out.x, out.y, out.z); out.canopy = canopy; out.hm = hm; out.sea = sea;
   return out;
 };
 

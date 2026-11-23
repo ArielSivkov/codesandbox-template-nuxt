@@ -798,7 +798,7 @@ function renderEnv() {
   <label>רוח ${w.windSpeed.toFixed(1)} מ'/ש' (${Math.round(w.windSpeed * 3.6)} קמ"ש) <input type="range" id="eWs" min="0" max="25" step="0.5" value="${w.windSpeed}"></label>
   <label>נושבת מ${dirName(w.windFrom)} (${Math.round(w.windFrom)}°) <input type="range" id="eWd" min="0" max="359" step="5" value="${w.windFrom}"></label>
   <label>משבים ×${w.gust.toFixed(1)} <input type="range" id="eWg" min="1" max="2.5" step="0.1" value="${w.gust}"></label>
-  <div class="mut">רוח: פרופיל לוגריתמי ממוצע + השפעת בניינים <b>מקורבת</b> (לא CFD). מעל הים: חספוס צ'רנוק (רוח חזקה יותר מביבשה).</div>
+  <div class="mut">רוח: פרופיל לוגריתמי ממוצע + השפעת בניינים <b>מקורבת</b> (לא CFD). מעל הים: חספוס צ'רנוק (רוח חזקה יותר מביבשה). משבים: מערבולות דריידן (תקן MIL-F-8785C) לפי גובה, עוצמה ממחוון המשבים – <b>מקורב</b> (תקן לשטח פתוח, בלי מערבולות של בניינים).</div>
   <label>עננות ${Math.round(w.cloud * 100)}% <input type="range" id="eCl" min="0" max="1" step="0.05" value="${w.cloud}"></label>
   <label>גשם ${w.rain.toFixed(1)} מ"מ/שעה <input type="range" id="eRn" min="0" max="20" step="0.5" value="${w.rain}"></label>
   <div class="row"><button class="btn" id="eLive">📡 נתוני אמת (Open-Meteo)</button><button class="btn" id="eX">סגירה</button></div>

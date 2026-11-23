@@ -89,10 +89,36 @@ const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).
   const bs = [sq(30, 0, 20), sq(-30, 0, 20)], town = { H: () => 0, near: () => bs, edge: (b, x, z) => ({ d: 20, px: x + 20, pz: z }) };
   SIM.weather.windSpeed = 6; SIM.weather.gust = 1; const o30 = SIM.windAt(0, 30, 0, 0, town), r30 = Math.hypot(o30.x, o30.z);   // אופקי (מעל הגגות יש רכיב אנכי קטן)
   ok(Math.abs(r30 - SIM.meanWind(6, 30, 20)) < 1e-9 && r30 < 6.91 * 0.8, `שכונה 20 מ', רוח 6 מ'/ש': ב-30 מ' ${r30.toFixed(2)} מ'/ש' (היה 6.91 – העיר הגבירה רוח במקום להאט)`);
-  // משבים: ממוצע זמן = 1 (לפני התיקון +2.5% ב-G=1.5)
-  for (const G of [1.5, 2.5]) { SIM.weather.gust = G; let s = 0, N = 0; const open = { H: () => 0, near: () => [] };
-    for (let k = 0; k < 8; k++) for (let t = 0; t < 4000; t += 0.05) { s += SIM.windAt(k * 173.1, 10, k * 91.7, t, open).speed / 6; N++; }
-    ok(Math.abs(s / N - 1) < 0.01, `משבים G=${G}: ממוצע רוח / רוח ממוצעת = ${(s / N).toFixed(4)} (יעד 1 ±1%)`); }
+  // משבים = דריידן (MIL-F-8785C). (1) ממוצע וקטור הרוח לאורך הזרימה = הרוח הממוצעת (המהירות הסקלרית גדולה ממנה – נכון פיזיקלית)
+  { const open = { H: () => 0, near: () => [] }; SIM.weather.windSpeed = 6; SIM.weather.windFrom = 270;
+    for (const G of [1.5, 2.5]) { SIM.weather.gust = G; let s = 0, sp = 0, N = 0;
+      for (let k = 0; k < 400; k++) for (let t = 0; t < 600; t += 3.7) { const o = SIM.windAt(k * 173.1, 10, k * 91.7, t + k * 1000, open); s += o.x / 6; sp += o.speed / 6; N++; }
+      ok(Math.abs(s / N - 1) < 0.02 && sp / N >= s / N, `משבים G=${G}: ממוצע רכיב הרוח לאורך הזרימה / רוח ממוצעת = ${(s / N).toFixed(4)} (יעד 1 ±2%); מהירות סקלרית ${(sp / N).toFixed(3)}`); } }
+  // (2) זהות לנוסחאות הקנוניות של דריידן
+  { const { drydenParams: dp } = await import('../../physics/src/wind.js'); let mx = 0;
+    for (const h of [1, 3, 10, 30, 100, 400]) for (const W of [2, 7, 15]) { const a = SIM.drydenParams(h, W), b = dp(h, W); for (const k in b) mx = Math.max(mx, Math.abs(a[k] - b[k])); }
+    ok(mx < 1e-12, `דריידן במשחק = המודול הקנוני (σ ו-L, 18 צירופים, סטייה ${mx.toExponential(1)})`); }
+  // (3) שונות ופונקציית מתאם לאורך הרוח מול דריידן: Ru(L)=e⁻¹, Rv(L)=½e⁻¹, Rw(L)=½e⁻¹ (8785C)
+  { const u10 = 6, h = 10, sc = 1, p = SIM.drydenParams(h, SIM.W20(u10)), o1 = {}, o2 = {};
+    let ss = [0, 0, 0], cr = [0, 0, 0], N = 0, seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let n = 0; n < 60000; n++) { const xi = rnd() * 40000, eta = rnd() * 4000, t = rnd() * 3000;
+      SIM.gustAt(xi, eta, h, h, t, u10, sc, o1);
+      const g = [o1.u, o1.v, o1.w]; for (let c = 0; c < 3; c++) ss[c] += g[c] * g[c];
+      const L = [p.Lu, p.Lv, p.Lw];
+      for (let c = 0; c < 3; c++) { SIM.gustAt(xi + L[c], eta, h, h, t, u10, sc, o2); cr[c] += g[c] * [o2.u, o2.v, o2.w][c]; }
+      N++; }
+    const sd = ss.map(v => Math.sqrt(v / N)), ref = [p.sigmaU, p.sigmaV, p.sigmaW], R = cr.map((v, c) => v / ss[c]), Rref = [Math.exp(-1), 0.5 * Math.exp(-1), 0.5 * Math.exp(-1)];
+    const eS = Math.max(...sd.map((v, c) => Math.abs(v / ref[c] - 1))), eR = Math.max(...R.map((v, c) => Math.abs(v - Rref[c])));
+    ok(eS < 0.04, `משבים ב-10 מ', רוח 6: σu,σv,σw = ${sd.map(v => v.toFixed(3)).join(', ')} מול דריידן ${ref.map(v => v.toFixed(3)).join(', ')} (סטייה ${(eS * 100).toFixed(1)}%, סף 4%)`);
+    ok(eR < 0.05, `מתאם במרחק L: u ${R[0].toFixed(3)}/${Rref[0].toFixed(3)}, v ${R[1].toFixed(3)}/${Rref[1].toFixed(3)}, w ${R[2].toFixed(3)}/${Rref[2].toFixed(3)} (סף ±0.05)`); }
+  // (4) עוצמה מיחס המשב: G=1 → 0; G=1.5 בשטח פתוח → משב שיא 3 ש' ב-10 דק' ≈ G (בדיקת עקביות, g=3 מקורב)
+  { SIM.weather.gust = 1; const o = SIM.windAt(0, 10, 0, 3, { H: () => 0, near: () => [] });
+    ok(o.gu === 0 && o.gv === 0 && o.gw === 0, 'G=1 → בלי משבים (רוח ממוצעת בלבד)');
+    const u10 = 6, sc = SIM.turbScale(1.5, u10), ob = {}; let gsum = 0, W = 0;
+    for (let k = 0; k < 60; k++) { const buf = []; for (let t = 0; t < 600; t += 0.25) { SIM.gustAt(k * 5000, k * 300, 10, 10, t, u10, sc, ob); buf.push(u10 + ob.u); }
+      let mx = 0, acc = 0; for (let i = 0; i < buf.length; i++) { acc += buf[i]; if (i >= 12) acc -= buf[i - 12]; if (i >= 11) mx = Math.max(mx, acc / 12); }
+      gsum += mx / (buf.reduce((a, b) => a + b, 0) / buf.length); W++; }
+    const Gm = gsum / W; ok(Math.abs(Gm - 1.5) < 0.15, `G=1.5 (s=${sc.toFixed(2)}): יחס משב 3 ש' / ממוצע 10 דק' בסימולציה ${Gm.toFixed(2)} (60 חלונות, סף ±0.15)`); }
   // ים: חספוס צ'רנוק (Charnock 1955; Smith 1988) מול מקדם הגרר הנמדד של Smith 1980: CD10 = (0.61 + 0.063·U10)·10⁻³ (6–22 מ'/ש')
   { let worst = 0, rep = '';
     for (let U = 6; U <= 22; U += 2) { const us = SIM.seaUstar(U, 10), cd = (us / U) ** 2, ref = (0.61 + 0.063 * U) * 1e-3, e = Math.abs(cd - ref) / ref;

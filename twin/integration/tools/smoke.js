@@ -1,7 +1,7 @@
 // בדיקת עשן של העולם המשולב: node tools/smoke.js [url]   (קוד יציאה 1 בכישלון)
 // טעינה · כל המצבים הזמינים · מצבים בעבודה מסומנים · מצלמה 3 מבטים · מצב יזם (שכבה, שרטוט תקין/פסול) · זמן/מזג אוויר/שבת/איכות
 // · בידוד כשלים: תוסף שבור בכוונה (?) לא מפיל את העולם · אין שגיאות JS. (חסימת רשת של סביבת הבדיקה – ERR_TUNNEL_CONNECTION_FAILED לשרתים חיצוניים כמו שרת החשבונות – לא נספרת)
-const { chromium } = require('/tmp/pw/node_modules/playwright');
+const { chromium } = (() => { try { return require('playwright'); } catch (e) { return require('/tmp/pw/node_modules/playwright'); } })();
 (async () => {
   const url = process.argv[2] || 'http://localhost:8940/world/index.html?auto';
   const b = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
