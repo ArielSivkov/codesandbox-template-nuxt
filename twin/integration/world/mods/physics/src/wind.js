@@ -44,7 +44,16 @@
  *      along the canyon ("channelling", Oke 1988, Energy & Buildings 11:103). Perpendicular canyons
  *      are covered by H2 (Oke's skimming / wake-interference regimes, qualitatively).
  *   The numeric factors 0.15, 0.5, 0.3, 0.25, 0.3 are ASSUMED round numbers, not fitted to data.
+ *
+ * SEA SURFACE (option sea: true, no buildings):
+ *   z0 = α·u*²/g + 0.11·ν/u*,  α = 0.011, ν = 1.5e-5 m²/s  (Charnock 1955, QJRMS 81:639; smooth-flow term and
+ *   α from Smith 1988, JGR 93(C12):15467). u* is solved implicitly with the log law. The land station wind is
+ *   carried to the sea through the same blending height zb (Wieringa 1986), so at zb sea = land.
+ *   Checked against the bulk drag coefficient of Smith 1980 (JPO 10:709) CD10 = (0.61 + 0.063·U10)·1e-3.
+ *   [W7] APPROXIMATION: equilibrium sea (no fetch / internal boundary layer at the coast, no wave age:
+ *        α ranges 0.011–0.018 in the literature), neutral stability.
  */
+export const CHARNOCK_ALPHA = 0.011, NU_AIR = 1.5e-5, G0 = 9.81;
 
 const D2R = Math.PI / 180;
 const KAPPA = 0.4;
@@ -67,6 +76,24 @@ export function logLaw(z, uStar, z0, d = 0) {
   const zz = z - d;
   if (zz <= z0) return 0;
   return (uStar / KAPPA) * Math.log(zz / z0);
+}
+
+/** Sea roughness length (m) for friction velocity uStar (Charnock + smooth flow). [W7] */
+export function seaZ0(uStar) {
+  const u = Math.max(uStar, 1e-3);
+  return CHARNOCK_ALPHA * u * u / G0 + 0.11 * NU_AIR / u;
+}
+
+/** Friction velocity over the sea such that the log law gives speed U at height z (fixed point, |Δ| < 1e-12). */
+export function seaUstar(U, z) {
+  if (!(U > 0)) return 0;
+  let us = Math.max(0.04 * U, 1e-3);
+  for (let i = 0; i < 100; i++) {
+    const n = (KAPPA * U) / Math.log(z / seaZ0(us));
+    if (Math.abs(n - us) < 1e-12) return n;
+    us = n;
+  }
+  return us;
 }
 
 /** Dryden low-altitude intensities and scales (SI in, SI out). h in metres (clamped ≥ 3 m). */
@@ -102,6 +129,7 @@ export function createWind(o = {}) {
     speed10: o.speed10 ?? 5, fromDeg: o.fromDeg ?? 270, gammaDeg: o.gammaDeg ?? 0,
     buildings: o.buildings || [], gusts: o.gusts ?? true, turbulenceScale: o.turbulenceScale ?? 1,
     groundY: o.groundY ?? 0, zb: 60, z0open: 0.03, canopyA: 2, urbanEffects: o.urbanEffects ?? true,
+    sea: !!o.sea,
   };
   const hs = W.buildings.map((b) => b.h);
   const Hm = o.meanHeight ?? (hs.length ? hs.reduce((a, b) => a + b, 0) / hs.length : 0);
@@ -117,6 +145,10 @@ export function createWind(o = {}) {
   function meanSpeed(z) {
     const uStarOpen = (W.speed10 * KAPPA) / Math.log(10 / W.z0open);
     const ub = logLaw(W.zb, uStarOpen, W.z0open);                   // [W1] speed at blending height
+    if (W.sea && !(W.Hm > 0)) {                                     // [W7] open sea, Charnock roughness
+      const us = seaUstar(ub, W.zb), z0s = seaZ0(us);
+      return logLaw(Math.max(z, z0s * 1.0001), us, z0s);
+    }
     const uStar = (ub * KAPPA) / Math.log((W.zb - W.d) / W.z0);
     const Hc = Math.max(W.Hm, W.d + W.z0 * 1.5);
     if (z >= Hc || W.d === 0) return logLaw(Math.max(z, W.d + W.z0 * 1.0001), uStar, W.z0, W.d);

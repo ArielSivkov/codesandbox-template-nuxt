@@ -135,11 +135,26 @@ SIM.fetchWeather = async function (lat, lon) { const r = await fetch(SIM.openMet
  *  z = גובה מעל הקרקע, hm = גובה בניינים ממוצע סביב (0 = שטח פתוח). אותן נוסחאות כמו physics/src/wind.js (meanSpeed):
  *  חוק לוגריתמי u = (u*)÷κ·ln((z−d)/z0), κ=0.4; שטח פתוח z0=0.03 מ' (WMO/Davenport); עיר: d=0.7·H, z0=0.1·H (Grimmond & Oke 1999);
  *  מעבר שטח פתוח→עיר בגובה ערבוב zb=60 מ' שבו שני הפרופילים שווים (Wieringa 1986); מתחת לגג: u(H)·e^{2(z/H−1)} (Macdonald 2000, a=2 משוער).
- *  מקורב: ים מקבל z0 של שטח פתוח (0.03 ולא ~0.0002), יציבות ניטרלית בלבד, H הוא ממוצע הבניינים ברדיוס 40 מ' ולא שדה גבהים. */
+ *  ים (sea=true, בלי בניינים): חספוס צ'רנוק z0 = α·u*²/g + 0.11·ν/u*, α=0.011 (Charnock 1955; Smith 1988), u* נפתר במשוואה סתומה;
+ *  רוח התחנה עוברת לים דרך אותו גובה ערבוב. נבדק מול מקדם הגרר של Smith 1980: CD10 = (0.61+0.063·U10)·10⁻³.
+ *  מקורב: ים בשיווי משקל (בלי שכבת גבול פנימית ליד החוף, בלי גיל גלים), יציבות ניטרלית בלבד, H הוא ממוצע הבניינים ברדיוס 40 מ' ולא שדה גבהים. */
 const KAPPA = 0.4, Z0_OPEN = 0.03, ZB = 60, CANOPY_A = 2;
 const lawLog = (z, us, z0, d) => (z - d <= z0 ? 0 : us / KAPPA * Math.log((z - d) / z0));
-SIM.meanWind = function (u10, z, hm) {
+const CHARNOCK = 0.011, NU_AIR = 1.5e-5, G0 = 9.81;
+SIM.seaZ0 = (us) => { const u = Math.max(us, 1e-3); return CHARNOCK * u * u / G0 + 0.11 * NU_AIR / u; };
+SIM.seaUstar = function (U, z) {   // u* מעל ים כך שהחוק הלוגריתמי נותן U בגובה z (נקודת שבת)
+  if (!(U > 0)) return 0; let us = Math.max(0.04 * U, 1e-3);
+  for (let i = 0; i < 100; i++) { const n = KAPPA * U / Math.log(z / SIM.seaZ0(us)); if (Math.abs(n - us) < 1e-12) return n; us = n; }
+  return us;
+};
+let seaCache = { ub: -1, us: 0, z0: 0 };
+SIM.meanWind = function (u10, z, hm, sea) {
   const usO = u10 * KAPPA / Math.log(10 / Z0_OPEN);
+  if (sea && !(hm > 0)) {                                                       // ים פתוח: חספוס צ'רנוק
+    const ub = lawLog(ZB, usO, Z0_OPEN, 0);
+    if (ub !== seaCache.ub) { const us = SIM.seaUstar(ub, ZB); seaCache = { ub, us, z0: SIM.seaZ0(us) }; }
+    return lawLog(Math.max(z, seaCache.z0 * 1.0001), seaCache.us, seaCache.z0, 0);
+  }
   if (!(hm > 0)) return lawLog(Math.max(z, Z0_OPEN * 1.0001), usO, Z0_OPEN, 0);
   const z0 = Math.max(0.1 * hm, Z0_OPEN), d = 0.7 * hm, zb = Math.max(ZB, 2 * hm), us = lawLog(zb, usO, Z0_OPEN, 0) * KAPPA / Math.log((zb - d) / z0);   // גובה ערבוב ≥ 2H (Grimmond & Oke 1999) – ליד מגדלים d>60 נתן לוג של שלילי = NaN
   const Hc = Math.max(hm, d + 1.5 * z0);
@@ -164,7 +179,8 @@ SIM.windAt = function (x, y, z, t, world, out) {
   const list = world.near(x, z, 40);
   for (const b of list) { const h = b.top - Math.max(g, 0); hs += h; n++; if (h > hmax) hmax = h; }
   const hm = n ? hs / n : 0;
-  let U = SIM.meanWind(w.windSpeed, zag, hm);                              // פרופיל ממוצע – זהה למודול הקנוני physics/src/wind.js
+  const sea = !n && world.isSea ? world.isSea(x, z) : false;               // מעל הים (בלי בניינים סביב): חספוס צ'רנוק
+  let U = SIM.meanWind(w.windSpeed, zag, hm, sea);                              // פרופיל ממוצע – זהה למודול הקנוני physics/src/wind.js
   let canopy = 0;
   if (n && zag < hmax) {                                                   // בתוך חופת הבניינים (ההאטה כבר בפרופיל החופה)
     canopy = 1;
@@ -180,7 +196,7 @@ SIM.windAt = function (x, y, z, t, world, out) {
   const gm = 1 + (w.gust - 1) * (Math.max(-0.35, s) - GUST_MEAN);          // ממוצע לאורך זמן = 1 (הרוח הממוצעת לא מתנפחת)
   U *= gm;
   const vert = canopy ? 0 : 0.08 * U * gustSignal(t * 1.3 + 7, z, x);     // מערבולות אנכיות קטנות מעל הגגות
-  out.x = ux * U; out.z = uz * U; out.y = vert; out.speed = Math.hypot(out.x, out.y, out.z); out.canopy = canopy; out.hm = hm;
+  out.x = ux * U; out.z = uz * U; out.y = vert; out.speed = Math.hypot(out.x, out.y, out.z); out.canopy = canopy; out.hm = hm; out.sea = sea;
   return out;
 };
 

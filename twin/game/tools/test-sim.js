@@ -93,5 +93,18 @@ const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).
   for (const G of [1.5, 2.5]) { SIM.weather.gust = G; let s = 0, N = 0; const open = { H: () => 0, near: () => [] };
     for (let k = 0; k < 8; k++) for (let t = 0; t < 4000; t += 0.05) { s += SIM.windAt(k * 173.1, 10, k * 91.7, t, open).speed / 6; N++; }
     ok(Math.abs(s / N - 1) < 0.01, `משבים G=${G}: ממוצע רוח / רוח ממוצעת = ${(s / N).toFixed(4)} (יעד 1 ±1%)`); }
+  // ים: חספוס צ'רנוק (Charnock 1955; Smith 1988) מול מקדם הגרר הנמדד של Smith 1980: CD10 = (0.61 + 0.063·U10)·10⁻³ (6–22 מ'/ש')
+  { let worst = 0, rep = '';
+    for (let U = 6; U <= 22; U += 2) { const us = SIM.seaUstar(U, 10), cd = (us / U) ** 2, ref = (0.61 + 0.063 * U) * 1e-3, e = Math.abs(cd - ref) / ref;
+      if (e > worst) worst = e; if (U === 10) rep = `${(cd * 1e3).toFixed(2)}·10⁻³ מול ${(ref * 1e3).toFixed(2)}`;
+      const back = us / 0.4 * Math.log(10 / SIM.seaZ0(us)); if (Math.abs(back - U) > 1e-9) worst = 9; }
+    ok(worst < 0.15, `ים: מקדם גרר ב-10 מ'/ש' ${rep} (Smith 1980); סטייה מרבית ${(worst * 100).toFixed(1)}% ב-6–22 מ'/ש' (סף 15%), משוואה סתומה נפתרת עד 1e-9`); }
+  { const { createWind: cw, seaZ0 } = await import('../../physics/src/wind.js'); let mx = 0;
+    for (const u10 of [2, 6, 12, 20]) { const C = cw({ speed10: u10, sea: true, gusts: false }); for (let z = 0.5; z <= 150; z += 0.5) { const g = SIM.meanWind(u10, z, 0, true), c = C.meanSpeed(z); mx = Math.max(mx, Math.abs(g - c) / c); } }
+    const s10 = SIM.meanWind(6, 10, 0, true), l10 = SIM.meanWind(6, 10, 0), s60 = SIM.meanWind(6, 60, 0, true), l60 = SIM.meanWind(6, 60, 0);
+    ok(mx < 1e-9, `ים: פרופיל במשחק = המודול הקנוני (סטייה ${mx.toExponential(1)}, 4 רוחות × 300 גבהים)`);
+    ok(s10 > l10 && Math.abs(s60 - l60) < 1e-9 && seaZ0(0.25) < 0.001, `ים: רוח תחנה 6 מ'/ש' → מעל הים ב-10 מ' ${s10.toFixed(2)} (יבשה ${l10.toFixed(2)}, z0 ים ≈ ${(seaZ0(0.25) * 1000).toFixed(2)} מ"מ מול 30 מ"מ), בגובה הערבוב שווה ${s60.toFixed(2)}`);
+    SIM.weather.windSpeed = 6; SIM.weather.gust = 1; const seaW = { H: () => -5, near: () => [], isSea: () => true }, o = SIM.windAt(0, 10, 0, 0, seaW);
+    ok(o.sea && Math.abs(Math.hypot(o.x, o.z) - s10) < 1e-9, `windAt מעל הים משתמש בפרופיל הימי (${Math.hypot(o.x, o.z).toFixed(2)} מ'/ש')`); }
   console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); process.exit(fail ? 1 : 0);
 })();

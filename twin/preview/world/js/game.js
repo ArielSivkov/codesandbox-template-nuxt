@@ -108,7 +108,7 @@ const mine = new Map(JSON.parse(localStorage.getItem('w27.mine') || '[]').map(o 
 function saveMine() { localStorage.setItem('w27.mine', JSON.stringify([...mine.values()])); $('nMine').textContent = mine.size; }
 $('nMine').textContent = mine.size;
 
-const SIMW = { H: (x, z) => W.H(x, z), near: (x, z, r) => W.near(x, z, r), edge: (b, x, z) => W.edgeDist(b, x, z), collide: (x, z, r, a, b) => W.collide(x, z, r, a, b), floor: (x, z, y) => W.floorAt(x, z, y) };
+const SIMW = { H: (x, z) => W.H(x, z), isSea: (x, z) => W.isSea(x, z), near: (x, z, r) => W.near(x, z, r), edge: (b, x, z) => W.edgeDist(b, x, z), collide: (x, z, r, a, b) => W.collide(x, z, r, a, b), floor: (x, z, y) => W.floorAt(x, z, y) };
 const windHere = { x: 0, y: 0, z: 0, speed: 0 };
 // ---------- דמות (Quaternius UBC + UAL, כמו באש 5), עם דמות זמנית עד שנטען
 const player = new T.Group(); player.name = 'player'; scene.add(player);
@@ -761,6 +761,7 @@ function renderEnv() {
   <label>רוח ${w.windSpeed.toFixed(1)} מ'/ש' (${Math.round(w.windSpeed * 3.6)} קמ"ש) <input type="range" id="eWs" min="0" max="25" step="0.5" value="${w.windSpeed}"></label>
   <label>נושבת מ${dirName(w.windFrom)} (${Math.round(w.windFrom)}°) <input type="range" id="eWd" min="0" max="359" step="5" value="${w.windFrom}"></label>
   <label>משבים ×${w.gust.toFixed(1)} <input type="range" id="eWg" min="1" max="2.5" step="0.1" value="${w.gust}"></label>
+  <div class="mut">רוח: פרופיל לוגריתמי ממוצע + השפעת בניינים <b>מקורבת</b> (לא CFD). מעל הים: חספוס צ'רנוק (רוח חזקה יותר מביבשה).</div>
   <label>עננות ${Math.round(w.cloud * 100)}% <input type="range" id="eCl" min="0" max="1" step="0.05" value="${w.cloud}"></label>
   <label>גשם ${w.rain.toFixed(1)} מ"מ/שעה <input type="range" id="eRn" min="0" max="20" step="0.5" value="${w.rain}"></label>
   <div class="row"><button class="btn" id="eLive">📡 נתוני אמת (Open-Meteo)</button><button class="btn" id="eX">סגירה</button></div>

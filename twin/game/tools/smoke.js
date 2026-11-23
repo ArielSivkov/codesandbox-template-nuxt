@@ -1,6 +1,6 @@
 // בדיקת עשן אוטומטית: node tools/smoke.js [url]   (יוצא עם קוד 1 בכישלון)
 // מריץ: טעינה, 5 מצבים, התנגשות בבניין, כרטיס + קישור #pre, נכס שלי, כניסה/יציאה מהעסק, שמש/מזג אוויר, בלי שגיאות JS.
-const { chromium } = require(process.env.PW || '/tmp/pw/node_modules/playwright');
+const { chromium } = require(process.env.PW || 'playwright');
 (async () => {
   const url = process.argv[2] || 'http://localhost:8931/index.html?auto';
   const b = await chromium.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
