@@ -31,7 +31,10 @@ function cleanAvatar(a) {   // רק שדות מוכרים, ערכים מוגבל
   return JSON.stringify({ base: pick(a.base, ['m', 'f']) || 'm', skin: col(a.skin), hair: col(a.hair), top: col(a.top), bottom: col(a.bottom), shoes: col(a.shoes),
     hairStyle: pick(a.hairStyle, ['parted', 'buzzed', 'long', 'buns', 'none']) || 'parted', beard: !!a.beard, height: Math.min(2.05, Math.max(1.45, +a.height || 1.75)) });
 }
-async function init(db) { for (const s of SCHEMA) await db.prepare(s).run(); }
+let READY = false;
+async function init(db) { if (READY) return; for (const s of SCHEMA) await db.prepare(s).run();
+  try { await db.prepare('ALTER TABLE users ADD COLUMN device_hash TEXT').run(); } catch (e) { /* כבר קיים */ }
+  await db.prepare('CREATE UNIQUE INDEX IF NOT EXISTS users_device ON users(device_hash)').run(); READY = true; }
 async function limited(db, k) {   // עד 10 ניסיונות כושלים ב-15 דקות לכל שם משתמש/כתובת
   const r = await db.prepare('SELECT n, t FROM attempts WHERE k=?').bind(k).first(); const now = Date.now();
   return r && now - r.t < 900000 && r.n >= 10;
@@ -83,6 +86,13 @@ export default {
         if (!u || !u.pw_hash || !eq(await pbkdf2(pw, u.pw_salt), u.pw_hash)) { await fail(db, k); return J(req, { error: 'שם משתמש או סיסמה שגויים' }, 401); }
         return J(req, { token: await session(db, u.id), ...(await me(db, u.id)) });
       }
+      if (p === '/api/device' && req.method === 'POST') {   // כל טלפון = חשבון משלו אוטומטית (סוד אקראי שנשמר רק בטלפון)
+        const b = await body(req), sec = String(b.secret || '');
+        if (!/^[0-9a-f]{64}$/.test(sec)) return J(req, { error: 'סוד מכשיר לא תקין' }, 400);
+        const dh = await sha('dev:' + sec); let u = await db.prepare('SELECT id FROM users WHERE device_hash=?').bind(dh).first();
+        if (!u) { const id = rnd(8); await db.prepare('INSERT INTO users (id,device_hash,created) VALUES (?,?,?)').bind(id, dh, Date.now()).run(); await newProfile(db, id, b.profileName || 'אני', b.avatar); u = { id }; }
+        return J(req, { token: await session(db, u.id), ...(await me(db, u.id)) });
+      }
       if (p === '/api/google' && req.method === 'POST') {
         if (!env.GOOGLE_CLIENT_ID) return J(req, { error: 'התחברות עם גוגל עוד לא הוגדרה' }, 501);
         const b = await body(req), r = await fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(b.credential || ''));
@@ -95,6 +105,16 @@ export default {
       const uid = await auth(req, db);
       if (!uid) return J(req, { error: 'צריך להתחבר' }, 401);
       if (p === '/api/me') return J(req, await me(db, uid));
+      if (p === '/api/claim' && req.method === 'POST') {   // חשבון מכשיר מקבל שם משתמש וסיסמה – כדי להיכנס גם מטלפון אחר
+        const b = await body(req), un = String(b.username || '').trim().toLowerCase(), pw = String(b.password || '');
+        if (!USER_RE.test(un)) return J(req, { error: 'שם משתמש: 3–24 תווים, אותיות/מספרים/_.-' }, 400);
+        if (pw.length < 8) return J(req, { error: 'סיסמה: לפחות 8 תווים' }, 400);
+        const cur = await db.prepare('SELECT username FROM users WHERE id=?').bind(uid).first();
+        if (cur && cur.username) return J(req, { error: 'לחשבון כבר יש שם משתמש' }, 409);
+        if (await db.prepare('SELECT 1 FROM users WHERE username=?').bind(un).first()) return J(req, { error: 'שם המשתמש תפוס' }, 409);
+        const salt = rnd(16); await db.prepare('UPDATE users SET username=?, pw_hash=?, pw_salt=? WHERE id=?').bind(un, await pbkdf2(pw, salt), salt, uid).run();
+        return J(req, await me(db, uid));
+      }
       if (p === '/api/logout' && req.method === 'POST') { await db.prepare('DELETE FROM sessions WHERE token_hash=?').bind(await sha((req.headers.get('authorization') || '').slice(7))).run(); return J(req, { ok: true }); }
       if (p === '/api/profiles' && req.method === 'POST') {
         const b = await body(req), id = await newProfile(db, uid, b.name, b.avatar);

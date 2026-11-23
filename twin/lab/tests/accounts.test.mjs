@@ -24,4 +24,12 @@ for (let i = 0; i < 10; i++) await call('POST', '/api/login', { username: 'bob',
 r = await call('POST', '/api/login', { username: 'bob', password: 'xxxxxxxx' }); check(r.s === 429, 'חסימה אחרי 10 ניסיונות');
 const row = sql.prepare('SELECT pw_hash FROM users').get(); check(row.pw_hash.length === 64 && !row.pw_hash.includes('Secret'), 'הסיסמה שמורה רק כגיבוב');
 r = await call('POST', '/api/google', { credential: 'x' }); check(r.s === 501, 'גוגל כבוי עד שיוגדר');
+const sec = 'a'.repeat(64);
+r = await call('POST', '/api/device', { secret: sec }); check(r.s === 200 && r.j.token && r.j.profiles.length === 1 && !r.j.user.username, 'חשבון מכשיר אוטומטי');
+const dt = r.j.token, did = r.j.user.id;
+r = await call('POST', '/api/device', { secret: sec }); check(r.j.user.id === did, 'אותו טלפון → אותו חשבון');
+r = await call('POST', '/api/device', { secret: 'b'.repeat(64) }); check(r.j.user.id !== did, 'טלפון אחר → חשבון אחר');
+r = await call('POST', '/api/claim', { username: 'אריאל_27', password: 'Secret-pass-9' }, dt); check(r.s === 409, 'claim: שם תפוס');
+r = await call('POST', '/api/claim', { username: 'ariel_phone', password: 'Secret-pass-9' }, dt); check(r.s === 200 && r.j.user.username === 'ariel_phone', 'claim: שם וסיסמה לחשבון המכשיר');
+r = await call('POST', '/api/login', { username: 'ariel_phone', password: 'Secret-pass-9' }); check(r.s === 200 && r.j.user.id === did, 'כניסה מטלפון אחר לאותו חשבון');
 console.log(ok ? 'בדיקות החשבונות עברו' : 'נכשל'); process.exit(ok ? 0 : 1);

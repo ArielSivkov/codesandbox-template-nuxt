@@ -1,4 +1,5 @@
-/* חשבון, פרופילים ודמות: כפתור 👤 → כניסה/הרשמה (שם משתמש וסיסמה; גוגל כשיוגדר), עד 5 פרופילים לכל משתמש,
+/* חשבון, פרופילים ודמות: כל טלפון מקבל חשבון משלו אוטומטית (בלי הרשמה); אפשר להוסיף לו שם משתמש וסיסמה, או להתחבר לגוגל (כשיוגדר).
+ * כפתור 👤 → כניסה/הרשמה (שם משתמש וסיסמה; גוגל כשיוגדר), עד 5 פרופילים לכל משתמש,
  * ועורך דמות (גבר/אישה, תסרוקת, זקן, צבעי עור/שיער/חולצה/מכנסיים/נעליים, גובה) עם תצוגה חיה על הדמות במשחק.
  * שרת: esh27-accounts (Cloudflare Worker + D1). בלי חשבון: הדמות נשמרת בטלפון בלבד (אורח). ?acct=<כתובת> מחליף שרת (לבדיקות).
  */
@@ -15,16 +16,21 @@
   const profile = () => A.me && A.me.profiles.find(p => p.id === A.active);
   function avatar() { return Object.assign({}, DEF, A.edit || (profile() ? profile().avatar : A.guest) || {}); }
   function apply() { const G = window.G27; if (G && G.applyAvatar) G.applyAvatar(avatar()); }
+  function devSecret() { const s = store.get(); if (s.dev && /^[0-9a-f]{64}$/.test(s.dev)) return s.dev;
+    const d = [...crypto.getRandomValues(new Uint8Array(32))].map(x => x.toString(16).padStart(2, '0')).join(''); store.set({ dev: d }); return d; }
+  async function deviceLogin() { gotMe(await call('POST', '/api/device', { secret: devSecret(), avatar: A.guest || DEF })); }
   function gotMe(j) { if (j.token) { A.token = j.token; store.set({ token: j.token }); } A.me = { user: j.user, profiles: j.profiles };
     if (!profile()) A.active = j.profiles[0] && j.profiles[0].id; store.set({ active: A.active }); A.edit = null; apply(); render(); }
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
   function render() {
-    const el = A.el; if (!el || el.hidden) return; let h = '<div class="ac-head"><b>👤 ' + (A.me ? esc(A.me.user.username || A.me.user.email || 'החשבון שלי') : 'אורח') + '</b><button class="ac-x" data-a="close">✕</button></div>';
+    const el = A.el; if (!el || el.hidden) return; let h = '<div class="ac-head"><b>👤 ' + (A.me ? esc(A.me.user.username || A.me.user.email || 'החשבון של הטלפון הזה') : 'אורח') + '</b><button class="ac-x" data-a="close">✕</button></div>';
     if (!A.me) h += '<div class="ac-card"><div class="ac-t">כניסה או הרשמה</div><input id="acU" placeholder="שם משתמש" autocomplete="username"><input id="acP" type="password" placeholder="סיסמה (8+ תווים)" autocomplete="current-password">' +
       '<div class="ac-row"><button data-a="login">כניסה</button><button data-a="signup">הרשמה</button></div>' + (A.google ? '<div id="acG"></div>' : '<div class="ac-m">התחברות עם גוגל – בקרוב</div>') + '<div class="ac-m" id="acMsg"></div></div>';
     else h += '<div class="ac-card"><div class="ac-t">הפרופילים שלי</div><div class="ac-pl">' + A.me.profiles.map(p => '<button class="' + (p.id === A.active ? 'on' : '') + '" data-a="pick" data-id="' + p.id + '">' + esc(p.name) + '</button>').join('') +
-      (A.me.profiles.length < 5 ? '<button data-a="new">➕ חדש</button>' : '') + '</div><div class="ac-row"><button data-a="logout" class="ghost">יציאה</button>' + (A.me.profiles.length > 1 ? '<button data-a="del" class="ghost">מחק פרופיל</button>' : '') + '</div></div>';
+      (A.me.profiles.length < 5 ? '<button data-a="new">➕ חדש</button>' : '') + '</div><div class="ac-row">' + (A.me.user.username ? '<button data-a="logout" class="ghost">יציאה</button>' : '') + (A.me.profiles.length > 1 ? '<button data-a="del" class="ghost">מחק פרופיל</button>' : '') + '</div></div>';
+    if (A.me && !A.me.user.username) h += '<div class="ac-card"><div class="ac-t">🔗 להיכנס גם מטלפון או מחשב אחר</div><div class="ac-m">החשבון שמור בטלפון הזה. כדי להגיע אליו ממקום אחר – קבע שם משתמש וסיסמה' + (A.google ? ' או חבר לגוגל' : ' (חיבור לגוגל – בקרוב)') + '.</div>' +
+      '<input id="acU" placeholder="שם משתמש" autocomplete="username"><input id="acP" type="password" placeholder="סיסמה (8+ תווים)" autocomplete="new-password"><div class="ac-row"><button data-a="claim">שמור שם וסיסמה</button><button data-a="other" class="ghost">יש לי כבר חשבון</button></div><div class="ac-m" id="acMsg"></div></div>';
     const v = avatar(), col = (k, l) => '<label>' + l + '<input type="color" data-k="' + k + '" value="' + v[k] + '"></label>';
     h += '<div class="ac-card"><div class="ac-t">הדמות' + (profile() ? ' – ' + esc(profile().name) : '') + '</div>' + (profile() ? '<input id="acN" value="' + esc(profile().name) + '" maxlength="40">' : '') +
       '<div class="ac-seg">' + [['m', 'גבר'], ['f', 'אישה']].map(([k, l]) => '<button data-a="set" data-k="base" data-v="' + k + '" class="' + (v.base === k ? 'on' : '') + '">' + l + '</button>').join('') + '</div>' +
@@ -41,7 +47,9 @@
       if (a === 'close') { A.el.hidden = true; if (window.YZCam && A.cam0 != null) { YZCam.view = A.cam0; A.cam0 = null; } return; }
       if (a === 'login' || a === 'signup') { const u = document.getElementById('acU').value, p = document.getElementById('acP').value; msg('acMsg', '…');
         gotMe(await call('POST', '/api/' + a, { username: u, password: p, avatar: a === 'signup' ? (A.guest || DEF) : undefined })); return; }
-      if (a === 'logout') { try { await call('POST', '/api/logout'); } catch (e) { /* */ } A.token = null; A.me = null; store.set({ token: null }); apply(); render(); return; }
+      if (a === 'claim') { msg('acMsg', '…'); gotMe(await call('POST', '/api/claim', { username: document.getElementById('acU').value, password: document.getElementById('acP').value })); msg('acS', '✓ עכשיו אפשר להיכנס מכל מקום'); return; }
+      if (a === 'other') { A.me = null; A.token = null; render(); return; }
+      if (a === 'logout') { try { await call('POST', '/api/logout'); } catch (e) { /* */ } A.token = null; A.me = null; store.set({ token: null }); deviceLogin().catch(() => { apply(); render(); }); return; }
       if (a === 'pick') { A.active = d.id; A.edit = null; store.set({ active: A.active }); apply(); render(); return; }
       if (a === 'new') { const n = prompt('שם לפרופיל החדש'); if (!n) return; const j = await call('POST', '/api/profiles', { name: n, avatar: DEF }); A.active = j.profiles[j.profiles.length - 1].id; gotMe(j); return; }
       if (a === 'del') { if (!confirm('למחוק את הפרופיל "' + profile().name + '"?')) return; const id = A.active; A.active = null; gotMe(await call('DELETE', '/api/profiles/' + id)); return; }
@@ -72,7 +80,8 @@
     init() {
       ui(); const s = store.get(); A.token = s.token || null; A.active = s.active || null; A.guest = s.guest || null;
       fetch(API + '/api/health').then(r => r.json()).then(j => { A.google = !!j.google; }).catch(() => { /* אין שרת – מצב אורח */ });
-      if (A.token) call('GET', '/api/me').then(gotMe).catch(() => { A.token = null; store.set({ token: null }); });
+      if (A.token) call('GET', '/api/me').then(gotMe).catch(() => { A.token = null; store.set({ token: null }); deviceLogin().catch(() => { /* אין שרת – אורח */ }); });
+      else deviceLogin().catch(() => { /* אין שרת – מצב אורח בטלפון */ });
       let tries = 0; const iv = setInterval(() => { tries++; const G = window.G27; if (G && G.applyAvatar && G.applyAvatar(avatar())) clearInterval(iv); else if (tries > 120) clearInterval(iv); }, 500);
     },
     update() {}, dispose() { if (A.el) A.el.remove(); const b = document.getElementById('yzAcct'); if (b) b.remove(); } });
