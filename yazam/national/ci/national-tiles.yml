@@ -1,0 +1,66 @@
+# לוח היזם · כיסוי ארצי – בניית אריחים מגיאופבריק (OSM מלא) בשלבים.
+# לא מותקן: כדי שירוץ צריך להעתיק ל-.github/workflows/ בענף main (החלטה של אריאל – workflow_dispatch רץ רק מהענף הראשי).
+# בארגז החול שלנו גיאופבריק חסום; ב-GitHub Actions הוא נגיש. העלאה ל-R2 רק אם הסודות קיימים (R2 עוד לא הופעל).
+name: national-tiles
+on:
+  workflow_dispatch:
+    inputs:
+      radius_km: { description: "רדיוס סביב אשדוד (100, 110, 120 ...)", default: "100", required: true }
+permissions:
+  contents: read
+concurrency: { group: national-tiles, cancel-in-progress: false }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: national-v1 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y osmium-tool
+          pip install osmium==4.* shapely==2.* pyproj numpy pillow
+      - name: cache staging (resumable between runs)
+        uses: actions/cache@v4
+        with:
+          path: yazam/national/data/staging.sqlite
+          key: national-staging-${{ github.run_id }}
+          restore-keys: national-staging-
+      - name: download OSM (Geofabrik, ODbL)
+        run: |
+          mkdir -p _osm && cd _osm
+          curl -fsSLO https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf
+          curl -fsSLO https://download.geofabrik.de/asia/israel-and-palestine-latest.osm.pbf.md5
+          md5sum -c israel-and-palestine-latest.osm.pbf.md5
+          ls -la
+      - name: build tiles
+        run: |
+          cd yazam/national/pipeline
+          time python3 -I build_national.py --radius-km "${{ inputs.radius_km }}" --pbf ../../../_osm/israel-and-palestine-latest.osm.pbf --out ../data \
+            --land inputs/land_il.geojson --public inputs/ashdod_reference.csv --public-points inputs/ashdod_public_facts.json 2>&1 | tail -40
+          python3 -I build_overview.py --data ../data --land inputs/land_il.geojson
+          du -sh ../data/tiles ../data/nat; find ../data/tiles -type f | wc -l
+          cat ../data/nat/stage_*.json
+      - name: upload artifact (90 days)
+        uses: actions/upload-artifact@v4
+        with:
+          name: national-tiles-r${{ inputs.radius_km }}
+          path: |
+            yazam/national/data/tiles
+            yazam/national/data/nat
+            yazam/national/data/build.log
+      - name: upload to R2 (only if Ariel enabled R2 and added secrets)
+        if: env.R2_ACCOUNT_ID != ''
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          EP="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          # json.gz/bin.gz נשמרים דחוסים; הלקוח מזהה gzip לפי חתימה – אין צורך ב-Content-Encoding
+          aws s3 sync yazam/national/data/tiles "s3://yazam-map/national/tiles" --endpoint-url "$EP" --size-only --cache-control "public, max-age=86400"
+          aws s3 sync yazam/national/data/nat "s3://yazam-map/national/nat" --endpoint-url "$EP" --cache-control "public, max-age=3600"

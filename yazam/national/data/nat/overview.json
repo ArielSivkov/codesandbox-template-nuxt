@@ -1,0 +1,36 @@
+{
+ "origin_itm_nw": [
+  66000,
+  735000
+ ],
+ "cell_m": 100,
+ "size": 2010,
+ "radius_km": 100.0,
+ "center_itm": [
+  166951.1,
+  634275.0
+ ],
+ "buildings_counted": 257551,
+ "blocks": 41516,
+ "encoding": "R=sqrt(built fraction)*255, G=area-weighted mean height m, B=land(OSM coast 2017), A=inside circle; row0=north",
+ "blocks_bin": "gzip; records <int16 col, int16 row, uint8 h_m, uint8 frac*255> from origin_itm_nw",
+ "roads": {
+  "lines": 71496,
+  "points": 222758,
+  "bytes_gz": 867535,
+  "min_cls": 1,
+  "simplify_m": 2.5
+ },
+ "coast": {
+  "land": {
+   "polys": 3,
+   "vertices": 270,
+   "bytes": 4246
+  },
+  "sea": {
+   "polys": 13,
+   "vertices": 268,
+   "bytes": 4238
+  }
+ }
+}

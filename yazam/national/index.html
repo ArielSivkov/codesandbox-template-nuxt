@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#05070d">
+<link rel="icon" href="data:,">
+<title>לוח היזם · ישראל בתלת־ממד</title>
+<style>
+:root{--bg:#05070d;--glass:rgba(10,14,24,.62);--line:rgba(255,255,255,.12);--fg:#f3f1ec;--mut:#9aa6b6;--sun:#ffc56b;--moon:#a9c1e8;--acc:#f2b84b}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:"Heebo","Noto Sans Hebrew",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:none;user-select:none;-webkit-user-select:none}
+canvas#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block;touch-action:none}
+canvas#fade{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;opacity:0;transition:opacity .45s ease}
+.glass{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2)}
+#top{position:fixed;top:calc(env(safe-area-inset-top) + 10px);right:10px;left:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;z-index:5;pointer-events:none}
+#brand{pointer-events:auto;border-radius:14px;padding:7px 12px 8px}
+#brand b{display:block;font-size:15px;letter-spacing:.2px}
+#brand span{display:block;font-size:11px;color:var(--mut);margin-top:1px}
+#alt{border-radius:12px;padding:6px 10px;font-size:12px;color:var(--mut);white-space:nowrap;pointer-events:auto;direction:rtl}
+#alt b{color:var(--fg);font-variant-numeric:tabular-nums;font-size:14px}
+#side{position:fixed;left:10px;top:calc(env(safe-area-inset-top) + 74px);display:flex;flex-direction:column;gap:8px;z-index:5}
+.rb{width:44px;height:44px;border-radius:14px;color:var(--fg);font:600 18px/1 inherit;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.rb:active{transform:scale(.94)}
+#jumps{position:fixed;right:10px;top:calc(env(safe-area-inset-top) + 74px);display:flex;flex-direction:column;gap:6px;z-index:5}
+.jb{border-radius:12px;padding:8px 12px;font:600 13px/1 inherit;color:var(--fg);cursor:pointer;text-align:right;min-width:74px}
+.jb.on{border-color:var(--acc);color:var(--acc)}
+#sheet{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 30px);border-radius:18px;padding:10px 14px 12px;z-index:5;max-width:520px;margin:0 auto}
+#row1{display:flex;align-items:center;gap:10px}
+#clock{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.5px;min-width:76px;direction:ltr;text-align:right}
+#phase{flex:1;font-size:12px;color:var(--mut);line-height:1.35}
+#phase b{color:var(--fg);font-weight:600}
+#now{border-radius:12px;padding:8px 12px;font:700 13px/1 inherit;color:#1b1300;background:var(--acc);border:0;cursor:pointer}
+#now.live{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+#slider{position:relative;height:34px;margin-top:8px}
+#slider .track{position:absolute;inset:12px 0;border-radius:6px;background:linear-gradient(90deg,#0b1430 0%,#16224a 20%,#f0a35a 26%,#7fb8e8 34%,#9fd0f5 50%,#7fb8e8 66%,#f0a35a 73%,#16224a 80%,#0b1430 100%);direction:ltr}
+#slider input{position:absolute;inset:0;width:100%;margin:0;opacity:0;cursor:pointer;direction:ltr}
+#knob{position:absolute;top:5px;width:24px;height:24px;margin-left:-12px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 18px var(--sun);pointer-events:none}
+#knob.night{box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 18px var(--moon);background:#dfe8f7}
+#ticks{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);direction:ltr;margin-top:-2px;padding:0 2px}
+#attr{position:fixed;left:0;right:0;bottom:0;padding:5px 10px calc(env(safe-area-inset-bottom) + 5px);font-size:10px;color:#c9d2de;background:linear-gradient(0deg,rgba(0,0,0,.65),rgba(0,0,0,0));z-index:4;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#card{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 160px);max-width:420px;margin:0 auto;border-radius:16px;padding:10px 14px;z-index:6;display:none;font-size:13px;user-select:text}
+#card h3{margin:0 0 4px;font-size:15px}
+#card .m{color:var(--mut);font-size:12px}
+#card .x{position:absolute;left:10px;top:8px;background:none;border:0;color:var(--mut);font-size:18px;cursor:pointer}
+#tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:9px;border:1px solid #e0a64a;color:#ffd08a;margin-inline-start:6px}
+#load{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:radial-gradient(ellipse at 50% 60%,#0c1530,#03040a 70%);z-index:20;transition:opacity .6s}
+#load b{font-size:20px;letter-spacing:.3px}
+#load .bar{width:180px;height:3px;border-radius:2px;background:#ffffff1a;overflow:hidden}
+#load .bar i{display:block;height:100%;width:0;background:var(--acc);transition:width .2s}
+#load span{font-size:12px;color:var(--mut)}
+#dbg{position:fixed;left:62px;top:calc(env(safe-area-inset-top) + 74px);font:11px/1.35 ui-monospace,monospace;color:#cfe;white-space:pre;z-index:5;border-radius:10px;padding:6px 8px;display:none;direction:ltr}
+#toast{position:fixed;left:50%;top:38%;transform:translateX(-50%);border-radius:12px;padding:8px 14px;font-size:13px;display:none;z-index:9;max-width:84vw;text-align:center}
+@media (max-width:380px){#brand span{display:none}#clock{font-size:22px;min-width:64px}}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<canvas id="fade"></canvas>
+<div id="top">
+  <div id="brand" class="glass"><b>לוח היזם · ישראל</b><span id="cov">טוען כיסוי…</span></div>
+  <div id="alt" class="glass">גובה <b id="altv">–</b></div>
+</div>
+<div id="side">
+  <button class="rb glass" id="zin" aria-label="התקרב">+</button>
+  <button class="rb glass" id="zout" aria-label="התרחק">−</button>
+  <button class="rb glass" id="tilt" aria-label="הטיה">⤢</button>
+  <button class="rb glass" id="north" aria-label="צפון">N</button>
+  <button class="rb glass" id="dbgb" aria-label="מדדי ביצועים" style="font-size:16px">⏱</button>
+</div>
+<div id="jumps">
+  <button class="jb glass" data-go="globe">כדור הארץ</button>
+  <button class="jb glass" data-go="israel">ישראל</button>
+  <button class="jb glass" data-go="ashdod">אשדוד</button>
+  <button class="jb glass" data-go="haerez">הארז</button>
+</div>
+<div id="dbg" class="glass"></div>
+<div id="card" class="glass"><button class="x" id="cx" aria-label="סגור">×</button><h3 id="ct"></h3><div id="cb"></div></div>
+<div id="toast" class="glass"></div>
+<div id="sheet" class="glass">
+  <div id="row1"><div id="clock">--:--</div><div id="phase"></div><button id="now">עכשיו</button></div>
+  <div id="slider"><div class="track"></div><div id="knob"></div><input id="time" type="range" min="0" max="1439" step="1" value="720" aria-label="שעה"></div>
+  <div id="ticks"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+</div>
+<div id="attr">© תורמי OpenStreetMap (ODbL) · כדור הארץ: תצלומי נאס"א · קו חוף 2017 · גובהי הבניינים משוערים</div>
+<div id="load"><b>לוח היזם</b><div class="bar"><i id="lbar"></i></div><span id="lmsg">טוען את כדור הארץ…</span></div>
+<script src="vendor/three.min.js"></script>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>

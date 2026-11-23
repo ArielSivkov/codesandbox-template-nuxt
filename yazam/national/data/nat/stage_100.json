@@ -1,0 +1,24 @@
+{
+ "radius_km": 100.0,
+ "circle_km2": 31416,
+ "land_km2_in_circle": 16935,
+ "tiles_in_circle": 31816,
+ "buildings": 257551,
+ "roads_segments": 169032,
+ "tiles_written": 2061,
+ "built_m2": 97620394,
+ "built_km2": 97.62,
+ "tiles_bytes": 12306609,
+ "seconds_ingest": 0.6,
+ "seconds_tiles": 2.0,
+ "this_run": {
+  "src_R": 1773,
+  "public_override": 9,
+  "src_U": 9,
+  "buildings": 1782,
+  "roads": 2294,
+  "named_roads": 822,
+  "landuse": 0,
+  "built_m2": 868736.3184382392
+ }
+}
