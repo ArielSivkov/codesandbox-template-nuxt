@@ -81,6 +81,8 @@ def main(argv=None):
     ap.add_argument("--no-green", action="store_true", help="skip the vegetation layer (tiles/g)")
     ap.add_argument("--tree-slots", help="street-tree slots JSON from the transport team [{x,y,cls,street}] ITM")
     ap.add_argument("--ndvi", help="Sentinel-2 NDVI .npz on the ITM 10 m grid (see vegetation.load_ndvi_npz)")
+    ap.add_argument("--no-keep-sea", action="store_true", help="old behaviour: OUTSIDE also for open sea beyond the study area")
+    ap.add_argument("--bathy", help="bathymetry grid (ESRI ASCII .asc from EMODnet/GEBCO, WGS84) -> tiles/b/*.bin.gz")
     args = ap.parse_args(argv)
     t0 = time.time()
     city = load_city(args)
@@ -97,7 +99,7 @@ def main(argv=None):
         D = yz_sample.load(args.yz)
         raw_b, roads, dsm_fn, yzgrid = yz_sample.to_inputs(D)
         sea0 = landmask.clean_dem_sea_mask(yzgrid["sea"])
-        osm = {"buildings": raw_b, "roads": roads, "water": [], "boundary": None,
+        osm = {"buildings": raw_b, "roads": roads, "water": [], "boundary": None, "maritime": [],
                "coast": [yz_sample.synthetic_coastline(sea0, yzgrid)]}
         args.dem = "yzsample"
         sources_used["osm"] = "sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline"
@@ -110,7 +112,8 @@ def main(argv=None):
     else:
         osm = sources_osm.overpass(bbox, city.get("osm_name"))
         sources_used["osm"] = LICENCES["osm"] + " (Overpass)"
-    log("osm:", len(osm["buildings"]), "buildings,", len(osm["coast"]), "coast ways,", len(osm["roads"]), "roads")
+    log("osm:", len(osm["buildings"]), "buildings,", len(osm["coast"]), "coast ways,", len(osm["roads"]), "roads,",
+        len(osm.get("maritime", [])), "maritime features")
 
     if args.measurements and os.path.exists(args.measurements):
         meas = json.load(open(args.measurements, encoding="utf-8"))
@@ -219,7 +222,14 @@ def main(argv=None):
     log("heights by primary source:", stats_src, "conf:", confs)
 
     # ---------------------------------------------------------------- 7. tiles + manifest
-    keys = tiles.write_city(args.out, city, blds, osm["roads"], land, ground_fn, study)
+    mar_area = tiles.maritime_tile_area(osm.get("maritime", []), box(*geo.bbox_wgs_to_itm(bbox)))
+    keys = tiles.write_city(args.out, city, blds, osm["roads"], land, ground_fn, study,
+                            maritime=osm.get("maritime", []), keep_sea_outside=not args.no_keep_sea,
+                            extra_area=mar_area)
+    if args.bathy:
+        from yazam import bathy
+        nb = bathy.write_tiles(args.out, keys, bathy.EsriAsciiGrid(args.bathy))
+        sources_used["bathy"] = bathy.LICENCE_HINT + f" ({os.path.basename(args.bathy)}, {nb} tiles)"
     hs = np.array([b["h"] for b in blds]) if blds else np.zeros(1)
     ss = np.array([b["sigma"] for b in blds]) if blds else np.zeros(1)
     stats = {"buildings": len(blds), "tiles": len(keys), "area_km2": round(city_poly.area / 1e6, 2),

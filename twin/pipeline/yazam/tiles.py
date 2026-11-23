@@ -16,7 +16,11 @@ Vector tile JSON (compact, same delta/decimetre ring encoding as the current pag
          "r":[[dx,dy,dx,dy,...]],                                          # dm, first pair from tile origin
          "h":154,"s":21,"f":5,"fl":4,"fh":5,"src":"L","c":1,"u":"LN"}],    # h,s dm; c: 0 verified..3 low
    "rd":[{"c":2,"n":"הרצל","r":[...]}],
-   "sea":[[[dx,dy,...]]]}                                                  # sea polygons clipped to tile
+   "sea":[[[dx,dy,...]]],                                                  # sea polygons clipped to tile
+   "mar":[{"i":"w123","k":0,"g":"l","r":[dx,dy,...],"t":{...},"w":26}]}      # maritime patch: k = MAR_KINDS index,
+                                                                           # g = a(rea outer ring)|l(ine)|p(oint, "p")
+Maritime patch: keep_sea_outside=True writes SEA (not OUTSIDE) for sea nodes beyond the study area, so open sea is
+not turned into land by clients that fill OUTSIDE cells (twin/game/js/world.js diffuses land into them).
 """
 from __future__ import annotations
 
@@ -80,20 +84,62 @@ def building_record(b, ox, oy):
             "u": "".join(b["used"]), "x": "".join(b.get("rejected", []))}
 
 
-def write_city(out_dir, city, buildings, roads, land_geom, ground_fn, study_area):
-    """city: dict(slug,name_he,...); ground_fn(x,y)->metres (vectorised); study_area: Polygon (ITM)."""
+def maritime_records(maritime, fr, x0, y0):
+    """maritime features (ITM shapely) clipped to the tile frame `fr` -> compact 'mar' records"""
+    from .sources_osm import MAR_KINDS
+    out = []
+    for m in maritime or []:
+        g = m["geom"]
+        if not g.intersects(fr):
+            continue
+        k = MAR_KINDS.index(m["kind"]) if m["kind"] in MAR_KINDS else -1
+        rec = {"i": m["id"], "k": k, "t": m.get("tags", {})}
+        try:
+            w = float(str(m.get("tags", {}).get("width", "")).split()[0])
+            rec["w"] = round(w, 1)
+        except (ValueError, IndexError):
+            pass
+        if g.geom_type == "Point":
+            out.append({**rec, "g": "p", "p": [int(round((g.x - x0) * COORD_Q)), int(round((g.y - y0) * COORD_Q))]})
+            continue
+        c = g.intersection(fr.buffer(50))           # small overlap so lines/areas join across tiles
+        for part in (c.geoms if hasattr(c, "geoms") else [c]):
+            if part.is_empty:
+                continue
+            if part.geom_type == "Polygon" and part.area > 25:
+                out.append({**rec, "g": "a", "r": _enc_ring(list(part.simplify(0.5).exterior.coords), x0, y0)})
+            elif part.geom_type == "LineString" and part.length > 1:
+                out.append({**rec, "g": "l", "r": _enc_ring(list(part.simplify(0.5).coords), x0, y0)})
+    return out
+
+
+def maritime_tile_area(maritime, clip, pad=50.0):
+    """Area (ITM) covered by maritime features inside `clip` (the fetch bbox). Offshore breakwaters / buoys lie
+    beyond the city boundary; without this their tiles were never written and the features were silently lost."""
+    from shapely.ops import unary_union
+    gs = [m["geom"].buffer(pad) for m in maritime or [] if m["geom"].intersects(clip)]
+    return unary_union(gs).intersection(clip) if gs else None
+
+
+def write_city(out_dir, city, buildings, roads, land_geom, ground_fn, study_area, maritime=None, keep_sea_outside=False,
+               extra_area=None):
+    """city: dict(slug,name_he,...); ground_fn(x,y)->metres (vectorised); study_area: Polygon (ITM).
+    maritime: list of maritime records (sources_osm) -> 'mar' layer; keep_sea_outside: SEA beyond the study area.
+    extra_area: more tiles to write (e.g. maritime_tile_area) – they do NOT extend the study area: land there stays
+    OUTSIDE (no terrain claimed), sea is SEA when keep_sea_outside, and only the vector layers are filled."""
     import shapely
     shapely.prepare(study_area)
+    tile_area = study_area if extra_area is None or extra_area.is_empty else study_area.union(extra_area)
     by_tile = {}
     for b in buildings:
         by_tile.setdefault(tile_of(b["cx"], b["cy"]), []).append(b)
-    minx, miny, maxx, maxy = study_area.bounds
+    minx, miny, maxx, maxy = tile_area.bounds
     keys = []
     for tx in range(int(minx // TILE_M), int(maxx // TILE_M) + 1):
         for ty in range(int(miny // TILE_M), int(maxy // TILE_M) + 1):
             x0, y0, x1, y1 = tile_bounds(tx, ty)
             fr = box(x0, y0, x1, y1)
-            if not fr.intersects(study_area):
+            if not fr.intersects(tile_area):
                 continue
             k = tile_key(tx, ty)
             keys.append(k)
@@ -108,7 +154,8 @@ def write_city(out_dir, city, buildings, roads, land_geom, ground_fn, study_area
             zz = np.where(land_pts, np.maximum(zz, 0.3), 0)          # land never below +0.3 m
             q = np.round(zz * 10).astype(np.int32)
             q = np.where(land_pts, q, SEA)
-            q = np.where(inside, q, OUTSIDE).astype("<i2")
+            keep = (inside | ~land_pts) if keep_sea_outside else inside
+            q = np.where(keep, q, OUTSIDE).astype("<i2")
             mask = rasterize(land_geom, x0, y0, MASK_STEP, NM, NM)
             hdr = struct.pack("<4sHiiHHH", b"YZT1", 1, tx, ty, NT, NM, TERRAIN_STEP)
             _write_gz(os.path.join(out_dir, "tiles/t", k + ".bin.gz"), hdr + q.tobytes() + pack_bits(mask))
@@ -127,6 +174,8 @@ def write_city(out_dir, city, buildings, roads, land_geom, ground_fn, study_area
             sea = fr.difference(land_geom) if not land_geom.is_empty else fr
             sea = [_enc_poly(p.simplify(1.0), x0, y0) for p in _polys(sea) if p.area > 25]
             old.update({"b": recs, "rd": rd if rd else old.get("rd", []), "sea": sea})
+            if maritime:
+                old["mar"] = maritime_records(maritime, fr, x0, y0)
             _write_gz(vp, json.dumps(old, ensure_ascii=False, separators=(",", ":")).encode())
     return keys
 

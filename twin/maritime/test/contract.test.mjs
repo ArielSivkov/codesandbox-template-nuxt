@@ -5,13 +5,13 @@ import fs from 'node:fs';
 import zlib from 'node:zlib';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { decodeMarLayer } from '../maritime.js';
+import { decodeMarLayer, MAR_KINDS } from '../maritime.js';
 import { decodeTerrainBin, fillFromTiles, buildGrid, contour, lineLength } from '../src/grid.js';
 import { FixtureAIS, ServerProxyAIS, shipClass, deadReckon } from '../src/ais.js';
 import { KELVIN } from '../src/traffic.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const SAMPLE = path.join(HERE, '../../../codesandbox-template-nuxt/twin/pipeline/sample-out-ashdod');
+const SAMPLE = path.join(HERE, '../../pipeline/sample-out-ashdod');
 
 test('pipeline "mar" layer (written by the patched pipeline) decodes into maritime features', () => {
   const fx = JSON.parse(fs.readFileSync(path.join(HERE, '../fixtures/mar_tiles_from_patch.json'), 'utf8'));
@@ -52,3 +52,11 @@ test('AIS: fixture adapter never reports live; proxy without WebSocket reports o
 });
 
 test('Kelvin wake half-angle = arcsin(1/3) ≈ 19.47°', () => { assert.ok(Math.abs(KELVIN * 180 / Math.PI - 19.4712) < 1e-3); });
+
+test('MAR_KINDS in maritime.js is identical (same order) to the pipeline sources_osm.py list', () => {
+  const py = fs.readFileSync(path.join(HERE, '../../pipeline/yazam/sources_osm.py'), 'utf8');
+  const m = py.match(/MAR_KINDS = \[([\s\S]*?)\]/);
+  assert.ok(m, 'MAR_KINDS not found in pipeline');
+  const pyKinds = [...m[1].matchAll(/"([a-z_]+)"/g)].map(x => x[1]);
+  assert.deepEqual(MAR_KINDS, pyKinds);
+});
