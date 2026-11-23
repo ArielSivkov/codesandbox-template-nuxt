@@ -9,7 +9,7 @@
 (function () {
   'use strict';
   // פרמטרי לילה – מכוילים מול תמונות השטח של אריאל (סבבי שימור-שיפור, rounds/*.json)
-  const NIGHT = window.YZNight = Object.assign({ amb: 0.95, sky: 0x8c8678, gnd: 0x6e5c48, ev: 0.25, pool: 16, poolOp: 0.55, win: 0.9 }, window.YZNight || {});
+  const NIGHT = window.YZNight = Object.assign({ amb: 0.95, sky: 0x8c8678, gnd: 0x6e5c48, ev: 0.25, pool: 26, poolOp: 0.85, win: 0.9, lamp: 4.5, lampY: 8, ground: 0x3a3022 }, window.YZNight || {});
   const A = { night: 0, golden: 0, lamps: null, pools: null, stars: null, lampT: 0, mask: null, wallE: null, cnt: 0 };
   const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
   const C = (h) => new THREE.Color(h);
@@ -22,7 +22,8 @@
     const img = map && map.image; if (!img || !img.width) return null;
     const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; const x = c.getContext('2d'); x.drawImage(img, 0, 0);
     const d = x.getImageData(0, 0, c.width, c.height), p = d.data, w = c.width, h = c.height;
-    const cellOn = [1, 0.25, 0.85, 0], warm = [[255, 214, 150], [255, 236, 200], [255, 190, 120], [200, 220, 255]];
+    const cellOn = [0.9, 0, 0.35, 0],   // 01:00 בלילה: מעט חלונות דולקים (תמונות השטח)
+      _u = 0, warm = [[255, 214, 150], [255, 236, 200], [255, 190, 120], [200, 220, 255]];
     for (let i = 0; i < w * h; i++) { const r = p[i * 4], g = p[i * 4 + 1], b = p[i * 4 + 2]; const win = b > r + 18 && b > 40;
       const cx = (i % w) * 2 / w | 0, cy = (i / w | 0) * 2 / h | 0, k = cy * 2 + cx, on = cellOn[k] * (win ? 1 : 0);
       p[i * 4] = warm[k][0] * on; p[i * 4 + 1] = warm[k][1] * on; p[i * 4 + 2] = warm[k][2] * on; p[i * 4 + 3] = 255; }
@@ -46,7 +47,7 @@
     const pos = lampPositions(world, max), n = pos.length / 2, H = world.data.H;
     const m = new THREE.Matrix4(), q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 2), s = new THREE.Vector3(1, 1, 1), v = new THREE.Vector3();
     A.pools.count = n; const lp = A.lamps.geometry.attributes.position;
-    for (let i = 0; i < n; i++) { const x = pos[i * 2], z = pos[i * 2 + 1], g = Math.max(0, H(x, z)); v.set(x, g + 0.4, z); m.compose(v, q, s); A.pools.setMatrixAt(i, m); lp.setXYZ(i, x, g + 6.5, z); }
+    for (let i = 0; i < n; i++) { const x = pos[i * 2], z = pos[i * 2 + 1], g = Math.max(0, H(x, z)); v.set(x, g + 0.4, z); m.compose(v, q, s); A.pools.setMatrixAt(i, m); lp.setXYZ(i, x, g + NIGHT.lampY, z); }
     A.pools.instanceMatrix.needsUpdate = true; lp.needsUpdate = true; A.lamps.geometry.setDrawRange(0, n); A.lamps.geometry.computeBoundingSphere(); A.pools.computeBoundingSphere(); A.cnt = n;
   }
   function grade(world) {
@@ -65,6 +66,8 @@
     const MAT = world.data.MAT; if (MAT && MAT.wall) { if (!A.mask) { A.mask = windowMask(MAT.wall.map); }
       if (A.mask) { if (A.night > 0.05) { MAT.wall.emissiveMap = A.mask; MAT.wall.emissive.set(0xffffff); MAT.wall.emissiveIntensity = A.night * NIGHT.win; } else { MAT.wall.emissiveMap = null; MAT.wall.emissive.set(0x000000); }
         MAT.wall.needsUpdate = true; } }
+    // קרקע מוארת בלילה (אספלט ומדרכות בהירים בתמונות — פנסים צפופים); לא אור אמיתי, הארה עצמית חלשה
+    for (const k of ['road', 'walk', 'terrain']) { const m = MAT && MAT[k]; if (!m || !m.emissive) continue; m.emissive.setHex(NIGHT.ground).multiplyScalar(A.night * (k === 'terrain' ? 0.6 : 1)); }
     const vis = A.night > 0.05; A.lamps.visible = A.pools.visible = vis; A.stars.visible = !world.providers.starsReal && A.night > 0.5 && world.weather.cloud < 0.8;   // מחלקת השמיים מציירת כוכבים אמיתיים
     A.pools.material.opacity = NIGHT.poolOp * A.night; A.lamps.material.opacity = A.night; A.stars.material.opacity = (1 - world.weather.cloud) * A.night * (1 - hz);
     if (vis && !A.cnt) rebuildLamps(world);
@@ -75,10 +78,10 @@
     init(world, api) {
       const g = api.group(); const MAX = 700;
       const pg = new THREE.PlaneGeometry(NIGHT.pool, NIGHT.pool);
-      A.pools = new THREE.InstancedMesh(pg, new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.4, 1.0), map: glowTex('rgba(255,200,130,1)', 'rgba(255,170,90,0.45)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true }), MAX);
+      A.pools = new THREE.InstancedMesh(pg, new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.4, 1.0), map: glowTex('rgba(255,214,150,1)', 'rgba(255,186,110,0.5)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true }), MAX);
       A.pools.count = 0; A.pools.frustumCulled = false; A.pools.renderOrder = 1; g.add(A.pools);
       const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX * 3), 3)); lg.setDrawRange(0, 0);
-      A.lamps = new THREE.Points(lg, new THREE.PointsMaterial({ size: 2.2, map: glowTex('rgba(255,245,220,1)', 'rgba(255,190,110,0.6)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, fog: true }));
+      A.lamps = new THREE.Points(lg, new THREE.PointsMaterial({ size: NIGHT.lamp, map: glowTex('rgba(255,245,220,1)', 'rgba(255,190,110,0.6)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true, fog: true }));
       A.lamps.frustumCulled = false; g.add(A.lamps);
       const sp = new Float32Array(900 * 3); for (let i = 0; i < 900; i++) { const u = Math.random(), v = Math.random() * 0.9 + 0.1, th = u * Math.PI * 2, y = v, r = Math.sqrt(1 - y * y); sp[i * 3] = Math.cos(th) * r * 1800; sp[i * 3 + 1] = y * 1800; sp[i * 3 + 2] = Math.sin(th) * r * 1800; }
       const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));

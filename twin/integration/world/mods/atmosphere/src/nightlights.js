@@ -147,8 +147,8 @@ void main() {
   float d = max(-mv.z, 1.0);
   float blink = phase < 0.0 ? 1.0 : step(0.5, fract(time * 0.5 + phase));   // aviation lights: 1 s on / 1 s off
   float s = size * px * 420.0 / d * (1.0 + rays * 2.0);
-  gl_PointSize = clamp(s, 1.5 * px, 48.0 * px);
-  vC = color * on * blink * clamp(s / (1.5 * px), 0.2, 1.0);   // sub-pixel lamps keep their energy, fade only a little
+  gl_PointSize = clamp(s, 1.5 * px, (20.0 + 28.0 * rays) * px);
+  vC = color * on * blink * clamp(s / (1.5 * px), 0.2, 1.0) * clamp(60.0 / d, 0.25, 1.0);   // near lamps: big but not brighter (avoid bloom blobs)   // sub-pixel lamps keep their energy, fade only a little
   vR = rays;
 }`;
 const SPRITE_FS = /* glsl */`

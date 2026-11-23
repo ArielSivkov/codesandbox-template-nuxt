@@ -26,11 +26,11 @@ MODS = {
     'npc':        (SW + '/npc',        ['js', 'data']),
     'buildings':  (SW + '/buildings',  ['src']),
     'sky':        (SW + '/sky',        ['dist/esh27-sky.js']),
-    'assets':     (SW + '/assets/pack', ['models', 'vendor', 'report.json']),
+    'assets':     (SW + '/assets/pack', ['models']),
 }
 
 # מודולים שיש להם מתאם פעיל – רק הם מועתקים (השאר נבדקים ומדווחים)
-WIRED = {'physics', 'weather', 'present', 'audio', 'maritime', 'atmosphere', 'sky', 'vegetation', 'aviation', 'procgen'}
+WIRED = {'physics', 'weather', 'present', 'audio', 'maritime', 'atmosphere', 'sky', 'vegetation', 'aviation', 'procgen', 'assets'}
 
 def copy_item(src, dst):
     if os.path.isdir(src):

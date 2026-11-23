@@ -24,7 +24,7 @@ const W_WARM = norm(hexToLinear(FIELD_NIGHT.window_warm)), W_COOL = norm(hexToLi
 export const LOOK_TUNING = {
   preethamGain: 0.24,     // Preetham radiance → our scale (matched by eye so the noon zenith ≈ #3D7CC9 target)
   windowRadiance: 9e-5,   // lit window radiance (scene units) — ≈ 3 cd/m² equivalent; tuned to field photo 007/008
-  lampSprite: 0.0028,     // lamp head sprite radiance
+  lampSprite: 0.0016,     // lamp head sprite radiance
   lampLux: 22,            // peak illuminance under a lamp head (Israeli street lighting ~10–30 lux; SI 20.3 / EN 13201 classes)
   moonSky: 0.03, cityGlowSky: 0.022, cloudCity: 0.8,
 };
