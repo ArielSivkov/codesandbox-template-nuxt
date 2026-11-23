@@ -6,163 +6,265 @@
 <meta name="theme-color" content="#000000">
 <title>סורק אש 27</title>
 <style>
-:root{--bg:#0f1214;--card:#1a1f23;--line:#2a3238;--text:#eef2f4;--mute:#9aa7b0;--ok:#3ecf8e;--warn:#f5b342;--bad:#ff6b6b;--acc:#ff8a3d}
+:root{--card:#14191ccc;--line:#ffffff22;--text:#f2f5f7;--mute:#a9b4bc;--ok:#3ecf8e;--warn:#f5b342;--bad:#ff6b6b;--acc:#ff8a3d}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:#000;color:var(--text);font-family:system-ui,-apple-system,Arial,sans-serif;font-size:15px}
-.tabs{display:flex;gap:6px;padding:8px;position:sticky;top:0;z-index:20;background:#000d}
-.tabs button{flex:1;padding:10px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-weight:700;font-size:14px}
-.tabs button.on{background:var(--acc);color:#1b0d03}
-#cam{position:relative;width:100%;background:#000}
-#vid{width:100%;display:block;max-height:70vh;object-fit:contain}
-#hud{position:absolute;inset:0;pointer-events:none}
-.hudtxt{position:absolute;top:6px;right:6px;left:6px;display:flex;flex-wrap:wrap;gap:4px}
-.p{font-size:12px;padding:2px 8px;border-radius:99px;background:#000a;border:1px solid #fff3}
-.p.ok{border-color:var(--ok);color:var(--ok)}.p.warn{border-color:var(--warn);color:var(--warn)}.p.bad{border-color:var(--bad);color:var(--bad)}
-.ctl{display:flex;gap:8px;padding:10px;flex-wrap:wrap;justify-content:center}
-.big{width:78px;height:78px;border-radius:50%;border:5px solid #fff;background:var(--acc)}
-.big.rec{background:var(--bad)}
-.sm{background:#2a3238;color:var(--text);border:0;border-radius:9px;padding:8px 12px;font-size:13px}
-.sm.on{background:var(--ok);color:#06120c}
-main{padding:10px;max-width:680px;margin:0 auto}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
-.tip{background:#22190f;border:1px solid #5a3a14;border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:10px}
+html,body{margin:0;height:100%;background:#000;color:var(--text);font-family:system-ui,-apple-system,Arial,sans-serif;overflow:hidden}
+#vid{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+#hud{position:fixed;inset:0;width:100%;height:100%;pointer-events:none}
+/* פס עליון: איפה אני */
+#top{position:fixed;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px;background:linear-gradient(#000c,#0000)}
+#place{font-size:17px;font-weight:800}
+#sub{font-size:13px;color:var(--mute);margin-top:2px}
+.dots{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.d{font-size:12px;padding:2px 8px;border-radius:99px;background:#0008;border:1px solid var(--line)}
+.d.ok{border-color:var(--ok);color:var(--ok)}.d.warn{border-color:var(--warn);color:var(--warn)}.d.bad{border-color:var(--bad);color:var(--bad)}
+/* מפה קטנה */
+#map{position:fixed;left:10px;top:calc(env(safe-area-inset-top) + 92px);width:132px;height:132px;border-radius:50%;border:2px solid #fff6;background:#111;overflow:hidden}
+#map canvas{width:100%;height:100%}
+/* הנחיה במרכז */
+#guide{position:fixed;left:50%;top:58%;transform:translate(-50%,-50%);font-size:20px;font-weight:800;text-align:center;text-shadow:0 2px 8px #000;padding:8px 14px;border-radius:14px;background:#0006;max-width:86vw;transition:opacity .3s}
+/* פס תחתון */
+#bot{position:fixed;left:0;right:0;bottom:0;padding:10px 14px calc(env(safe-area-inset-bottom) + 14px);background:linear-gradient(#0000,#000d);display:flex;align-items:center;justify-content:space-between;gap:10px}
+#go{width:84px;height:84px;border-radius:50%;border:5px solid #fff;background:var(--acc);color:#1b0d03;font-weight:900;font-size:15px}
+#go.on{background:var(--bad);color:#fff}
+.side{min-width:92px;text-align:center;font-size:13px;color:var(--mute)}
+.side b{display:block;font-size:20px;color:var(--text)}
+.ib{background:#0008;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:8px 10px;font-size:13px}
+#flash{position:fixed;inset:0;background:#fff;opacity:0;pointer-events:none;transition:opacity .15s}
+/* מסך פתיחה */
+#intro{position:fixed;inset:0;background:#000e;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:14px;z-index:40}
+#intro h1{margin:0;font-size:24px}
+#intro p{margin:0;color:var(--mute);font-size:15px;line-height:1.5;max-width:420px}
+#intro button{font-size:18px;font-weight:900;background:var(--acc);border:0;border-radius:14px;padding:16px 28px;color:#1b0d03}
+#keyrow{display:flex;gap:8px;width:100%;max-width:340px}#keyrow input{flex:1;background:#111;color:#fff;border:1px solid #333;border-radius:10px;padding:10px}
+/* חלון כלים */
+#tools{position:fixed;inset:0;background:#0b0e10;z-index:30;overflow:auto;display:none}
+#tools.open{display:block}
+.tw{padding:12px;max-width:680px;margin:0 auto}
+.card{background:#1a1f23;border:1px solid #2a3238;border-radius:14px;padding:12px;margin-bottom:10px}
 .msg{font-size:13px;margin-top:6px;color:var(--mute)}
-input[type=text],input[type=number],input[type=password]{width:100%;background:#0f1214;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;font-size:15px}
-label.f{display:block;font-size:13px;color:var(--mute)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}td,th{border-bottom:1px solid var(--line);padding:5px;text-align:right}
+.tabs{display:flex;gap:6px}.tabs button{flex:1;padding:10px 4px;border-radius:10px;border:1px solid #2a3238;background:#1a1f23;color:var(--text);font-weight:700}.tabs button.on{background:var(--acc);color:#1b0d03}
+input[type=text],input[type=number]{width:100%;background:#0f1214;color:var(--text);border:1px solid #2a3238;border-radius:8px;padding:8px;font-size:15px}
+label.f{display:block;font-size:13px;color:var(--mute)}.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}td,th{border-bottom:1px solid #2a3238;padding:5px;text-align:right}
 #mCv{width:100%;touch-action:none;border-radius:10px;background:#000;display:block}
-#mLoupe{position:fixed;top:70px;left:12px;width:140px;height:140px;border-radius:50%;border:2px solid var(--acc);display:none;z-index:30;background:#000}
-.thumbs{display:flex;gap:6px;flex-wrap:wrap}.thumbs img{width:72px;height:54px;object-fit:cover;border-radius:6px;border:2px solid var(--line)}
-.thumbs img.ok{border-color:var(--ok)}.thumbs img.bad{border-color:var(--bad)}
+#mLoupe{position:fixed;top:70px;left:12px;width:140px;height:140px;border-radius:50%;border:2px solid var(--acc);display:none;z-index:50;background:#000}
+.sm{background:#2a3238;color:var(--text);border:0;border-radius:9px;padding:8px 12px;font-size:13px}
 .shot{display:block;text-align:center;background:var(--acc);color:#1b0d03;font-weight:800;border-radius:12px;padding:12px;cursor:pointer}.shot input{display:none}
 .bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+#log{font-size:12px;color:var(--mute);white-space:pre-wrap;max-height:200px;overflow:auto;direction:ltr;text-align:left}
 </style>
 </head>
 <body>
-<div class="tabs"><button id="tbCam" class="on">📷 סריקה</button><button id="tbMeas">📏 מדידה</button><button id="tbSet">⚙️ חיבור</button></div>
+<video id="vid" playsinline muted autoplay></video>
+<canvas id="hud"></canvas>
+<div id="flash"></div>
 
-<section id="secCam">
-  <div id="cam"><video id="vid" playsinline muted autoplay></video><canvas id="hud"></canvas>
-    <div class="hudtxt"><span id="hGps" class="p">GPS …</span><span id="hHead" class="p">מצפן …</span><span id="hTilt" class="p">הטיה …</span><span id="hUp" class="p">0 עלו</span></div></div>
-  <div class="ctl">
-    <button class="sm" id="bStart">▶️ הפעל מצלמה וחיישנים</button>
-    <button class="big" id="bShot" title="צילום"></button>
-    <button class="sm" id="bVid">🎥 וידאו</button>
-    <button class="sm" id="bPano">🔄 פנורמה אוטומטית</button>
+<div id="top">
+  <div id="place">מחפש מיקום…</div>
+  <div id="sub">—</div>
+  <div class="dots"><span id="dGps" class="d">GPS</span><span id="dHead" class="d">מצפן</span><span id="dHold" class="d">אחיזה</span><span id="dUp" class="d">0 עלו</span></div>
+</div>
+<div id="map"><canvas id="mapc" width="264" height="264"></canvas></div>
+<div id="guide"></div>
+
+<div id="bot">
+  <div class="side"><b id="sDist">0 מ'</b>הלכת</div>
+  <button id="go">התחל</button>
+  <div class="side"><b id="sShots">0</b>צילומים<br><button class="ib" id="openTools">🛠 כלים</button></div>
+</div>
+
+<div id="intro">
+  <h1>📷 סורק אש 27</h1>
+  <p>לוחצים <b>התחל</b> והולכים.<br>הסורק יודע איפה אתה, לאן אתה הולך ואיך אתה מחזיק את הטלפון – ומצלם לבד כל כמה מטרים.<br>כל צילום נכנס לבד לעולם התאום.</p>
+  <div id="keyrow" hidden><input id="key" placeholder="מפתח העלאה"></div>
+  <button id="begin">אפשר מצלמה וחיישנים</button>
+  <p id="introMsg" style="font-size:13px"></p>
+</div>
+
+<div id="tools"><div class="tw">
+  <div class="bar" style="justify-content:space-between"><b>🛠 כלים</b><button class="sm" id="closeTools">✕ חזרה לסריקה</button></div>
+  <div class="tabs" style="margin-top:10px"><button id="tbM" class="on">📏 מדידה</button><button id="tbS">⚙️ מצב ובדיקה</button></div>
+  <div id="paneM">
+    <div class="msg">📏 <b>קטן וקרוב</b>: "מישור" – 4 פינות של משבצת ידועה, ואז מודדים כל דבר על אותו משטח. 🏢 <b>גדול ורחוק</b>: "גובה ומרחק" – אופק מהחיישן, ואז בסיס וראש.</div>
+    <div class="tabs" style="margin-top:8px"><button id="mmP" class="on">מישור משבצות</button><button id="mmH">גובה ומרחק</button></div>
+    <div class="bar"><button class="sm" id="mLast">📷 הצילום האחרון</button><label class="shot" style="flex:1">בחר תמונה<input id="mFile" type="file" accept="image/*"></label></div>
+    <div class="card" style="margin-top:10px"><div id="mHint" class="msg"></div><canvas id="mCv"></canvas><div class="bar"><button class="sm" id="mUndo">↩ בטל נקודה</button><button class="sm" id="mClear">נקה</button><button class="sm" id="mAutoH">אופק מהחיישן</button></div></div>
+    <div class="card" id="mPlaneIn"><div class="g2"><label class="f">רוחב ייחוס (ס"מ)<input id="mW" type="number" value="30"></label><label class="f">± (ס"מ)<input id="mWs" type="number" value="0.2" step="0.1"></label>
+      <label class="f">גובה ייחוס (ס"מ)<input id="mH" type="number" value="30"></label><label class="f">± (ס"מ)<input id="mHs" type="number" value="0.2" step="0.1"></label></div></div>
+    <div class="card" id="mHgtIn" hidden><div class="g2"><label class="f">גובה המצלמה מהקרקע (מ')<input id="mCam" type="number" value="1.5" step="0.01"></label><label class="f">± (מ')<input id="mCams" type="number" value="0.05" step="0.01"></label>
+      <label class="f">מוקד שקול 35 מ"מ<input id="mF" type="number" value="24"></label><label class="f">± (%)<input id="mFs" type="number" value="5"></label></div><div class="msg" id="mFsrc"></div></div>
+    <div class="card"><div class="g2"><label class="f">דיוק הקשה (פיקסלי מסך)<input id="mSigTap" type="number" value="2" step="0.5"></label><label class="f">הערה<input id="mNote" type="text" placeholder="מה מדדת ואיפה"></label></div></div>
+    <div class="card"><div id="mOut"></div><button class="sm" id="mSave" style="margin-top:8px">💾 שמור מדידה</button></div>
   </div>
-  <main>
+  <div id="paneS" hidden>
+    <div class="card"><b>בדיקת חיישנים</b><div id="selftest" class="msg">לחץ "בדוק" כשהטלפון מונח על שולחן, ואז שוב כשאתה הולך.</div><div class="bar"><button class="sm" id="runTest">בדוק</button><button class="sm" id="demo">הדגמה בלי ללכת</button></div></div>
     <div class="card"><label class="f">איפה אתה (לא חובה)<input id="where" type="text" placeholder="למשל: ליד בית ספר היובל"></label>
-    <div class="msg" id="camMsg">כל תמונה עולה עם המיקום, כיוון המצפן, ההטיה והתאוצה של הטלפון – ונכנסת לבד לתור של מודלי הענן.</div></div>
-    <div class="card"><div class="thumbs" id="thumbs"></div></div>
-  </main>
-</section>
-
-<section id="secMeas" hidden><main>
-  <div class="tip">📏 <b>קטן וקרוב</b> (משבצת, עובי, מדרכה): "מישור" – מסמנים 4 פינות של מלבן ידוע, ומודדים כל דבר על אותו משטח.<br>🏢 <b>גדול ורחוק</b> (עמוד, עץ, בניין): "גובה ומרחק" – האופק מגיע מהחיישן, מסמנים בסיס וראש.<br>כל תוצאה עם ± מחושב. "ערך ידוע" מלמד את הסורק לתקן את עצמו.</div>
-  <div class="tabs" style="position:static;padding:0 0 8px"><button id="mmP" class="on">מישור משבצות</button><button id="mmH">גובה ומרחק</button></div>
-  <div class="bar"><button class="sm" id="mLast">📷 התמונה האחרונה</button><label class="shot" style="flex:1">בחר תמונה<input id="mFile" type="file" accept="image/*"></label></div>
-  <div class="card" style="margin-top:10px"><div id="mHint" class="msg"></div><canvas id="mCv"></canvas><div class="bar"><button class="sm" id="mUndo">↩ בטל נקודה</button><button class="sm" id="mClear">נקה</button><button class="sm" id="mAutoH">אופק מהחיישן</button></div></div>
-  <div class="card" id="mPlaneIn"><div class="g2"><label class="f">רוחב ייחוס (ס"מ)<input id="mW" type="number" value="30"></label><label class="f">± (ס"מ)<input id="mWs" type="number" value="0.2" step="0.1"></label>
-    <label class="f">גובה ייחוס (ס"מ)<input id="mH" type="number" value="30"></label><label class="f">± (ס"מ)<input id="mHs" type="number" value="0.2" step="0.1"></label></div></div>
-  <div class="card" id="mHgtIn" hidden><div class="g2"><label class="f">גובה המצלמה מהקרקע (מ')<input id="mCam" type="number" value="1.5" step="0.01"></label><label class="f">± (מ')<input id="mCams" type="number" value="0.05" step="0.01"></label>
-    <label class="f">מוקד שקול 35 מ"מ<input id="mF" type="number" value="24"></label><label class="f">± (%)<input id="mFs" type="number" value="5"></label></div><div class="msg" id="mFsrc"></div></div>
-  <div class="card"><div class="g2"><label class="f">דיוק הקשה (פיקסלי מסך)<input id="mSigTap" type="number" value="2" step="0.5"></label><label class="f">הערה<input id="mNote" type="text" placeholder="מה מדדת ואיפה"></label></div></div>
-  <div class="card"><div id="mOut"></div><button class="sm" id="mSave" style="margin-top:8px">💾 שמור מדידה</button></div>
+      <label class="f" style="margin-top:8px">צלם כל (מטרים)<input id="every" type="number" value="4" step="1"></label></div>
+    <div class="card"><b>יומן</b><div id="log"></div></div>
+  </div>
   <canvas id="mLoupe" width="280" height="280"></canvas>
-</main></section>
-
-<section id="secSet" hidden><main>
-  <div class="card"><label class="f">מפתח העלאה<input id="key" type="password" placeholder="מגיע בקישור שקיבלת"></label>
-  <div class="bar"><button class="sm" id="bKey">שמור ובדוק</button></div><div class="msg" id="keyMsg"></div></div>
-  <div class="card" id="sensInfo"></div>
-</main></section>
+</div></div>
 
 <script>
 (function(){'use strict';
 var $=function(i){return document.getElementById(i);};
-var S={key:'',session:'',n:0,up:0,queue:[],busy:false,stream:null,track:null,gps:null,head:null,ori:{},mot:null,motLog:[],rec:null,recChunks:[],pano:false,panoLast:null,lastShot:null};
+var R=Math.PI/180;
+var S={key:'',session:new Date().toISOString().slice(0,16).replace(/[:T]/g,'-'),on:false,stream:null,track:null,
+  gps:null,gpsT:0,head:null,headAbs:false,ori:{},grav:null,gyro:0,
+  pos:null,track:[],dist:0,course:null,speed:0,steps:0,lastStepT:0,accHist:[],
+  shots:0,up:0,queue:[],busy:false,lastShotPos:null,lastShotT:0,lastShotHead:null,lastShot:null,demo:false,logs:[]};
+function log(m){S.logs.push(new Date().toTimeString().slice(0,8)+' '+m);if(S.logs.length>80)S.logs.shift();$('log').textContent=S.logs.slice().reverse().join('\n');}
 try{S.key=new URLSearchParams(location.search).get('k')||localStorage.getItem('esh27key')||'';if(S.key)localStorage.setItem('esh27key',S.key);}catch(e){}
-S.session=new Date().toISOString().slice(0,16).replace(/[:T]/g,'-');
-function pill(id,t,c){var e=$(id);e.textContent=t;e.className='p'+(c?' '+c:'');}
-function tab(n){['Cam','Meas','Set'].forEach(function(k){$('sec'+k).hidden=k!==n;$('tb'+k).className=k===n?'on':'';});if(n==='Meas'&&window.__esh27measure)window.__esh27measure.redraw();}
-$('tbCam').onclick=function(){tab('Cam');};$('tbMeas').onclick=function(){tab('Meas');};$('tbSet').onclick=function(){tab('Set');};
-if(!S.key)tab('Set');$('key').value=S.key;
+if(!S.key)$('keyrow').hidden=false;
+function dot(id,t,c){var e=$(id);e.textContent=t;e.className='d'+(c?' '+c:'');}
+function guide(t){var g=$('guide');g.textContent=t||'';g.style.opacity=t?1:0;}
+
+// ---------- גאומטריה ----------
+var EARTH=6371008.8;
+function enu(a,b){return{x:(b.lon-a.lon)*R*EARTH*Math.cos(a.lat*R),y:(b.lat-a.lat)*R*EARTH};}   // מטרים מזרח/צפון
+function moveLL(p,dx,dy){return{lat:p.lat+dy/EARTH/R,lon:p.lon+dx/(EARTH*Math.cos(p.lat*R))/R};}
+function dirName(h){if(h==null)return'';return['צפונה','צפון-מזרחה','מזרחה','דרום-מזרחה','דרומה','דרום-מערבה','מערבה','צפון-מערבה'][Math.round(((h%360)+360)%360/45)%8];}
+
+// ---------- אחיזה: הטיה וגלגול מכוח הכבידה ----------
+function hold(){var g=S.grav;if(!g)return null;var n=Math.hypot(g.x,g.y,g.z)||9.81;
+  return{pitch:Math.asin(Math.max(-1,Math.min(1,-g.z/n)))/R,roll:Math.atan2(g.x,g.y)/R};}   // טלפון לאורך: pitch 0 = מצלמה מול האופק
+
+// ---------- מיקום משולב: GPS + צעדים ----------
+function onGps(c,t){
+  var p={lat:c.latitude,lon:c.longitude,acc:c.accuracy||50};S.gps={lat:p.lat,lon:p.lon,acc:p.acc,alt:c.altitude,altAcc:c.altitudeAccuracy,heading:c.heading,speed:c.speed,t:t};S.gpsT=Date.now();
+  if(!S.pos){S.pos={lat:p.lat,lon:p.lon,acc:p.acc};S.track.push({lat:p.lat,lon:p.lon});return;}
+  // מסנן משולב: משקל לפי הדיוק של כל מקור
+  var k=Math.min(1,Math.max(0.15,(S.pos.acc*S.pos.acc)/(S.pos.acc*S.pos.acc+p.acc*p.acc)));
+  var d=enu(S.pos,p);var np=moveLL(S.pos,d.x*k,d.y*k);np.acc=Math.sqrt((1-k))*S.pos.acc+0.5;np.acc=Math.max(Math.min(np.acc,p.acc),2);
+  advance(np);
+  if(c.speed!=null&&c.speed>0.4&&c.heading!=null&&!isNaN(c.heading)){S.course=c.heading;S.speed=c.speed;}
+}
+function advance(np){var last=S.track[S.track.length-1];var d=enu(last,np),m=Math.hypot(d.x,d.y);
+  S.pos=np;var now=Date.now();S.mv=(S.mv||[]).concat([[now,m]]).filter(function(x){return now-x[0]<4000;});if(!S.gps||S.gps.speed==null||isNaN(S.gps.speed))S.speed=S.mv.reduce(function(a,x){return a+x[1];},0)/4;if(m>=0.8){S.track.push({lat:np.lat,lon:np.lon});if(S.on)S.dist+=m;if(m>1.5&&!S.course)S.course=(Math.atan2(d.x,d.y)/R+360)%360;if(S.track.length>2000)S.track.shift();}}
+function onStep(){S.steps++;if(!S.pos||S.head==null)return;var L=0.72;   // אורך צעד משוער
+  var np=moveLL(S.pos,Math.sin(S.head*R)*L,Math.cos(S.head*R)*L);np.acc=S.pos.acc+0.3;advance(np);}
+function stepDetect(a){var m=Math.hypot(a.x,a.y,a.z);S.accHist.push(m);if(S.accHist.length>25)S.accHist.shift();
+  var avg=S.accHist.reduce(function(s,v){return s+v;},0)/S.accHist.length,now=Date.now();
+  if(m-avg>1.6&&now-S.lastStepT>300){S.lastStepT=now;onStep();}}
 
 // ---------- חיישנים ----------
-function startSensors(){
-  if(navigator.geolocation)navigator.geolocation.watchPosition(function(p){S.gps={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude,altAcc:p.coords.altitudeAccuracy,heading:p.coords.heading,speed:p.coords.speed,t:p.timestamp};
-    pill('hGps','GPS ±'+Math.round(p.coords.accuracy)+' מ\'',p.coords.accuracy<10?'ok':p.coords.accuracy<30?'warn':'bad');},function(e){pill('hGps','GPS: '+(e.code===1?'אין הרשאה':'אין קליטה'),'bad');},{enableHighAccuracy:true,maximumAge:0,timeout:20000});
-  function ori(e){var h=e.webkitCompassHeading!=null?e.webkitCompassHeading:(e.absolute&&e.alpha!=null?(360-e.alpha)%360:null);
-    S.ori={alpha:e.alpha,beta:e.beta,gamma:e.gamma,abs:!!(e.absolute||e.webkitCompassHeading!=null),acc:e.webkitCompassAccuracy};if(h!=null)S.head=h;}
+function sensors(){
+  if(navigator.geolocation)navigator.geolocation.watchPosition(function(p){if(!S.demo)onGps(p.coords,p.timestamp);},function(e){dot('dGps','GPS: '+(e.code===1?'אין הרשאה':'אין קליטה'),'bad');log('gps error '+e.code);},{enableHighAccuracy:true,maximumAge:0,timeout:30000});
+  function ori(e){if(S.demo)return;var h=e.webkitCompassHeading!=null?e.webkitCompassHeading:(e.absolute&&e.alpha!=null?(360-e.alpha)%360:null);
+    S.ori={alpha:e.alpha,beta:e.beta,gamma:e.gamma};if(h!=null){S.head=h;S.headAbs=true;}else if(!S.headAbs&&e.alpha!=null){S.head=(360-e.alpha)%360;}}
   window.addEventListener('deviceorientationabsolute',ori);window.addEventListener('deviceorientation',ori);
-  window.addEventListener('devicemotion',function(e){var a=e.accelerationIncludingGravity||{},r=e.rotationRate||{};S.mot={ax:a.x,ay:a.y,az:a.z,ra:r.alpha,rb:r.beta,rg:r.gamma,dt:e.interval};
-    if(S.rec){S.motLog.push([Date.now(),a.x,a.y,a.z,r.alpha,r.beta,r.gamma,S.head,S.ori.beta,S.ori.gamma]);}});
-  setInterval(hud,100);
+  window.addEventListener('devicemotion',function(e){if(S.demo)return;var g=e.accelerationIncludingGravity;if(g&&g.x!=null){
+      S.grav=S.grav?{x:S.grav.x*0.8+g.x*0.2,y:S.grav.y*0.8+g.y*0.2,z:S.grav.z*0.8+g.z*0.2}:{x:g.x,y:g.y,z:g.z};stepDetect(g);}
+    var r=e.rotationRate;if(r)S.gyro=S.gyro*0.7+Math.hypot(r.alpha||0,r.beta||0,r.gamma||0)*0.3;});
+  setInterval(frame,120);
 }
-function tilt(){   // הטיה ממשיכת הכבידה: זווית המצלמה מעל האופק וגלגול – כשהטלפון מוחזק לאורך
-  var m=S.mot;if(!m||m.ax==null)return null;var g=Math.hypot(m.ax,m.ay,m.az)||9.81;
-  var pitch=Math.asin(Math.max(-1,Math.min(1,-m.az/g)))*180/Math.PI;var roll=Math.atan2(m.ax,m.ay)*180/Math.PI;return{pitch:pitch,roll:roll};}
-function hud(){var c=$('hud'),v=$('vid');c.width=c.clientWidth;c.height=c.clientHeight;var g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);
-  if(S.head!=null)pill('hHead','🧭 '+Math.round(S.head)+'°'+(S.ori.abs?'':' (יחסי)'),S.ori.abs?'ok':'warn');
-  var t=tilt();if(!t)return;pill('hTilt','הטיה '+t.pitch.toFixed(1)+'° · גלגול '+t.roll.toFixed(1)+'°',Math.abs(t.roll)<2?'ok':'warn');
-  // אופק מלאכותי: לפי מוקד משוער של המצלמה
-  var f=fpxVideo(c);if(!f)return;var cx=c.width/2,cy=c.height/2,dy=f*Math.tan(t.pitch*Math.PI/180),r=-t.roll*Math.PI/180;
-  g.save();g.translate(cx,cy+dy);g.rotate(r);g.strokeStyle=Math.abs(t.roll)<1?'#3ecf8e':'#f5b342';g.lineWidth=2;g.setLineDash([12,8]);g.beginPath();g.moveTo(-c.width,0);g.lineTo(c.width,0);g.stroke();g.restore();
-  g.strokeStyle='#fff8';g.beginPath();g.moveTo(cx-10,cy);g.lineTo(cx+10,cy);g.moveTo(cx,cy-10);g.lineTo(cx,cy+10);g.stroke();
-  if(S.pano)panoTick();}
-function fpxVideo(c){var f35=+$('mF').value||24;return f35*Math.hypot(c.width,c.height)/43.27;}
 
-// ---------- מצלמה ----------
-$('bStart').onclick=function(){
-  var ask=[];if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)ask.push(DeviceOrientationEvent.requestPermission());
-  if(window.DeviceMotionEvent&&DeviceMotionEvent.requestPermission)ask.push(DeviceMotionEvent.requestPermission());
-  Promise.all(ask).catch(function(){}).then(function(){startSensors();
-    return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4000},height:{ideal:3000}},audio:false});})
-  .then(function(st){S.stream=st;S.track=st.getVideoTracks()[0];$('vid').srcObject=st;$('bStart').textContent='✓ פועל';
-    var s=S.track.getSettings();$('sensInfo').innerHTML='מצלמה: '+s.width+'×'+s.height+(window.ImageCapture?' · צילום ברזולוציה מלאה':'')+'<br>חיישנים: GPS, מצפן, ג\'יירוסקופ, תאוצה';})
-  .catch(function(e){$('camMsg').textContent='לא הצלחתי להפעיל מצלמה: '+e.message;});};
+// ---------- תצוגה ----------
+var lastPlaceT=0;
+function frame(){
+  var gpsAge=(Date.now()-S.gpsT)/1000;
+  if(S.pos){var a=Math.round(S.pos.acc);dot('dGps','📍 ±'+a+' מ\''+(gpsAge>10?' (צעדים)':''),a<=6?'ok':a<=15?'warn':'bad');}
+  if(S.head!=null)dot('dHead','🧭 '+Math.round(S.head)+'° '+dirName(S.head),S.headAbs?'ok':'warn');
+  var h=hold();
+  if(h){var okP=Math.abs(h.pitch)<20,okR=Math.abs(h.roll)<12;dot('dHold',okP&&okR?'✓ אחיזה טובה':'הטיה '+Math.round(h.pitch)+'°',okP&&okR?'ok':'warn');}
+  // שורת "איפה אני"
+  if(S.pos&&Date.now()-lastPlaceT>1500){lastPlaceT=Date.now();var near=nearest(S.pos);
+    $('place').textContent=near?(near.d<60?'ליד '+near.n:near.n+' · '+Math.round(near.d)+' מ\' '+dirName(near.b)):'אשדוד';
+    var T=S.track,a0=T[Math.max(0,T.length-6)],a1=T[T.length-1];if(a0&&a1){var dd=enu(a0,a1);if(Math.hypot(dd.x,dd.y)>2)S.course=(Math.atan2(dd.x,dd.y)/R+360)%360;}
+    var mv=S.on&&S.speed>0.3?'הולך '+dirName(S.course)+' · '+(S.speed*3.6).toFixed(1)+' קמ"ש':(S.on?'עומד':'מוכן');
+    $('sub').textContent=mv+' · '+S.pos.lat.toFixed(5)+', '+S.pos.lon.toFixed(5);}
+  $('sDist').textContent=(S.dist<1000?Math.round(S.dist)+' מ\'':(S.dist/1000).toFixed(2)+' ק"מ');$('sShots').textContent=S.shots;
+  drawHud(h);drawMap();
+  if(S.on)autoShoot(h);
+}
+function drawHud(h){var c=$('hud'),W=c.clientWidth,H=c.clientHeight;if(c.width!==W){c.width=W;c.height=H;}var g=c.getContext('2d');g.clearRect(0,0,W,H);
+  if(!h)return;var f=24*Math.hypot(W,H)/43.27,cx=W/2,cy=H/2,dy=f*Math.tan(h.pitch*R);
+  g.save();g.translate(cx,cy+dy);g.rotate(-h.roll*R);var good=Math.abs(h.roll)<2&&Math.abs(h.pitch)<10;
+  g.strokeStyle=good?'#3ecf8e':'#f5b342';g.lineWidth=3;g.beginPath();g.moveTo(-W,0);g.lineTo(-40,0);g.moveTo(40,0);g.lineTo(W,0);g.stroke();
+  g.fillStyle=g.strokeStyle;g.font='bold 13px sans-serif';g.fillText('אופק',W*0.3,-6);g.restore();
+  g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.arc(cx,cy,14,0,7);g.moveTo(cx-24,cy);g.lineTo(cx-14,cy);g.moveTo(cx+14,cy);g.lineTo(cx+24,cy);g.stroke();
+  // סרגל מצפן למעלה
+  if(S.head!=null){var y=H*0.2;g.fillStyle='#0006';g.fillRect(cx-150,y-16,300,30);g.fillStyle='#fff';g.font='bold 13px sans-serif';g.textAlign='center';
+    for(var d=-60;d<=60;d+=15){var a=Math.round((S.head+d)/15)*15,x=cx+(a-S.head)*2.4;if(x<cx-145||x>cx+145)continue;var lab={0:'צ',90:'מז',180:'ד',270:'מע'}[(a%360+360)%360];g.fillText(lab||String((a%360+360)%360),x,y+5);}
+    g.fillStyle='#ff8a3d';g.beginPath();g.moveTo(cx,y+16);g.lineTo(cx-6,y+24);g.lineTo(cx+6,y+24);g.fill();g.textAlign='start';}}
+function drawMap(){var c=$('mapc'),g=c.getContext('2d'),W=c.width,s=W/2;g.fillStyle='#14191c';g.fillRect(0,0,W,W);if(!S.pos)return;
+  var sc=s/40;   // 40 מטר לרדיוס
+  g.strokeStyle='#ffffff22';for(var r=10;r<=40;r+=10){g.beginPath();g.arc(s,s,r*sc,0,7);g.stroke();}
+  g.strokeStyle='#5ab0ff';g.lineWidth=4;g.beginPath();S.track.forEach(function(p,i){var d=enu(S.pos,p);var x=s+d.x*sc,y=s-d.y*sc;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();
+  S.shotPts&&S.shotPts.forEach(function(p){var d=enu(S.pos,p);g.fillStyle='#ff8a3d';g.beginPath();g.arc(s+d.x*sc,s-d.y*sc,4,0,7);g.fill();});
+  g.fillStyle='#3ecf8e33';g.beginPath();g.arc(s,s,Math.max(4,S.pos.acc*sc),0,7);g.fill();
+  if(S.head!=null){g.save();g.translate(s,s);g.rotate(S.head*R);g.fillStyle='#fff';g.beginPath();g.moveTo(0,-16);g.lineTo(9,10);g.lineTo(0,4);g.lineTo(-9,10);g.closePath();g.fill();g.restore();}
+  g.fillStyle='#fff';g.font='bold 18px sans-serif';g.fillText('צ',s-6,20);}
 
-function meta(kind){var t=tilt();return{kind:kind,when:new Date().toISOString(),where:$('where').value,gps:S.gps,heading:S.head,orientation:S.ori,tilt:t,motion:S.mot,
-  video:S.track?S.track.getSettings():null,ua:navigator.userAgent,f35_guess:+$('mF').value};}
-function grab(){if(window.ImageCapture&&S.track){try{return new ImageCapture(S.track).takePhoto();}catch(e){}}
-  return new Promise(function(res){var v=$('vid'),c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);c.toBlob(res,'image/jpeg',0.92);});}
-function shoot(kind){if(!S.stream){$('camMsg').textContent='קודם הפעל מצלמה.';return;}var m=meta(kind);
-  grab().catch(function(){S.track=null;return grab();}).then(function(b){var n=++S.n,name=('00'+n).slice(-3)+'_'+kind+'.jpg';S.lastShot={blob:b,meta:m};
-    var im=document.createElement('img');im.src=URL.createObjectURL(b);$('thumbs').prepend(im);enqueue(name,b,m,im);});}
-$('bShot').onclick=function(){shoot('photo');};
+// נקודות מוכרות (מאינדקס GEOINT)
+var POI=[{n:'מגדלור אשדוד, גבעת יונה',lat:31.813906,lon:34.646331},{n:'תצפית גבעת יונה',lat:31.8136,lon:34.6458},{n:'מגדלי הדקל',lat:31.8061,lon:34.6407},{n:'מועדון השחמט',lat:31.8056,lon:34.6431},{n:'כיכר רוגוזין',lat:31.8084,lon:34.6444}];
+function nearest(p){var b=null;POI.forEach(function(q){var d=enu(p,q),m=Math.hypot(d.x,d.y);if(!b||m<b.d)b={n:q.n,d:m,b:(Math.atan2(d.x,d.y)/R+360)%360};});return b&&b.d<3000?b:null;}
 
-// פנורמה: צילום אוטומטי כל 20° של מצפן
-$('bPano').onclick=function(){S.pano=!S.pano;S.panoLast=null;this.className='sm'+(S.pano?' on':'');$('camMsg').textContent=S.pano?'סובב לאט במקום. צילום אוטומטי כל 20°, כשהטלפון יציב.':'';};
-function panoTick(){if(S.head==null)return;var m=S.mot,still=m&&Math.hypot(m.ra||0,m.rb||0,m.rg||0)<12;if(!still)return;
-  if(S.panoLast==null||Math.abs(((S.head-S.panoLast+540)%360)-180)>=20){S.panoLast=S.head;shoot('pano');}}
-
-// וידאו עם יומן חיישנים
-$('bVid').onclick=function(){if(!S.stream)return;var b=this;
-  if(S.rec){S.rec.stop();return;}
-  var mt=['video/webm;codecs=vp9','video/webm','video/mp4'].find(function(t){return window.MediaRecorder&&MediaRecorder.isTypeSupported(t);});if(!mt){$('camMsg').textContent='הדפדפן לא תומך בהקלטה';return;}
-  S.recChunks=[];S.motLog=[];var m=meta('video');S.rec=new MediaRecorder(S.stream,{mimeType:mt,videoBitsPerSecond:6e6});
-  S.rec.ondataavailable=function(e){if(e.data.size)S.recChunks.push(e.data);};
-  S.rec.onstop=function(){var blob=new Blob(S.recChunks,{type:mt});m.sensor_log_cols=['t','ax','ay','az','gyro_a','gyro_b','gyro_g','heading','beta','gamma'];m.sensor_log=S.motLog;
-    var n=++S.n;enqueue(('00'+n).slice(-3)+'_video.'+(mt.indexOf('mp4')>=0?'mp4':'webm'),blob,m,null);S.rec=null;b.textContent='🎥 וידאו';$('bShot').className='big';};
-  S.rec.start(1000);b.textContent='⏹ עצור';$('bShot').className='big rec';setTimeout(function(){if(S.rec)S.rec.stop();},20000);};
+// ---------- צילום אוטומטי ----------
+function autoShoot(h){
+  if(!h){guide('');return;}
+  if(Math.abs(h.pitch)>25){guide(h.pitch>0?'⬇️ הורד קצת את הטלפון':'⬆️ הרם את הטלפון מול הרחוב');return;}
+  if(Math.abs(h.roll)>15){guide('↔️ ישר את הטלפון');return;}
+  if(S.gyro>40){guide('לאט… ✋');return;}
+  guide('');
+  var every=+$('every').value||4,now=Date.now(),need=false,why='';
+  if(!S.lastShotPos){need=true;why='התחלה';}
+  else{var d=enu(S.lastShotPos,S.pos),m=Math.hypot(d.x,d.y);if(m>=every){need=true;why=Math.round(m)+' מ\'';}
+    else if(S.head!=null&&S.lastShotHead!=null&&Math.abs(((S.head-S.lastShotHead+540)%360)-180)>=25&&now-S.lastShotT>1200){need=true;why='סיבוב';}}
+  if(need&&now-S.lastShotT>900)shoot('walk',why);}
+function meta(kind,why){return{kind:kind,why:why,when:new Date().toISOString(),where:$('where').value,pos:S.pos,gps:S.gps,heading:S.head,heading_abs:S.headAbs,course:S.course,speed:S.speed,
+  hold:hold(),gyro:S.gyro,steps:S.steps,dist:S.dist,orientation:S.ori,video:S.track_?null:(S.vt?S.vt.getSettings():null),demo:S.demo};}
+function grab(){var v=$('vid');if(window.ImageCapture&&S.vt&&!S.demo){try{return new ImageCapture(S.vt).takePhoto().catch(function(){return still();});}catch(e){}}return still();}
+function still(){return new Promise(function(res){var v=$('vid'),c=document.createElement('canvas');c.width=v.videoWidth||1280;c.height=v.videoHeight||720;var g=c.getContext('2d');
+  if(v.videoWidth)g.drawImage(v,0,0);else{g.fillStyle='#456';g.fillRect(0,0,c.width,c.height);g.fillStyle='#fff';g.font='60px sans-serif';g.fillText('DEMO '+S.shots,80,200);}
+  c.toBlob(res,'image/jpeg',0.9);});}
+function shoot(kind,why){var m=meta(kind,why);S.lastShotPos={lat:S.pos.lat,lon:S.pos.lon};S.lastShotT=Date.now();S.lastShotHead=S.head;S.shotPts=(S.shotPts||[]).concat([S.lastShotPos]).slice(-300);
+  S.shots++;var f=$('flash');f.style.opacity=.35;setTimeout(function(){f.style.opacity=0;},120);if(navigator.vibrate)navigator.vibrate(25);
+  grab().then(function(b){S.lastShot={blob:b,meta:{tilt:m.hold,pitch:m.hold&&m.hold.pitch}};enqueue(('000'+S.shots).slice(-4)+'_'+kind+'.jpg',b,m);log('צילום '+S.shots+' ('+why+')');});}
 
 // ---------- העלאה ----------
 function b64u(s){return btoa(unescape(encodeURIComponent(s)));}
-function enqueue(name,blob,m,im){S.queue.push({name:name,blob:blob,meta:m,im:im});pump();}
-function pump(){if(S.busy)return;var q=S.queue.find(function(x){return !x.done&&!x.fail;});if(!q)return;S.busy=true;
-  var mm=JSON.stringify(q.meta);var big=mm.length>6000;   // יומן וידאו ארוך עולה כקובץ נפרד
-  fetch('/api/upload?session='+S.session+'&name='+encodeURIComponent(q.name),{method:'POST',headers:{'X-Key':S.key,'X-Meta':b64u(big?JSON.stringify({kind:q.meta.kind,when:q.meta.when,gps:q.meta.gps,heading:q.meta.heading,log:'separate'}):mm)},body:q.blob})
-  .then(function(r){if(!r.ok)throw new Error(r.status);
-    if(big)return fetch('/api/upload?session='+S.session+'&name='+encodeURIComponent(q.name+'.sensors.json'),{method:'POST',headers:{'X-Key':S.key},body:new Blob([mm.padEnd(1200,' ')],{type:'application/json'})});})
-  .then(function(){q.done=true;S.up++;pill('hUp',S.up+' עלו','ok');if(q.im)q.im.className='ok';},function(e){q.fail=true;pill('hUp','העלאה נכשלה ('+e.message+')','bad');if(q.im)q.im.className='bad';})
+function enqueue(name,blob,m){S.queue.push({name:name,blob:blob,meta:m});pump();}
+function pump(){if(S.busy)return;var q=S.queue.find(function(x){return!x.done&&!x.fail;});if(!q)return;S.busy=true;
+  if(S.demo){setTimeout(function(){q.done=true;S.up++;dot('dUp','⬆️ '+S.up+' (הדגמה)','ok');S.busy=false;pump();},200);return;}
+  fetch('/api/upload?session='+S.session+'&name='+encodeURIComponent(q.name),{method:'POST',headers:{'X-Key':S.key,'X-Meta':b64u(JSON.stringify(q.meta))},body:q.blob})
+  .then(function(r){if(!r.ok)throw new Error(r.status===401?'מפתח שגוי':String(r.status));q.done=true;S.up++;var w=S.queue.filter(function(x){return!x.done;}).length;dot('dUp','⬆️ '+S.up+(w?' · '+w+' ממתינים':''),'ok');})
+  .catch(function(e){q.fail=true;dot('dUp','⚠️ העלאה: '+e.message,'bad');log('upload fail '+e.message);})
   .then(function(){S.busy=false;pump();});}
-setInterval(function(){S.queue.forEach(function(q){if(q.fail&&navigator.onLine){q.fail=false;}});pump();},15000);
-window.__esh27upload=function(name,blob,m){return new Promise(function(res,rej){var q={name:name,blob:blob,meta:m};S.queue.push(q);pump();var iv=setInterval(function(){if(q.done){clearInterval(iv);res();}if(q.fail){clearInterval(iv);rej(new Error('upload'));}},300);});};
-window.__esh27sensors=function(){return{tilt:tilt(),last:S.lastShot};};
+setInterval(function(){if(navigator.onLine)S.queue.forEach(function(q){if(q.fail)q.fail=false;});pump();},10000);
+window.__esh27upload=function(name,blob,m){return new Promise(function(res,rej){var q={name:name,blob:blob,meta:m};S.queue.push(q);pump();var iv=setInterval(function(){if(q.done){clearInterval(iv);res();}else if(q.fail){clearInterval(iv);rej(new Error('upload'));}},300);});};
+window.__esh27sensors=function(){return{tilt:hold(),last:S.lastShot};};
 
-$('bKey').onclick=function(){S.key=$('key').value.trim();try{localStorage.setItem('esh27key',S.key);}catch(e){}
-  fetch('/api/ping',{headers:{'X-Key':S.key}}).then(function(r){return r.json();}).then(function(j){$('keyMsg').textContent=j.key_ok?'✓ המפתח תקין':'✗ מפתח שגוי';}).catch(function(){$('keyMsg').textContent='אין חיבור';});};
+// ---------- התחלה ----------
+function startCam(){return navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:3840},height:{ideal:2160}},audio:false})
+  .then(function(st){S.stream=st;S.vt=st.getVideoTracks()[0];$('vid').srcObject=st;var s=S.vt.getSettings();log('מצלמה '+s.width+'x'+s.height);});}
+$('begin').onclick=function(){if(!S.key&&$('key').value)S.key=$('key').value.trim();try{localStorage.setItem('esh27key',S.key);}catch(e){}
+  var ask=[];if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)ask.push(DeviceOrientationEvent.requestPermission());
+  if(window.DeviceMotionEvent&&DeviceMotionEvent.requestPermission)ask.push(DeviceMotionEvent.requestPermission());
+  Promise.all(ask).catch(function(){}).then(function(){sensors();return startCam();})
+  .then(function(){$('intro').style.display='none';guide('לחץ התחל והתחל ללכת');},function(e){$('introMsg').textContent='לא הצלחתי לפתוח מצלמה: '+e.message;sensors();setTimeout(function(){$('intro').style.display='none';},1500);});
+  if(S.key)fetch('/api/ping',{headers:{'X-Key':S.key}}).then(function(r){return r.json();}).then(function(j){if(!j.key_ok){dot('dUp','⚠️ מפתח שגוי','bad');}}).catch(function(){});};
+$('go').onclick=function(){S.on=!S.on;this.textContent=S.on?'עצור':'התחל';this.className=S.on?'on':'';if(S.on){S.lastShotPos=null;guide('הולכים 🚶 – הסורק מצלם לבד');setTimeout(function(){guide('');},2500);}else guide('נעצר ✋');log(S.on?'התחלה':'עצירה');};
+$('openTools').onclick=function(){$('tools').className='open';if(window.__esh27measure)window.__esh27measure.redraw();};$('closeTools').onclick=function(){$('tools').className='';};
+$('tbM').onclick=function(){$('tbM').className='on';$('tbS').className='';$('paneM').hidden=false;$('paneS').hidden=true;};
+$('tbS').onclick=function(){$('tbS').className='on';$('tbM').className='';$('paneS').hidden=false;$('paneM').hidden=true;};
+
+// ---------- בדיקה עצמית ----------
+$('runTest').onclick=function(){var r=[],h=hold();
+  r.push((S.vt?'✅':'❌')+' מצלמה'+(S.vt?' '+S.vt.getSettings().width+'×'+S.vt.getSettings().height:''));
+  r.push((S.gps?'✅':'❌')+' GPS'+(S.gps?' ±'+Math.round(S.gps.acc)+' מ\' · עודכן לפני '+Math.round((Date.now()-S.gpsT)/1000)+' ש\'':''));
+  r.push((S.head!=null?(S.headAbs?'✅':'⚠️'):'❌')+' מצפן'+(S.head!=null?(S.headAbs?' אמיתי (צפון)':' יחסי בלבד – סובב את הטלפון בצורת 8 לכיול'):''));
+  r.push((h?'✅':'❌')+' כבידה/הטיה'+(h?' '+h.pitch.toFixed(1)+'° / '+h.roll.toFixed(1)+'°':''));
+  r.push((S.gyro!=null?'✅':'❌')+' ג\'יירו '+S.gyro.toFixed(1)+'°/ש\' '+(S.gyro<3?'(הטלפון יציב)':'(בתנועה)'));
+  r.push('👣 צעדים שנספרו: '+S.steps);r.push('⬆️ עלו '+S.up+' · ממתינים '+S.queue.filter(function(q){return!q.done;}).length);
+  $('selftest').innerHTML=r.join('<br>');log('בדיקה: '+r.join(' | '));};
+// הדגמה: הליכה מדומה לאורך רחוב, לבדיקה בלי לזוז
+$('demo').onclick=function(){S.demo=true;var p={latitude:31.7905,longitude:34.6402,accuracy:5},hd=20,t=0;S.head=hd;S.headAbs=true;S.grav={x:0.2,y:9.7,z:-0.5};S.gyro=2;
+  $('tools').className='';if(!S.on)$('go').click();
+  var iv=setInterval(function(){t++;var np=moveLL({lat:p.latitude,lon:p.longitude},Math.sin(hd*R)*1.3,Math.cos(hd*R)*1.3);p={latitude:np.lat,longitude:np.lon,accuracy:4+Math.random()*3,heading:hd,speed:1.3};
+    onGps(p,Date.now());if(t%3===0)onStep();if(t===12)hd=110;S.head=hd;if(t>=24){clearInterval(iv);$('go').click();S.demo=false;log('הדגמה הסתיימה: '+S.shots+' צילומים, '+Math.round(S.dist)+' מ\'');}},1000);};
+window.__esh27test={S:S,onGps:onGps,onStep:onStep,hold:hold,enu:enu};
 })();
 </script>
 <script>
