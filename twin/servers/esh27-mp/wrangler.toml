@@ -1,0 +1,13 @@
+# esh27-mp – שרת מרובה משתתפים (Worker + Durable Object). לא נפרס – החלטה של אריאל (ראו README.md).
+name = "esh27-mp"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "Room"
+
+# Durable Objects מבוססי SQLite – זמינים גם בתוכנית החינמית של Workers
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Room"]
