@@ -306,7 +306,7 @@ function enterTakeover(m) {
 function leaveTakeover(m, pos) {
   const G = world.G27, S = G.S; G.input.override = null; document.body.classList.remove('yz-pm', 'yz-ovl'); paused = false;
   const pl = world.scene.getObjectByName('player'); if (pl) pl.visible = true;
-  if (pos) { const c = G.W.collide(pos.x, pos.z, 0.4, 0, 2); S.p.set(c.x, 0, c.z); S.p.y = G.W.floorAt(c.x, c.z, Math.max(G.W.H(c.x, c.z), 0) + 400); S.vy = 0; S.grounded = true; }
+  if (pos) { const c = G.W.collide(pos.x, pos.z, 0.4, 0, 2); S.p.set(c.x, 0, c.z); S.p.y = G.W.floorAt(c.x, c.z, Math.max(G.W.H(c.x, c.z), 0) + 400); if (G.W.isSea(c.x, c.z) && S.p.y < -1.4) S.p.y = -1.4; S.vy = 0; S.grounded = true; }   // יורדים מסירה לים: צפים (מקורב), לא על קרקעית −2.5
   const ui = GAME_MODES[FROM_GAME[S.mode]]; if (ui && $('modeT')) { $('modeT').textContent = ui[2]; $('mode').querySelector('.ic').textContent = ui[1]; }
 }
 
@@ -506,7 +506,12 @@ addEventListener('pointerdown', function once() { removeEventListener('pointerdo
 function onWorldReady() {
   const G = world.G27, W = G.W;
   world.coords.origin = { E: W.OX, N: W.OY }; world.coords.toScene = W.toScene; world.coords.toITM = W.toITM;
-  if (window.PGEO) { world.coords.itmToWgs84 = window.PGEO.itmToWgs84; world.coords.wgs84ToItm = window.PGEO.wgs84ToItm; }
+  // מסגרת הדגימה ≠ ITM אמיתי: אמיתי = דגימה + היסט (groundtruth/ashdod_reference.json). toITM נשאר במסגרת הדגימה (תאימות לאחור).
+  const OFF = window.ITM ? window.ITM.SAMPLE_OFFSET : { dE: 1524.6, dN: 753.6 }; world.coords.sampleOffset = OFF;
+  world.coords.toRealITM = (x, z) => { const p = W.toITM(x, z); return { E: p.E + OFF.dE, N: p.N + OFF.dN }; };
+  world.coords.fromRealITM = (E, N) => W.toScene(E - OFF.dE, N - OFF.dN);
+  if (window.ITM) { world.coords.itmToWgs84 = window.ITM.itmToWgs84; world.coords.wgs84ToItm = window.ITM.wgs84ToItm; }   // הלמרט 7 פרמטרים + TM, ≤0.5 מ"מ מול PROJ
+  else if (window.PGEO) { world.coords.itmToWgs84 = window.PGEO.itmToWgs84; world.coords.wgs84ToItm = window.PGEO.wgs84ToItm; }
   world.data = { W, tiles: W.tiles, H: W.H, floorAt: W.floorAt, near: W.near, buildingAt: W.buildingAt, onRoad: W.onRoad, nearestStreet: W.nearestStreet, collide: W.collide, pip: W.pip, edgeDist: W.edgeDist, MAT: W.MAT, bounds: W.bounds,
     buildingById(id) { for (const t of W.tiles.values()) for (const b of t.blds || []) if (b.id === id) return b; return null; } };
   const prevOn = W.onTile; W.onTile = (t, k) => { if (prevOn) prevOn(t, k); bus.emit('tile', { tile: t, kind: k }); };

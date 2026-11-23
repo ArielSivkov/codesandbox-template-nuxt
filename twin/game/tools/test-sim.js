@@ -46,6 +46,7 @@ ok(gD.v <= P.vMaxGPS + 0.1 && gD.tilt <= P.maxTilt / D2R_ + 0.05 && Math.abs(gD.
 // חוזה: העותקים בעולם המאוחד ובתצוגה המקדימה זהים למקור
 const fs = require('fs'), path = require('path'), src = fs.readFileSync(path.join(__dirname, '../js/sim.js'), 'utf8');
 for (const c of ['../../integration/world/js/sim.js', '../../preview/world/js/sim.js']) { const f = path.join(__dirname, c); if (fs.existsSync(f)) ok(fs.readFileSync(f, 'utf8') === src, `העותק ${c.replace('../../', '')} זהה ל-game/js/sim.js`); }
+for (const c of ['../../integration/world/js/itm.js', '../../preview/world/js/itm.js']) { const f = path.join(__dirname, c); if (fs.existsSync(f)) ok(fs.readFileSync(f, 'utf8') === fs.readFileSync(path.join(__dirname, '../js/itm.js'), 'utf8'), `העותק ${c.replace('../../', '')} זהה ל-game/js/itm.js`); }
 // פרופיל רוח: חזק יותר בגובה
 SIM.weather.windSpeed = 8; SIM.weather.gust = 1.5;
 const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).speed; ok(b > a, `רוח ב-60 מ' (${b.toFixed(1)}) > ב-2 מ' (${a.toFixed(1)})`);

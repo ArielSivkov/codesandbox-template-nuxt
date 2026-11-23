@@ -11,7 +11,7 @@
   function cycle() { C.view = (C.view + 1) % 3; C.blend = 0; const b = document.getElementById('yzCam'); if (b) b.textContent = ICONS[C.view]; YZW.notice('מצלמה: ' + NAMES[C.view], { kind: 'info', ms: 1200 }); }
   function target(world) {
     const G = world.G27, S = G.S, m = world.player.mode;
-    if (m === 'car') return { x: S.car.x, y: S.car.y, z: S.car.z, h: S.car.h, eye: 1.25, fwd: 0.1, side: -0.38, back: 9, kind: 'car' };
+    if (m === 'car') return { x: S.car.x, y: S.car.y, z: S.car.z, h: S.car.h, eye: 1.25, fwd: 0.1, side: 0.38, back: 9, kind: 'car' }   /* נהג משמאל (ישראל) */;
     if (m === 'heli') return { x: S.heli.x, y: S.heli.y, z: S.heli.z, h: S.heli.h, eye: 1.7, fwd: 1.6, side: -0.3, back: 19, kind: 'heli' };
     if (m === 'drone') { const d = G.drone; return { x: d.position.x, y: d.position.y, z: d.position.z, h: S.cam.yaw, eye: -0.08, fwd: 0.15, side: 0, back: 3.4, kind: 'drone' }; }
     if (m === 'walk' || m === 'jetpack') return { x: S.p.x, y: S.p.y, z: S.p.z, h: S.cam.yaw, eye: EYE, fwd: 0.12, side: 0, back: 5.2, kind: 'foot' };

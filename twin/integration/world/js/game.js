@@ -448,32 +448,39 @@ function interact() {
 }
 
 // ---------- פיזיקה
-const G_FOOT = 22, R_FOOT = 0.35;
+const G_FOOT = 9.81, R_FOOT = 0.35;                 // כבידה תקנית
+const V_JUMP = 3.0;                                 // קפיצה מעמידה: שיא ≈0.46 מ', 0.61 ש' באוויר (אדם ממוצע 0.3–0.5 מ') – מקורב
+const K_DRAG = G_FOOT / (55 * 55);                  // גרר אוויר ריבועי, מהירות סופית ≈55 מ'/ש' (צנחן שטוח) – מקורב
+const SWIM_Y = -1.4;                                // גובה הרגליים כשצפים במים עמוקים (הראש מעל המים) – מקורב
+const MU_BRAKE = 0.95, MU_WET = 0.6, MU_LAT = 0.9;  // אספלט יבש + ABS: ‏100→0 ב-41.4 מ' (v²/2μg); רטוב וצידי – מקורבים
 const _fw = new T.Vector3();
 function moveFoot(dt, inp, inside) {
   const jet = S.mode === 'jet' && !inside;
   let mx = inp.x, my = inp.y; const mag = Math.min(1, Math.hypot(mx, my));
   const yaw = S.cam.yaw; // כיוון יחסית למצלמה
   const fx = Math.sin(yaw), fz = Math.cos(yaw), rx = -Math.cos(yaw), rz = Math.sin(yaw);
-  let dx = fx * my - rx * mx, dz = fz * my - rz * mx; const dl = Math.hypot(dx, dz); if (dl > 0) { dx /= dl; dz /= dl; }
+  let dx = fx * my + rx * mx, dz = fz * my + rz * mx;  /* (rx,rz) = ימין המצלמה */ const dl = Math.hypot(dx, dz); if (dl > 0) { dx /= dl; dz /= dl; }
   let spd = input.joy ? (mag < 0.55 ? 2.0 * mag / 0.55 : lerp(2.0, 5.4, (mag - 0.55) / 0.45)) : (mag > 0 ? 5.4 : 0);
   if (inp.sprint || (TOUCH && inp.down && S.mode === 'foot')) spd = mag > 0 ? 8.5 : 0;
   if (jet && !S.grounded) spd = mag * 11;
   if (inside) spd = Math.min(spd, 3.2);
+  const swimming = !inside && !jet && S.p.y < SWIM_Y + 0.3 && W.isSea(S.p.x, S.p.z) && W.H(S.p.x, S.p.z) < SWIM_Y;
+  if (swimming) spd = Math.min(spd, 1.0);            // שחייה ≈1 מ'/ש' – מקורב
   S.speed = damp(S.speed, spd, 10, dt);
   if (dl > 0) S.heading = S.heading + angDiff(S.heading, Math.atan2(dx, dz)) * Math.min(1, dt * 12);
   const vx = Math.sin(S.heading) * S.speed * (dl > 0 ? 1 : 0.0), vz = Math.cos(S.heading) * S.speed * (dl > 0 ? 1 : 0.0);
   let nx = S.p.x + (dl > 0 ? dx * S.speed * dt : 0), nz = S.p.z + (dl > 0 ? dz * S.speed * dt : 0);
   // אנכי
-  if (jet && inp.up && S.fuel > 0) { S.vy = Math.min(S.vy + 30 * dt, 13); S.fuel = Math.max(0, S.fuel - dt / 6); S.grounded = false; }
-  else if (!jet && inp.up && S.grounded && !inside) { S.vy = 7.2; S.grounded = false; }
-  S.vy -= (jet ? 12 : G_FOOT) * dt; S.vy = Math.max(S.vy, jet ? -18 : -40);
+  if (jet && inp.up && S.fuel > 0) { S.vy = Math.min(S.vy + 28 * dt, 13);   // ג'טפק בדיוני: תאוצה נטו +18 מ'/ש² כמו קודם
+  S.fuel = Math.max(0, S.fuel - dt / 6); S.grounded = false; }
+  else if (!jet && inp.up && S.grounded && !inside && !swimming) { S.vy = V_JUMP; S.grounded = false; }
+  S.vy -= (G_FOOT + K_DRAG * S.vy * Math.abs(S.vy)) * dt; if (jet) S.vy = Math.max(S.vy, -18);
   let ny = S.p.y + S.vy * dt;
   if (inside) { nx = clamp(nx, -5.6, 5.6); nz = clamp(nz, -3.6, 3.75); const f = 0; if (ny <= f) { ny = f; S.vy = 0; S.grounded = true; } S.p.set(nx, ny, nz); if (nz > 3.6 && dz > 0.5) exitInterior(); return; }
   // ים: לא נכנסים ברגל למים עמוקים
-  if (W.H(nx, nz) < -0.4 && S.p.y < 1.5) { nx = S.p.x; nz = S.p.z; }
+  if (W.H(nx, nz) < -0.4 && S.p.y < 1.5 && W.H(S.p.x, S.p.z) >= -0.4) { nx = S.p.x; nz = S.p.z; }   // מהחוף לא נכנסים; מי שבמים – שוחה
   const c = W.collide(nx, nz, R_FOOT, ny + 0.3, ny + 1.7); nx = c.x; nz = c.z;
-  const fl = W.floorAt(nx, nz, Math.max(ny, S.p.y) + 0.5);
+  let fl = W.floorAt(nx, nz, Math.max(ny, S.p.y) + 0.5); if (fl < SWIM_Y && W.isSea(nx, nz)) fl = SWIM_Y;   // צף, לא עומד על קרקעית −2.5 (מצייני מקום)
   if (ny <= fl) { // נחיתה / הליכה על הקרקע (מדרגה עד 0.6 מ')
     if (fl - S.p.y > 0.7 && S.grounded) { nx = S.p.x; nz = S.p.z; ny = S.p.y; }
     else { ny = fl; S.vy = 0; S.grounded = true; }
@@ -483,17 +490,20 @@ function moveFoot(dt, inp, inside) {
 }
 function bounds(o) { const B = W.bounds; if (!B) return; o.x = clamp(o.x, B.minx, B.maxx); o.z = clamp(o.z, B.minz, B.maxz); }
 function moveCar(dt, inp) {
-  const c = S.car, road = W.onRoad(c.x, c.z), vmax = road ? 34 : 14;
+  const c = S.car, road = W.onRoad(c.x, c.z), vmax = road ? 34 : 14, v0 = c.v;
   let thr = inp.y; if (inp.down) thr = -1;              // כפתור "אחורה"
   const brake = inp.up;                                  // "בלם" / רווח
-  if (thr > 0.05) c.v += (c.v < 0 ? 22 : 9 * (1 - c.v / vmax)) * thr * dt;
-  else if (thr < -0.05) c.v += (c.v > 0 ? -22 : -6 * (1 + c.v / 9)) * -thr * dt;
-  else c.v = damp(c.v, 0, 0.6, dt);
-  if (brake) c.v = damp(c.v, 0, 4, dt);
-  if (c.v > vmax) c.v = damp(c.v, vmax, 2, dt);
+  const aB = (SIM.weather.rain > 0.5 ? MU_WET : MU_BRAKE) * G_FOOT * dt;   // בלימה מוגבלת חיכוך: a = μ·g
+  if (thr > 0.05) { if (c.v < 0) c.v = Math.min(0, c.v + aB * thr); else c.v += 9 * (1 - c.v / vmax) * thr * dt; }
+  else if (thr < -0.05) { if (c.v > 0) c.v = Math.max(0, c.v - aB * -thr); else c.v += -6 * (1 + c.v / 9) * -thr * dt; }
+  else if (!brake) c.v -= Math.sign(c.v) * Math.min(Math.abs(c.v), (0.6 + 0.00027 * c.v * c.v) * dt);   // גלגול + אוויר + בלימת מנוע – מקורב
+  if (brake) c.v = Math.abs(c.v) <= aB ? 0 : c.v - Math.sign(c.v) * aB;
+  if (c.v > vmax) c.v = Math.max(vmax, c.v - aB);
   const steerMax = 0.6 / (1 + Math.abs(c.v) / 16); c.steer = damp(c.steer, -inp.x * steerMax, 8, dt);
-  c.h += c.v / 2.6 * Math.tan(c.steer) * dt;
-  let nx = c.x + Math.sin(c.h) * c.v * dt, nz = c.z + Math.cos(c.h) * c.v * dt;
+  const yr = c.v / 2.6 * Math.tan(c.steer), yrMax = MU_LAT * G_FOOT / Math.max(Math.abs(c.v), 1);
+  c.h += clamp(yr, -yrMax, yrMax) * dt;               // גבול אחיזה צידית ≈0.9g (תת־היגוי מקורב, בלי החלקת צמיגים)
+  const vm = (v0 + c.v) / 2;                          // מהירות ממוצעת בצעד → מרחק עצירה לא תלוי בקצב הפריימים
+  let nx = c.x + Math.sin(c.h) * vm * dt, nz = c.z + Math.cos(c.h) * vm * dt;
   if (W.H(nx, nz) < -0.3) { nx = c.x; nz = c.z; c.v *= -0.2; toast('🌊 הים! הרכב נעצר בחוף'); }
   // שני עיגולי התנגשות (חזית/אחור)
   for (const off of [1.3, -1.3]) { const px = nx + Math.sin(c.h) * off, pz = nz + Math.cos(c.h) * off; const r = W.collide(px, pz, 1.05, c.y + 0.2, c.y + 1.5);
@@ -798,5 +808,5 @@ function start() { $('load').style.display = 'none'; S.started = true; S.t = 0; 
 requestAnimationFrame(frame); boot();
 
 // ---------- ממשק לבדיקות אוטומטיות
-window.G27 = { SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
+window.G27 = { phys: { moveFoot, moveCar }, SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
 })();
