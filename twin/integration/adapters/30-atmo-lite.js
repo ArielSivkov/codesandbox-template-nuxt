@@ -8,6 +8,8 @@
  */
 (function () {
   'use strict';
+  // פרמטרי לילה – מכוילים מול תמונות השטח של אריאל (סבבי שימור-שיפור, rounds/*.json)
+  const NIGHT = window.YZNight = Object.assign({ amb: 0.95, sky: 0x8c8678, gnd: 0x6e5c48, ev: 0.25, pool: 16, poolOp: 0.55, win: 0.9 }, window.YZNight || {});
   const A = { night: 0, golden: 0, lamps: null, pools: null, stars: null, lampT: 0, mask: null, wallE: null, cnt: 0 };
   const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
   const C = (h) => new THREE.Color(h);
@@ -28,6 +30,9 @@
   }
   function lampPositions(world, max) {
     const P = world.player.pos, cand = [], R2 = 520 * 520;
+    if (world.providers.lamps && world.providers.lamps.length) {   // פנסים אמיתיים-בסגנון מהריהוט הנגזר (procgen)
+      const L = world.providers.lamps.map(l => [(l.x - P.x) ** 2 + (l.z - P.z) ** 2, l.x, l.z]).filter(a => a[0] < R2).sort((a, b) => a[0] - b[0]);
+      const out = []; for (let i = 0; i < Math.min(max, L.length); i++) out.push(L[i][1], L[i][2]); return out; }
     for (const t of world.data.tiles.values()) for (const r of t.roads || []) {
       const p = r.p, off = r.w / 2 + 1.2; let acc = 0, side = 1;
       for (let i = 0; i < p.length / 2 - 1; i++) { const ax = p[i * 2], az = p[i * 2 + 1], dx = p[i * 2 + 2] - ax, dz = p[i * 2 + 3] - az, L = Math.hypot(dx, dz) || 1;
@@ -47,20 +52,21 @@
   function grade(world) {
     const el = world.sun.elevation, G = world.G27, r = world.renderer;
     A.night = clamp((2 - el) / 8, 0, 1); A.golden = clamp(1 - Math.abs(el - 6) / 9, 0, 1) * (1 - world.weather.cloud * 0.8);
-    r.toneMappingExposure = 1.05 + A.golden * 0.18 - A.night * 0.1;
+    r.toneMappingExposure = 1.05 + A.golden * 0.18 + A.night * NIGHT.ev;   // מצב לילה של טלפון: חשיפה ארוכה
     if (world.sunLight) { if (A.golden > 0.05) world.sunLight.color.lerp(C(0xff9a48), A.golden * 0.85); world.sunLight.intensity *= 1 + A.golden * 0.45; }
     if (world.hemi) { world.hemi.color.set(0xdcecff).lerp(C(0xffc08a), A.golden * 0.65).lerp(C(0x3a4c7a), A.night); world.hemi.groundColor.set(0xa08f70).lerp(C(0x6a4a3a), A.golden * 0.4).lerp(C(0x2a2018), A.night);
-      world.hemi.intensity = Math.max(world.hemi.intensity, 0.32 * A.night + 0.18); }
+      world.hemi.intensity = Math.max(world.hemi.intensity, NIGHT.amb * A.night + 0.18);   // אור עירוני מוחזר בלילה (לפי תמונות השטח: קירות טיח מוארים)
+      if (A.night > 0.3) { world.hemi.color.lerp(C(NIGHT.sky), A.night * 0.8); world.hemi.groundColor.lerp(C(NIGHT.gnd), A.night * 0.8); } }
     // זיהום אוויר → אובך: גוון חום-אפור + הגבלת טווח
     const aqi = world.weather.aqi || 0, hz = clamp((aqi - 25) / 200, 0, 0.8); A.haze = hz;
     if (world.scene.fog && hz > 0) { const hc = A.night > 0.5 ? C(0x3a3640) : C(0xb8a58c); world.scene.fog.color.lerp(hc, hz * 0.6); world.scene.background && world.scene.background.lerp && world.scene.background.lerp(hc, hz * 0.4);
       const u = world.sky && world.sky.material.uniforms; if (u && u.hor) u.hor.value.lerp(hc, hz * 0.5); }
     // חלונות דולקים
     const MAT = world.data.MAT; if (MAT && MAT.wall) { if (!A.mask) { A.mask = windowMask(MAT.wall.map); }
-      if (A.mask) { if (A.night > 0.05) { MAT.wall.emissiveMap = A.mask; MAT.wall.emissive.set(0xffffff); MAT.wall.emissiveIntensity = A.night * 0.9; } else { MAT.wall.emissiveMap = null; MAT.wall.emissive.set(0x000000); }
+      if (A.mask) { if (A.night > 0.05) { MAT.wall.emissiveMap = A.mask; MAT.wall.emissive.set(0xffffff); MAT.wall.emissiveIntensity = A.night * NIGHT.win; } else { MAT.wall.emissiveMap = null; MAT.wall.emissive.set(0x000000); }
         MAT.wall.needsUpdate = true; } }
     const vis = A.night > 0.05; A.lamps.visible = A.pools.visible = vis; A.stars.visible = !world.providers.starsReal && A.night > 0.5 && world.weather.cloud < 0.8;   // מחלקת השמיים מציירת כוכבים אמיתיים
-    A.pools.material.opacity = 0.55 * A.night; A.lamps.material.opacity = A.night; A.stars.material.opacity = (1 - world.weather.cloud) * A.night * (1 - hz);
+    A.pools.material.opacity = NIGHT.poolOp * A.night; A.lamps.material.opacity = A.night; A.stars.material.opacity = (1 - world.weather.cloud) * A.night * (1 - hz);
     if (vis && !A.cnt) rebuildLamps(world);
   }
   window.YZAtmoLite = A;
@@ -68,7 +74,7 @@
     id: 'atmo-lite', name: 'אווירה: יום/לילה, אורות עיר, אובך (גישור)', dept: 'integration → atmosphere', order: 30,
     init(world, api) {
       const g = api.group(); const MAX = 700;
-      const pg = new THREE.PlaneGeometry(16, 16);
+      const pg = new THREE.PlaneGeometry(NIGHT.pool, NIGHT.pool);
       A.pools = new THREE.InstancedMesh(pg, new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.4, 1.0), map: glowTex('rgba(255,200,130,1)', 'rgba(255,170,90,0.45)'), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, fog: true }), MAX);
       A.pools.count = 0; A.pools.frustumCulled = false; A.pools.renderOrder = 1; g.add(A.pools);
       const lg = new THREE.BufferGeometry(); lg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX * 3), 3)); lg.setDrawRange(0, 0);
@@ -77,7 +83,7 @@
       const sp = new Float32Array(900 * 3); for (let i = 0; i < 900; i++) { const u = Math.random(), v = Math.random() * 0.9 + 0.1, th = u * Math.PI * 2, y = v, r = Math.sqrt(1 - y * y); sp[i * 3] = Math.cos(th) * r * 1800; sp[i * 3 + 1] = y * 1800; sp[i * 3 + 2] = Math.sin(th) * r * 1800; }
       const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.BufferAttribute(sp, 3));
       A.stars = new THREE.Points(sg, new THREE.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, transparent: true, depthWrite: false, fog: false })); A.stars.frustumCulled = false; A.stars.renderOrder = -1; g.add(A.stars);
-      api.on('env', () => grade(world)); api.on('quality', () => { A.cnt = 0; }); api.on('tile', () => { A.lampDirty = true; });
+      api.on('env', () => grade(world)); api.on('quality', () => { A.cnt = 0; }); api.on('tile', () => { A.lampDirty = true; }); api.on('lamps', () => { A.lampDirty = true; A.lampT = 0; });
       grade(world);
     },
     update(dt, world) {

@@ -56,3 +56,5 @@ body.yz-card-open #toast{top:calc(env(safe-area-inset-top) + 64px)!important}
 #yzHUDp>div.c{max-height:1.5em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 body.yz-pm #prompt,body.yz-pm #bE{display:none!important}
 @media (max-width:480px) and (orientation:portrait){#yzHUDp{top:calc(env(safe-area-inset-top) + 142px)!important;max-width:58vw}}
+/* מצב צילום נקי (?clean=1) – בלי ממשק, לצילומי השוואה ומצגות */
+body.yz-clean #top,body.yz-clean #mm,body.yz-clean #mmN,body.yz-clean #hud,body.yz-clean #joy,body.yz-clean #acts,body.yz-clean #toast,body.yz-clean #prompt,body.yz-clean #fps,body.yz-clean #yzBadge,body.yz-clean #yzHUDp,body.yz-clean #yzEye,body.yz-clean #yzNotices,body.yz-clean #yzDevBar,body.yz-clean #card,body.yz-clean #yzLeg{display:none!important}

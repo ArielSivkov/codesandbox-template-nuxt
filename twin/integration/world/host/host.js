@@ -470,6 +470,7 @@ function renderHUD() {
 // ---------------------------------------------------------------- חיבור למשחק
 let READY = false;
 function attach() {
+  if (qs.has('clean')) document.body.classList.add('yz-clean');
   const G = window.G27; world.G27 = G; world.THREE = window.THREE; world.scene = G.scene; world.camera = G.camera; world.renderer = G.renderer;
   const r = G.renderer, orig = r.render.bind(r);
   let inPR = false;

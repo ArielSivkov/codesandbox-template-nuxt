@@ -51,8 +51,9 @@
       const pgm = merge([box(0.42, 0.85, 0.26, 1.05), box(0.36, 0.8, 0.22, 0.4), box(0.24, 0.26, 0.24, 1.62)]);
       L.pedMesh = new THREE.InstancedMesh(pgm, new THREE.MeshLambertMaterial({ color: 0xffffff }), MAXP); L.pedMesh.frustumCulled = false; g.add(L.pedMesh);
       const c = new THREE.Color(); for (let i = 0; i < MAXC; i++) { c.setHex(PALETTE[i % PALETTE.length]); L.carMesh.setColorAt(i, c); }
-      const mk = (col, size) => { const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXC * 2 * 3), 3)); const p = new THREE.Points(geo, new THREE.PointsMaterial({ color: col, size, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); p.frustumCulled = false; g.add(p); return p; };
-      L.heads = mk(0xfff4d6, 1.1); L.tails = mk(0xff2a1a, 0.7);
+      const dot = (() => { const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d'); const g = x.createRadialGradient(16, 16, 0, 16, 16, 16); g.addColorStop(0, '#fff'); g.addColorStop(0.4, 'rgba(255,255,255,0.5)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 32, 32); return new THREE.CanvasTexture(c); })();
+      const mk = (col, size) => { const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXC * 2 * 3), 3)); const p = new THREE.Points(geo, new THREE.PointsMaterial({ color: col, size, map: dot, sizeAttenuation: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));   // נקודות עגולות (לא ריבועים אדומים ליד המצלמה) p.frustumCulled = false; g.add(p); return p; };
+      L.heads = mk(0xfff4d6, 0.9); L.tails = mk(0xff2a1a, 0.45);
       for (let i = 0; i < MAXC; i++) L.cars.push({}); for (let i = 0; i < MAXP; i++) L.peds.push({});
       collectRoads(world); L.cars.forEach(c2 => spawnCar(world, c2)); L.peds.forEach(q => spawnPed(world, q)); recolorPeds(world);
       api.on('shabbat', () => recolorPeds(world)); api.on('env', () => { L.night = Math.max(0, Math.min(1, (2 - world.sun.elevation) / 8)); });

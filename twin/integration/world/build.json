@@ -1,5 +1,5 @@
 {
- "built_at": "2026-11-23 02:34:21",
+ "built_at": "2026-11-23 02:45:37",
  "game_js_mtime": "00:58:17",
  "mods": {
   "physics": "copied(2)",
@@ -13,6 +13,7 @@
   "maritime": "copied(3)",
   "npc": "present-not-wired",
   "aviation": "copied(1)",
+  "procgen": "copied(2)",
   "sky": "copied(1)",
   "assets": "present-not-wired"
  },
@@ -28,6 +29,7 @@
   "45-maritime.js",
   "48-vegetation.js",
   "50-life-lite.js",
+  "52-procgen.js",
   "55-aviation.js",
   "60-audio.js",
   "70-present.js",

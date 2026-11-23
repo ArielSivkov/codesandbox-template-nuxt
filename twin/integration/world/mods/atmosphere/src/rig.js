@@ -41,7 +41,12 @@ export function createAtmosphere({ THREE, renderer, scene, camera, site = ASHDOD
   const post = new AtmoPost(T, renderer, { lut: { data: buildLUT(32), size: 32 } });
   const st = { ms: Date.now(), aq: Object.assign({ source: 'preset' }, AQ_PRESETS.clean), weather: {}, tier, profile, t: 0, exposure: null, look: null, lampMap: null, lamps: null, focus: new T.Vector3() };
   const v3 = (o, a) => o.set(a[0], a[1], a[2]);
-  const fogObj = new T.FogExp2(0xffffff, 0.0001);   // for OTHER teams' standard materials (density = β: matches our exp fog at 1/β)
+  // Host-friendly fog: if the host already owns scene.fog (e.g. a linear THREE.Fog whose near/far it animates), KEEP that object
+  // and only drive its colour — replacing it broke the integration world (host read fog.far → NaN camera.far → black frame).
+  const hostFog = scene.fog || null;
+  const fogObj = hostFog || new T.FogExp2(0xffffff, 0.0001);   // ours: density = β (matches our exp fog at 1/β)
+  const saved = { toneMapping: renderer.toneMapping, exposure: renderer.toneMappingExposure, background: scene.background, fog: scene.fog,
+    shadow: renderer.shadowMap.enabled, autoClear: renderer.autoClear };
 
   function applyTier() {
     const c = TIERS[st.tier] || TIERS.mid;
@@ -84,7 +89,7 @@ export function createAtmosphere({ THREE, renderer, scene, camera, site = ASHDOD
     S.uSkyRefl.value.setRGB(...L.night.skyRefl); S.uLampOn.value = L.night.lightsOn * L.night.lampLux / 22; S.uCityUp.value.setRGB(...L.night.cityUp); S.uTime.value = st.t;
     S.uWarm.value.setRGB(...L.night.warm); S.uCool.value.setRGB(...L.night.cool); S.uTv.value.setRGB(...L.night.tv);
     // other teams' materials: standard FogExp2 with the same colour
-    fogObj.color.setRGB(...L.fog.color); fogObj.density = L.fog.beta; scene.fog = fogObj;
+    fogObj.color.setRGB(...L.fog.color); if (fogObj.isFogExp2) fogObj.density = L.fog.beta; if (scene.fog !== fogObj) scene.fog = fogObj;
     scene.background = null;
     // phone auto-white-balance at night: pulls the sodium/LED cast ~35% toward neutral (field photos: pools read #957E5F, not orange)
     { const n = L.night.lightsOn, c = [1.0, 0.78, 0.52].map(v => 1 / (1 - 0.35 * n * (1 - v))), m = c[1]; post.phoneWB = c.map(v => v / m); }
@@ -142,11 +147,14 @@ export function createAtmosphere({ THREE, renderer, scene, camera, site = ASHDOD
     patchMaterial(m) { return patchMaterial(m, S); },
     setSize(w, h) { post.setSize(w, h); },
     update(dt = 0) { st.t += dt; apply(dt); return st.look; },
-    render() {   // phone profile: night-mode multi-frame exposure is ~1–1.5 EV brighter than the eye-like auto exposure
+    render() {
+      renderer.autoClear = true;   // hosts that render in passes may leave autoClear off — our HDR target must be cleared   // phone profile: night-mode multi-frame exposure is ~1–1.5 EV brighter than the eye-like auto exposure
       const e = st.exposure ?? 1, g = st.profile === 'phone' ? 1 + 1.0 * Math.min(1, Math.max(0, (Math.log10(e) - 1) / 2)) : 1;
       post.render(scene, camera, e * g, st.t); },
     get state() { return st.look; }, get exposure() { return st.exposure; }, get tier() { return st.tier; }, get profile() { return st.profile; },
-    dispose() { post.dispose(); scene.remove(group); st.lampMap && st.lampMap.rt.dispose(); sky.material.dispose(); },
+    dispose() { post.dispose(); scene.remove(group); st.lampMap && st.lampMap.rt.dispose(); sky.material.dispose();
+      renderer.toneMapping = saved.toneMapping; renderer.toneMappingExposure = saved.exposure; renderer.shadowMap.enabled = saved.shadow; renderer.autoClear = saved.autoClear;
+      scene.background = saved.background; scene.fog = saved.fog; renderer.setRenderTarget(null); },
   };
   const sz = renderer.getSize(new T.Vector2()); post.setSize(sz.x, sz.y);
   applyTier(); if (profile === 'phone') api.setCameraProfile('phone');
