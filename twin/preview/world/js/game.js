@@ -341,9 +341,30 @@ function sunCard(b) {
         rows += `<tr><td>${nm}</td><td>${cell(r[0])}</td><td>${cell(r[1])}</td></tr>`; }
       html += `<h3>☀️ ${label} · אורך היום ${fmt(dayH, 1)} ש'</h3><table><tr><td>חזית</td><td>קומת קרקע</td><td>קומה עליונה</td></tr>${rows}</table>`;
     }
+    html += `<h3>🏢 לפי קומה</h3><label>קומה <span id="sfN">1</span> מתוך ${b.floors || 1} <input type="range" id="sfR" min="1" max="${Math.max(1, b.floors || 1)}" value="1" step="1"></label><div id="sfOut"></div><div class="acts"><button class="btn" id="sCsv">⬇️ דוח הצללה (CSV, כל הקומות)</button></div>`;
     out.innerHTML = html + `<p class="note">שעות שמש ישירה על החזית (ש'). הטווח = גובה השכנים ±σ. מקורב: בלי עצים, מרפסות ותבליט; שכנים רק מהאזור הטעון (עד 800 מ'); צעד 5 דק'. מיקום שמש: NOAA, נבדק מול NREL SPA. (${Math.round(performance.now() - t0)} מ"ש)</p>`;
+    const fh = b.floors ? (b.top - b.base) / b.floors : 3;   // גובה קומה ממוצע מהגובה המשוער
+    const floorRow = (k, day) => names.map(nm => { const f = fp[nm]; return SIM.sunHours({ x: f.x, z: f.z, y: b.base + (k - 0.5) * fh, nx: f.nx, nz: f.nz, day, near: W.near, exclude: b.id, lat: LAT, lon: LON, gamma: GAMMA }); });
+    const showFloor = k => { $('sfN').textContent = k; const w = floorRow(k, `${Y}-12-21`), s = floorRow(k, `${Y}-06-21`);
+      $('sfOut').innerHTML = `<table><tr><td>חזית</td><td>21.12</td><td>21.6</td></tr>${names.map((nm, i) => `<tr><td>${nm}</td><td>${cell(w[i])}</td><td>${cell(s[i])}</td></tr>`).join('')}</table>`; };
+    let sfT = null; $('sfR').oninput = e => { clearTimeout(sfT); const k = +e.target.value; $('sfN').textContent = k; sfT = setTimeout(() => showFloor(k), 120); }; showFloor(1);
+    $('sCsv').onclick = () => {
+      const lines = ['building_id,floor,height_m,facade,date,sun_hours,low,high,day_hours'];
+      for (let k = 1; k <= Math.max(1, b.floors || 1); k++) for (const day of [`${Y}-12-21`, `${Y}-06-21`]) { const r = floorRow(k, day);
+        names.forEach((nm, i) => lines.push([b.id, k, (b.base + (k - 0.5) * fh).toFixed(1), nm, day, r[i].hours.toFixed(2), r[i].lo.toFixed(2), r[i].hi.toFixed(2), r[i].dayHours.toFixed(2)].join(','))); }
+      lines.push('# מקורב: גבהים משוערים ±σ, בלי עצים/מרפסות/תבליט, צעד 5 דק\'. שמש: NOAA. נתוני מפה © תורמי OpenStreetMap (ODbL)');
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv' })); a.download = `shading-${b.id}.csv`; document.body.appendChild(a); a.click(); a.remove(); toast('⬇️ דוח הצללה ירד'); };
   }, 30);
 }
+function hhmm(m) { if (m == null) return '—'; const r = Math.round(m); return `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; }
+/** זריחה, שקיעה ואורך יום לתאריך המוצג (שפה עליונה באופק, כולל שבירה, בלי תבליט) */
+function sunDayHtml() { const ip = ilParts(ENV.date), day = `${ip.y}-${String(ip.mo + 1).padStart(2, '0')}-${String(ip.d).padStart(2, '0')}`;
+  const r = SIM.sunRiseSet(day, LAT, LON);
+  return `🌅 זריחה ${hhmm(r.rise)} · 🌇 שקיעה ${hhmm(r.set)} · יום ${fmt(r.rise != null && r.set != null ? (r.set - r.rise) / 60 : null, 1)} ש'`; }
+/** מיקום השחקן: ITM אמיתי (מסגרת הדגימה + היסט) ו-WGS84 (itm.js) */
+function whereHtml() { const p = curPos(), E = p.x + W.OX, N = W.OY - p.z; if (!window.ITM) return 'אין המרה';
+  const r = ITM.sampleToItm(E, N), g = ITM.itmToWgs84(r.E, r.N), lat = g.lat.toFixed(6), lon = g.lon.toFixed(6);
+  return `רשת ישראל החדשה: <span dir="ltr">${Math.round(r.E)} / ${Math.round(r.N)}</span> · GPS: <span dir="ltr">${lat}, ${lon}</span><br>גובה ${fmt(p.y, 1)} מ' · <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}" target="_blank" rel="noopener">פתח במפה</a> <span class="tag">מיקום במשחק, לא GPS של הטלפון</span>`; }
 function closeCard() { $('card').style.display = 'none'; cardB = null; }
 function toggleMine(b) {
   if (mine.has(b.id)) { mine.delete(b.id); removeGlow(b.id); toast('הסימון הוסר'); }
@@ -662,7 +683,9 @@ function renderMenu() {
   <div>מגע: ג'ויסטיק משמאל, כפתורים מימין, גרירה על המסך מסובבת מצלמה, הקשה על בניין פותחת כרטיס.</div>
   <h3 style="margin-top:10px">איכות</h3>
   <div class="row"><button class="btn ${Q.level === 0 ? 'on' : ''}" data-q="0">גבוהה</button><button class="btn ${Q.level === 1 ? 'on' : ''}" data-q="1">בינונית</button><button class="btn ${Q.level === 2 ? 'on' : ''}" data-q="2">חסכונית</button><button class="btn ${Q.auto ? 'on' : ''}" id="qAuto">אוטומטי</button></div>
-  <div class="row"><button class="btn" id="mSpawn">↩ חזרה לנקודת ההתחלה</button><button class="btn" id="mBiz">🏪 אל ${BIZ.name}</button><button class="btn" id="mFps">FPS</button></div>
+  <div class="row"><button class="btn" id="mSpawn">↩ חזרה לנקודת ההתחלה</button><button class="btn" id="mBiz">🏪 אל ${BIZ.name}</button><button class="btn" id="mFps">FPS</button><button class="btn" id="mWhere">📍 איפה אני</button></div>
+  <div class="row"><button class="btn ${gpsOn() ? 'on' : ''}" id="mGps">🛰 להתחיל במיקום שלי (GPS)${gpsOn() ? ' ✓' : ''}</button></div>
+  <div id="whereOut" class="mut" style="font-size:12px"></div>
   <div id="stats"></div>
   <p style="font-size:11px;color:var(--mut)">נתוני מפה © תורמי OpenStreetMap (ODbL) · גבהים משוערים (גדוד 5) · דמות Quaternius (CC0). זה אב־טיפוס: אין שמירה בשרת, אין משחק מרובה משתתפים.</p>
   <div class="row"><button class="btn" id="menuX">סגירה</button></div>`;
@@ -671,6 +694,9 @@ function renderMenu() {
   $('mSpawn').onclick = () => { el.style.display = 'none'; spawn(); };
   $('mBiz').onclick = () => { el.style.display = 'none'; if (S.mode !== 'foot') setMode('foot'); spawn(); };
   $('mFps').onclick = () => { $('fps').classList.toggle('hidden'); };
+  $('mWhere').onclick = () => { $('whereOut').innerHTML = whereHtml(); };
+  $('mGps').onclick = () => { if (gpsOn()) { try { localStorage.removeItem('w27.gpsSpawn'); } catch (e) { /* */ } toast('התחלה במיקום שלי כובתה'); renderMenu(); return; }
+    try { localStorage.setItem('w27.gpsSpawn', '1'); } catch (e) { /* */ } el.style.display = 'none'; gpsSpawn(); };
   $('menuX').onclick = () => el.style.display = 'none';
   statsText();
 }
@@ -711,19 +737,22 @@ function renderEnv() {
   el.innerHTML = `<h3>☀ שמש · ${hh} <span class="tag">שעון ישראל</span></h3>
   <div class="row"><input type="date" id="eDate" value="${ds}"><button class="btn" id="eNow">עכשיו</button></div>
   <label>שעה <input type="range" id="eTime" min="0" max="1430" step="10" value="${ip.min}"></label>
-  <div class="ro">אזימוט ${sp.azimuth.toFixed(1)}° · גובה ${sp.elevation.toFixed(1)}° ${sp.elevation < 0 ? '(לילה)' : ''}<br><span class="mut">אשדוד ${LAT}°, ${LON}° · NOAA · צל מחושב סביב השחקן (±85 מ')</span></div>
+  <div class="ro">אזימוט ${sp.azimuth.toFixed(1)}° · גובה ${sp.elevation.toFixed(1)}° ${sp.elevation < 0 ? '(לילה)' : ''}<br><span class="mut">אשדוד ${LAT}°, ${LON}° · NOAA · צל מחושב סביב השחקן (±85 מ')</span><br>${sunDayHtml()}</div><div class="row"><button class="btn" id="eHere">☀️ שעות שמש כאן היום</button></div><div id="eHereOut" class="mut"></div>
   <h3>🌬 מזג אוויר <span class="tag">${esc(w.source)}</span></h3>
   <label>רוח ${w.windSpeed.toFixed(1)} מ'/ש' (${Math.round(w.windSpeed * 3.6)} קמ"ש) <input type="range" id="eWs" min="0" max="25" step="0.5" value="${w.windSpeed}"></label>
   <label>נושבת מ${dirName(w.windFrom)} (${Math.round(w.windFrom)}°) <input type="range" id="eWd" min="0" max="359" step="5" value="${w.windFrom}"></label>
   <label>משבים ×${w.gust.toFixed(1)} <input type="range" id="eWg" min="1" max="2.5" step="0.1" value="${w.gust}"></label>
   <label>עננות ${Math.round(w.cloud * 100)}% <input type="range" id="eCl" min="0" max="1" step="0.05" value="${w.cloud}"></label>
   <label>גשם ${w.rain.toFixed(1)} מ"מ/שעה <input type="range" id="eRn" min="0" max="20" step="0.5" value="${w.rain}"></label>
-  <div class="row"><button class="btn" id="eLive" ${ENV.live ? '' : 'disabled'}>📡 נתוני אמת (Open-Meteo)</button><button class="btn" id="eX">סגירה</button></div>
+  <div class="row"><button class="btn" id="eLive">📡 נתוני אמת (Open-Meteo)</button><button class="btn" id="eX">סגירה</button></div>
   <div class="mut">${ENV.live ? 'מחובר לפי בקשה בלבד.' : 'כבוי בגרסה הלא־מקוונת. להפעלה: ‎?live=1‎ בכתובת.'}</div>`;
   const rr = (id, f) => { $(id).oninput = e => { f(+e.target.value); applyEnv(); renderEnvSoft(); }; };
   $('eTime').oninput = e => { const p2 = ilParts(ENV.date); setIL(p2.y, p2.mo, p2.d, +e.target.value); renderEnvSoft(); };
   $('eDate').onchange = e => { const [y, mo, d] = e.target.value.split('-').map(Number); if (y) { setIL(y, mo - 1, d, ilParts(ENV.date).min); renderEnv(); } };
   $('eNow').onclick = () => { ENV.date = new Date(); applyEnv(); renderEnv(); };
+  $('eHere').onclick = () => { const p = curPos(), ip2 = ilParts(ENV.date), day = `${ip2.y}-${String(ip2.mo + 1).padStart(2, '0')}-${String(ip2.d).padStart(2, '0')}`;
+    const r = SIM.sunHours({ x: p.x, z: p.z, y: Math.max(W.H(p.x, p.z), 0) + 1.5, day, near: W.near, lat: LAT, lon: LON, gamma: GAMMA });
+    $('eHereOut').innerHTML = `${fmt(r.hours, 1)} מתוך ${fmt(r.dayHours, 1)} שעות שמש ישירה בגובה 1.5 מ' כאן <span class="tag" dir="ltr">${fmt(r.lo, 1)}–${fmt(r.hi, 1)}</span> (טווח = שכנים ±σ; בלי עצים ותבליט)`; };
   rr('eWs', v => w.windSpeed = v); rr('eWd', v => w.windFrom = v); rr('eWg', v => w.gust = v); rr('eCl', v => w.cloud = v); rr('eRn', v => w.rain = v);
   $('eX').onclick = () => el.style.display = 'none';
   $('eLive').onclick = async () => { try { Object.assign(SIM.weather, await SIM.fetchWeather(LAT, LON)); applyEnv(); renderEnv(); toast('מזג אוויר עודכן מ-Open-Meteo'); } catch (e) { toast('לא הצלחתי למשוך נתונים: ' + e.message); } };
@@ -824,9 +853,28 @@ async function boot() {
     if (/[?&]auto/.test(location.search)) start();
   } catch (e) { console.error(e); $('lerr').textContent = 'שגיאה בטעינה: ' + e.message + ' (צריך שרת קבצים, לא file://)'; }
 }
-function start() { $('load').style.display = 'none'; S.started = true; S.t = 0; last = performance.now(); if (!TOUCH) toast('WASD לתנועה · F להחלפת מצב · הקשה על בניין לפרטים', 4); else toast('ג׳ויסטיק משמאל · גרירה למצלמה · הקשה על בניין', 4); }
+/** התחלה במיקום האמיתי של הטלפון: GPS → WGS84 → ITM (itm.js) → מסגרת הדגימה → סצנה. המיקום לא נשלח לשום מקום. */
+function gpsOn() { try { return /[?&]gps=1/.test(location.search) || localStorage.getItem('w27.gpsSpawn') === '1'; } catch (e) { return /[?&]gps=1/.test(location.search); } }
+function gpsSpawn() {
+  if (!navigator.geolocation || !window.ITM) { toast('אין GPS בדפדפן הזה'); return; }
+  toast('🛰 מחפש מיקום…', 3);
+  navigator.geolocation.getCurrentPosition(pos => spawnAtLatLon(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+    err => toast('לא קיבלתי מיקום: ' + (err.code === 1 ? 'אין הרשאה' : err.message)), { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+}
+async function spawnAtLatLon(lat, lon, acc) {
+  const r = ITM.wgs84ToItm(lat, lon), s = ITM.itmToSample(r.E, r.N), sc = W.toScene(s.E, s.N), B = W.bounds;
+  if (!B || sc.x < B.minx || sc.x > B.maxx || sc.z < B.minz || sc.z > B.maxz) { toast('📍 אתה מחוץ לאזור הנתונים (כרגע רק אשדוד) – מתחיל בנקודת ברירת המחדל', 5); return false; }
+  if (S.mode !== 'foot') setMode('foot');
+  const t0 = performance.now(); await new Promise(res => { const tick = () => { W.update(sc.x, sc.z, 40); if (W.pending() === 0 || performance.now() - t0 > 8000) res(); else setTimeout(tick, 60); }; tick(); });
+  let x = sc.x, z = sc.z; const inB = W.buildingAt(x, z);   // בתוך בניין (GPS בתוך מבנה) → הקיר הקרוב, מטר החוצה, ברמת הרחוב
+  if (inB) { const e = W.edgeDist(inB, x, z), dx = e.px - x, dz = e.pz - z, l = Math.hypot(dx, dz) || 1; x = e.px + dx / l * 1.2; z = e.pz + dz / l * 1.2; }
+  const c = W.collide(x, z, 0.6, Math.max(W.H(x, z), 0), Math.max(W.H(x, z), 0) + 2); S.p.set(c.x, 0, c.z); S.p.y = W.floorAt(c.x, c.z, Math.max(W.H(c.x, c.z), 0) + 2);
+  if (W.isSea(c.x, c.z) && S.p.y < -1.4) S.p.y = -1.4; S.vy = 0; S.grounded = true; S.cam.yaw = S.heading;
+  toast(`📍 התחלת במיקום שלך (דיוק GPS ±${Math.round(acc || 0)} מ')`, 4); return true;
+}
+function start() { $('load').style.display = 'none'; S.started = true; S.t = 0; last = performance.now(); if (gpsOn()) setTimeout(gpsSpawn, 1200); if (!TOUCH) toast('WASD לתנועה · F להחלפת מצב · הקשה על בניין לפרטים', 4); else toast('ג׳ויסטיק משמאל · גרירה למצלמה · הקשה על בניין', 4); }
 requestAnimationFrame(frame); boot();
 
 // ---------- ממשק לבדיקות אוטומטיות
-window.G27 = { phys: { moveFoot, moveCar }, SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
+window.G27 = { phys: { moveFoot, moveCar }, spawnAtLatLon, SIM, ENV, applyEnv, drone, windHere, S, W, setMode, input, showCard, enterInterior, exitInterior, interact, toggleMine, spawn, flyTo, setQuality, Q, renderer, camera, scene, AN, biz: bizObj, mine, start, fps: () => fpsAvg, statsText };
 })();

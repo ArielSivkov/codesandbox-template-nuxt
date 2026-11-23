@@ -94,6 +94,15 @@ SIM.sunHours = function (o) {
   const h = c => c * step / 60;
   return { hours: h(cnt[1]), lo: h(cnt[2]), hi: h(cnt[0]), first: first < 0 ? null : first - step / 2, last: last < 0 ? null : last + step / 2, dayHours: h(day) };
 };
+/** זריחה ושקיעה (דקות מחצות שעון ישראל): השפה העליונה באופק = גובה גאומטרי של המרכז −0.833° (חצי קוטר 0.267° + שבירה תקנית 0.567°; מתחת ל-−0.575° NOAA לא מוסיף שבירה). חיפוש בינארי. */
+SIM.sunRiseSet = function (day, lat, lon) {
+  const [Y, M, D] = day.split('-').map(Number), off = SIM.israelOffsetMin(new Date(Date.UTC(Y, M - 1, D, 12))), t0 = Date.UTC(Y, M - 1, D) - off * 60000;
+  const f = m => SIM.sunPosition(new Date(t0 + m * 60000), lat, lon).elevation + 0.833;
+  let noon = 0, best = -99; for (let m = 0; m < 1440; m += 10) { const e = f(m); if (e > best) { best = e; noon = m; } }
+  if (best < 0) return { rise: null, set: null, noon };
+  const bis = (a, b) => { const up = f(a) < f(b); for (let i = 0; i < 40; i++) { const c = (a + b) / 2; if ((f(c) < 0) === up) a = c; else b = c; } return (a + b) / 2; };
+  return { rise: f(0) < 0 ? bis(0, noon) : null, set: f(1439.99) < 0 ? bis(noon, 1439.99) : null, noon };
+};
 /** נקודות מדידה לחזיתות בניין: לכל כיוון (דרום/מזרח/מערב/צפון) הקיר הארוך שהנורמל שלו הכי קרוב, 0.5 מ' מחוץ לקיר */
 SIM.facadePoints = function (b) {
   const dirs = { 'דרום': [0, 1], 'מזרח': [1, 0], 'מערב': [-1, 0], 'צפון': [0, -1] }, out = {};

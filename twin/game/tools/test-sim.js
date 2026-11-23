@@ -65,6 +65,9 @@ for (const c of ['../../integration/world/js/itm.js', '../../preview/world/js/it
   // חזיתות של קופסה: נורמלים החוצה ובכיוון הנכון
   const box = { p: new Float32Array([0, 0, 20, 0, 20, 10, 0, 10]), n: 4 }, fp = SIM.facadePoints(box);
   ok(fp['דרום'] && fp['דרום'].nz > 0.99 && fp['דרום'].z > 10 && fp['צפון'].nz < -0.99 && fp['צפון'].z < 0 && fp['מזרח'].nx > 0.99 && fp['מערב'].nx < -0.99, 'נקודות חזית: 4 כיוונים, נורמלים החוצה'); }
+// 5) זריחה ושקיעה באשדוד מול NREL SPA (pvlib, 23.11.2026): 06:16:34 / 16:38:45
+{ const r = SIM.sunRiseSet('2026-11-23', LAT, LON), ref = [6 * 60 + 16 + 34 / 60, 16 * 60 + 38 + 45 / 60];
+  ok(Math.abs(r.rise - ref[0]) < 1 && Math.abs(r.set - ref[1]) < 1, `זריחה ${(r.rise / 60 | 0)}:${(r.rise % 60).toFixed(1)} (SPA 6:16.6), שקיעה ${(r.set / 60 | 0)}:${(r.set % 60).toFixed(1)} (SPA 16:38.8) – פחות מדקה`); }
 // פרופיל רוח: חזק יותר בגובה
 SIM.weather.windSpeed = 8; SIM.weather.gust = 1.5;
 const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).speed; ok(b > a, `רוח ב-60 מ' (${b.toFixed(1)}) > ב-2 מ' (${a.toFixed(1)})`);
