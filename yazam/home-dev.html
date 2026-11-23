@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>לוח היזם – הפרויקט שלך בעיר האמיתית, לפני הוועדה</title>
+<meta name="description" content="לוח היזם: עולם תאום תלת־ממדי של אשדוד עם בניינים אמיתיים, שמש וצל לפי תאריך ושעה, ומצגת פרויקט לוועדה ולדיירים.">
+<meta name="theme-color" content="#10243B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=IBM+Plex+Sans+Hebrew:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#10243B;      /* כחול לילה ים־תיכוני */
+  --ink-2:#2B3F57;
+  --sea:#1F6F78;      /* טורקיז ים */
+  --sun:#F2A93B;      /* שמש שעת זהב */
+  --sun-deep:#B86A0E;
+  --dusk:#5B5A8C;     /* סגול צל */
+  --stone:#E7E1D6;    /* אבן כורכר */
+  --paper:#F6F7F5;
+  --line:#D5DAE0;
+  --muted:#4E5D6E;
+  --ok:#1E7A4C; --ok-bg:#E2F3EA;
+  --part:#8A5A00; --part-bg:#FBEFD8;
+  --soon:#4B4A7A; --soon-bg:#E9E8F4;
+  --display:"Frank Ruhl Libre","David Libre","Times New Roman",serif;
+  --body:"IBM Plex Sans Hebrew","Segoe UI","Arial Hebrew",Arial,system-ui,sans-serif;
+  --wrap:1120px;
+  --pad:20px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+body{margin:0;font-family:var(--body);font-size:17px;line-height:1.65;color:var(--ink);background:var(--paper);overflow-x:hidden}
+img,svg{display:block;max-width:100%}
+a{color:var(--sea)}
+:focus-visible{outline:3px solid var(--sun);outline-offset:3px;border-radius:6px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 var(--pad)}
+.skip{position:absolute;inset-inline-start:12px;top:-60px;background:var(--sun);color:var(--ink);padding:10px 14px;border-radius:8px;z-index:100;font-weight:600}
+.skip:focus{top:10px}
+
+/* ---------- סרגל עליון ---------- */
+.bar{position:sticky;top:0;z-index:40;background:rgba(16,36,59,.94);backdrop-filter:saturate(1.4) blur(10px);-webkit-backdrop-filter:saturate(1.4) blur(10px);color:#fff;border-bottom:1px solid rgba(255,255,255,.08)}
+.bar .wrap{display:flex;align-items:center;gap:12px;min-height:60px}
+.logo{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;min-height:44px}
+.logo svg{width:30px;height:30px;flex:none}
+.logo b{font-family:var(--display);font-weight:900;font-size:23px;letter-spacing:0;line-height:1}
+.topnav{display:none;margin-inline-start:auto;gap:4px}
+.topnav a{color:#D9E2EC;text-decoration:none;font-size:15px;padding:10px 12px;border-radius:8px;min-height:44px;display:flex;align-items:center}
+.topnav a:hover{color:#fff;background:rgba(255,255,255,.07)}
+.menu-btn{margin-inline-start:auto;display:flex;align-items:center;gap:8px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:10px;min-height:44px;min-width:44px;padding:0 14px;font:inherit;font-size:15px;cursor:pointer}
+.menu-btn:hover{background:rgba(255,255,255,.08)}
+.menu-btn svg{width:20px;height:20px}
+@media (min-width:980px){.topnav{display:flex}.menu-btn{margin-inline-start:4px}}
+
+/* ---------- מגירה / גיליון תחתון ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,20,34,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:60}
+.sheet{position:fixed;z-index:61;background:#fff;color:var(--ink);inset-inline:0;bottom:0;border-radius:20px 20px 0 0;max-height:88vh;overflow:auto;transform:translateY(105%);visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s linear .3s;padding:8px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(16,36,59,.25)}
+.sheet .grab{width:44px;height:5px;border-radius:3px;background:var(--line);margin:6px auto 10px}
+.sheet h2{font-family:var(--display);font-size:22px;margin:0 4px 6px;display:flex;align-items:center;justify-content:space-between}
+.sheet .x{background:none;border:0;min-width:44px;min-height:44px;font-size:26px;line-height:1;color:var(--muted);cursor:pointer;border-radius:10px}
+.sheet nav a{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;padding:6px 10px;color:var(--ink);text-decoration:none;font-size:17px;border-radius:12px}
+.sheet nav a:hover,.sheet nav a:focus-visible{background:var(--paper)}
+.sheet nav a small{color:var(--muted);font-size:13px}
+.sheet nav hr{border:0;border-top:1px solid var(--line);margin:6px 10px}
+.sheet .sib{background:var(--stone)}
+body.open .scrim{opacity:1;pointer-events:auto}
+body.open .sheet{transform:none;visibility:visible;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+@media (min-width:720px){
+  .sheet{inset-inline-start:auto;inset-inline-end:auto;right:0;left:auto;top:0;bottom:0;width:380px;max-height:none;border-radius:0;transform:translateX(105%);padding-top:18px}
+  .sheet .grab{display:none}
+}
+
+/* ---------- גיבור ---------- */
+.hero{position:relative;color:#fff;background:var(--ink);overflow:hidden;isolation:isolate}
+.hero-art{position:absolute;inset:0 0 var(--band,0px) 0;z-index:-1}
+.hero-art svg{width:100%;height:100%}
+.hero-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(16,36,59,.55) 0%,rgba(16,36,59,.25) 45%,rgba(16,36,59,0) 70%)}
+@media (min-width:900px){.hero-art::after{background:linear-gradient(270deg,rgba(16,36,59,.6) 0%,rgba(16,36,59,.3) 40%,rgba(16,36,59,0) 60%)}}
+.hero{--band:150px}
+.hero .stage{padding-top:30px;padding-bottom:20px;min-height:max(560px,calc(100svh - 60px - var(--band)))}
+.clockband{background:var(--ink);min-height:var(--band);display:flex;align-items:center}
+.clockband .wrap{width:100%}
+.hero h1{font-family:var(--display);font-weight:900;font-size:clamp(36px,10.4vw,76px);line-height:1.04;margin:0 0 14px;max-width:13ch;text-wrap:balance;text-shadow:0 2px 24px rgba(16,36,59,.35)}
+.hero p.lead{font-size:clamp(17px,4.4vw,21px);line-height:1.55;margin:0 0 22px;max-width:34ch;color:#F1F4F8;text-shadow:0 1px 12px rgba(16,36,59,.5)}
+.ctas{display:flex;flex-wrap:wrap;gap:10px}
+.ctas .btn{flex:1 1 auto;padding:0 16px}
+@media (min-width:560px){.ctas .btn{flex:0 0 auto;padding:0 24px}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:0 22px;border-radius:12px;font-weight:600;font-size:17px;text-decoration:none;border:2px solid transparent;cursor:pointer;font-family:var(--body)}
+.btn-sun{background:var(--sun);color:var(--ink)}
+.btn-sun:hover{background:#F6BC5E}
+.btn-ghost{background:rgba(16,36,59,.62);color:#fff;border-color:rgba(255,255,255,.6)}
+.btn-ghost:hover{background:rgba(16,36,59,.8)}
+.btn-ink{background:var(--ink);color:#fff}
+.btn-ink:hover{background:var(--ink-2)}
+.btn-line{background:#fff;color:var(--ink);border-color:var(--ink)}
+.btn svg{width:20px;height:20px;flex:none}
+
+.clock{padding:10px 0 4px;max-width:520px}
+.clock-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;color:#C9D4E0}
+.clock-top output{font-family:var(--display);font-weight:700;font-size:26px;color:#fff;direction:ltr;unicode-bidi:isolate}
+.clock label{display:block}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;margin:0;direction:ltr;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#5B5A8C,#F2A93B 30%,#FFF3D6 50%,#F2A93B 70%,#5B5A8C)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:linear-gradient(90deg,#5B5A8C,#F2A93B 30%,#FFF3D6 50%,#F2A93B 70%,#5B5A8C)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;border:4px solid var(--sun);margin-top:-11px;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid var(--sun)}
+.clock small{display:block;color:#AFC0D2;font-size:12.5px;line-height:1.4;padding-bottom:6px}
+
+/* ---------- כללי מקטעים ---------- */
+section{scroll-margin-top:64px}
+.sec{padding:64px 0}
+.sec h2{font-family:var(--display);font-weight:900;font-size:clamp(30px,7.4vw,48px);line-height:1.1;margin:0 0 14px;text-wrap:balance}
+.sec .intro{font-size:18px;color:var(--muted);max-width:60ch;margin:0 0 28px}
+
+/* למה */
+.why{background:#fff;border-bottom:1px solid var(--line)}
+.why-grid{display:grid;gap:0;border-top:2px solid var(--ink)}
+.why-item{padding:20px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:start}
+.why-item svg{width:40px;height:40px;grid-row:span 2;color:var(--sea)}
+.why-item h3{margin:0;font-size:19px;line-height:1.35}
+.why-item p{margin:0;color:var(--muted);font-size:16px}
+@media (min-width:860px){.why-grid{grid-template-columns:repeat(3,1fr);gap:0 36px}.why-item{border-bottom:0}}
+
+/* מודולים */
+.mod{padding:56px 0;border-bottom:1px solid var(--line)}
+.mod:nth-of-type(even){background:#fff}
+.mod .wrap{display:grid;gap:26px;align-items:center}
+@media (min-width:900px){.mod .wrap{grid-template-columns:1.05fr .95fr;gap:56px}.mod.flip .copy{order:2}}
+.mod h2{font-family:var(--display);font-weight:900;font-size:clamp(28px,7vw,42px);line-height:1.12;margin:10px 0 12px;text-wrap:balance}
+.mod p{margin:0 0 14px;max-width:58ch}
+.mod ul{margin:0 0 18px;padding:0;list-style:none}
+.mod li{position:relative;padding-inline-start:26px;margin:0 0 9px}
+.mod li::before{content:"";position:absolute;inset-inline-start:2px;top:.62em;width:12px;height:12px;border-radius:50%;border:3px solid var(--sun)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;padding:4px 12px;border-radius:999px;line-height:1.5}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.chip.ok{color:var(--ok);background:var(--ok-bg)}
+.chip.part{color:var(--part);background:var(--part-bg)}
+.chip.soon{color:var(--soon);background:var(--soon-bg)}
+.note{display:flex;gap:10px;background:var(--part-bg);border-inline-start:4px solid var(--sun-deep);padding:12px 14px;border-radius:10px;font-size:15.5px;color:#4A3300;margin:0 0 18px;max-width:58ch}
+.note svg{width:22px;height:22px;flex:none;margin-top:2px;color:var(--sun-deep)}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.fig{border-radius:18px;overflow:hidden;background:var(--ink);box-shadow:0 18px 40px -18px rgba(16,36,59,.45)}
+.fig svg{width:100%;height:auto}
+.fig figcaption{background:#fff;color:var(--muted);font-size:14px;padding:10px 14px;border-top:1px solid var(--line)}
+figure{margin:0}
+.feat-list{display:grid;gap:10px;margin:0 0 18px}
+.feat-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;background:var(--paper);border-radius:12px}
+.mod:nth-of-type(odd) .feat-row{background:#fff}
+.feat-row span{font-weight:500}
+
+/* שלבים */
+.steps{background:var(--ink);color:#fff}
+.steps .intro{color:#C9D4E0}
+.steps ol{list-style:none;margin:0;padding:0;display:grid;gap:14px;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:20px 20px 20px 20px;padding-inline-start:78px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);min-height:96px}
+.steps li::before{content:counter(s);position:absolute;inset-inline-start:18px;top:18px;width:44px;height:44px;border-radius:50%;background:var(--sun);color:var(--ink);font-family:var(--display);font-weight:900;font-size:24px;display:grid;place-items:center;line-height:1}
+.steps h3{margin:0 0 4px;font-size:19px}
+.steps p{margin:0;color:#C9D4E0;font-size:16px}
+@media (min-width:860px){.steps ol{grid-template-columns:repeat(3,1fr)}}
+
+/* טבלה */
+.status-table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line)}
+.status-table th,.status-table td{text-align:start;padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top;font-size:16px}
+.status-table thead th{background:var(--stone);font-size:14.5px;font-weight:600}
+.status-table tbody tr:last-child td{border-bottom:0}
+.status-table td:first-child{font-weight:600;width:42%}
+.status-table td small{display:block;color:var(--muted);font-weight:400;font-size:14px;margin-top:2px}
+@media (max-width:560px){
+  .status-table thead{display:none}
+  .status-table,.status-table tbody,.status-table tr,.status-table td{display:block;width:100%}
+  .status-table tr{padding:12px 14px;border-bottom:1px solid var(--line)}
+  .status-table tr:last-child{border-bottom:0}
+  .status-table td{border:0;padding:0}
+  .status-table td:first-child{width:auto;margin-bottom:6px}
+}
+
+/* מוצר אחות */
+.sib-band{background:var(--stone)}
+.sib-band .wrap{display:grid;gap:18px;align-items:center}
+@media (min-width:860px){.sib-band .wrap{grid-template-columns:1fr auto}}
+.sib-band h2{font-size:clamp(26px,6vw,36px)}
+.sib-band p{margin:0;max-width:60ch;color:var(--ink-2)}
+
+/* צור קשר */
+.contact{background:#fff}
+.contact-grid{display:grid;gap:12px;max-width:720px}
+.c-row{display:flex;align-items:center;gap:14px;min-height:64px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;text-decoration:none;color:var(--ink);background:var(--paper)}
+.c-row:hover{border-color:var(--ink)}
+.c-row svg{width:28px;height:28px;flex:none;color:var(--sea)}
+.c-row b{display:block;font-size:17px}
+.c-row span{display:block;color:var(--muted);font-size:15px;direction:ltr;text-align:right;unicode-bidi:plaintext}
+.price-line{margin-top:22px;padding:16px 18px;border-radius:14px;background:var(--ink);color:#fff;max-width:720px}
+.price-line b{font-family:var(--display);font-size:22px;display:block}
+.price-line p{margin:4px 0 0;color:#C9D4E0;font-size:15.5px}
+
+footer{background:var(--ink);color:#AFC0D2;font-size:14.5px;padding:26px 0 calc(26px + env(safe-area-inset-bottom))}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+footer a{color:#fff;display:inline-flex;align-items:center;min-height:44px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">דילוג לתוכן</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="לוח היזם – לראש הדף">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="12" width="7" height="17" rx="1" fill="#E7E1D6"/><rect x="12" y="4" width="8" height="25" rx="1" fill="none" stroke="#F2A93B" stroke-width="2" stroke-dasharray="3 2"/><rect x="22" y="15" width="7" height="14" rx="1" fill="#E7E1D6"/><circle cx="26" cy="7" r="3" fill="#F2A93B"/></svg>
+      <b>לוח היזם</b>
+    </a>
+    <nav class="topnav" aria-label="ניווט ראשי">
+      <a href="#world">העולם התלת־ממדי</a>
+      <a href="#present">מצגת לוועדה</a>
+      <a href="#renewal">התחדשות עירונית</a>
+      <a href="#sky">שמש וצל</a>
+      <a href="#contact">צור קשר</a>
+    </nav>
+    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="sheet">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      תפריט
+    </button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true" inert>
+  <div class="grab" aria-hidden="true"></div>
+  <h2><span id="sheetTitle">תפריט</span><button class="x" id="closeBtn" aria-label="סגירת התפריט">×</button></h2>
+  <nav aria-label="תפריט מלא">
+    <a href="#top">בית</a>
+    <a href="#world">העולם התלת־ממדי <small>חי</small></a>
+    <a href="#present">מצגת לוועדה <small>הדגמה חיה</small></a>
+    <a href="#renewal">התחדשות עירונית <small>חלקי</small></a>
+    <a href="#sky">שמש וצל <small>חי</small></a>
+    <a href="#costs">כמויות ועלויות <small>בפיתוח</small></a>
+    <hr>
+    <a class="sib" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/yazam-design/yazam/app.html" target="_blank" rel="noopener">תכלס קבלנים <small>מוצר אחות, לקבלנים</small></a>
+    <hr>
+    <a href="#contact">צור קשר</a>
+  </nav>
+</aside>
+
+<main id="main">
+<!-- ===== גיבור ===== -->
+<section class="hero" id="top" aria-labelledby="heroTitle">
+  <div class="hero-art" aria-hidden="true">
+    <svg id="city" viewBox="0 0 400 700" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop id="sk0" offset="0" stop-color="#1B3A5C"/>
+          <stop id="sk1" offset=".55" stop-color="#E08A3C"/>
+          <stop id="sk2" offset="1" stop-color="#F7C873"/>
+        </linearGradient>
+        <linearGradient id="seaG" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2C7C86"/><stop offset="1" stop-color="#174E5A"/>
+        </linearGradient>
+        <linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#10243B" stop-opacity="0"/>
+          <stop offset=".35" stop-color="#10243B" stop-opacity=".0"/>
+          <stop offset="1" stop-color="#10243B" stop-opacity=".55"/>
+        </linearGradient>
+        <radialGradient id="glow"><stop offset="0" stop-color="#FFF6DF"/><stop offset=".25" stop-color="#FFD98A" stop-opacity=".9"/><stop offset="1" stop-color="#F2A93B" stop-opacity="0"/></radialGradient>
+      </defs>
+      <rect width="1600" height="700" fill="url(#skyGrad)"/>
+      <circle id="sunGlow" cx="60" cy="430" r="90" fill="url(#glow)"/>
+      <circle id="sunDisc" cx="60" cy="430" r="15" fill="#FFF3D6"/>
+      <!-- ים במערב: צד שמאל -->
+      <rect id="seaRect" x="0" y="560" width="1600" height="30" fill="url(#seaG)"/>
+      <g id="sparkle" fill="#FFE7B0" opacity=".7"></g>
+      <rect x="0" y="588" width="1600" height="112" fill="#CFC3AE"/>
+      <g id="shadows" fill="#2E3460"></g>
+      <g id="blds"></g>
+      
+    </svg>
+  </div>
+  <div class="wrap stage">
+    <h1 id="heroTitle">הפרויקט שלך, בתוך העיר האמיתית.</h1>
+    <p class="lead">רואים את המגדל המוצע על המגרש, את הצל שהוא מטיל בכל שעה ואת הסיפור שמספרים לוועדה ולדיירים — לפני שמגישים.</p>
+    <div class="ctas">
+      <a class="btn btn-sun" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/integration/index.html" target="_blank" rel="noopener">לפתוח את העולם</a>
+      <a class="btn btn-ghost" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/present/index.html#site=w552921285&fl=14&d=2026-12-21&h=9.5&v=swipe&play=1" target="_blank" rel="noopener">לראות מצגת לדוגמה</a>
+    </div>
+  </div>
+  <div class="clockband"><div class="wrap">
+    <div class="clock">
+      <label for="hour">
+        <span class="clock-top"><span>הזיזו את השעה וראו איך הצל זז</span><output id="hourOut" for="hour">16:30</output></span>
+        <input type="range" id="hour" min="6" max="18" step="0.25" value="16.5" aria-describedby="clockNote">
+      </label>
+      <small id="clockNote">איור להמחשה בלבד. החישוב האמיתי, לפי תאריך, שעה ומיקום, נמצא בעולם התלת־ממדי.</small>
+    </div>
+  </div></div>
+</section>
+
+<!-- ===== למה ===== -->
+<section class="sec why" aria-labelledby="whyTitle">
+  <div class="wrap">
+    <h2 id="whyTitle">ועדה ודיירים לא מחליטים לפי מחירון. הם מחליטים לפי מה שהם רואים.</h2>
+    <p class="intro">הדמיה יפה של בניין לבד לא עונה על השאלות שעולות בדיון: מה יקרה לשמש של השכן, איך ייראה הנוף מהחלון, איך הבניין יושב ברחוב. לוח היזם בנוי כדי לענות עליהן מתוך העיר עצמה.</p>
+    <div class="why-grid">
+      <div class="why-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 34h28M10 34V18h7v16M20 34V8h10v26"/><path d="M22 14h6M22 20h6M22 26h6" stroke-width="1.6"/></svg>
+        <h3>הקשר אמיתי, לא רקע מצויר</h3>
+        <p>הבניין המוצע עומד בין הבניינים הקיימים, בגובה ובמיקום שלהם.</p>
+      </div>
+      <div class="why-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="11" r="5"/><path d="M12 2v2M3 11h2M5.6 4.6l1.4 1.4"/><path d="M24 34V14h8v20M24 34l-14 0 8-10h6"/></svg>
+        <h3>שמש וצל לפי תאריך ושעה</h3>
+        <p>רואים מראש כמה שעות שמש השכנים מאבדים, על הגג ועל החזית.</p>
+      </div>
+      <div class="why-item">
+        <svg viewBox="0 0 40 40" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="5" y="8" width="30" height="20" rx="2"/><path d="M20 8v20M14 34h12M20 28v6"/></svg>
+        <h3>סיפור אחד שמשתפים בקישור</h3>
+        <p>מצגת מוכנה עם כיתובים בעברית, שאפשר לשלוח לוועדה, לשמאי ולדיירים.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 1. עולם ===== -->
+<section class="mod" id="world" aria-labelledby="worldTitle">
+  <div class="wrap">
+    <div class="copy">
+      <span class="chip ok">חי עכשיו</span>
+      <h2 id="worldTitle">עולם תאום תלת־ממדי של אשדוד</h2>
+      <p>מודל של העיר עם הבניינים האמיתיים והגבהים שלהם, ושמש וצל לפי כל תאריך ושעה. בהמשך — כל הארץ.</p>
+      <ul>
+        <li>מבט־על עם שכבות שאפשר להדליק ולכבות</li>
+        <li>כרטיס בניין: לוחצים על בניין ורואים את הנתונים שלו</li>
+        <li>שרטוט מגרש ישירות על המפה</li>
+      </ul>
+      <div class="links"><a class="btn btn-ink" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/integration/index.html" target="_blank" rel="noopener">לפתוח את העולם</a></div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 360 230" role="img" aria-label="איור: מבט־על על בלוקים של בניינים עם צללים וקו חוף">
+        <rect width="360" height="230" fill="#173350"/>
+        <path d="M0 0h70c-10 60 8 140-6 230H0z" fill="#1F6F78"/>
+        <path d="M70 0c-10 60 8 140-6 230" stroke="#E7E1D6" stroke-width="3" fill="none" opacity=".5"/>
+        <g fill="#2E3460" opacity=".9">
+          <path d="M120 60h30l18 22h-30z"/><path d="M190 40h26l26 30h-26z"/><path d="M250 120h34l14 16h-34z"/><path d="M130 150h40l20 24h-40z"/><path d="M215 165h24l12 14h-24z"/>
+        </g>
+        <g fill="#E7E1D6">
+          <rect x="110" y="40" width="30" height="22" rx="2"/><rect x="180" y="20" width="26" height="22" rx="2"/><rect x="240" y="100" width="34" height="22" rx="2"/><rect x="120" y="128" width="40" height="24" rx="2"/><rect x="205" y="150" width="24" height="16" rx="2"/><rect x="290" y="40" width="40" height="30" rx="2"/><rect x="300" y="170" width="34" height="30" rx="2"/>
+        </g>
+        <rect x="180" y="92" width="38" height="36" rx="2" fill="none" stroke="#F2A93B" stroke-width="2.5" stroke-dasharray="6 4"/>
+        <rect x="186" y="98" width="26" height="24" fill="#F2A93B" opacity=".25"/>
+        <g font-family="IBM Plex Sans Hebrew, Arial, sans-serif" font-size="12" fill="#fff">
+          <rect x="222" y="66" width="100" height="26" rx="6" fill="#fff"/>
+          <text x="314" y="83" text-anchor="start" fill="#10243B" font-weight="600">המגרש שלך</text>
+        </g>
+      </svg>
+      <figcaption>איור הסבר. בעולם החי: בניינים אמיתיים, שכבות וכרטיס בניין.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 2. מצגת ===== -->
+<section class="mod flip" id="present" aria-labelledby="presentTitle">
+  <div class="wrap">
+    <div class="copy">
+      <span class="chip ok">הדגמה חיה</span>
+      <h2 id="presentTitle">מצגת פרויקט לוועדה ולדיירים</h2>
+      <p>מציבים את המגדל המוצע על מגרש אמיתי, ומקבלים סיפור מוכן להצגה.</p>
+      <ul>
+        <li>החלקה בין לפני ואחרי</li>
+        <li>שעות צל שכל שכן מאבד — על הגג (דודי שמש) ועל החזית</li>
+        <li>המבט מחלון של שכן</li>
+        <li>סיפור אוטומטי של 9 תמונות עם כיתובים בעברית</li>
+        <li>קישור לשיתוף</li>
+      </ul>
+      <p class="note"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg><span>חשוב לדעת: גובהי הבניינים השכנים כרגע מוערכים. לבדיקת הצללה רשמית צריך גבהים מדודים.</span></p>
+      <div class="links"><a class="btn btn-ink" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/present/index.html#site=w552921285&fl=14&d=2026-12-21&h=9.5&v=swipe&play=1" target="_blank" rel="noopener">לראות מצגת לדוגמה</a></div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 360 230" role="img" aria-label="איור: מסך מפוצל לפני ואחרי, עם מגדל מוצע וצל על בניין שכן">
+        <rect width="360" height="230" fill="#E8C68C"/>
+        <rect x="180" width="180" height="230" fill="#E3A85E"/>
+        <rect y="190" width="360" height="40" fill="#CFC3AE"/>
+        <!-- לפני (ימין) -->
+        <g fill="#F6F1E7"><rect x="210" y="130" width="46" height="60"/><rect x="290" y="110" width="40" height="80"/></g>
+        <!-- אחרי (שמאל) -->
+        <g fill="#F6F1E7"><rect x="30" y="130" width="46" height="60"/><rect x="110" y="110" width="40" height="80"/></g>
+        <rect x="84" y="40" width="22" height="150" fill="#fff" stroke="#F2A93B" stroke-width="2"/>
+        <path d="M84 190 L30 190 L30 150 L84 120z" fill="#2E3460" opacity=".45"/>
+        <g fill="#10243B" opacity=".35"><rect x="88" y="50" width="14" height="4"/><rect x="88" y="62" width="14" height="4"/><rect x="88" y="74" width="14" height="4"/><rect x="88" y="86" width="14" height="4"/><rect x="88" y="98" width="14" height="4"/></g>
+        <rect x="178" y="0" width="4" height="230" fill="#fff"/>
+        <circle cx="180" cy="115" r="16" fill="#fff"/><path d="M174 115l-5-5v10zM186 115l5-5v10z" fill="#10243B"/>
+        <g font-family="IBM Plex Sans Hebrew, Arial, sans-serif" font-size="13" font-weight="600">
+          <rect x="296" y="12" width="52" height="24" rx="12" fill="#10243B"/><text x="322" y="29" text-anchor="middle" fill="#fff">לפני</text>
+          <rect x="12" y="12" width="52" height="24" rx="12" fill="#10243B"/><text x="38" y="29" text-anchor="middle" fill="#fff">אחרי</text>
+        </g>
+      </svg>
+      <figcaption>איור הסבר של מסך ההחלקה. ההדגמה החיה מציגה מגרש אמיתי באשדוד.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 3. התחדשות ===== -->
+<section class="mod" id="renewal" aria-labelledby="renewalTitle">
+  <div class="wrap">
+    <div class="copy">
+      <span class="chip part">חלקי — חלק חי, חלק בדרך</span>
+      <h2 id="renewalTitle">התחדשות עירונית: תמ״א ופינוי־בינוי</h2>
+      <p>בפרויקט התחדשות צריך להבין את הבניין הקיים, להעריך את העבודה ולשכנע את הדיירים. כאן זה מתחיל מאותו מודל של העיר.</p>
+      <div class="feat-list">
+        <div class="feat-row"><span>כרטיס בניין: קומות ושטח</span><span class="chip ok">חי</span></div>
+        <div class="feat-row"><span>מצגת שמופנית לדיירים</span><span class="chip ok">הדגמה חיה</span></div>
+        <div class="feat-row"><span>כתב כמויות לבניין</span><span class="chip part">בפיתוח</span></div>
+        <div class="feat-row"><span>תיק פרויקט מלא לדיירים ולוועדה</span><span class="chip soon">בקרוב</span></div>
+      </div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 360 230" role="img" aria-label="איור: כרטיס בניין ליד בניין ישן">
+        <rect width="360" height="230" fill="#173350"/>
+        <rect x="200" y="70" width="110" height="140" fill="#E7E1D6"/>
+        <g fill="#8A94A0"><rect x="212" y="84" width="18" height="16"/><rect x="246" y="84" width="18" height="16"/><rect x="280" y="84" width="18" height="16"/><rect x="212" y="116" width="18" height="16"/><rect x="246" y="116" width="18" height="16"/><rect x="280" y="116" width="18" height="16"/><rect x="212" y="148" width="18" height="16"/><rect x="246" y="148" width="18" height="16"/><rect x="280" y="148" width="18" height="16"/></g>
+        <rect x="200" y="20" width="110" height="50" fill="none" stroke="#F2A93B" stroke-width="2" stroke-dasharray="6 4"/>
+        <rect y="210" width="360" height="20" fill="#2B3F57"/>
+        <g font-family="IBM Plex Sans Hebrew, Arial, sans-serif">
+          <rect x="24" y="44" width="150" height="130" rx="12" fill="#fff"/>
+          <text x="160" y="72" text-anchor="start" font-size="14" font-weight="700" fill="#10243B">כרטיס בניין</text>
+          <rect x="36" y="86" width="126" height="1" fill="#D5DAE0"/>
+          <text x="160" y="108" text-anchor="start" font-size="12" fill="#4E5D6E">קומות</text>
+          <rect x="40" y="99" width="40" height="10" rx="5" fill="#E7E1D6"/>
+          <text x="160" y="132" text-anchor="start" font-size="12" fill="#4E5D6E">שטח</text>
+          <rect x="40" y="123" width="52" height="10" rx="5" fill="#E7E1D6"/>
+          <text x="160" y="156" text-anchor="start" font-size="12" fill="#4E5D6E">כמויות</text>
+          <rect x="40" y="147" width="46" height="10" rx="5" fill="#FBEFD8"/>
+        </g>
+      </svg>
+      <figcaption>איור הסבר. הנתונים בכרטיס האמיתי נלקחים מהמודל.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 4. שמיים ===== -->
+<section class="mod flip" id="sky" aria-labelledby="skyTitle">
+  <div class="wrap">
+    <div class="copy">
+      <span class="chip ok">חי עכשיו</span>
+      <h2 id="skyTitle">שמיים וזמנים: שמש וצל מדויקים</h2>
+      <p>מנוע שמחשב את מיקום השמש לכל תאריך, שעה ונקודה. בבדיקות שלנו הסטייה הייתה בסביבות 0.006 מעלות.</p>
+      <ul>
+        <li>מיקום השמש בשמיים, דקה אחרי דקה</li>
+        <li>שעות אור ושעות צל לכל נקודה</li>
+        <li>הבסיס לחישובי הצל במצגת ובעולם</li>
+      </ul>
+      <div class="links"><a class="btn btn-ink" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/sky/twin-sky-demo.html" target="_blank" rel="noopener">לפתוח את הדגמת השמיים</a></div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 360 230" role="img" aria-label="איור: מסלול השמש בקשת מעל האופק בעונות שונות">
+        <rect width="360" height="230" fill="#10243B"/>
+        <path d="M30 190 Q180 -10 330 190" fill="none" stroke="#F2A93B" stroke-width="2.5"/>
+        <path d="M60 190 Q180 70 300 190" fill="none" stroke="#9FA3D6" stroke-width="2" stroke-dasharray="5 5"/>
+        <circle cx="250" cy="92" r="11" fill="#FFF3D6"/>
+        <circle cx="250" cy="92" r="22" fill="#F2A93B" opacity=".25"/>
+        <rect y="190" width="360" height="40" fill="#2B3F57"/>
+        <g font-family="IBM Plex Sans Hebrew, Arial, sans-serif" font-size="12" fill="#C9D4E0">
+          <text x="180" y="62" text-anchor="middle">קיץ</text>
+          <text x="180" y="122" text-anchor="middle">חורף</text>
+          <text x="40" y="212" text-anchor="end">מערב</text><text x="320" y="212" text-anchor="start">מזרח</text>
+        </g>
+      </svg>
+      <figcaption>איור הסבר של מסלול השמש. החישוב עצמו נמצא בהדגמה.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== 5. כמויות ===== -->
+<section class="mod" id="costs" aria-labelledby="costsTitle">
+  <div class="wrap">
+    <div class="copy">
+      <span class="chip part">בפיתוח</span>
+      <h2 id="costsTitle">כמויות ועלויות ביצוע, לבדיקת היתכנות</h2>
+      <p>כדי לדעת אם פרויקט שווה את זה, צריך הערכה של עלות הביצוע. המנוע שמאחורי זה הוא מנוע המחירים של הקבלנים — אותו מנוע שמפעיל את "תכלס קבלנים".</p>
+      <div class="feat-list">
+        <div class="feat-row"><span>מנוע מחירים לפריטי עבודה</span><span class="chip ok">חי, אצל הקבלנים</span></div>
+        <div class="feat-row"><span>תמונת עלויות ברמת פרויקט ליזם</span><span class="chip soon">בקרוב</span></div>
+      </div>
+      <div class="links"><a class="btn btn-line" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/yazam-design/yazam/app.html" target="_blank" rel="noopener">תכלס קבלנים – הצעות מחיר לקבלנים</a></div>
+    </div>
+    <figure class="fig">
+      <svg viewBox="0 0 360 230" role="img" aria-label="איור: בניין מחולק לשכבות עם עמודות עלות">
+        <rect width="360" height="230" fill="#173350"/>
+        <g><rect x="200" y="40" width="120" height="34" fill="#E7E1D6"/><rect x="200" y="78" width="120" height="34" fill="#D9D0C0"/><rect x="200" y="116" width="120" height="34" fill="#CBC0AD"/><rect x="200" y="154" width="120" height="34" fill="#BDB09A"/></g>
+        <g fill="#F2A93B"><rect x="40" y="48" width="120" height="16" rx="4" opacity=".55"/><rect x="80" y="86" width="80" height="16" rx="4" opacity=".7"/><rect x="60" y="124" width="100" height="16" rx="4" opacity=".85"/><rect x="100" y="162" width="60" height="16" rx="4"/></g>
+        <g stroke="#fff" stroke-opacity=".35" stroke-dasharray="3 3"><path d="M164 56h32M164 94h32M164 132h32M164 170h32"/></g>
+        <rect y="192" width="360" height="38" fill="#2B3F57"/>
+      </svg>
+      <figcaption>איור הסבר בלבד, בלי נתונים אמיתיים.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ===== שלבים ===== -->
+<section class="sec steps" id="how" aria-labelledby="howTitle">
+  <div class="wrap">
+    <h2 id="howTitle">איך זה עובד</h2>
+    <p class="intro">שלושה צעדים, מהמגרש ועד הקישור שנשלח לוועדה.</p>
+    <ol>
+      <li><h3>בוחרים מגרש</h3><p>מוצאים את המגרש בעולם התלת־ממדי או משרטטים אותו על המפה.</p></li>
+      <li><h3>מציבים את הבניין המוצע</h3><p>קובעים מספר קומות, וצופים בבניין, בצל ובנוף מול השכנים.</p></li>
+      <li><h3>משתפים את הסיפור</h3><p>מקבלים מצגת עם כיתובים בעברית וקישור אחד לשליחה.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== מה עובד ===== -->
+<section class="sec" id="status" aria-labelledby="statusTitle">
+  <div class="wrap">
+    <h2 id="statusTitle">מה עובד היום, ומה בדרך</h2>
+    <p class="intro">אנחנו בונים בגלוי. כך נראה המצב נכון לעכשיו.</p>
+    <table class="status-table">
+      <thead><tr><th scope="col">יכולת</th><th scope="col">מצב</th><th scope="col">הערה</th></tr></thead>
+      <tbody>
+        <tr><td>עולם תלת־ממדי של אשדוד</td><td><span class="chip ok">חי</span></td><td>שכבות, כרטיס בניין, שרטוט מגרש</td></tr>
+        <tr><td>שמש וצל לפי תאריך ושעה</td><td><span class="chip ok">חי</span></td><td>סטייה של כ־0.006 מעלות בבדיקות שלנו</td></tr>
+        <tr><td>מצגת לוועדה ולדיירים</td><td><span class="chip ok">הדגמה חיה</span></td><td>גובהי השכנים מוערכים; לבדיקה רשמית צריך גבהים מדודים</td></tr>
+        <tr><td>כרטיס בניין להתחדשות עירונית</td><td><span class="chip ok">חי</span></td><td>קומות ושטח</td></tr>
+        <tr><td>כתב כמויות לבניין</td><td><span class="chip part">בפיתוח</span></td><td>על בסיס מנוע המחירים של הקבלנים</td></tr>
+        <tr><td>עלויות ביצוע לבדיקת היתכנות</td><td><span class="chip soon">בקרוב</span></td><td></td></tr>
+        <tr><td>ערים נוספות וכל הארץ</td><td><span class="chip soon">בקרוב</span></td><td>מתחילים באשדוד</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== מוצר אחות ===== -->
+<section class="sec sib-band" aria-labelledby="sibTitle">
+  <div class="wrap">
+    <div>
+      <h2 id="sibTitle">קבלן? יש לנו מוצר בשבילך</h2>
+      <p>"תכלס קבלנים" הוא מוצר אחות: מחירון לפריטי עבודה והצעת מחיר מסודרת ללקוח, ישר מהטלפון. לוח היזם מיועד ליזמים.</p>
+    </div>
+    <a class="btn btn-ink" href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/yazam-design/yazam/app.html" target="_blank" rel="noopener">תכלס קבלנים – הצעות מחיר לקבלנים</a>
+  </div>
+</section>
+
+<!-- ===== צור קשר ===== -->
+<section class="sec contact" id="contact" aria-labelledby="contactTitle">
+  <div class="wrap">
+    <h2 id="contactTitle">רוצים לראות את המגרש שלכם בעולם?</h2>
+    <p class="intro">ספרו לנו איפה המגרש ומה מתכננים, ונראה ביחד מה אפשר להציג כבר היום.</p>
+    <div class="contact-grid">
+      <a class="c-row" href="https://wa.me/972502525066" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 2.5 4.2 4.5 4.5l1.2-1.2 2 1-.5 1.6c-3.5.5-8-4-7.5-7.5L10.3 7l1 2z" stroke-width="1.5"/></svg>
+        <div><b>וואטסאפ</b><span>050-2525066</span></div>
+      </a>
+      <a class="c-row" href="tel:+972502525066">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+        <div><b>טלפון</b><span>050-2525066</span></div>
+      </a>
+      <a class="c-row" href="mailto:ariel@esh27.com?subject=%D7%9C%D7%95%D7%97%20%D7%94%D7%99%D7%96%D7%9D">
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+        <div><b>אימייל</b><span>ariel@esh27.com</span></div>
+      </a>
+    </div>
+    <div class="price-line">
+      <b>תמחור ליזמים – בשיחה</b>
+      <p>עדיין לא קבענו מחירון ליזמים. נדבר על הפרויקט שלכם ונתאים.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>לוח היזם · חלק מ־ESH27</span>
+    <span>מוצר אחות: <a href="https://raw.githack.com/ArielSivkov/codesandbox-template-nuxt/yazam-design/yazam/app.html" target="_blank" rel="noopener">תכלס קבלנים</a></span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  // ---------- תפריט ----------
+  var body=document.body, btn=document.getElementById('menuBtn'), sheet=document.getElementById('sheet'),
+      scrim=document.getElementById('scrim'), closeBtn=document.getElementById('closeBtn');
+  function openMenu(){scrim.hidden=false;sheet.removeAttribute('inert');sheet.setAttribute('aria-hidden','false');
+    requestAnimationFrame(function(){body.classList.add('open')});btn.setAttribute('aria-expanded','true');
+    setTimeout(function(){closeBtn.focus()},60);}
+  function closeMenu(focusBack){body.classList.remove('open');btn.setAttribute('aria-expanded','false');
+    sheet.setAttribute('aria-hidden','true');sheet.setAttribute('inert','');
+    setTimeout(function(){scrim.hidden=true},260); if(focusBack!==false)btn.focus();}
+  btn.addEventListener('click',openMenu);
+  closeBtn.addEventListener('click',function(){closeMenu()});
+  scrim.addEventListener('click',function(){closeMenu()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&body.classList.contains('open'))closeMenu();});
+  sheet.querySelectorAll('nav a').forEach(function(a){a.addEventListener('click',function(){closeMenu(false)})});
+
+  // ---------- עיר בשעת זהב ----------
+  var NS='http://www.w3.org/2000/svg', G=588;
+  // בניינים: x, רוחב, גובה, האם המוצע
+  var BASE=[[78,26,56],[104,20,88],[126,34,42],[162,24,120],[188,30,78],[220,22,158,1],[246,34,96],[282,20,64],[304,30,112],[336,24,52],[362,40,84]];
+  var EXTRA=[[410,28,70],[444,22,100],[472,36,58],[514,24,92],[544,30,46],[580,22,74],[608,34,38],[650,26,52],[684,20,30],[712,30,24]];
+  var city=document.getElementById('city'), blds=document.getElementById('blds'), shG=document.getElementById('shadows'), sp=document.getElementById('sparkle');
+  function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);p.appendChild(e);return e;}
+  var B=[], wins=[], shadows=[], W=400, wideMQ=window.matchMedia('(min-width:900px)');
+  function build(){
+    var wide=wideMQ.matches;
+    // במסך רחב: הים במערב (שמאל), העיר במרכז־שמאל, ומימין שמיים פתוחים מאחורי הכותרת
+    W=wide?1600:400;
+    city.setAttribute('viewBox','0 0 '+W+' 700');
+    B=wide?BASE.concat(EXTRA.slice(0,8)).map(function(b){return [Math.round(60+b[0]*1.15),Math.round(b[1]*1.3),Math.round(b[2]*1.75),b[3]]}):BASE.map(function(b){return [b[0],b[1],Math.round(b[2]*0.86),b[3]]});
+    blds.textContent='';shG.textContent='';sp.textContent='';wins=[];shadows=[];
+    B.forEach(function(b){
+      var x=b[0],w=b[1],h=b[2],prop=b[3];
+      shadows.push(el('polygon',{points:'',opacity:prop?'.6':'.42'},shG));
+      var g=el('g',{},blds);
+      el('rect',{x:x,y:G-h,width:w,height:h,fill:prop?'#FFFFFF':'#EFE6D6',opacity:prop?'.92':'1'},g);
+      el('rect',{class:'side',x:x+w*0.62,y:G-h,width:w*0.38,height:h,fill:'#7D6E8E',opacity:'.45'},g);
+      if(prop) el('rect',{x:x-1,y:G-h-1,width:w+2,height:h+1,fill:'none',stroke:'#F2A93B','stroke-width':'2','stroke-dasharray':'5 3'},g);
+      for(var yy=G-h+8; yy<G-10; yy+=12){
+        for(var xx=x+4; xx<x+w-6; xx+=8){
+          wins.push(el('rect',{x:xx,y:yy,width:4,height:5,fill:'#10243B',opacity:'.28'},g));
+        }
+      }
+    });
+    var n=wide?40:14;
+    for(var i=0;i<n;i++) el('rect',{x:8+i*28+(i%3)*5,y:566+(i%4)*5,width:10+(i%3)*4,height:1.4,rx:.7},sp);
+  }
+  build();
+  function mix(a,b,t){var pa=parseInt(a.slice(1),16),pb=parseInt(b.slice(1),16);
+    var r=Math.round(((pa>>16)&255)*(1-t)+((pb>>16)&255)*t),g=Math.round(((pa>>8)&255)*(1-t)+((pb>>8)&255)*t),bl=Math.round((pa&255)*(1-t)+(pb&255)*t);
+    return '#'+((1<<24)|(r<<16)|(g<<8)|bl).toString(16).slice(1);}
+  var sk0=document.getElementById('sk0'),sk1=document.getElementById('sk1'),sk2=document.getElementById('sk2'),
+      disc=document.getElementById('sunDisc'),glow=document.getElementById('sunGlow'),out=document.getElementById('hourOut');
+
+  function render(h){
+    // המחשה בלבד: קשת פשוטה בין 6:00 ל־18:00. מזרח מימין, ים ומערב משמאל.
+    var t=(h-6)/12, ang=Math.PI*t, elev=Math.sin(ang);       // 0..1
+    var sx=(W-40)-(W-80)*t, sy=520-400*elev;
+    disc.setAttribute('cx',sx);disc.setAttribute('cy',sy);glow.setAttribute('cx',sx);glow.setAttribute('cy',sy);
+    var gold=1-Math.min(1,elev*1.6); // 1 בשקיעה/זריחה
+    sk0.setAttribute('stop-color',mix('#2F6EA5','#1B3A5C',gold));
+    sk1.setAttribute('stop-color',mix('#8EC3E6','#E08A3C',gold));
+    sk2.setAttribute('stop-color',mix('#DCEFF8','#F7C873',gold));
+    glow.setAttribute('r',60+60*gold);
+    // צל: אורך ~ גובה/טנגנס זווית, כיוון הפוך לשמש
+    var e=Math.max(0.12,elev), L=1/Math.tan(e*1.25)*0.55, dir=(t<0.5)?-1:1; // שמש במזרח => צל למערב (שמאל)
+    var side=Math.cos(ang); // >0 בבוקר
+    B.forEach(function(b,i){
+      var x=b[0],w=b[1],h=b[2], len=Math.min(260,h*L), dx=dir*len*Math.abs(side)+ (dir*6), dy=Math.min(90,10+len*0.32);
+      var p=[[x,G],[x+w,G],[x+w+dx,G+dy],[x+dx,G+dy]];
+      shadows[i].setAttribute('points',p.map(function(q){return q[0].toFixed(1)+','+q[1].toFixed(1)}).join(' '));
+    });
+    // צד מוצל של הבניינים מתחלף בין בוקר לערב
+    blds.querySelectorAll('.side').forEach(function(r,i){var b=B[i];r.setAttribute('x',t<0.5?b[0]:b[0]+b[1]*0.62);r.setAttribute('opacity',(0.2+0.4*gold).toFixed(2));});
+    var lit=gold>0.75;
+    wins.forEach(function(w,i){var on=lit&&(i*7%5===0);w.setAttribute('fill',on?'#FFD98A':'#10243B');w.setAttribute('opacity',on?'.95':'.28');});
+    var hh=Math.floor(h),mm=Math.round((h-hh)*60);out.value=(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm;
+  }
+  var range=document.getElementById('hour');
+  var onMQ=function(){build();render(+range.value)};
+  if(wideMQ.addEventListener)wideMQ.addEventListener('change',onMQ);else wideMQ.addListener(onMQ);
+  range.addEventListener('input',function(){render(+range.value)});
+  range.setAttribute('aria-valuetext','שעה '+'16:30');
+  range.addEventListener('change',function(){range.setAttribute('aria-valuetext','שעה '+out.value)});
+
+  // רגע פתיחה אחד: השמש יורדת מהצהריים לשעת הזהב
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){render(16.5);}else{
+    var start=null, from=12, to=16.5, dur=1800;
+    render(from);
+    function step(ts){if(!start)start=ts;var k=Math.min(1,(ts-start)/dur),ease=1-Math.pow(1-k,3),v=from+(to-from)*ease;
+      render(v); if(k<1&&+range.value===16.5)requestAnimationFrame(step); else if(k>=1) render(+range.value);}
+    requestAnimationFrame(step);
+    range.addEventListener('input',function(){start=-1e9},{once:true});
+  }
+})();
+</script>
+</body>
+</html>
