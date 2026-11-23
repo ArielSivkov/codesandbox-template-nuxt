@@ -213,7 +213,15 @@ function drawMap(){var c=$('mapc'),g=c.getContext('2d'),W=c.width,s=W/2;g.fillSt
   var sc=s/40;   // 40 מטר לרדיוס
   g.strokeStyle='#ffffff22';for(var r=10;r<=40;r+=10){g.beginPath();g.arc(s,s,r*sc,0,7);g.stroke();}
   g.strokeStyle='#5ab0ff';g.lineWidth=4;g.beginPath();S.track.forEach(function(p,i){var d=enu(S.pos,p);var x=s+d.x*sc,y=s-d.y*sc;i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();
-  S.shotPts&&S.shotPts.forEach(function(p){var d=enu(S.pos,p);g.fillStyle='#ff8a3d';g.beginPath();g.arc(s+d.x*sc,s-d.y*sc,4,0,7);g.fill();});
+  // כל צילום: נקודה + "מניפה" לכיוון שצילמת (שדה ראייה ≈ 53° לרוחב בצילום לאורך)
+  var FOV=2*Math.atan(12/((+$('mF').value)||24))/R,cov=new Array(36).fill(0);
+  S.shotPts&&S.shotPts.forEach(function(p){var d=enu(S.pos,p),x=s+d.x*sc,y=s-d.y*sc;
+    if(p.h!=null){var a0=(p.h-FOV/2-90)*R,a1=(p.h+FOV/2-90)*R;g.fillStyle='#ff8a3d30';g.beginPath();g.moveTo(x,y);g.arc(x,y,9*sc,a0,a1);g.closePath();g.fill();
+      if(Math.hypot(d.x,d.y)<8){for(var k=Math.floor((p.h-FOV/2)/10);k<=Math.floor((p.h+FOV/2)/10);k++)cov[((k%36)+36)%36]=1;}}
+    g.fillStyle='#ff8a3d';g.beginPath();g.arc(x,y,3.5,0,7);g.fill();});
+  // טבעת כיסוי 360° סביבך: ירוק = כיוון שכבר צולם מכאן (עד 8 מ'), אפור = חסר
+  var cn=0;for(var k=0;k<36;k++){cn+=cov[k];g.strokeStyle=cov[k]?'#3ecf8e':'#ffffff30';g.lineWidth=6;g.beginPath();g.arc(s,s,26,(k*10-90)*R+0.02,(k*10+10-90)*R-0.02);g.stroke();}
+  S.cov=cn*10;g.fillStyle='#fff';g.font='bold 13px sans-serif';g.fillText(S.cov+'°',W-46,W-10);
   g.fillStyle='#3ecf8e33';g.beginPath();g.arc(s,s,Math.max(4,S.pos.acc*sc),0,7);g.fill();
   if(S.head!=null){g.save();g.translate(s,s);g.rotate(S.head*R);g.fillStyle='#fff';g.beginPath();g.moveTo(0,-16);g.lineTo(9,10);g.lineTo(0,4);g.lineTo(-9,10);g.closePath();g.fill();g.restore();}
   g.fillStyle='#fff';g.font='bold 18px sans-serif';g.fillText('צ',s-6,20);}
@@ -232,8 +240,10 @@ function autoShoot(h){
   var every=+$('every').value||4,now=Date.now(),need=false,why='';
   if(!S.lastShotPos){need=true;why='התחלה';}
   else{var d=enu(S.lastShotPos,S.pos),m=Math.hypot(d.x,d.y);if(m>=every){need=true;why=Math.round(m)+' מ\'';}
-    else if(!S.car&&S.head!=null&&S.lastShotHead!=null&&Math.abs(((S.head-S.lastShotHead+540)%360)-180)>=25&&now-S.lastShotT>1200){need=true;why='סיבוב';}}
-  if(need&&now-S.lastShotT>900)shoot('walk',why);}
+    else if(!S.car&&S.head!=null&&S.lastShotHead!=null&&Math.abs(((S.head-S.lastShotHead+540)%360)-180)>=40&&now-S.lastShotT>2000&&S.gyro<25){need=true;why='סיבוב';}}
+  if(!need)S.needT=0;
+  if(need&&S.gyro>28&&!S.car&&now-(S.needT||(S.needT=now))<1500)return;   // מחכים רגע שקט (עד 1.5 ש') כדי שהתמונה לא תיטשטש
+  if(need&&now-S.lastShotT>900){S.needT=0;shoot('walk',why);}}
 function meta(kind,why){return{kind:kind,why:why,when:new Date().toISOString(),where:$('where').value,pos:S.pos,gps:S.gps,heading:S.head,heading_abs:S.headAbs,course:S.course,speed:S.speed,
   car:S.car,heading_best:S.car&&S.course!=null?S.course:S.head,heading_src:S.car&&S.course!=null?'gps':'compass',
   hold:hold(),gyro:S.gyro,steps:S.steps,dist:S.dist,orientation:S.ori,video:S.track_?null:(S.vt?S.vt.getSettings():null),demo:S.demo};}
@@ -241,7 +251,7 @@ function grab(){return still();}   // צילום מתוך הווידאו: בלי
 function still(){return new Promise(function(res){var v=$('vid'),c=document.createElement('canvas');c.width=v.videoWidth||1280;c.height=v.videoHeight||720;var g=c.getContext('2d');
   if(v.videoWidth)g.drawImage(v,0,0);else{g.fillStyle='#456';g.fillRect(0,0,c.width,c.height);g.fillStyle='#fff';g.font='60px sans-serif';g.fillText('DEMO '+S.shots,80,200);}
   c.toBlob(res,'image/jpeg',0.85);});}
-function shoot(kind,why){var m=meta(kind,why);S.lastShotPos={lat:S.pos.lat,lon:S.pos.lon};S.lastShotT=Date.now();S.lastShotHead=S.head;S.shotPts=(S.shotPts||[]).concat([S.lastShotPos]).slice(-300);
+function shoot(kind,why){var m=meta(kind,why);S.lastShotPos={lat:S.pos.lat,lon:S.pos.lon};S.lastShotT=Date.now();S.lastShotHead=S.head;var hb=S.car&&S.course!=null?S.course:S.head;S.shotPts=(S.shotPts||[]).concat([{lat:S.lastShotPos.lat,lon:S.lastShotPos.lon,h:hb}]).slice(-300);
   S.shots++;var f=$('flash');f.style.opacity=.35;setTimeout(function(){f.style.opacity=0;},120);if(navigator.vibrate)navigator.vibrate(25);
   grab().then(function(b){S.lastShot={blob:b,meta:{tilt:m.hold,pitch:m.hold&&m.hold.pitch}};enqueue(('000'+S.shots).slice(-4)+'_'+kind+'.jpg',b,m);log('צילום '+S.shots+' ('+why+')');});}
 
