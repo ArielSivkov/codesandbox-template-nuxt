@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0d1420">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%226%22 fill=%22%23f2b84b%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2218%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-weight=%22bold%22%3E27%3C/text%3E%3C/svg%3E">
+<title>לוח היזם · עולם תאום · אשדוד</title>
+<style>
+:root{--bg:#0d1420;--panel:rgba(12,20,32,.88);--line:rgba(255,255,255,.14);--fg:#eef3f8;--mut:#a3b3c5;--acc:#f2b84b;--ok:#5cc8a0;--warn:#ff8a65}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Arial,"Noto Sans Hebrew",sans-serif;overflow:hidden;overscroll-behavior:none;touch-action:none}
+#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block;touch-action:none}
+.btn{font:inherit;font-size:13px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:7px 11px;cursor:pointer;min-height:38px;white-space:nowrap;backdrop-filter:blur(4px)}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--acc);color:#1b1300;border-color:var(--acc);font-weight:700}
+.btn.on{border-color:var(--acc);color:var(--acc)}
+.hidden{display:none!important}
+#top{position:fixed;top:calc(env(safe-area-inset-top) + 8px);right:8px;display:flex;gap:6px;z-index:10;align-items:flex-start;flex-wrap:wrap;max-width:calc(100vw - 150px)}
+#mode{font-weight:700;font-size:14px;border-color:var(--acc)}
+#mode .ic{font-size:17px;margin-inline-end:4px}
+#mm{position:fixed;top:calc(env(safe-area-inset-top) + 8px);left:8px;width:124px;height:124px;border-radius:50%;border:2px solid rgba(255,255,255,.35);background:#1b2a36;z-index:9;box-shadow:0 4px 14px #0007}
+#mmN{position:fixed;top:calc(env(safe-area-inset-top) + 4px);left:62px;z-index:10;font-size:11px;font-weight:700;color:#fff;text-shadow:0 1px 2px #000}
+#hud{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 10px);z-index:9;display:flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:5px 12px;font-size:13px;white-space:nowrap}
+#hud b{font-size:18px;font-variant-numeric:tabular-nums;color:#fff}
+#hud .u{color:var(--mut);font-size:11px}
+#hud .sep{width:1px;height:22px;background:var(--line)}
+#fuel{width:70px;height:9px;border-radius:5px;background:#0006;border:1px solid var(--line);overflow:hidden}
+#fuel i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff7043,#ffc640)}
+#joy{position:fixed;left:calc(env(safe-area-inset-left) + 18px);bottom:calc(env(safe-area-inset-bottom) + 22px);width:132px;height:132px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);z-index:9;touch-action:none}
+#joy i{position:absolute;left:41px;top:41px;width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 8px #0006}
+#acts{position:fixed;right:calc(env(safe-area-inset-right) + 14px);bottom:calc(env(safe-area-inset-bottom) + 20px);z-index:9;display:grid;grid-template-columns:auto auto;gap:10px;direction:ltr}
+.ab{width:64px;height:64px;border-radius:50%;font-size:13px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;line-height:1.1;border:2px solid rgba(255,255,255,.3);background:rgba(12,20,32,.6);color:#fff;touch-action:none}
+.ab span{font-size:20px}
+.ab.hold{background:rgba(242,184,75,.55);border-color:var(--acc)}
+#bE{grid-column:1 / span 2;width:auto;height:44px;border-radius:14px;background:var(--acc);color:#1b1300;border-color:var(--acc);font-size:14px}
+#prompt{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 60px);transform:translateX(-50%);z-index:9;background:var(--panel);border:1px solid var(--acc);border-radius:12px;padding:6px 12px;font-size:13px;display:none;max-width:70vw;text-align:center}
+#toast{position:fixed;left:50%;top:40%;transform:translateX(-50%);z-index:30;background:#1d2a3d;border:1px solid var(--acc);border-radius:10px;padding:8px 14px;font-size:14px;display:none;max-width:86vw;text-align:center}
+#card{position:fixed;z-index:20;right:8px;left:8px;bottom:calc(env(safe-area-inset-bottom) + 8px);max-width:420px;margin-inline-start:auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 12px 12px;box-shadow:0 10px 30px #000a;display:none;max-height:min(72vh,560px);overflow:auto;user-select:text}
+#card h2{margin:0 0 6px;font-size:16px;display:flex;gap:8px;align-items:center}
+#card h2 .x{margin-inline-start:auto}
+#card h3{font-size:13px;margin:10px 0 4px;color:var(--acc)}
+#card table{width:100%;border-collapse:collapse;font-size:13px}
+#card td{padding:4px 2px;border-top:1px solid var(--line);vertical-align:top}
+#card td:first-child{color:var(--mut);width:44%}
+#card .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#card .note{font-size:11px;color:var(--mut);margin:6px 0 0}
+.tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:8px;background:#ffffff1a;color:var(--mut);margin-inline-start:4px}
+.tag.low{background:#ff8a6533;color:#ffb39a}.tag.mid{background:#f2b84b33;color:#f6cf7f}.tag.ok{background:#5cc8a033;color:#8fe0c0}
+.ltr{direction:ltr;unicode-bidi:embed;font-family:ui-monospace,monospace;font-size:12px}
+#mine{position:fixed;z-index:21;top:calc(env(safe-area-inset-top) + 56px);right:8px;width:min(330px,calc(100vw - 16px));max-height:60vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 10px;display:none}
+#mine h3{margin:2px 0 6px;font-size:14px;color:var(--acc)}
+#mine .it{display:flex;gap:6px;align-items:center;border-top:1px solid var(--line);padding:6px 0;font-size:13px}
+#mine .it .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#menu{position:fixed;z-index:21;top:calc(env(safe-area-inset-top) + 56px);right:8px;width:min(340px,calc(100vw - 16px));max-height:76vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:none;font-size:13px;line-height:1.5}
+#menu h3{margin:2px 0 6px;font-size:14px;color:var(--acc)}
+#menu .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+#menu kbd{background:#ffffff1a;border-radius:4px;padding:0 5px;font-family:ui-monospace,monospace;direction:ltr;display:inline-block}
+#env{position:fixed;z-index:21;top:calc(env(safe-area-inset-top) + 56px);right:8px;width:min(340px,calc(100vw - 16px));max-height:calc(100vh - 140px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;display:none;font-size:13px}
+#env h3{margin:4px 0 6px;font-size:14px;color:var(--acc)}
+#env label{display:block;margin:6px 0}
+#env input[type=range]{width:100%;accent-color:var(--acc);height:26px}
+#env input[type=date]{font:inherit;padding:6px;border-radius:8px;border:1px solid var(--line);background:#0a111b;color:var(--fg);color-scheme:dark}
+#env .row{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+#env .mut,#env .ro .mut{color:var(--mut);font-size:11px}
+#stats{font-family:ui-monospace,monospace;font-size:11px;direction:ltr;text-align:left;color:var(--mut);white-space:pre-wrap}
+#fps{position:fixed;left:8px;top:calc(env(safe-area-inset-top) + 138px);z-index:9;font:11px ui-monospace,monospace;color:#fff;text-shadow:0 1px 2px #000;direction:ltr}
+#inUI{position:fixed;z-index:12;bottom:calc(env(safe-area-inset-bottom) + 96px);left:50%;transform:translateX(-50%);display:none;gap:6px}
+#load{position:fixed;inset:0;z-index:50;background:radial-gradient(circle at 50% 35%,#21364d,#0d1420 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:20px}
+#load h1{margin:0;font-size:30px;letter-spacing:1px}
+#load h1 em{font-style:normal;color:var(--acc)}
+#load p{margin:0;color:var(--mut);font-size:14px;max-width:420px}
+#lbar{width:220px;height:8px;border-radius:4px;background:#ffffff1a;overflow:hidden}
+#lbar i{display:block;height:100%;width:5%;background:var(--acc);transition:width .2s}
+#go{font-size:17px;padding:10px 26px}
+#lerr{color:var(--warn);font-size:13px}
+@media (max-width:420px){ #top .lbl{display:none} #hud{font-size:12px;padding:4px 9px;gap:6px} #hud b{font-size:16px} }
+@media (max-height:420px){ #joy{width:116px;height:116px} #joy i{left:33px;top:33px} .ab{width:56px;height:56px} #card{max-height:86vh;max-width:380px} #mm{width:104px;height:104px} #fps{top:120px} }
+@media (max-aspect-ratio:1/1){ #hud{bottom:calc(env(safe-area-inset-bottom) + 170px)} #prompt{top:calc(env(safe-area-inset-top) + 150px)} }
+body.inside #mm,body.inside #mmN,body.inside #hud,body.inside #top{display:none!important}
+body.desk #joy,body.desk #acts .ab{display:none}
+</style>
+<link rel="stylesheet" href="host/host.css">
+</head>
+<body>
+<canvas id="cv"></canvas>
+<canvas id="mm" width="248" height="248" aria-label="מפה מוקטנת"></canvas><div id="mmN">צ</div>
+<div id="fps"></div>
+<div id="top">
+  <button class="btn" id="mode" aria-label="החלפת מצב"><span class="ic">🚶</span><span id="modeT">רגלי</span></button>
+  <button class="btn" id="bMine">⭐<span class="lbl"> הנכסים שלי</span> <span id="nMine">0</span></button>
+  <button class="btn" id="bEnv" aria-label="זמן ומזג אוויר">☀<span class="lbl"> מזג אוויר</span></button>
+  <button class="btn" id="bMenu" aria-label="תפריט">☰</button>
+</div>
+<div id="hud"><span><b id="hSpd">0</b> <span class="u">קמ״ש</span></span><span class="sep"></span><span><b id="hAlt">0</b> <span class="u" id="hAltU">מ׳ מעל הקרקע</span></span><span class="sep"></span><span><i id="hWarr" style="display:inline-block;font-style:normal">↑</i> <b id="hWind">0</b> <span class="u">מ׳/ש׳ רוח</span></span><span class="sep" id="fuelSep"></span><span id="fuelW"><span class="u">דלק</span> <span id="fuel"><i></i></span></span></div>
+<div id="joy"><i></i></div>
+<div id="acts">
+  <button class="ab" id="bB"><span>▼</span><b id="bBt">רוץ</b></button>
+  <button class="ab" id="bA"><span>▲</span><b id="bAt">קפוץ</b></button>
+  <button class="ab hidden" id="bE">היכנס</button>
+</div>
+<div id="prompt"></div>
+<div id="toast"></div>
+<div id="card"></div>
+<div id="mine"></div>
+<div id="menu"></div>
+<div id="env"></div>
+<div id="inUI"><button class="btn pri" id="inLink">🌐 פתח את הדף</button><button class="btn" id="inExit">🚪 יציאה</button></div>
+<div id="load">
+  <h1>27<em>wrld</em> · אשדוד</h1>
+  <p>אב־טיפוס משחק בעיר אמיתית: רחובות ובניינים מנתוני מפה פתוחים (OpenStreetMap). הליכה, רכב, מסוק ותרמיל סילון. כל בניין – נכס שאפשר לסמן ולתמחר בלוח היזם.</p>
+  <div id="lbar"><i></i></div>
+  <div id="lmsg">טוען…</div>
+  <button class="btn pri hidden" id="go">▶ יוצאים לרחוב</button>
+  <div id="lerr"></div>
+  <p style="font-size:11px">© תורמי OpenStreetMap (ODbL) · דמות ואנימציות: Quaternius (CC0) · מנוע: three.js</p>
+</div>
+<script src="vendor/three.min.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/world.js"></script>
+<script src="host/host.js"></script>
+<script src="js/game.js"></script>
+<script src="adapters/05-safety.js"></script>
+<script src="adapters/10-physics.js"></script>
+<script src="adapters/15-sky.js"></script>
+<script src="adapters/20-weather.js"></script>
+<script src="adapters/30-atmo-lite.js"></script>
+<script src="adapters/32-atmosphere.js"></script>
+<script src="adapters/35-camera.js"></script>
+<script src="adapters/40-dev.js"></script>
+<script src="adapters/45-maritime.js"></script>
+<script src="adapters/48-vegetation.js"></script>
+<script src="adapters/50-life-lite.js"></script>
+<script src="adapters/55-aviation.js"></script>
+<script src="adapters/60-audio.js"></script>
+<script src="adapters/70-present.js"></script>
+<script src="adapters/90-pending.js"></script>
+</body>
+</html>

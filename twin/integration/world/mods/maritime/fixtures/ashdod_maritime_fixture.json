@@ -1,0 +1,642 @@
+{
+ "v": 1,
+ "crs": "EPSG:2039",
+ "kind": "maritime-fixture",
+ "label_he": "שכבה ימית לדוגמה – לא נתוני OSM. רציפים ונחל לכיש שורטטו מנתוני הגובה של הדגימה (SRTM, ±50 מ'); שוברי גלים, אגן, מרינה, מעגן, נתיב ומצופים – סכמטיים משוערים בלבד.",
+ "src_codes": {
+  "traced-srtm": "שורטט ידנית מרשת הגובה/ים של הדגימה (SRTM 2000), דיוק ±50 מ'",
+  "schematic": "פריסה סכמטית משוערת – לא מדידה, לא OSM"
+ },
+ "frame_note": "coords are REAL ITM = sample frame + (1524.6, 753.6)",
+ "features": [
+  {
+   "id": "fx-breakwater-0",
+   "kind": "breakwater",
+   "geom": "line",
+   "coords": [
+    [
+     165994.6,
+     636173.6
+    ],
+    [
+     165774.6,
+     636453.6
+    ],
+    [
+     165624.6,
+     636953.6
+    ],
+    [
+     165624.6,
+     637553.6
+    ],
+    [
+     165774.6,
+     638053.6
+    ],
+    [
+     166024.6,
+     638453.6
+    ],
+    [
+     166274.6,
+     638753.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 26,
+   "crest": 5.5,
+   "tags": {
+    "man_made": "breakwater"
+   },
+   "name": "שובר הגלים הראשי (סכמטי)"
+  },
+  {
+   "id": "fx-breakwater-1",
+   "kind": "breakwater",
+   "geom": "line",
+   "coords": [
+    [
+     167174.6,
+     638653.6
+    ],
+    [
+     166874.6,
+     638753.6
+    ],
+    [
+     166574.6,
+     638803.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 22,
+   "crest": 5.0,
+   "tags": {
+    "man_made": "breakwater"
+   },
+   "name": "שובר הגלים המשני (סכמטי)"
+  },
+  {
+   "id": "fx-basin-2",
+   "kind": "basin",
+   "geom": "area",
+   "coords": [
+    [
+     165994.6,
+     636173.6
+    ],
+    [
+     165774.6,
+     636453.6
+    ],
+    [
+     165624.6,
+     636953.6
+    ],
+    [
+     165624.6,
+     637553.6
+    ],
+    [
+     165774.6,
+     638053.6
+    ],
+    [
+     166024.6,
+     638453.6
+    ],
+    [
+     166274.6,
+     638753.6
+    ],
+    [
+     166574.6,
+     638803.6
+    ],
+    [
+     166874.6,
+     638753.6
+    ],
+    [
+     167174.6,
+     638653.6
+    ],
+    [
+     167124.6,
+     638153.6
+    ],
+    [
+     166924.6,
+     637753.6
+    ],
+    [
+     166724.6,
+     637703.6
+    ],
+    [
+     166224.6,
+     637653.6
+    ],
+    [
+     166174.6,
+     636753.6
+    ],
+    [
+     166084.6,
+     636253.6
+    ]
+   ],
+   "src": "schematic",
+   "depth": 15.0,
+   "shelter": 0.12,
+   "tags": {
+    "harbour": "yes"
+   },
+   "name": "אגן הנמל (עומק משוער 15 מ')"
+  },
+  {
+   "id": "fx-port_area-3",
+   "kind": "port_area",
+   "geom": "area",
+   "coords": [
+    [
+     166084.6,
+     636273.6
+    ],
+    [
+     166774.6,
+     636313.6
+    ],
+    [
+     166824.6,
+     636753.6
+    ],
+    [
+     166774.6,
+     637703.6
+    ],
+    [
+     166224.6,
+     637703.6
+    ],
+    [
+     166174.6,
+     637253.6
+    ],
+    [
+     166184.6,
+     636753.6
+    ]
+   ],
+   "src": "traced-srtm",
+   "tags": {
+    "landuse": "port"
+   },
+   "name": "נמל אשדוד – שטח רציפים (שורטט מה-SRTM)"
+  },
+  {
+   "id": "fx-port_area-4",
+   "kind": "port_area",
+   "geom": "area",
+   "coords": [
+    [
+     166944.6,
+     637803.6
+    ],
+    [
+     167144.6,
+     638153.6
+    ],
+    [
+     167224.6,
+     638603.6
+    ],
+    [
+     167084.6,
+     638573.6
+    ],
+    [
+     166924.6,
+     638053.6
+    ]
+   ],
+   "src": "traced-srtm",
+   "tags": {
+    "landuse": "port"
+   },
+   "name": "רציפים צפוניים (שורטט מה-SRTM)"
+  },
+  {
+   "id": "fx-light-5",
+   "kind": "light",
+   "geom": "point",
+   "coords": [
+    166274.6,
+    638753.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "light_minor",
+    "seamark:light:colour": "green"
+   }
+  },
+  {
+   "id": "fx-light-6",
+   "kind": "light",
+   "geom": "point",
+   "coords": [
+    166574.6,
+    638803.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "light_minor",
+    "seamark:light:colour": "red"
+   }
+  },
+  {
+   "id": "fx-buoy-7",
+   "kind": "buoy",
+   "geom": "point",
+   "coords": [
+    166284.6,
+    639103.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "buoy_lateral",
+    "seamark:buoy_lateral:colour": "green"
+   }
+  },
+  {
+   "id": "fx-buoy-8",
+   "kind": "buoy",
+   "geom": "point",
+   "coords": [
+    166584.6,
+    639133.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "buoy_lateral",
+    "seamark:buoy_lateral:colour": "red"
+   }
+  },
+  {
+   "id": "fx-buoy-9",
+   "kind": "buoy",
+   "geom": "point",
+   "coords": [
+    166224.6,
+    639503.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "buoy_lateral",
+    "seamark:buoy_lateral:colour": "green"
+   }
+  },
+  {
+   "id": "fx-buoy-10",
+   "kind": "buoy",
+   "geom": "point",
+   "coords": [
+    166524.6,
+    639533.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "buoy_lateral",
+    "seamark:buoy_lateral:colour": "red"
+   }
+  },
+  {
+   "id": "fx-anchorage-11",
+   "kind": "anchorage",
+   "geom": "area",
+   "coords": [
+    [
+     162324.6,
+     637353.6
+    ],
+    [
+     164124.6,
+     637353.6
+    ],
+    [
+     164124.6,
+     639353.6
+    ],
+    [
+     162324.6,
+     639353.6
+    ]
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "anchorage"
+   },
+   "name": "מעגן המתנה (סכמטי)"
+  },
+  {
+   "id": "fx-fairway-12",
+   "kind": "fairway",
+   "geom": "line",
+   "coords": [
+    [
+     163424.6,
+     638353.6
+    ],
+    [
+     165124.6,
+     639353.6
+    ],
+    [
+     166424.6,
+     639353.6
+    ],
+    [
+     166424.6,
+     638803.6
+    ],
+    [
+     166124.6,
+     638153.6
+    ],
+    [
+     165944.6,
+     637503.6
+    ]
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "fairway"
+   },
+   "name": "נתיב כניסה (סכמטי)"
+  },
+  {
+   "id": "fx-river-13",
+   "kind": "river",
+   "geom": "line",
+   "coords": [
+    [
+     165964.6,
+     635978.6
+    ],
+    [
+     166224.6,
+     636043.6
+    ],
+    [
+     166524.6,
+     636143.6
+    ],
+    [
+     166824.6,
+     636223.6
+    ],
+    [
+     167004.6,
+     636273.6
+    ],
+    [
+     167174.6,
+     636453.6
+    ],
+    [
+     167374.6,
+     636633.6
+    ],
+    [
+     167574.6,
+     636753.6
+    ],
+    [
+     167824.6,
+     636903.6
+    ],
+    [
+     168124.6,
+     637053.6
+    ]
+   ],
+   "src": "traced-srtm",
+   "width": 28,
+   "tags": {
+    "waterway": "river",
+    "name": "נחל לכיש"
+   },
+   "name": "נחל לכיש (מסלול משוער מהעמק ב-SRTM)"
+  },
+  {
+   "id": "fx-breakwater-14",
+   "kind": "breakwater",
+   "geom": "line",
+   "coords": [
+    [
+     164654.6,
+     632953.6
+    ],
+    [
+     164404.6,
+     633043.6
+    ],
+    [
+     164354.6,
+     633303.6
+    ],
+    [
+     164424.6,
+     633453.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 16,
+   "crest": 4.0,
+   "tags": {
+    "man_made": "breakwater"
+   },
+   "name": "שובר גלים מרינה (סכמטי)"
+  },
+  {
+   "id": "fx-breakwater-15",
+   "kind": "breakwater",
+   "geom": "line",
+   "coords": [
+    [
+     164794.6,
+     633513.6
+    ],
+    [
+     164574.6,
+     633523.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 14,
+   "crest": 3.5,
+   "tags": {
+    "man_made": "breakwater"
+   }
+  },
+  {
+   "id": "fx-marina-16",
+   "kind": "marina",
+   "geom": "area",
+   "coords": [
+    [
+     164654.6,
+     632953.6
+    ],
+    [
+     164404.6,
+     633043.6
+    ],
+    [
+     164354.6,
+     633303.6
+    ],
+    [
+     164424.6,
+     633453.6
+    ],
+    [
+     164574.6,
+     633523.6
+    ],
+    [
+     164794.6,
+     633513.6
+    ],
+    [
+     164724.6,
+     632953.6
+    ]
+   ],
+   "src": "schematic",
+   "depth": 4.0,
+   "shelter": 0.08,
+   "tags": {
+    "leisure": "marina"
+   },
+   "name": "מרינה אשדוד (מיקום וצורה משוערים)"
+  },
+  {
+   "id": "fx-pier-17",
+   "kind": "pier",
+   "geom": "line",
+   "coords": [
+    [
+     164674.6,
+     633103.6
+    ],
+    [
+     164474.6,
+     633103.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 2.6,
+   "floating": true,
+   "tags": {
+    "man_made": "pier",
+    "floating": "yes"
+   }
+  },
+  {
+   "id": "fx-pier-18",
+   "kind": "pier",
+   "geom": "line",
+   "coords": [
+    [
+     164674.6,
+     633203.6
+    ],
+    [
+     164474.6,
+     633203.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 2.6,
+   "floating": true,
+   "tags": {
+    "man_made": "pier",
+    "floating": "yes"
+   }
+  },
+  {
+   "id": "fx-pier-19",
+   "kind": "pier",
+   "geom": "line",
+   "coords": [
+    [
+     164674.6,
+     633303.6
+    ],
+    [
+     164474.6,
+     633303.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 2.6,
+   "floating": true,
+   "tags": {
+    "man_made": "pier",
+    "floating": "yes"
+   }
+  },
+  {
+   "id": "fx-pier-20",
+   "kind": "pier",
+   "geom": "line",
+   "coords": [
+    [
+     164674.6,
+     633403.6
+    ],
+    [
+     164474.6,
+     633403.6
+    ]
+   ],
+   "src": "schematic",
+   "width": 2.6,
+   "floating": true,
+   "tags": {
+    "man_made": "pier",
+    "floating": "yes"
+   }
+  },
+  {
+   "id": "fx-light-21",
+   "kind": "light",
+   "geom": "point",
+   "coords": [
+    164424.6,
+    633453.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "light_minor",
+    "seamark:light:colour": "green"
+   }
+  },
+  {
+   "id": "fx-light-22",
+   "kind": "light",
+   "geom": "point",
+   "coords": [
+    164574.6,
+    633523.6
+   ],
+   "src": "schematic",
+   "tags": {
+    "seamark:type": "light_minor",
+    "seamark:light:colour": "red"
+   }
+  }
+ ]
+}

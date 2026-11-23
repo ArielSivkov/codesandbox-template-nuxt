@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0f1a28">
+<title>לוח היזם · מצגת פרויקט · אשדוד</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%227%22 fill=%22%23f2b84b%22/%3E%3Cpath d=%22M9 24V12l7-5 7 5v12z%22 fill=%22%230f1a28%22/%3E%3C/svg%3E">
+<style>
+:root{--bg:#0f1a28;--panel:rgba(250,250,248,.94);--ink:#152232;--mut:#5d6b7b;--line:rgba(21,34,50,.12);--acc:#d98e04;--acc2:#f2b84b;--blue:#2f6690;--ok:#2e8b6a;--r:14px;
+  --safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom);--safe-r:env(safe-area-inset-right);--safe-l:env(safe-area-inset-left)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:"Assistant","Rubik","Noto Sans Hebrew","Segoe UI",system-ui,Arial,sans-serif;overscroll-behavior:none}
+#cv{position:fixed;inset:0;width:100vw;height:100vh;display:block;touch-action:none}
+#labels{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.p-label{position:absolute;left:0;top:0;background:rgba(15,26,40,.86);color:#fff;font-size:12px;font-weight:600;padding:3px 8px;border-radius:9px;white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.p-label::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-top-color:rgba(15,26,40,.86);border-bottom:0}
+.p-label.acc{background:var(--acc2);color:#1b1300}.p-label.acc::after{border-top-color:var(--acc2)}
+button{font:inherit;color:inherit}
+.btn{font-size:13px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 11px;min-height:36px;cursor:pointer;white-space:nowrap;box-shadow:0 2px 10px rgba(10,20,35,.12)}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.acc{background:var(--acc2);border-color:var(--acc2);color:#1b1300;font-weight:700}
+.btn.sm{min-height:30px;padding:4px 9px;font-size:12px}
+.hidden{display:none!important}
+/* כותרת */
+#top{position:fixed;z-index:10;top:calc(var(--safe-t) + 8px);right:calc(var(--safe-r) + 8px);left:calc(var(--safe-l) + 8px);display:flex;gap:6px;align-items:center;pointer-events:none}
+#top>*{pointer-events:auto}
+#brand{display:flex;align-items:center;gap:7px;background:var(--panel);border-radius:12px;padding:4px 10px 4px 8px;min-height:36px;box-shadow:0 2px 10px rgba(10,20,35,.12);font-weight:800;font-size:14px;white-space:nowrap}
+#brand i{width:20px;height:20px;border-radius:6px;background:var(--acc2);display:inline-block;position:relative}
+#brand i::after{content:"";position:absolute;inset:5px 5px 4px;background:var(--ink);clip-path:polygon(0 100%,0 40%,50% 0,100% 40%,100% 100%)}
+#brand small{font-weight:500;color:var(--mut);font-size:12px}
+.seg{display:flex;background:var(--panel);border-radius:12px;padding:3px;box-shadow:0 2px 10px rgba(10,20,35,.12);border:1px solid var(--line)}
+.seg button{border:0;background:transparent;padding:4px 10px;border-radius:9px;font-size:13px;min-height:28px;cursor:pointer;color:var(--mut)}
+.seg button.on{background:var(--ink);color:#fff;font-weight:700}
+#top .sp{flex:1}
+/* החלקה */
+#swipe{position:fixed;z-index:5;top:0;bottom:0;width:0;left:50%;pointer-events:none}
+#swipe .ln{position:absolute;top:0;bottom:0;left:-1px;width:2px;background:#fff;box-shadow:0 0 0 1px rgba(15,26,40,.25)}
+#swipe .kn{position:absolute;top:50%;left:-22px;width:44px;height:44px;margin-top:-22px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.3);pointer-events:auto;touch-action:none;cursor:ew-resize;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink);font-weight:800;direction:ltr}
+.sw-tag{position:fixed;z-index:5;top:calc(var(--safe-t) + 54px);background:rgba(15,26,40,.82);color:#fff;font-size:12px;font-weight:700;padding:3px 10px;border-radius:9px;pointer-events:none}
+#tagB{right:calc(var(--safe-r) + 10px)}#tagA{left:calc(var(--safe-l) + 10px);background:var(--acc2);color:#1b1300}
+/* לוח */
+#panel{position:fixed;z-index:8;background:var(--panel);box-shadow:0 -6px 30px rgba(10,20,35,.22);display:flex;flex-direction:column;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+#tabs{display:flex;gap:4px;padding:8px 10px 4px;border-bottom:1px solid var(--line);align-items:center}
+#tabs button{border:0;background:transparent;padding:6px 10px;border-radius:9px;font-size:13px;cursor:pointer;color:var(--mut);font-weight:600}
+#tabs button.on{background:rgba(21,34,50,.08);color:var(--ink)}
+#tabs .x{margin-inline-start:auto}
+#pbody{overflow:auto;padding:8px 12px 12px;font-size:13px;line-height:1.45;-webkit-overflow-scrolling:touch}
+#pbody h4{margin:10px 0 4px;font-size:12px;color:var(--mut);font-weight:700;letter-spacing:.02em}
+.row{display:flex;gap:8px;align-items:center;margin:5px 0;flex-wrap:wrap}
+.row label{min-width:86px;color:var(--mut)}
+.row input[type=range]{flex:1;min-width:120px;accent-color:var(--acc)}
+.row input[type=number],.row input[type=date],.row select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:#fff;min-height:30px}
+.row input[type=number]{width:64px}
+.row input[type=date]{width:150px}
+.val{font-variant-numeric:tabular-nums;font-weight:700;min-width:44px;text-align:center}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 8px}
+.kpi b{display:block;font-size:17px;font-variant-numeric:tabular-nums}
+.kpi span{font-size:11px;color:var(--mut)}
+.bars{margin:6px 0}
+.bar{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:12px}
+.bar span{width:84px;color:var(--mut)}
+.bar i{display:block;height:12px;border-radius:6px;background:#c9ced4;position:relative}
+.bar i.p{background:var(--acc2)} .bar i em{position:absolute;top:0;bottom:0;background:rgba(21,34,50,.16);border-radius:6px}
+.bar b{font-variant-numeric:tabular-nums;font-size:12px}
+.note{font-size:11px;color:var(--mut);margin:4px 0}
+.warn{font-size:11.5px;background:#fff6e0;border:1px solid #f2d79b;border-radius:9px;padding:6px 8px;color:#6a4a00;margin:6px 0}
+.list{margin:4px 0;padding:0;list-style:none}
+.list li{display:flex;gap:6px;align-items:center;border-top:1px solid var(--line);padding:5px 0;font-size:12.5px;cursor:pointer}
+.list li .sw{width:12px;height:12px;border-radius:3px;flex:none}
+.list li .t{flex:1}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--mut)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:3px;vertical-align:-1px}
+.ltr{direction:ltr;unicode-bidi:embed}
+#link{width:100%;font:12px ui-monospace,monospace;direction:ltr;padding:6px;border:1px solid var(--line);border-radius:8px;background:#fff;height:62px;resize:none}
+/* כרטיס בחירה */
+#card{position:fixed;z-index:9;background:var(--panel);border-radius:var(--r);box-shadow:0 8px 30px rgba(10,20,35,.25);padding:8px 10px;font-size:12.5px;max-width:300px}
+#card h3{margin:0 0 4px;font-size:14px;display:flex;align-items:center;gap:6px}
+#card h3 .x{margin-inline-start:auto}
+#card .acts{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.tag{display:inline-block;font-size:10.5px;padding:1px 6px;border-radius:7px;background:#f6e2b4;color:#6a4a00}
+/* מצב סיפור */
+#story{position:fixed;z-index:12;left:50%;transform:translateX(-50%);bottom:calc(var(--safe-b) + 10px);width:min(680px,calc(100vw - 16px));background:rgba(15,26,40,.9);color:#fff;border-radius:16px;padding:10px 14px 8px;box-shadow:0 10px 30px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
+#story h3{margin:0;font-size:15px;color:var(--acc2);display:flex;gap:8px;align-items:baseline}
+#story h3 small{color:#9fb0c3;font-weight:500;font-size:11.5px}
+#story p{margin:4px 0 6px;font-size:14px;line-height:1.45;min-height:2.9em}
+#story .ctl{display:flex;gap:5px;align-items:center;min-width:0}
+#story .ctl button{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:10px;min-width:36px;min-height:34px;font-size:15px;cursor:pointer;flex:none;padding:0 6px}
+#story .ctl button.pp{background:var(--acc2);color:#1b1300;min-width:52px;font-weight:800}
+#dots{display:flex;gap:3px;flex:1;min-width:0;justify-content:center;direction:rtl;flex-wrap:wrap}
+#story .src{font-size:9.5px;color:#8597ab;margin-top:3px}
+body.story #attr{display:none}
+#dots i{flex:none;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.28);cursor:pointer}
+#dots i.on{background:var(--acc2);width:12px;border-radius:4px}
+#attr{position:fixed;z-index:3;left:calc(var(--safe-l) + 6px);bottom:calc(var(--safe-b) + 3px);font-size:10px;color:rgba(21,34,50,.7);background:rgba(255,255,255,.55);padding:1px 6px;border-radius:6px;direction:rtl}
+#busy{position:fixed;z-index:30;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg);color:#fff;font-size:15px;flex-direction:column;gap:10px}
+#busy i{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--acc2);border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toast{position:fixed;z-index:40;left:50%;top:30%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:10px;font-size:13px;display:none;max-width:86vw;text-align:center}
+/* פריסה: לאורך – גיליון תחתון */
+@media (orientation:portrait){
+  #panel{left:0;right:0;bottom:0;max-height:44vh;border-radius:18px 18px 0 0;padding-bottom:var(--safe-b)}
+  #panel.min{max-height:none}#panel.min #pbody{display:none}
+  #card{right:8px;left:8px;margin-inline-start:auto;bottom:calc(44vh + 8px)}
+  body.story #story{bottom:calc(var(--safe-b) + 10px)}
+  #brand small{display:none}
+  #attr{bottom:calc(44vh + 4px)} body.pmin #attr{bottom:calc(var(--safe-b) + 52px)} body.story #attr{bottom:calc(var(--safe-b) + 150px)}
+  body.pmin #card{bottom:60px}
+}
+/* פריסה: לרוחב – לוח צד מימין */
+@media (orientation:landscape){
+  #panel{top:calc(var(--safe-t) + 52px);bottom:calc(var(--safe-b) + 8px);right:calc(var(--safe-r) + 8px);width:min(330px,42vw);border-radius:16px}
+  #panel.min{bottom:auto}#panel.min #pbody{display:none}
+  #card{left:calc(var(--safe-l) + 8px);bottom:calc(var(--safe-b) + 22px)}
+  #story{width:min(640px,calc(100vw - 24px))}
+}
+@media (orientation:landscape) and (max-height:430px){
+  #story{padding:6px 12px 6px}#story p{font-size:13px;min-height:0;margin:2px 0 4px}#story h3{font-size:13.5px}
+  #story .ctl button{min-height:30px}
+  .sw-tag{top:calc(var(--safe-t) + 50px)}
+}
+@media (max-width:420px){ .seg button{padding:4px 7px} #brand{padding:4px 8px} }
+body.story #panel,body.story #card{display:none}
+</style>
+</head>
+<body>
+<canvas id="cv" aria-label="תצוגת תלת־ממד של הפרויקט"></canvas>
+<div id="labels"></div>
+<div id="busy"><i></i><div>טוען את העולם התאום של אשדוד…</div></div>
+
+<div id="top">
+  <div id="brand"><i></i>לוח היזם <small>· מצגת פרויקט</small></div>
+  <div class="seg" id="vseg" role="tablist" aria-label="תצוגה">
+    <button data-v="before">לפני</button><button data-v="swipe">השוואה</button><button data-v="after" class="on">אחרי</button>
+  </div>
+  <span class="sp"></span>
+  <button class="btn acc" id="bStory" aria-label="הפעל מצגת">▶ מצגת</button>
+</div>
+
+<div id="swipe" class="hidden"><div class="ln"></div><div class="kn" aria-label="פס השוואה">‹ ›</div></div>
+<div class="sw-tag hidden" id="tagB">לפני · היום</div><div class="sw-tag hidden" id="tagA">אחרי · מוצע</div>
+
+<aside id="panel">
+  <div id="tabs">
+    <button data-t="proj" class="on">פרויקט</button><button data-t="anal">ניתוחים</button><button data-t="share">שיתוף</button>
+    <button class="x btn sm" id="bMin" aria-label="מזער לוח">▾</button>
+  </div>
+  <div id="pbody">
+    <section data-s="proj">
+      <div class="row"><label>סוג הדמיה</label>
+        <div class="seg" id="kseg"><button data-k="massing" class="on">מסה פשוטה</button><button data-k="gltf">מודל glTF</button></div></div>
+      <div id="massingCtl">
+        <div class="row"><label>קומות</label><input type="range" id="iFl" min="1" max="40" value="14"><span class="val" id="vFl">14</span></div>
+        <div class="row"><label>גובה קומה</label><input type="range" id="iFh" min="2.8" max="4" step="0.05" value="3.1"><span class="val" id="vFh">3.1</span></div>
+        <div class="row"><label>קומת קרקע</label><input type="range" id="iGf" min="3" max="6" step="0.1" value="4.5"><span class="val" id="vGf">4.5</span></div>
+        <div class="row"><label>נסיגה מקומה</label><input type="number" id="iSbF" min="2" max="40" value="11"><label style="min-width:0">בעומק</label><input type="number" id="iSbI" min="0" max="10" step="0.5" value="2"><span class="note">מ'</span></div>
+        <div class="row"><label>סיבוב</label><input type="range" id="iRot" min="-45" max="45" step="1" value="0"><span class="val" id="vRot">0°</span></div>
+        <p class="note">הקונטור = קונטור הבניין הקיים מ־OSM (אפשר להעביר קונטור אחר דרך הקישור או ה־API).</p>
+      </div>
+      <div id="gltfCtl" class="hidden">
+        <p class="note">מודל דוגמה: models/tower.gltf (מטרים, Y למעלה, מקור במרכז הבסיס). מיושר לצלע הארוכה של החלקה.</p>
+        <div class="row"><label>סיבוב</label><input type="range" id="iRotG" min="-90" max="90" step="1" value="0"><span class="val" id="vRotG">0°</span></div>
+      </div>
+      <h4>הבניין שמוחלף</h4>
+      <div id="siteInfo" class="note"></div>
+      <p class="note">להחלפת בניין אחר: הקישו על בניין בסצנה ← "החלף בבניין המוצע".</p>
+    </section>
+    <section data-s="anal" class="hidden">
+      <div class="kpis" id="kpis"></div>
+      <h4>גובה מול השכנים (רדיוס 100 מ')</h4>
+      <div class="bars" id="bars"></div>
+      <h4>הצללה על השכנים</h4>
+      <div class="row"><label>תאריך</label><input type="date" id="iDate" value="2026-12-21"><button class="btn sm" id="bSol">21.12</button><button class="btn sm" id="bEq">21.3</button></div>
+      <div class="row"><label>שעה</label><input type="range" id="iHour" min="6" max="18" step="0.25" value="12"><span class="val ltr" id="vHour">12:00</span></div>
+      <div class="row"><button class="btn pri" id="bShadow">חשב הצללה 9:00–15:00</button>
+        <label style="min-width:0"><input type="checkbox" id="cHeat"> מפת חום</label><label style="min-width:0"><input type="checkbox" id="cFan"> מניפת צל</label></div>
+      <div id="shRes"></div>
+      <div class="row"><button class="btn sm" id="bSens">בדיקת רגישות: שכנים ±σ</button><span class="note" id="sensRes"></span></div>
+      <h4>מבט מחלון</h4>
+      <div class="row"><label>בניין</label><select id="iWinB"></select><label style="min-width:0">קומה</label><input type="number" id="iWinF" min="1" max="40" value="2"></div>
+      <div class="row"><button class="btn" id="bWin">מבט מהחלון</button><button class="btn" id="bTopView">מהקומה העליונה מערבה</button><button class="btn sm" id="bReset">מבט על</button></div>
+      <div id="winRes" class="note"></div>
+    </section>
+    <section data-s="share" class="hidden">
+      <p class="note">הקישור שומר את כל התרחיש: הבניין, הפרויקט, התאריך והשעה, התצוגה, הצילום במצגת והחלון.</p>
+      <textarea id="link" readonly></textarea>
+      <div class="row"><button class="btn pri" id="bCopy">העתק קישור</button><button class="btn" id="bCopyPlay">קישור שמתחיל מצגת</button></div>
+      <div class="warn">ייצוא סרטון מהמצגת – מחוץ לתחום בגרסה זו. אפשר להקליט עם מקליט המסך של הטלפון בזמן שהמצגת רצה.</div>
+      <h4>מקורות ודיוק</h4>
+      <p class="note">שמש: אלגוריתם NOAA, נבדק מול NREL SPA (סטייה &lt; 0.01°). קונטורים: OpenStreetMap (ODbL). קרקע: SRTM. גובהי הבניינים הקיימים – <b>הערכה לפי כלל</b> (σ≈6 מ'), לא מדידה. צל מחושב על מנסרות (ללא מרפסות, עצים וגגות משופעים).</p>
+    </section>
+  </div>
+</aside>
+
+<div id="card" class="hidden"></div>
+
+<div id="story" class="hidden" role="region" aria-label="מצגת">
+  <h3><span id="sTitle"></span><small id="sNum"></small></h3>
+  <p id="sText"></p>
+  <div class="ctl">
+    <button id="sPrev" aria-label="הקודם">›</button>
+    <button id="sPlay" class="pp" aria-label="נגן/השהה">❚❚</button>
+    <button id="sNext" aria-label="הבא">‹</button>
+    <div id="dots"></div>
+    <button id="sShare" aria-label="קישור לצילום הזה">🔗</button>
+    <button id="sClose" aria-label="סגור מצגת">✕</button>
+  </div>
+  <div class="src">© תורמי OpenStreetMap (ODbL) · SRTM · גובהי הבניינים הקיימים – הערכה · קו החוף בנתוני הדוגמה – משוער</div>
+</div>
+<div id="attr">© תורמי OSM (ODbL) · SRTM · גבהים וקו חוף: הערכה</div>
+<div id="toast"></div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/geo.js"></script>
+<script src="js/data.js"></script>
+<script src="js/present.js"></script>
+<script src="js/story.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

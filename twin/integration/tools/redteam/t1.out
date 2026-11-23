@@ -1,0 +1,179 @@
+{
+ "portrait": {
+  "R": {
+   "top": [
+    142,
+    8,
+    352,
+    134
+   ],
+   "mode": [
+    277,
+    8,
+    352,
+    46
+   ],
+   "bMine": [
+    300,
+    52,
+    352,
+    90
+   ],
+   "bMenu": [
+    316,
+    96,
+    352,
+    134
+   ],
+   "bEnv": [
+    256,
+    52,
+    294,
+    90
+   ],
+   "mm": [
+    8,
+    8,
+    132,
+    132
+   ],
+   "hud": [
+    13,
+    600,
+    347,
+    632
+   ],
+   "joy": [
+    18,
+    646,
+    150,
+    778
+   ],
+   "acts": [
+    208,
+    716,
+    346,
+    780
+   ],
+   "bA": [
+    282,
+    716,
+    346,
+    780
+   ],
+   "bB": [
+    208,
+    716,
+    272,
+    780
+   ],
+   "fps": [
+    8,
+    138,
+    48,
+    151
+   ]
+  },
+  "overlaps": [],
+  "offscreen": [],
+  "clipped": [],
+  "card": {
+   "h": 471,
+   "top": 321,
+   "sh": 469,
+   "name": "Synagogue Klarh Carraco"
+  },
+  "errs": [
+   "warning: [.WebGL-0x1ddc0114da00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "warning: [.WebGL-0x1ddc0114da00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "warning: [.WebGL-0x1ddc0114da00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels",
+   "warning: [.WebGL-0x1ddc0114da00]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)"
+  ]
+ },
+ "landscape": {
+  "R": {
+   "top": [
+    201,
+    8,
+    792,
+    46
+   ],
+   "mode": [
+    717,
+    8,
+    792,
+    46
+   ],
+   "bMine": [
+    430,
+    8,
+    550,
+    46
+   ],
+   "bMenu": [
+    201,
+    8,
+    237,
+    46
+   ],
+   "bEnv": [
+    335,
+    8,
+    424,
+    46
+   ],
+   "mm": [
+    8,
+    8,
+    112,
+    112
+   ],
+   "hud": [
+    221,
+    320,
+    579,
+    354
+   ],
+   "joy": [
+    18,
+    222,
+    134,
+    338
+   ],
+   "acts": [
+    664,
+    284,
+    786,
+    340
+   ],
+   "bA": [
+    730,
+    284,
+    786,
+    340
+   ],
+   "bB": [
+    664,
+    284,
+    720,
+    340
+   ],
+   "fps": [
+    8,
+    120,
+    48,
+    133
+   ]
+  },
+  "overlaps": [],
+  "offscreen": [],
+  "clipped": [],
+  "card": {
+   "h": 310,
+   "top": 42,
+   "sh": 469,
+   "name": "Synagogue Klarh Carraco"
+  },
+  "errs": []
+ }
+}

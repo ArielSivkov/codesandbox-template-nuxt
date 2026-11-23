@@ -1,0 +1,92 @@
+{
+ "v": 1,
+ "kind": "ais-fixture",
+ "label_he": "כלי שיט בדויים לדוגמה בלבד (MMSI 999…) – לא נתוני AIS אמיתיים",
+ "t0": 0,
+ "vessels": [
+  {
+   "mmsi": "999000001",
+   "name": "דוגמה – מכולות 1",
+   "type": "cargo",
+   "lat": 31.835,
+   "lon": 34.585,
+   "sog": 0.1,
+   "cog": 250,
+   "heading": null,
+   "length": 230,
+   "ts": 0
+  },
+  {
+   "mmsi": "999000002",
+   "name": "דוגמה – מכולות 2",
+   "type": "cargo",
+   "lat": 31.845,
+   "lon": 34.575,
+   "sog": 0.0,
+   "cog": 255,
+   "heading": null,
+   "length": 300,
+   "ts": 0
+  },
+  {
+   "mmsi": "999000003",
+   "name": "דוגמה – מכלית",
+   "type": "tanker",
+   "lat": 31.828,
+   "lon": 34.57,
+   "sog": 0.2,
+   "cog": 260,
+   "heading": null,
+   "length": 180,
+   "ts": 0
+  },
+  {
+   "mmsi": "999000004",
+   "name": "דוגמה – בתפזורת",
+   "type": "cargo",
+   "lat": 31.85,
+   "lon": 34.592,
+   "sog": 0.0,
+   "cog": 240,
+   "heading": null,
+   "length": 190,
+   "ts": 0
+  },
+  {
+   "mmsi": "999000005",
+   "name": "דוגמה – נכנסת לנמל",
+   "type": "cargo",
+   "lat": 31.842,
+   "lon": 34.61,
+   "sog": 7.5,
+   "cog": 120,
+   "heading": 118,
+   "length": 210,
+   "ts": 0
+  },
+  {
+   "mmsi": "999000006",
+   "name": "דוגמה – גוררת",
+   "type": "tug",
+   "lat": 31.832,
+   "lon": 34.627,
+   "sog": 5.0,
+   "cog": 200,
+   "heading": 200,
+   "length": 30,
+   "ts": 0
+  },
+  {
+   "mmsi": "999000007",
+   "name": "דוגמה – יאכטה",
+   "type": "pleasure",
+   "lat": 31.795,
+   "lon": 34.615,
+   "sog": 5.5,
+   "cog": 330,
+   "heading": 330,
+   "length": 14,
+   "ts": 0
+  }
+ ]
+}

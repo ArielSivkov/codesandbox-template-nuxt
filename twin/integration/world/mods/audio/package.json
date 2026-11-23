@@ -1,0 +1,10 @@
+{
+  "name": "esh27-twin-audio",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Procedural spatial audio for the ESH27 Ashdod twin (Web Audio API, no dependencies, no audio files)",
+  "type": "module",
+  "main": "audio.js",
+  "scripts": { "test": "node --test test/*.test.mjs", "render": "node test/render.mjs" },
+  "license": "MIT"
+}

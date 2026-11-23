@@ -1,0 +1,83 @@
+{
+ "A_corrupt": {
+  "st": {
+   "o": {
+    "165_633": "absent",
+    "164_633": {
+     "failed": false,
+     "blds": 0,
+     "hasH": true
+    },
+    "166_633": {
+     "failed": false,
+     "blds": 248,
+     "hasH": true
+    },
+    "165_634": {
+     "failed": true,
+     "blds": null,
+     "hasH": false
+    }
+   },
+   "H": 29.937027218693707,
+   "frame": 67
+  },
+  "framesAdvancing": true,
+  "errs": [
+   "error: Failed to load resource: the server responded with a status of 404 (Not Found)",
+   "warning: tile 165_634 HTTP 404 data/tiles/v/165_634.json.gz",
+   "warning: tile 165_633 Failed to fetch",
+   "warning: terrain grid 0 0",
+   "error: THREE.BufferGeometry.computeBoundingSphere(): Computed radius is NaN. The \"position\" attribute is likely to have NaN values. s"
+  ]
+ },
+ "B_offline": {
+  "failedWhileOffline": [
+   "167_634",
+   "167_633",
+   "166_635"
+  ],
+  "afterOnline8s": {
+   "stillFailed": [],
+   "ground": 18.432055512120176,
+   "nearBuildings": 17
+  },
+  "errs": [
+   "error: Failed to load resource: net::ERR_INTERNET_DISCONNECTED",
+   "warning: tile 167_634 Failed to fetch",
+   "warning: tile 167_633 Failed to fetch",
+   "warning: tile 166_635 Failed to fetch"
+  ]
+ },
+ "C_nan": {
+  "carAfterNaNsteer": {
+   "x": -1513.0958944241202,
+   "z": 245.86539145921392,
+   "h": 0,
+   "steer": 0
+  },
+  "droneAfterInfStick": {
+   "x": -1513.3874958131023,
+   "y": 30.206274713944236,
+   "vx": -2.3336490034647146
+  },
+  "errs": []
+ },
+ "D_fallbackGround": {
+  "before": {
+   "y": 1,
+   "H": 1
+  },
+  "mid": {
+   "y": 30.679057693481443,
+   "H": 30.679057693481443
+  },
+  "moved": 7.072201604476987,
+  "after": {
+   "y": 30.61778374876654,
+   "H": 30.61778374876654
+  },
+  "t": 4.999899999999997,
+  "errs": []
+ }
+}

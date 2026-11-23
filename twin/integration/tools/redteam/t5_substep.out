@@ -1,0 +1,120 @@
+{
+ "tunneling": {
+  "car_34ms": {
+   "walls": 2248,
+   "passedThrough": 3,
+   "endedInside": 1,
+   "pct": 0.2,
+   "ex": [
+    {
+     "id": "w358974561",
+     "area": 1027.8,
+     "wall": 29.6
+    },
+    {
+     "id": "w358974559",
+     "area": 1030,
+     "wall": 29.6
+    },
+    {
+     "id": "w98483024",
+     "area": 1232.6,
+     "wall": 21.4
+    }
+   ]
+  },
+  "heli_46ms": {
+   "walls": 2248,
+   "passedThrough": 2,
+   "endedInside": 16,
+   "pct": 0.8,
+   "ex": [
+    {
+     "id": "w358974559",
+     "area": 1030,
+     "wall": 29.6
+    },
+    {
+     "id": "w98483024",
+     "area": 1232.6,
+     "wall": 21.4
+    }
+   ]
+  },
+  "jet_11ms": {
+   "walls": 2248,
+   "passedThrough": 3,
+   "endedInside": 1,
+   "pct": 0.2,
+   "ex": [
+    {
+     "id": "w358974561",
+     "area": 1027.8,
+     "wall": 29.6
+    },
+    {
+     "id": "w358974559",
+     "area": 1030,
+     "wall": 29.6
+    },
+    {
+     "id": "w98483024",
+     "area": 1232.6,
+     "wall": 21.4
+    }
+   ]
+  },
+  "foot_sprint": {
+   "walls": 2248,
+   "passedThrough": 3,
+   "endedInside": 1,
+   "pct": 0.2,
+   "ex": [
+    {
+     "id": "w358974561",
+     "area": 1027.8,
+     "wall": 29.6
+    },
+    {
+     "id": "w358974559",
+     "area": 1030,
+     "wall": 29.6
+    },
+    {
+     "id": "w98483024",
+     "area": 1232.6,
+     "wall": 21.4
+    }
+   ]
+  }
+ },
+ "fallbackGround": {
+  "before": {
+   "y": 1,
+   "H": 1,
+   "tileLoaded": false
+  },
+  "mid": {
+   "y": 48.7,
+   "H": 48.7,
+   "tileLoaded": true
+  },
+  "movedWhileHoldingForward10s": 13.01,
+  "after": {
+   "y": 48.28,
+   "H": 48.28
+  },
+  "gameSecondsElapsed": 6.2
+ },
+ "heliRam": {
+  "building": "w98483610",
+  "top": 59.3,
+  "w": 51.4,
+  "d": 51.1,
+  "heliInsideFootprint": false,
+  "heliPastBuilding": false,
+  "hz": -4300.8,
+  "y": 39.3
+ },
+ "errs": []
+}

@@ -1,0 +1,58 @@
+/* מארח התוספים של העולם (מחלקת האינטגרציה) — RTL, ידידותי לטלפון */
+#yzNotices{position:fixed;z-index:60;top:calc(env(safe-area-inset-top) + 52px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:6px;width:min(92vw,420px);pointer-events:none}
+.yzN{pointer-events:auto;background:#2a1a12f0;border:1px solid #ff8a65;color:#ffe3d6;border-radius:12px;padding:7px 10px;font-size:12.5px;display:flex;gap:8px;align-items:flex-start;box-shadow:0 6px 18px #0008}
+.yzN.info{background:#12202ef0;border-color:#5cc8a0;color:#d9fff0}
+.yzN b{flex:1}
+.yzN button{font:inherit;font-size:12px;background:#ffffff1a;color:inherit;border:1px solid #ffffff33;border-radius:8px;padding:2px 8px;cursor:pointer}
+#yzSheet{position:fixed;z-index:40;inset:auto 0 0 0;max-height:min(82vh,640px);overflow:auto;background:rgba(12,20,32,.96);border-top:1px solid rgba(255,255,255,.18);border-radius:18px 18px 0 0;padding:10px 12px calc(env(safe-area-inset-bottom) + 14px);display:none;color:#eef3f8;font-size:13.5px;direction:rtl;box-shadow:0 -10px 30px #000a;user-select:none}
+@media (min-width:700px){#yzSheet{inset:auto auto 0 50%;transform:translateX(-50%);width:560px}}
+@media (max-height:440px){#yzSheet{max-height:94vh}}
+#yzSheet h3{margin:10px 0 6px;font-size:14px;color:#f2b84b}
+#yzSheet .hd{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+#yzSheet .hd h2{margin:0;font-size:16px;flex:1}
+#yzSheet .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px}
+#yzSheet .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media (orientation:landscape) and (max-height:500px){#yzSheet .grid{grid-template-columns:repeat(5,1fr)}}
+.yzM{font:inherit;background:#ffffff10;border:1px solid #ffffff26;color:#fff;border-radius:14px;padding:10px 4px;min-height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.yzM .i{font-size:26px;line-height:1}
+.yzM .s{font-size:10.5px;color:#a3b3c5}
+.yzM.on{border-color:#f2b84b;background:#f2b84b22}
+.yzM[disabled]{opacity:.42;cursor:not-allowed}
+#yzSheet label{display:block;margin:7px 0}
+#yzSheet input[type=range]{width:100%;accent-color:#f2b84b;height:28px}
+#yzSheet input[type=date]{font:inherit;padding:6px;border-radius:8px;border:1px solid #ffffff26;background:#0a111b;color:#eef3f8;color-scheme:dark}
+#yzSheet .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:6px 0}
+#yzSheet .seg{display:flex;border:1px solid #ffffff26;border-radius:12px;overflow:hidden}
+#yzSheet .seg button{font:inherit;font-size:13px;background:transparent;color:#eef3f8;border:0;padding:8px 12px;min-height:38px;cursor:pointer}
+#yzSheet .seg button.on{background:#f2b84b;color:#1b1300;font-weight:700}
+#yzSheet .mut{color:#a3b3c5;font-size:11.5px}
+#yzSheet .mod{display:flex;gap:8px;align-items:center;border-top:1px solid #ffffff1f;padding:7px 0}
+#yzSheet .mod .t{flex:1;min-width:0}
+#yzSheet .mod .t small{display:block;color:#a3b3c5;font-size:11px;overflow:hidden;text-overflow:ellipsis}
+.yzSt{font-size:10.5px;border-radius:8px;padding:1px 7px;white-space:nowrap}
+.yzSt.on{background:#5cc8a033;color:#8fe0c0}.yzSt.error{background:#ff8a6533;color:#ffb39a}.yzSt.off{background:#ffffff1a;color:#a3b3c5}.yzSt.pending{background:#f2b84b26;color:#f6cf7f}.yzSt.loading{background:#4b8bf233;color:#9cc0ff}
+.yzBtn{font:inherit;font-size:13px;color:#eef3f8;background:#ffffff12;border:1px solid #ffffff26;border-radius:12px;padding:7px 11px;min-height:38px;cursor:pointer}
+.yzBtn.pri{background:#f2b84b;color:#1b1300;border-color:#f2b84b;font-weight:700}
+.yzBtn.on{border-color:#f2b84b;color:#f2b84b}
+#yzDiag{font:11px ui-monospace,monospace;direction:ltr;text-align:left;white-space:pre-wrap;color:#a3b3c5;background:#0006;border-radius:8px;padding:6px}
+#yzBadge{position:fixed;z-index:11;left:8px;top:calc(env(safe-area-inset-top) + 182px);display:flex;flex-direction:column;gap:4px;align-items:flex-start;pointer-events:none}
+#yzBadge span{font-size:11px;background:rgba(12,20,32,.75);border:1px solid rgba(255,255,255,.18);border-radius:9px;padding:1px 7px;color:#eef3f8}
+#yzBadge span.sh{border-color:#f2b84b;color:#f6cf7f}
+@media (max-height:420px){#yzBadge{top:160px}#yzEye{top:118px!important}}
+#yzOverlay{position:fixed;inset:0;z-index:45;background:#0f1a28;display:none}
+#yzOverlay iframe{border:0;width:100%;height:100%}
+#yzOverlay .x{position:fixed;z-index:46;top:calc(env(safe-area-inset-top) + 8px);left:8px}
+#yzHUDp{position:fixed;z-index:10;right:8px;top:calc(env(safe-area-inset-top) + 56px);display:flex;flex-direction:column;gap:6px;max-width:46vw;pointer-events:none}
+#yzHUDp>div{background:rgba(12,20,32,.78);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:4px 8px;font-size:11.5px;color:#eef3f8}
+body.yz-pm #joy{display:block}
+body.yz-ovl #top,body.yz-ovl #mm,body.yz-ovl #mmN,body.yz-ovl #hud,body.yz-ovl #joy,body.yz-ovl #acts{display:none!important}
+/* צוות אדום 11: ב-360 רוחב – פס מהירות/גובה מעל הכפתורים והג'ויסטיק; הודעה לא מכסה כרטיס; כרטיס לרוחב לא מכסה ג'ויסטיק */
+@media (max-width:480px) and (orientation:portrait){#hud{bottom:calc(env(safe-area-inset-bottom) + 168px)!important}#prompt{top:calc(env(safe-area-inset-top) + 104px)}}
+@media (orientation:landscape) and (max-height:500px){#card{max-width:min(380px,48vw)!important;left:auto!important;right:8px!important;margin:0!important}#hud{bottom:calc(env(safe-area-inset-bottom) + 6px)}}
+#toast{top:calc(env(safe-area-inset-top) + 64px)!important}
+body.yz-card-open #toast{top:calc(env(safe-area-inset-top) + 64px)!important}
+#fps{top:calc(env(safe-area-inset-top) + 228px)!important}
+#yzHUDp{pointer-events:none}#yzHUDp>div{pointer-events:auto;cursor:pointer;max-height:60vh;overflow:auto}
+#yzHUDp>div.c{max-height:1.5em;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+body.yz-pm #prompt,body.yz-pm #bE{display:none!important}
+@media (max-width:480px) and (orientation:portrait){#yzHUDp{top:calc(env(safe-area-inset-top) + 142px)!important;max-width:58vw}}
