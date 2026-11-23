@@ -1,0 +1,9 @@
+{
+  "name": "esh27-twin-aviation",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Jet fighter + spaceship modes and far-field Earth for the ESH27 twin (three.js, no other deps)",
+  "scripts": { "test": "node --test test/", "data": "node tools/build_data.mjs _dl /tmp/avnpm/node_modules && node tools/build_terrain.mjs", "shot": "node tools/shot.mjs" },
+  "license": "MIT"
+}
