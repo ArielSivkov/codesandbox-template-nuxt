@@ -5,7 +5,6 @@
   'use strict';
   const P = [
     ['transport', 'תחבורה: נתיבים, צמתים, תמרורים, רמזורים', 'transport', 'צינור נתונים בבנייה; גרסת גישור "life-lite" פעילה', []],
-    ['npc', 'דמויות: שגרה, שבת, דיאלוג', 'npc', 'js/life.js (סימולציה טהורה) קיים — ממתין לשכבת ציור/ממשק לעולם; גרסת גישור "life-lite" פעילה', []],
     ['engine-b6', 'מנוע אריחים לנייד (גדוד 6, window.YZ.engine)', 'b6/map', 'אפליקציה עם רנדרר וממשק משלה; תכונות היזם הועברו למצב יזם, המנוע עצמו ממתין לגרסת ספרייה', []],
   ];
   for (const [id, name, dept, why, provides] of P) YZW.register({ id, name, dept, pending: why, provides, order: 95 });

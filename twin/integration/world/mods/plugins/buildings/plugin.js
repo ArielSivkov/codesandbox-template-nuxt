@@ -21,13 +21,14 @@
   const S = { on: false, world: null, api: null, TY: null, LM: null, FX: null, mats: null, MATS: null, U: null, tiles: new Map(), kit: {}, balc: null,
     nearT: 0, nearKey: '', dekel: null, dekelObjs: [], dekelMesh: null, dekelLines: null, labels: [], origNear: null, patched: new Map(), cardObs: null,
     tileHints: new Map(), hintSrc: null,
+    capScale: 1, capT: 0,
     stats: { tiles: 0, buildings: 0, byCode: {}, byBasis: {}, villas: 0, yards: 0, pitched: 0, shops: 0, landmarks: 0, dekel: 0, buildMs: 0 }, unsub: [] };
   const CAPS = {
-    low:    { kitR: 0,   balcR: 0,   solar: 0,    tank: 0,   ac: 0,   stair: 0,   balc: 0,    yard: true,  lite: true },
-    medium: { kitR: 200, balcR: 140, solar: 700,  tank: 200, ac: 500, stair: 220, balc: 700,  yard: true,  lite: false },
-    high:   { kitR: 380, balcR: 260, solar: 2200, tank: 600, ac: 1500, stair: 600, balc: 2200, yard: true,  lite: false },
+    low:    { kitR: 90,  balcR: 60,  solar: 150,  tank: 60,  ac: 120, stair: 70,  balc: 160,  wallac: 120, awn: 60,  yard: true, lite: false },   // חלונות/תריסים/מרפסות בשיידר גם בשכבה הנמוכה (הרדמי עובד בה)
+    medium: { kitR: 200, balcR: 140, solar: 700,  tank: 200, ac: 500, stair: 220, balc: 700,  wallac: 450, awn: 220, yard: true, lite: false },
+    high:   { kitR: 380, balcR: 260, solar: 2200, tank: 600, ac: 1500, stair: 600, balc: 2200, wallac: 1400, awn: 600, yard: true, lite: false },
   };
-  const cap = () => CAPS[S.world.quality.tier] || CAPS.medium;
+  const cap = () => { const c = CAPS[S.world.quality.tier] || CAPS.medium, k = S.capScale; if (k >= 0.999) return c; const o = {}; for (const x in c) o[x] = typeof c[x] === 'number' ? Math.round(c[x] * (x.endsWith('R') ? Math.sqrt(k) : k)) : c[x]; return o; };
   const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
   const hash32 = s => { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
   // אותו גיבוב כמו eh() בשיידר של מחלקת הבניינים (דיוק float — התאמה כמעט תמיד; אי־התאמה היא קוסמטית בלבד)
@@ -135,22 +136,27 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     const roofTile = tileRoofMat(THREE);
     const yard = new THREE.MeshLambertMaterial({ vertexColors: true }); yard.name = 'yz-yard';
     const kit = new THREE.MeshLambertMaterial({ vertexColors: true }); kit.name = 'yz-kit';
+    const rail = new THREE.MeshLambertMaterial({ vertexColors: true, map: barsTex(THREE), alphaTest: 0.5, side: THREE.DoubleSide }); rail.name = 'yz-rail';
+    const awning = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide }); awning.name = 'yz-awning';
     const line = new THREE.LineDashedMaterial({ color: 0xffffff, dashSize: 2.2, gapSize: 1.6, transparent: true, opacity: 0.9, depthWrite: false });
     const lineC = new THREE.LineDashedMaterial({ color: 0xf2b84b, dashSize: 2.2, gapSize: 1.6, transparent: true, opacity: 0.95, depthWrite: false });
     S.U = facade.userData.uniforms;
-    return { facade, roofTile, yard, kit, line, lineC };
+    return { facade, roofTile, yard, kit, rail, awning, line, lineC };
   }
   function hookMats() {
     const Y = window.YZMAT, m = S.mats;
     Y.provide('buildings.facade', m.facade, { owner: ID, note: 'שיידר החזיתות של מחלקת הבניינים. תכונות: position, normal, color, afl(vec2: בסיס דצ"מ, גובה קומה דצ"מ; 0=גג/קיר בלי קומות), afc(vec4 Int16: u דצ"מ, אורך קיר דצ"מ, pack(code|floors<<4|pil<<10|shop<<11|mat<<12), זרע). uniforms: uNight, uLit, uDetail, uHide', attrs: ['afl', 'afc', 'color'] });
     Y.provide('buildings.roofTile', m.roofTile, { owner: ID, note: 'גגות רעפים משופעים (וילות). uv במטרים (u לאורך המרזב, v במעלה השיפוע), color = גוון לבניין', attrs: ['uv', 'color'] });
     Y.provide('buildings.yard', m.yard, { owner: ID, note: 'גינות, גדרות ושערים של וילות (צבעי קודקוד)', attrs: ['color'] });
-    Y.provide('buildings.kit', m.kit, { owner: ID, note: 'ציוד גג + מרפסות תלת־ממדיות (InstancedMesh, צבעי קודקוד)', attrs: ['color'] });
+    Y.provide('buildings.kit', m.kit, { owner: ID, note: 'ציוד גג + מרפסות טיח/זכוכית + מזגנים תלויים (InstancedMesh, צבעי קודקוד × instanceColor)', attrs: ['color', 'instanceColor'] });
+    Y.provide('buildings.rail', m.rail, { owner: ID, note: 'מרפסות עם מעקה מוטות (map: חצי תחתון אטום, חצי עליון מוטות; alphaTest)', attrs: ['uv', 'color', 'instanceColor'] });
+    Y.provide('buildings.awning', m.awning, { owner: ID, note: 'סוככי חנויות (instanceColor = צבע הבד)', attrs: ['color', 'instanceColor'] });
     const sw = (slot, set) => S.unsub.push(Y.on(slot, nw => { if (nw) set(nw); }));
     sw('buildings.facade', nw => { S.MATS[0] = nw; if (S.dekelMesh) S.dekelMesh.material = S.MATS; if (nw.userData && nw.userData.uniforms) S.U = nw.userData.uniforms; });
     sw('buildings.roofTile', nw => { S.MATS[1] = nw; });
     sw('buildings.yard', nw => { for (const r of S.tiles.values()) if (r.yard) r.yard.material = nw; });
-    sw('buildings.kit', nw => { for (const k in S.kit) S.kit[k].material = nw; if (S.balc) S.balc.material = nw; if (S.stand) S.stand.material = nw; });
+    sw('buildings.kit', nw => { for (const k in S.kit) S.kit[k].material = nw; for (const m of [S.balc, S.wallac, S.stand]) if (m) m.material = nw; });
+    sw('buildings.rail', nw => { if (S.bars) S.bars.material = nw; }); sw('buildings.awning', nw => { if (S.awn) S.awn.material = nw; });
   }
 
   // ------------------------------------------------------------ טיפולוגיה לבניין (דטרמיניסטית לפי מזהה)
@@ -213,7 +219,7 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     if (hTy != null && hTy >= 0 && hTy <= 10) cls = { code: hTy, he: TY.T_HE[hTy], basis: 'data', why: 'רמז ממחלקת הנתונים האמיתיים' + (hint.src ? ' (' + hint.src + ')' : '') };
     else if (cls.code !== T.VILLA && resid && b.area >= 40 && ((floors <= 2 && b.area < 400) || (b.area < 150 && floors <= 3))) { cls = { code: T.VILLA, he: TY.T_HE[T.VILLA], basis: 'shape', why: floors + ' קומות, ' + Math.round(b.area) + ' מ"ר (כלל: ≤2 קומות או טביעה קטנה)' }; }
     let lm = LM.landmarkOf(b.id), tgt = LM.targetHeight(lm);
-    if (D) { lm = { id: b.id, he: D.he, floors: S.dekel.floors, h: S.dekel.h, conf: D.osm ? 'candidate' : 'estimated', src: S.dekel.sources.map(s => s.url), note: D.note }; tgt = { h: D.h || S.dekel.h, basis: 'data' }   /* תיקון אינטגרציה: למגדלים ב-dekel.json אין h → NaN */; }
+    if (D) { lm = { id: b.id, he: D.he, floors: S.dekel.floors, h: S.dekel.h, conf: D.osm ? 'candidate' : 'estimated', src: S.dekel.sources.map(s => s.url), note: D.note }; tgt = { h: S.dekel.h, basis: 'data' }; }
     if (lm && tgt) {
       const hintH = hint && (+hint.h > 0 || +hint.height_m > 0 || +hint.floors > 0);
       if (!(hintH && tgt.basis === 'proc')) { floors = lm.floors || floors; patchHeight(b, tgt.h, floors); }   // גובה מצוטט גובר; "קומות × 3.3" נכנע לגבהים v2
@@ -286,6 +292,7 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     S.stats.pitched++;
   }
   // גינה + גדר + שער לווילה: מלבן חוסם מורחב (3 / 2 / 1.2 מ') שלא עולה על כביש או בניין שכן
+  const HEDGE = [[0.17, 0.32, 0.12], [0.21, 0.37, 0.15], [0.15, 0.28, 0.13]];
   const YCOL = { grass: [[0.33, 0.47, 0.22], [0.38, 0.52, 0.25], [0.30, 0.43, 0.21]], pave: [[0.72, 0.68, 0.60], [0.66, 0.63, 0.58]],
     wall: [[0.92, 0.91, 0.88], [0.80, 0.74, 0.62], [0.24, 0.24, 0.25], [0.85, 0.85, 0.83]], gate: [[0.12, 0.13, 0.14], [0.20, 0.17, 0.14], [0.55, 0.57, 0.58]] };
   function yardFor(Y, b, I) {
@@ -303,7 +310,8 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     const a = corner(u0, v0, 0.07), bb = corner(u1, v0, 0.07), c = corner(u1, v1, 0.07), d = corner(u0, v1, 0.07);
     for (const [p1, p2, p3] of [[a, bb, c], [a, c, d]]) { let nrm = triNormal(p1, p2, p3), x = p2, y = p3; if (nrm[1] < 0) { x = p3; y = p2; nrm = [-nrm[0], -nrm[1], -nrm[2]]; } pushTri(Y, p1, x, y, nrm, gc, null, 0); }
     // גדר: קיר נמוך 0.9–1.3 מ' סביב הגינה, שער 1.4 מ' בצד הפונה לכביש
-    const wc = YCOL.wall[(I.seed >> 2) % 4], gtc = YCOL.gate[(I.seed >> 4) % 3], fh = 0.9 + 0.4 * TY.rnd(I.seed, 53), th = 0.16;
+    const r57 = TY.rnd(I.seed, 57), style = r57 < 0.30 ? 0 : r57 < 0.48 ? 1 : r57 < 0.78 ? 2 : 3;   // 0 קיר טיח · 1 קיר אבן · 2 קיר נמוך + גדר חיה · 3 גדר חיה בלבד
+    const wc = style === 1 ? YCOL.wall[1] : YCOL.wall[[0, 3, 0, 2][(I.seed >> 2) % 4]], gtc = YCOL.gate[(I.seed >> 4) % 3], fh = 0.9 + 0.4 * TY.rnd(I.seed, 53), th = style === 1 ? 0.3 : 0.16;
     const sides = [[u0, v0, u1, v0, 0, -1], [u1, v0, u1, v1, 1, 0], [u1, v1, u0, v1, 0, 1], [u0, v1, u0, v0, -1, 0]];
     let gs = -1, gd = 1e9;
     for (let s = 0; s < 4; s++) { const [su0, sv0, su1, sv1, nu, nv] = sides[s]; const m = P2(o, (su0 + su1) / 2 + nu * 4, (sv0 + sv1) / 2 + nv * 4); const r = W.onRoad(m[0], m[1]); if (r) { const d2 = 0; if (d2 < gd) { gd = d2; gs = s; break; } } }
@@ -312,7 +320,12 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
       const [su0, sv0, su1, sv1, nu, nv] = sides[s], L = Math.hypot(su1 - su0, sv1 - sv0); if (L < 0.5) continue;
       const segs = s === gs && L > 3 ? [[0, L / 2 - 0.7], [L / 2 + 0.7, L]] : [[0, L]];
       const du = (su1 - su0) / L, dv = (sv1 - sv0) / L;
-      for (const [s0, s1] of segs) fenceSeg(Y, o, su0 + du * s0, sv0 + dv * s0, su0 + du * s1, sv0 + dv * s1, nu, nv, fh, th, wc, H);
+      for (const [s0, s1] of segs) {
+        const ua = su0 + du * s0, va = sv0 + dv * s0, ub = su0 + du * s1, vb = sv0 + dv * s1;
+        if (style !== 3) fenceSeg(Y, o, ua, va, ub, vb, nu, nv, style === 2 ? 0.6 : fh, th, wc, H);          // קיר טיח/אבן (נמוך כשיש גדר חיה מאחוריו)
+        if (style >= 2) { const ins = style === 2 ? 0.55 : 0.05, hc = HEDGE[(I.seed >> 5) % 3];                // גדר חיה (שיחים), בפנים
+          fenceSeg(Y, o, ua - nu * ins + du * 0.3, va - nv * ins + dv * 0.3, ub - nu * ins - du * 0.3, vb - nv * ins - dv * 0.3, nu, nv, 1.35 + 0.35 * TY.rnd(I.seed, 55 + s), 0.65, hc, H); }
+      }
       if (s === gs && L > 3) { // שער: לוח מתכת כהה בפתח
         const g0 = P2(o, su0 + du * (L / 2 - 0.7), sv0 + dv * (L / 2 - 0.7)), g1 = P2(o, su0 + du * (L / 2 + 0.7), sv0 + dv * (L / 2 + 0.7)), y0 = H(g0[0], g0[1]) + 0.05, y1 = y0 + fh + 0.25;
         const nn = P2(o, nu, nv);
@@ -405,24 +418,27 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
   let _m, _q, _v, _s, _up;
   function nearBuild() {
     const w = S.world, THREE = w.THREE, P = w.player.pos, c = cap(), TY = S.TY, W = w.data.W;
-    const R = Math.max(c.kitR, c.balcR); if (!R) { for (const k in S.kit) S.kit[k].count = 0; if (S.balc) S.balc.count = 0; return; }
-    const key = Math.round(P.x / 40) + ',' + Math.round(P.z / 40) + '|' + S.tiles.size + '|' + w.quality.tier; if (key === S.nearKey) return; S.nearKey = key;
-    if (!_m) { _m = new THREE.Matrix4(); _q = new THREE.Quaternion(); _v = new THREE.Vector3(); _s = new THREE.Vector3(1, 1, 1); _up = new THREE.Vector3(0, 1, 0); }
-    const cand = { solar: [], tank: [], ac: [], stair: [] }, bal = [];
-    const blds = W.near(P.x, P.z, R);
-    const list = blds.slice().sort((a, b) => ((a.cx - P.x) ** 2 + (a.cz - P.z) ** 2) - ((b.cx - P.x) ** 2 + (b.cz - P.z) ** 2));
+    const R = Math.max(c.kitR, c.balcR);
+    const key = Math.round(P.x / 40) + ',' + Math.round(P.z / 40) + '|' + S.tiles.size + '|' + w.quality.tier + '|' + S.capScale.toFixed(2); if (key === S.nearKey) return; S.nearKey = key;
+    if (!_m) { _m = new THREE.Matrix4(); _q = new THREE.Quaternion(); _v = new THREE.Vector3(); _s = new THREE.Vector3(1, 1, 1); _up = new THREE.Vector3(0, 1, 0); _c = new THREE.Color(); }
+    const cand = { solar: [], tank: [], ac: [], stair: [] }, F = { bal: [], bars: [], wallac: [], awn: [] };
+    const list = R ? W.near(P.x, P.z, R).slice().sort((a, b) => ((a.cx - P.x) ** 2 + (a.cz - P.z) ** 2) - ((b.cx - P.x) ** 2 + (b.cz - P.z) ** 2)) : [];
     for (const b of list) {
       const I = b._yz; if (!I) continue; const d = Math.hypot(b.cx - P.x, b.cz - P.z);
       if (d < c.kitR && !I.pitched) roofKitFor(b, I, cand);
-      if (d < c.balcR && [TY.T.WALKUP, TY.T.RAKEVET, TY.T.BLOCK, TY.T.TOWER].includes(I.code)) balconiesFor(b, I, bal);
+      if (d < c.balcR) facadeProps(b, I, F);
     }
-    for (const kd of ['solar', 'tank', 'ac', 'stair']) { const im = S.kit[kd], a = cand[kd], n = Math.min(a.length / 4, c[kd]);
-      for (let i = 0; i < n; i++) { _q.setFromAxisAngle(_up, a[i * 4 + 3]); _v.set(a[i * 4], a[i * 4 + 1], a[i * 4 + 2]); _s.set(1, 1, 1); _m.compose(_v, _q, _s); im.setMatrixAt(i, _m); }
-      im.count = n; im.instanceMatrix.needsUpdate = true; im.computeBoundingSphere(); }
-    const nb = Math.min(bal.length / 5, c.balc);
-    for (let i = 0; i < nb; i++) { _q.setFromAxisAngle(_up, bal[i * 5 + 3]); _v.set(bal[i * 5], bal[i * 5 + 1], bal[i * 5 + 2]); _s.set(bal[i * 5 + 4], 1, 1); _m.compose(_v, _q, _s); S.balc.setMatrixAt(i, _m); }
-    S.balc.count = nb; S.balc.instanceMatrix.needsUpdate = true; S.balc.computeBoundingSphere();
+    const put = (im, arr, stride, cap, colOf) => { const n = Math.min(arr.length / stride, cap);
+      for (let i = 0; i < n; i++) { const o = i * stride; _q.setFromAxisAngle(_up, arr[o + 3]); _v.set(arr[o], arr[o + 1], arr[o + 2]); _s.set(stride > 4 ? arr[o + 4] : 1, 1, 1); _m.compose(_v, _q, _s); im.setMatrixAt(i, _m);
+        if (colOf) { _c.setRGB(...colOf(arr, o)); im.setColorAt(i, _c); } }
+      im.count = n; im.instanceMatrix.needsUpdate = true; if (im.instanceColor) im.instanceColor.needsUpdate = true; im.computeBoundingSphere(); };
+    for (const kd of ['solar', 'tank', 'ac', 'stair']) put(S.kit[kd], cand[kd], 4, c[kd]);
+    const colAt = (arr, o) => [arr[o + 5], arr[o + 6], arr[o + 7]];
+    put(S.balc, F.bal, 8, c.balc, colAt); put(S.bars, F.bars, 8, Math.round(c.balc * 0.8), colAt);
+    put(S.wallac, F.wallac, 4, c.wallac); put(S.awn, F.awn, 8, c.awn, colAt);
+    S.near = { kit: cand.solar.length / 4, balc: S.balc.count, bars: S.bars.count, wallac: S.wallac.count, awn: S.awn.count };
   }
+  let _c;
   function pipB(b, x, z) { return S.world.data.W.pip(b, x, z); }
   function roofKitFor(b, I, out) {
     const TY = S.TY, W = S.world.data.W, kit = TY.roofKit(I.code, I.floors, b.area, b.h, I.seed); if (!kit) return;
@@ -438,21 +454,73 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
         out[kind].push(x, y, z, kind === 'solar' ? 0 : TY.rnd(I.seed, salt + i * 5) * Math.PI * 2); placed++; } };
     tryPlace('stair', kit.stair, 1.6, 101); tryPlace('tank', kit.tank, 0.7, 211); tryPlace('solar', Math.min(kit.solar, 24), 1.15, 307); tryPlace('ac', Math.min(kit.ac, 16), 0.5, 401);
   }
-  function balconiesFor(b, I, out) {   // אותן עמודות מרפסות שהשיידר מצייר (eh זהה), לוח + מעקה תלת־ממדי למרפסות פתוחות
-    const P = S.TY.FACADE[I.code] || S.TY.FACADE[S.TY.T.WALKUP], p = b.p, n = b.n, seed = I.seed, fh = I.fh;
-    const fStart = I.flags.pil || I.flags.shop ? 1 : 1;
+  // צבע הטיח של הבניין — אותה בחירה כמו בשיידר (yzPal(eh(seed·0.011, 4.1)))
+  function plasterOf(I) { const U = S.U; if (!U || !U.uYzCum) return [0.9, 0.88, 0.84]; const pc = eh(I.seed * 0.011, 4.1), cum = U.uYzCum.value, pal = U.uYzPal.value;
+    if (I.flags.mat === 1) return LOOK.stone; for (let i = 0; i < 8; i++) if (pc < cum[i]) return [pal[i].x, pal[i].y, pal[i].z]; return [pal[7].x, pal[7].y, pal[7].z]; }
+  const BARS = [[0.16, 0.17, 0.18], [0.92, 0.92, 0.90], [0.30, 0.24, 0.20], [0.55, 0.57, 0.58]];
+  const GLASS = [0.52, 0.62, 0.66];
+  const AWN = [[0.72, 0.16, 0.14], [0.12, 0.42, 0.26], [0.16, 0.30, 0.56], [0.86, 0.76, 0.52], [0.40, 0.40, 0.42], [0.86, 0.46, 0.16]];
+  /* מאפייני חזית תלת־ממדיים ליד השחקן — באותן עמודות/קומות שהשיידר מצייר (eh + אותו גיוון לכל בניין):
+     מרפסות פתוחות עם מעקה (טיח בגוון הבניין / מוטות מתכת / זכוכית — לפי בניין), מזגנים תלויים מתחת לחלון, סוככי חנויות מול שדרות. */
+  function facadeProps(b, I, F) {
+    const TY = S.TY, T = TY.T, P = TY.FACADE[I.code] || TY.FACADE[T.WALKUP], p = b.p, n = b.n, seed = I.seed, fh = I.fh, W = S.world.data.W;
+    const resid = [T.WALKUP, T.RAKEVET, T.BLOCK, T.TOWER, T.VILLA].includes(I.code);
+    const bay = P.bay * (0.88 + 0.26 * eh(seed * 0.017, 21.0)), ww = P.ww * (0.84 + 0.32 * eh(seed * 0.023, 22.0)), balP = P.balc * (0.70 + 0.60 * eh(seed * 0.047, 28.0));
+    const rk = eh(seed * 0.059, 30.0), railType = rk < 0.42 ? 0 : rk < 0.80 ? 1 : 2;   // 0 טיח, 1 מוטות, 2 זכוכית
+    const pc = plasterOf(I), barC = BARS[(seed >> 3) % 4];
+    const w2 = ww * 0.5, sl = P.sill, maxF = Math.min(I.floors, 30);
     for (let i = 0; i < n; i++) {
-      const j = (i + 1) % n, ax = p[i * 2], az = p[i * 2 + 1], dx = p[j * 2] - ax, dz = p[j * 2 + 1] - az, L = Math.hypot(dx, dz); if (L < 6) continue;
-      const nb = Math.max(1, Math.floor(L / P.bay + 0.5)), bw = L / nb, nx = -dz / L, nz = dx / L, ang = Math.atan2(-nz, nx) + Math.PI / 2;
+      const j = (i + 1) % n, ax = p[i * 2], az = p[i * 2 + 1], dx = p[j * 2] - ax, dz = p[j * 2 + 1] - az, L = Math.hypot(dx, dz); if (L < 2) continue;
+      const nb = P.ww <= 0 ? 0 : Math.max(1, Math.floor(L / bay + 0.5)), bw = L / nb, nx = -dz / L, nz = dx / L, ang = Math.atan2(nx, nz);
+      // סוככים: קיר חנויות שפונה לדרך ראשית (סוג ≥ 3)
+      if (I.flags.shop && L >= 6) { let main = false; for (const off of [5, 8, 11]) { const r = W.onRoad(ax + dx / 2 + nx * off, az + dz / 2 + nz * off); if (r && r.c >= 3) { main = true; break; } }
+        if (main) { const k = Math.max(1, Math.floor(L / 5)), aw = L / k; for (let q = 0; q < k; q++) { if (eh(q + 0.5, seed * 0.061 + 31.0) < 0.25) continue; const t = (q + 0.5) / k, col = AWN[Math.floor(eh(q + 1.5, seed * 0.067 + 32.0) * AWN.length) % AWN.length];
+          F.awn.push(ax + dx * t + nx * 0.03, b.base + 0.76 * fh, az + dz * t + nz * 0.03, ang, aw * 0.86, col[0], col[1], col[2]); } } }
+      if (!resid || !nb || L < 3) continue;
       for (let bi = 0; bi < nb; bi++) {
-        if (eh(bi + 0.37, seed * 0.013 + 2.1) >= P.balc) continue;
-        const t = (bi + 0.5) * bw / L, x = ax + dx * t, z = az + dz * t;
-        for (let fi = fStart; fi < I.floors; fi++) {
-          if (eh(bi + fi * 13.1, seed * 0.019 + 8.0) < P.closed) continue;   // מרפסת סגורה – נשארת בשיידר בלבד
-          out.push(x + nx * 0.02, b.base + fi * fh, z + nz * 0.02, ang, bw * 0.86);
+        const colBal = eh(bi + 0.37, seed * 0.013 + 2.1) <= balP, t = (bi + 0.5) * bw / L, x = ax + dx * t, z = az + dz * t;
+        for (let fi = 1; fi < maxF; fi++) {
+          if (colBal) {
+            if (eh(bi + fi * 13.1, seed * 0.019 + 8.0) <= P.closed) continue;   // מרפסת סגורה – נשארת בשיידר בלבד
+            if (I.code === T.VILLA) continue;
+            const y = b.base + fi * fh;
+            if (railType === 1) F.bars.push(x + nx * 0.02, y, z + nz * 0.02, ang, bw * 0.86, barC[0], barC[1], barC[2]);
+            else { const c = railType === 2 ? GLASS : pc; F.bal.push(x + nx * 0.02, y, z + nz * 0.02, ang, bw * 0.86, c[0], c[1], c[2]); }
+          } else if (eh(bi + fi * 3.7, seed * 0.023) < P.ac) {   // מזגן תלוי — במקום ובתנאי של המזגן המצויר בשיידר
+            const tu = (bi + 0.5 + w2 - 0.12) * bw / L; if (tu <= 0 || tu >= 1) continue;
+            F.wallac.push(ax + dx * tu + nx * 0.17, b.base + (fi + sl - 0.17) * fh - 0.06, az + dz * tu + nz * 0.17, ang);
+          }
         }
       }
     }
+  }
+  function barsGeo(THREE) {   // מרפסת עם מעקה מוטות: לוחות (v<0.5 במרקם = אטום) + מעקה (v>0.5 = מוטות שקופים-חלקית, alphaTest)
+    const P = [], N = [], C = [], U = [];
+    const quad = (a, b, c, d, col, uv) => { const n = triNormal(a, b, c); const q4 = [a, b, c, d]; for (const k of [0, 1, 2, 0, 2, 3]) { P.push(...q4[k]); N.push(...n); C.push(...col); U.push(...uv[k]); } };
+    const slab = [0.80, 0.79, 0.76], under = [0.55, 0.55, 0.53], rail = [1, 1, 1], S0 = [[0.1, 0.2], [0.2, 0.2], [0.2, 0.3], [0.1, 0.3]];
+    const w = 0.5, d = 1.05, t = 0.14, h = 1.0, nb = 9;
+    quad([-w, 0, 0], [-w, 0, d], [w, 0, d], [w, 0, 0], under, S0); quad([-w, 0, d], [-w, t, d], [w, t, d], [w, 0, d], slab, S0); quad([-w, t, 0], [w, t, 0], [w, t, d], [-w, t, d], slab, S0);
+    const R = (x0, x1) => [[x0, 0.52], [x1, 0.52], [x1, 0.98], [x0, 0.98]];
+    quad([-w, t, d], [w, t, d], [w, h, d], [-w, h, d], rail, R(0, nb));          // חזית (נראית משני הצדדים: DoubleSide)
+    quad([w, t, d], [w, t, 0], [w, h, 0], [w, h, d], rail, R(0, nb * d)); quad([-w, t, 0], [-w, t, d], [-w, h, d], [-w, h, 0], rail, R(0, nb * d));
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); g.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2)); return g;
+  }
+  function barsTex(THREE) {   // 32×32: חצי תחתון אטום לבן; חצי עליון: מעקה עליון/תחתון + מוט אנכי אחד לכל יחידת u
+    const c = document.createElement('canvas'); c.width = c.height = 32; const x = c.getContext('2d');
+    x.fillStyle = '#fff'; x.fillRect(0, 16, 32, 16); x.clearRect(0, 0, 32, 16);
+    x.fillRect(0, 0, 32, 2); x.fillRect(0, 14, 32, 2); x.fillRect(14, 0, 4, 16);
+    const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.wrapT = THREE.ClampToEdgeWrapping; t.flipY = true; t.magFilter = THREE.NearestFilter; return t;
+  }
+  function awningGeo(THREE) {   // סוכך: רוחב 1 מ' (מוגדל לפי המפרץ), בולט 1.25 מ' ויורד 0.45 מ', שוליים 0.22 מ', צדדים משולשים
+    const P = [], N = [], C = [];
+    const tri = (a, b, c, col) => { const n = triNormal(a, b, c); for (const q of [a, b, c]) { P.push(...q); N.push(...n); C.push(...col); } };
+    const top = [1, 1, 1], dark = [0.72, 0.72, 0.72], w = 0.5, d = 1.25, dy = -0.45, v = -0.22;
+    const A = [-w, 0, 0], B = [w, 0, 0], Cc = [w, dy, d], D = [-w, dy, d], E = [w, dy + v, d], Fq = [-w, dy + v, d];
+    tri(A, D, Cc, top); tri(A, Cc, B, top); tri(A, B, Cc, dark); tri(A, Cc, D, dark);
+    tri(D, Fq, E, top); tri(D, E, Cc, top);
+    tri([w, 0, 0], [w, dy, d], [w, 0, 0.02], top); tri([w, 0, 0], [w, dy, 0.02], [w, dy, d], top);
+    tri([-w, 0, 0], [-w, 0, 0.02], [-w, dy, d], top); tri([-w, 0, 0], [-w, dy, d], [-w, dy, 0.02], top);
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(N, 3)); g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3)); return g;
   }
   function balconyGeo(THREE) {   // לוח 1×1.05 מ' (רוחב מוגדל לפי המפרץ) + מעקה טיח 1.0 מ' — בולט ב-+z מקומי
     const P = [], N = [], C = [];
@@ -568,6 +636,7 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     scripts: [BASE + '../_common/mathooks.js', BASE + 'dept/typology.js', BASE + 'dept/landmarks.js', BASE + 'dept/facades.js'],
     requires: () => !!(window.ESHBuildings && ESHBuildings.typology && ESHBuildings.landmarks && ESHBuildings.facades && window.YZMAT),
     async init(world, api) {
+      S.stats = { tiles: 0, buildings: 0, byCode: {}, byBasis: {}, villas: 0, yards: 0, pitched: 0, shops: 0, landmarks: 0, dekel: 0, buildMs: 0 }; S.tileHints.clear(); S.capScale = 1; S.nearKey = '';
       S.world = world; S.api = api; S.on = true; S.TY = ESHBuildings.typology; S.LM = ESHBuildings.landmarks; S.FX = ESHBuildings.facades;
       const THREE = world.THREE;
       S.dekel = await (await fetch(BASE + 'dekel.json')).json();
@@ -577,6 +646,10 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
       const CAPMAX = CAPS.high;
       for (const kd of ['solar', 'tank', 'ac', 'stair']) { const m = new THREE.InstancedMesh(S.FX.kitGeometry(THREE, kd), S.mats.kit, CAPMAX[kd]); m.count = 0; m.name = 'yz-kit-' + kd; m.castShadow = true; g.add(m); S.kit[kd] = m; }
       S.balc = new THREE.InstancedMesh(balconyGeo(THREE), S.mats.kit, CAPMAX.balc); S.balc.count = 0; S.balc.name = 'yz-balcony'; S.balc.castShadow = true; g.add(S.balc);
+      S.bars = new THREE.InstancedMesh(barsGeo(THREE), S.mats.rail, CAPMAX.balc); S.bars.count = 0; S.bars.name = 'yz-balcony-bars'; g.add(S.bars);
+      S.wallac = new THREE.InstancedMesh(S.FX.kitGeometry(THREE, 'ac'), S.mats.kit, CAPMAX.wallac); S.wallac.count = 0; S.wallac.name = 'yz-wall-ac'; g.add(S.wallac);
+      S.awn = new THREE.InstancedMesh(awningGeo(THREE), S.mats.awning, CAPMAX.awn); S.awn.count = 0; S.awn.name = 'yz-awning'; S.awn.castShadow = true; g.add(S.awn);
+      api.on('budget', () => { S.capScale = Math.max(0.3, S.capScale * 0.7); S.nearKey = ''; });
       buildStandalone();
       api.eachTile((t, kind) => onTile(t, kind));
       api.on('quality', () => { const lite = cap().lite, m = S.mats.facade; if (!!(m.defines && m.defines.ESH_LITE) !== lite) { if (lite) m.defines.ESH_LITE = 1; else delete m.defines.ESH_LITE; m.needsUpdate = true; } S.nearKey = ''; for (const r of S.tiles.values()) syncTileVis(r.t); });
@@ -589,6 +662,7 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     update(dt, world) {
       if (S.U) { S.U.uNight.value = S.TY.nightFactor(world.sun.elevation); if (world.clock.date) S.U.uLit.value = S.TY.litFraction(israelHour(world.clock.date)); }
       S.nearT -= dt; if (S.nearT <= 0) { S.nearT = 0.8; nearBuild(); }
+      S.capT += dt; if (S.capT > 12) { S.capT = 0; const st = world.stats, bu = world.quality.budget; if (S.capScale < 1 && st.tris < bu.tris * 0.8 && st.calls < bu.calls * 0.85) { S.capScale = Math.min(1, S.capScale * 1.15); S.nearKey = ''; } }
       if (S.stand) { const W = world.data.W; let moved = false; for (const s of S.LM.STANDALONE) { const sp = W.toScene(s.itm[0], s.itm[1]), gy = Math.max(0, W.H(sp.x, sp.z)); if (S.standGY[s.key] == null) S.standGY[s.key] = gy; else if (Math.abs(S.standGY[s.key] - gy) > 0.5) moved = true; } if (moved) { world.scene.getObjectByName('standalone').remove(S.stand); S.stand.geometry.dispose(); buildStandalone(); } }
       updLabels();
     },
@@ -603,9 +677,9 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
         for (const k of ['solar', 'palms']) if (t[k]) { t.grp.remove(t[k]); t[k].traverse(o => { if (o.isInstancedMesh) o.dispose(); }); t[k] = null; }
         if (t.blds) for (const b of t.blds) delete b._yz; t.lod = -1; }
       S.tiles.clear();
-      const Y = window.YZMAT; if (Y) for (const s of ['buildings.facade', 'buildings.roofTile', 'buildings.yard', 'buildings.kit']) Y.withdraw(s);
+      const Y = window.YZMAT; if (Y) for (const s of ['buildings.facade', 'buildings.roofTile', 'buildings.yard', 'buildings.kit', 'buildings.rail', 'buildings.awning']) Y.withdraw(s);
       for (const k in S.mats || {}) { try { S.mats[k].dispose(); } catch (e) { /* */ } }
-      S.kit = {}; S.balc = null; S.stand = null; S.U = null;
+      S.kit = {}; S.balc = S.bars = S.wallac = S.awn = null; S.stand = null; S.U = null;
       delete window.YZBuildings;
     },
     settings: [

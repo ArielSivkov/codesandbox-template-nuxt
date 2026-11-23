@@ -363,7 +363,7 @@ function sunSky(elevDeg, aer = CLEAN_AEROSOL, cloud = 0) {
   return { direct, directH: direct * s, diffuse, total: direct * s + diffuse, sunRGB: rel.map((v) => v / m), T };
 }
 function skyChroma(elevDeg, haze = 0, dustTint = [0.82, 0.62, 0.38]) {
-  const day = [0.55, 0.72, 1], low = [0.86, 0.84, 0.92], blue = [0.36, 0.48, 1], night = [0.42, 0.5, 0.75];
+  const day = [0.55, 0.72, 1], low = [0.64, 0.77, 1], blue = [0.36, 0.48, 1], night = [0.42, 0.5, 0.75];
   let c;
   if (elevDeg >= 12) c = day;
   else if (elevDeg >= 2) c = day.map((v, i) => lerp(low[i], v, (elevDeg - 2) / 10));
@@ -399,9 +399,11 @@ function adaptationLux({ sunElev, aer = CLEAN_AEROSOL, cloud = 0, moonElev = -90
   const mE = moonIlluminance(moonElev, moonPhaseAngle, aer) * Math.max(0, Math.sin(moonElev * D2R2)) * (1 - 0.8 * cloud);
   return ss.total + mE + cityLux;
 }
-var EXPOSURE = { key: 0.62, ref: 11e4, p: 0.8, max: 9e3 };
+var EXPOSURE = { key: 0.62, ref: 11e4, pDay: 0.9, E1: 1e3, pNight: 0.727, max: 9e3 };
 function exposureFor(Elux, o = EXPOSURE) {
-  const e = o.key * Math.pow(o.ref / Math.max(Elux, 1e-4), o.p);
+  const E = Math.max(Elux, 1e-4);
+  const e1 = o.key * Math.pow(o.ref / o.E1, o.pDay);
+  const e = E >= o.E1 ? o.key * Math.pow(o.ref / E, o.pDay) : e1 * Math.pow(o.E1 / E, o.pNight);
   return clamp(e, o.key * 0.8, o.max);
 }
 function phaseHe(elev) {
@@ -770,9 +772,9 @@ function grade(rgb) {
   let [r, g, b] = rgb;
   const L = lum([r, g, b]);
   const sh = Math.max(0, 1 - L / 0.45), hl = Math.max(0, (L - 0.55) / 0.45);
-  r += -0.01 * sh + 0.02 * hl;
-  g += 4e-3 * sh + 8e-3 * hl;
-  b += 0.015 * sh - 0.012 * hl;
+  r += -0.02 * sh + 0.025 * hl;
+  g += 4e-3 * sh + 0.01 * hl;
+  b += 0.04 * sh - 0.015 * hl;
   const mx = Math.max(r, g, b), mn = Math.min(r, g, b), C = mx - mn;
   let hue = 0;
   if (C > 1e-6) {
@@ -901,15 +903,15 @@ var add = (a, b) => a.map((v, i) => v + b[i]);
 var mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
 var SODIUM = norm(hexToLinear(LAMP_TYPES.sodium.color));
 var LED = norm(hexToLinear(LAMP_TYPES.led.color));
-var CITY = norm(mix(SODIUM, LED, 0.5));
-var GROUND_ALBEDO = hexToLinear("#CDBB92");
+var CITY = norm(mix(SODIUM, LED, 0.7));
+var GROUND_ALBEDO = hexToLinear("#9C9080");
 var MOON_TINT = norm(hexToLinear("#9DB4D8"));
 var W_WARM = norm(hexToLinear(FIELD_NIGHT.window_warm));
 var W_COOL = norm(hexToLinear(FIELD_NIGHT.window_cool_led));
 var W_TV = norm(hexToLinear("#9DB8FF"));
 var LOOK_TUNING = {
-  preethamGain: 0.24,
-  // Preetham radiance → our scale (matched by eye so the noon zenith ≈ #3D7CC9 target)
+  preethamGain: 0.65,
+  // Preetham radiance → our scale. Value ladder: noon zenith displays ≈ #4682C8 (photo 044 sky at ~45°: #629BDD)
   windowRadiance: 9e-5,
   // lit window radiance (scene units) — ≈ 3 cd/m² equivalent; tuned to field photo 007/008
   lampSprite: 16e-4,
@@ -918,7 +920,12 @@ var LOOK_TUNING = {
   // peak illuminance under a lamp head (Israeli street lighting ~10–30 lux; SI 20.3 / EN 13201 classes)
   moonSky: 0.03,
   cityGlowSky: 0.022,
-  cloudCity: 0.8
+  cloudCity: 2,
+  // night clouds 3–5× the gaps between them (photos 006/008/013)
+  urbanSunlitGround: 0.35,
+  // share of the ground bounce that carries direct sun (street canyons: most ground a wall sees is shaded)
+  twilightSky: 1.6
+  // twilight dome radiance factor (blue hour zenith ≈ 1–1.5× a white wall, as in photographs)
 };
 function lightsOnFor(Elux) {
   return 1 - smooth2(25, 120, Elux);
@@ -941,7 +948,7 @@ function computeLook({ ms, site = ASHDOD, aq = AQ_PRESETS.clean, weather = {} })
   const sun = { dir: S.sunDir, color: ss.sunRGB, intensity: ss.direct / LUX_UNIT };
   const moon = { dir: S.moonDir, color: MOON_TINT, intensity: mEn / LUX_UNIT * smooth2(-2, -8, sunElev) };
   const skyIrr = add(mul(chroma, ss.diffuse / LUX_UNIT), add(mul(MOON_TINT, mEh * 0.08 / LUX_UNIT), mul(CITY, cityLux * 0.35 / LUX_UNIT)));
-  const groundIrr = add(mul(GROUND_ALBEDO, (ss.total + mEh) / LUX_UNIT), mul(CITY, cityLux * 0.9 / LUX_UNIT));
+  const groundIrr = add(GROUND_ALBEDO.map((a, i) => a * (ss.sunRGB[i] * ss.directH * LOOK_TUNING.urbanSunlitGround + chroma[i] * ss.diffuse + MOON_TINT[i] * mEh) / LUX_UNIT), mul(CITY, cityLux * 0.9 / LUX_UNIT));
   const visW = weather.visibility_m && isFinite(weather.visibility_m) ? weather.visibility_m : Infinity;
   const beta = Math.max(atm.beta, 3.912 / visW, rain * 3.912 / 8e3);
   const hazeAlb = ((c) => {
@@ -979,7 +986,7 @@ function computeLook({ ms, site = ASHDOD, aq = AQ_PRESETS.clean, weather = {} })
     mieCoefficient: 4e-3 + 0.02 * haze,
     mieG: 0.8 - 0.1 * dust,
     sunDisc: clamp(Math.exp(-(atm.tau550 - CLEAN_AEROSOL.tau550) * 2), 0.02, 1) * (1 - 0.95 * cloud),
-    twi: twiE * (1 - smooth2(-1, 5, sunElev)) * 0.55,
+    twi: twiE * (1 - smooth2(-1, 5, sunElev)) * LOOK_TUNING.twilightSky,
     twiSun: 0,
     nightBase: mul([0.35, 0.42, 0.65], 7e-4 / LUX_UNIT / PI),
     cityGlow: mul(CITY, cityLux * LOOK_TUNING.cityGlowSky * (1 + 3 * haze + 1.5 * cloud) / LUX_UNIT / PI),
@@ -989,12 +996,13 @@ function computeLook({ ms, site = ASHDOD, aq = AQ_PRESETS.clean, weather = {} })
     halo: 0.35 + 1.6 * cloud + 1.2 * haze,
     hazeColor: fogRad,
     hazeHorizon: 1 - Math.exp(-beta * 22e3),
-    hazeZenith: clamp(1 - Math.exp(-atm.tau550 * 0.75) - 0.06, 0, 0.97) + 0.5 * rain,
+    hazeZenith: clamp(1 - Math.exp(-Math.max(0, atm.tau550 - 0.12) * 1.3) + 0.15 * dust, 0, 0.97) + 0.5 * rain,
+    // clean: 0 · smog ≈ 0.3 · sharav ≈ 0.8 (sky turns one dusty colour)
     hazeSpread: 0.03 + 0.35 * (1 - Math.exp(-beta * 1500)),
     sunGlow,
     cloudCover: cloud,
     cloudDay: add(mul(ss.sunRGB, ss.direct / LUX_UNIT / PI * 0.22), mul(chroma, ss.diffuse / LUX_UNIT / PI * 0.6)),
-    cloudNight: add(mul(CITY, cityLux * LOOK_TUNING.cloudCity / LUX_UNIT / PI), mul([0.8, 0.85, 1], mEn * 0.9 * Math.max(0, S.moonDir.y + 0.2) / LUX_UNIT / PI))
+    cloudNight: add(mul(CITY, cityLux * LOOK_TUNING.cloudCity / LUX_UNIT / PI), mul([0.8, 0.85, 1], mEn * 2 * Math.max(0, S.moonDir.y + 0.2) / LUX_UNIT / PI))
     // city-lit bases + moonlit tops (field 006/008: clouds 3–5× the sky gaps)
   };
   sky.twiSun = smooth2(-10, -1, sunElev) * (1 - smooth2(1, 6, sunElev));
@@ -1477,7 +1485,22 @@ vec3 aces(vec3 c) {   // three.js ACESFilmicToneMapping (exposure applied by cal
   const mat3 I = mat3(vec3(0.59719, 0.07600, 0.02840), vec3(0.35458, 0.90834, 0.13383), vec3(0.04823, 0.01566, 0.83777));
   const mat3 O = mat3(vec3(1.60475, -0.10208, -0.00327), vec3(-0.53108, 1.10813, -0.07276), vec3(-0.07367, -0.00605, 1.07602));
   c = I * (c / 0.6); c = RRTAndODTFit(c); return clamp(O * c, 0.0, 1.0); }
-vec3 toSRGB(vec3 c) { return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }`
+vec3 toSRGB(vec3 c) { return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
+// AgX and Khronos PBR Neutral \u2014 copied from three.js r186 tonemapping_pars_fragment (MIT), exposure applied by the caller
+const mat3 LIN_REC2020_TO_SRGB = mat3(vec3(1.6605, -0.1246, -0.0182), vec3(-0.5876, 1.1329, -0.1006), vec3(-0.0728, -0.0083, 1.1187));
+const mat3 LIN_SRGB_TO_REC2020 = mat3(vec3(0.6274, 0.0691, 0.0164), vec3(0.3293, 0.9195, 0.0880), vec3(0.0433, 0.0113, 0.8956));
+vec3 agxContrast(vec3 x) { vec3 x2 = x * x, x4 = x2 * x2; return 15.5 * x4 * x2 - 40.14 * x4 * x + 31.96 * x4 - 6.868 * x2 * x + 0.4298 * x2 + 0.1191 * x - 0.00232; }
+vec3 agx(vec3 color) {
+  const mat3 Inset = mat3(vec3(0.856627153315983, 0.137318972929847, 0.11189821299995), vec3(0.0951212405381588, 0.761241990602591, 0.0767994186031903), vec3(0.0482516061458583, 0.101439036467562, 0.811302368396859));
+  const mat3 Outset = mat3(vec3(1.1271005818144368, -0.1413297634984383, -0.14132976349843826), vec3(-0.11060664309660323, 1.157823702216272, -0.11060664309660294), vec3(-0.016493938717834573, -0.016493938717834257, 1.2519364065950405));
+  color = Inset * (LIN_SRGB_TO_REC2020 * color); color = clamp((log2(max(color, 1e-10)) + 12.47393) / (4.026069 + 12.47393), 0.0, 1.0);
+  color = Outset * agxContrast(color); color = pow(max(vec3(0.0), color), vec3(2.2)); return clamp(LIN_REC2020_TO_SRGB * color, 0.0, 1.0); }
+vec3 neutralTM(vec3 color) {
+  const float StartCompression = 0.8 - 0.04; const float Desaturation = 0.15;
+  float x = min(color.r, min(color.g, color.b)); float offset = x < 0.08 ? x - 6.25 * x * x : 0.04; color -= offset;
+  float peak = max(color.r, max(color.g, color.b)); if (peak < StartCompression) return color;
+  float d = 1. - StartCompression; float newPeak = 1. - d * d / (peak + d - StartCompression); color *= newPeak / peak;
+  float g = 1. - 1. / (Desaturation * (peak - newPeak) + 1.); return mix(color, vec3(newPeak), g); }`
 );
 var AtmoPost = class {
   constructor(THREE, renderer, { lut } = {}) {
@@ -1516,6 +1539,7 @@ var AtmoPost = class {
       far: { value: 1e3 },
       res: { value: new THREE.Vector2(1, 1) },
       wb: { value: new THREE.Vector3(1, 1, 1) },
+      tm: { value: 0 },
       grain: { value: 0 },
       lift: { value: new THREE.Vector3(0, 0, 0) },
       feedback: { value: 0 },
@@ -1534,7 +1558,7 @@ var AtmoPost = class {
         `
         precision highp sampler3D;
         uniform sampler2D tColor, tDepth, tBloom, tPrev; uniform sampler3D tLut;
-        uniform float exposure, lutAmt, bloomAmt, aoAmt, near, far, grain, feedback, time, vign, sat; uniform vec2 res; uniform vec3 lift, wb; varying vec2 vUv;
+        uniform float exposure, lutAmt, bloomAmt, aoAmt, near, far, grain, feedback, time, vign, sat, tm; uniform vec2 res; uniform vec3 lift, wb; varying vec2 vUv;
         ${ACES}
         float lin(float z) { return near * far / (far - z * (far - near)); }
         float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233)) + time * 0.1) * 43758.5453); }
@@ -1550,7 +1574,7 @@ var AtmoPost = class {
           }
           c *= exposure * wb;
           if (bloomAmt > 0.0) c += texture2D(tBloom, vUv).rgb * bloomAmt;
-          c = aces(c);
+          c = tm > 1.5 ? clamp(neutralTM(c), 0.0, 1.0) : tm > 0.5 ? agx(c) : aces(c);
           float L = dot(c, vec3(0.2126, 0.7152, 0.0722)); c = mix(vec3(L), c, sat);
           c = c + lift * (1.0 - smoothstep(0.0, 0.25, L));
           vec3 s = toSRGB(clamp(c, 0.0, 1.0));
@@ -1572,6 +1596,58 @@ var AtmoPost = class {
     this.copy = mk("uniform sampler2D t; varying vec2 vUv; void main(){ gl_FragColor = texture2D(t, vUv); }");
     this.levels = [];
     this.phoneWB = [1, 1, 1];
+    this.toneMapper = null;
+    this.paint = { radius: 4, alpha: 1, q: 8, zeroCross: 0.58, amount: 0.85, vibration: 1, canvas: 1 };
+    const mk2 = (fs, u) => new THREE.ShaderMaterial({ uniforms: u, vertexShader: FS_QUAD_VS, fragmentShader: fs, depthTest: false, depthWrite: false, toneMapped: false });
+    this.tensor = mk2(`uniform sampler2D t; uniform vec2 texel; varying vec2 vUv;
+      vec3 S(float x, float y) { return texture2D(t, vUv + vec2(x, y) * texel).rgb; }
+      void main() { vec3 fx = (-S(-1.,-1.) - 2.0 * S(-1.,0.) - S(-1.,1.) + S(1.,-1.) + 2.0 * S(1.,0.) + S(1.,1.)) * 0.25;
+        vec3 fy = (-S(-1.,-1.) - 2.0 * S(0.,-1.) - S(1.,-1.) + S(-1.,1.) + 2.0 * S(0.,1.) + S(1.,1.)) * 0.25;
+        gl_FragColor = vec4(dot(fx, fx), dot(fx, fy), dot(fy, fy), 1.0); }`, { t: { value: null }, texel: { value: new THREE.Vector2() } });
+    this.tblur = mk2(`uniform sampler2D t; uniform vec2 dir; varying vec2 vUv;
+      void main() { vec4 a = texture2D(t, vUv) * 1.0; float w[4]; w[0] = 0.8825; w[1] = 0.6065; w[2] = 0.3247; w[3] = 0.1353;
+        for (int i = 0; i < 4; i++) { float o = float(i + 1); a += (texture2D(t, vUv + dir * o) + texture2D(t, vUv - dir * o)) * w[i]; }
+        gl_FragColor = a / 4.898; }`, { t: { value: null }, dir: { value: new THREE.Vector2() } });
+    this.kuwa = mk2(
+      `uniform sampler2D tColor, tTensor; uniform vec2 srcTexel; uniform float radius, alpha, q, zeta, eta; varying vec2 vUv;
+      void main() {
+        vec3 T3 = texture2D(tTensor, vUv).xyz; float E = T3.x, F = T3.y, G = T3.z, D = sqrt(max(0.0, (E - G) * (E - G) + 4.0 * F * F));
+        float l1 = 0.5 * (E + G + D), l2 = 0.5 * (E + G - D);
+        vec2 tv = vec2(l1 - E, -F); vec2 dv = length(tv) > 1e-7 ? normalize(tv) : vec2(0.0, 1.0);
+        float phi = -atan(dv.y, dv.x), A = (l1 + l2 > 1e-7) ? (l1 - l2) / (l1 + l2) : 0.0;
+        float a = radius * clamp((alpha + A) / alpha, 0.1, 2.0), b = radius * clamp(alpha / (alpha + A), 0.1, 2.0);
+        float cp = cos(phi), sp = sin(phi); mat2 SR = mat2(0.5 / a, 0.0, 0.0, 0.5 / b) * mat2(cp, -sp, sp, cp);
+        float mx = sqrt(a * a * cp * cp + b * b * sp * sp), my = sqrt(a * a * sp * sp + b * b * cp * cp);
+        vec4 m[8]; vec3 s[8]; for (int k = 0; k < 8; k++) { m[k] = vec4(0.0); s[k] = vec3(0.0); }
+        for (int j = -8; j <= 8; j++) { if (abs(float(j)) > my) continue;
+          for (int i = -8; i <= 8; i++) { if (abs(float(i)) > mx) continue;
+            vec2 v = SR * vec2(float(i), float(j)); if (dot(v, v) > 0.25) continue;
+            vec3 c = texture2D(tColor, vUv + vec2(float(i), float(j)) * srcTexel * 2.0).rgb;
+            float w[8], z, vxx, vyy, sum = 0.0;
+            vxx = zeta - eta * v.x * v.x; vyy = zeta - eta * v.y * v.y;
+            z = max(0.0, v.y + vxx); w[0] = z * z; z = max(0.0, -v.x + vyy); w[2] = z * z; z = max(0.0, -v.y + vxx); w[4] = z * z; z = max(0.0, v.x + vyy); w[6] = z * z;
+            vec2 u = 0.70710678 * vec2(v.x - v.y, v.x + v.y); vxx = zeta - eta * u.x * u.x; vyy = zeta - eta * u.y * u.y;
+            z = max(0.0, u.y + vxx); w[1] = z * z; z = max(0.0, -u.x + vyy); w[3] = z * z; z = max(0.0, -u.y + vxx); w[5] = z * z; z = max(0.0, u.x + vyy); w[7] = z * z;
+            for (int k = 0; k < 8; k++) sum += w[k];
+            float g = exp(-3.125 * dot(v, v)) / max(sum, 1e-6);
+            for (int k = 0; k < 8; k++) { float wk = w[k] * g; m[k] += vec4(c * wk, wk); s[k] += c * c * wk; } } }
+        vec4 o = vec4(0.0);
+        for (int k = 0; k < 8; k++) { if (m[k].w <= 1e-6) continue; vec3 mu = m[k].rgb / m[k].w; vec3 var = abs(s[k] / m[k].w - mu * mu);
+          float wgt = 1.0 / (1.0 + pow(1000.0 * (var.r + var.g + var.b), 0.5 * q)); o += vec4(mu * wgt, wgt); }
+        gl_FragColor = vec4(o.w > 0.0 ? o.rgb / o.w : texture2D(tColor, vUv).rgb, 1.0); }`,
+      { tColor: { value: null }, tTensor: { value: null }, srcTexel: { value: new THREE.Vector2() }, radius: { value: 4 }, alpha: { value: 1 }, q: { value: 8 }, zeta: { value: 0.25 }, eta: { value: 3.6 } }
+    );
+    this.paintOut = mk2(
+      `uniform sampler2D tPaint, tSharp; uniform vec2 res; uniform float amt, vib, canvas; varying vec2 vUv;
+      float h21(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+      void main() { vec3 p = texture2D(tPaint, vUv).rgb, o = texture2D(tSharp, vUv).rgb; vec2 px = vUv * res;
+        vec2 cell = floor(px / 3.0); float h = h21(cell), h2 = h21(cell + 17.0);
+        float L = dot(p, vec3(0.299, 0.587, 0.114)); vec3 ch = p - L, k = vec3(0.57735); float an = (h - 0.5) * 0.14 * vib;
+        ch = ch * cos(an) + cross(k, ch) * sin(an) + k * dot(k, ch) * (1.0 - cos(an)); p = L + ch; p *= 1.0 + (h2 - 0.5) * 0.04 * vib;
+        p += canvas * (sin(px.x * 1.3) * sin(px.y * 1.3) * 0.012 + (h21(floor(px)) - 0.5) * 0.012);
+        gl_FragColor = vec4(clamp(mix(o, p, amt), 0.0, 1.0), 1.0); }`,
+      { tPaint: { value: null }, tSharp: { value: null }, res: { value: new THREE.Vector2(1, 1) }, amt: { value: 0.85 }, vib: { value: 1 }, canvas: { value: 1 } }
+    );
   }
   _alloc() {
     const T = this.T;
@@ -1581,7 +1657,7 @@ var AtmoPost = class {
     const dt = this.tier === "high" ? new T.DepthTexture(W, H) : null;
     this.hdr = new T.WebGLRenderTarget(W, H, { type: T.HalfFloatType, samples: 4, depthTexture: dt, depthBuffer: true });
     this.U.res.value.set(W, H);
-    const wantBloom = this.tier === "high" || this.profile === "phone";
+    const wantBloom = this.tier === "high" || this.profile === "phone" || this.profile === "impression";
     if (wantBloom) {
       let w = W >> 1, h = H >> 1;
       for (let i = 0; i < 5; i++) {
@@ -1590,13 +1666,19 @@ var AtmoPost = class {
         h >>= 1;
       }
     }
-    if (this.profile === "phone") {
+    if (this.profile === "phone" || this.profile === "impression") {
       this.ldrA = new T.WebGLRenderTarget(W, H, { depthBuffer: false });
       this.ldrB = new T.WebGLRenderTarget(W, H, { depthBuffer: false });
     }
+    if (this.profile === "impression") {
+      const w2 = Math.max(1, W >> 1), h2 = Math.max(1, H >> 1);
+      this.tenA = new T.WebGLRenderTarget(w2, h2, { type: T.HalfFloatType, depthBuffer: false });
+      this.tenB = new T.WebGLRenderTarget(w2, h2, { type: T.HalfFloatType, depthBuffer: false });
+      this.paintRT = new T.WebGLRenderTarget(w2, h2, { depthBuffer: false });
+    }
   }
   _free() {
-    for (const k of ["hdr", "ldrA", "ldrB"]) {
+    for (const k of ["hdr", "ldrA", "ldrB", "tenA", "tenB", "paintRT"]) {
       if (this[k]) {
         this[k].depthTexture && this[k].depthTexture.dispose();
         this[k].dispose();
@@ -1626,8 +1708,9 @@ var AtmoPost = class {
   }
   render(scene, camera, exposure, time = 0) {
     const r = this.r, T = this.T;
+    const tmName = this.toneMapper || (this.profile === "impression" ? "agx" : "aces");
     if (this.tier === "low" || !this.hdr) {
-      r.toneMapping = T.ACESFilmicToneMapping;
+      r.toneMapping = tmName === "agx" ? T.AgXToneMapping : tmName === "neutral" ? T.NeutralToneMapping : T.ACESFilmicToneMapping;
       r.toneMappingExposure = exposure;
       r.setRenderTarget(null);
       r.render(scene, camera);
@@ -1636,7 +1719,8 @@ var AtmoPost = class {
     r.toneMapping = T.NoToneMapping;
     r.setRenderTarget(this.hdr);
     r.render(scene, camera);
-    const U = this.U, phone = this.profile === "phone";
+    const U = this.U, phone = this.profile === "phone", imp = this.profile === "impression";
+    U.tm.value = tmName === "agx" ? 1 : tmName === "neutral" ? 2 : 0;
     U.tColor.value = this.hdr.texture;
     U.exposure.value = exposure;
     U.time.value = time;
@@ -1664,14 +1748,14 @@ var AtmoPost = class {
         this.r.autoClear = true;
       }
       U.tBloom.value = L[0].texture;
-      U.bloomAmt.value = phone ? 0.38 : 0.2;
+      U.bloomAmt.value = phone ? 0.38 : imp ? 0.28 : 0.2;
     } else U.bloomAmt.value = 0;
     U.lutAmt.value = this.lut ? phone ? 0.5 : 1 : 0;
     U.grain.value = phone ? 0.06 : 0;
     U.wb.value.set(...phone ? this.phoneWB : [1, 1, 1]);
-    U.sat.value = phone ? 0.9 : 1;
-    U.vign.value = phone ? 0.35 : 0.16;
-    U.lift.value.set(phone ? 0.01 : 0, phone ? 0.016 : 0, phone ? 0.034 : 0);
+    U.sat.value = phone ? 0.9 : imp ? 1.1 : 1;
+    U.vign.value = phone ? 0.35 : imp ? 0.2 : 0.16;
+    U.lift.value.set(phone ? 25e-4 : 0, phone ? 4e-3 : 0, phone ? 0.01 : 0);
     if (phone) {
       U.tPrev.value = this.ldrB.texture;
       U.feedback.value = 0.28;
@@ -1681,6 +1765,37 @@ var AtmoPost = class {
       const t = this.ldrA;
       this.ldrA = this.ldrB;
       this.ldrB = t;
+    } else if (imp) {
+      U.feedback.value = 0;
+      this._pass(this.comp, this.ldrA);
+      const P = this.paint, z = 1 / Math.max(1, P.radius), sz = Math.sin(P.zeroCross);
+      this.tensor.uniforms.t.value = this.ldrA.texture;
+      this.tensor.uniforms.texel.value.set(1 / this.ldrA.width, 1 / this.ldrA.height);
+      this._pass(this.tensor, this.tenA);
+      this.tblur.uniforms.t.value = this.tenA.texture;
+      this.tblur.uniforms.dir.value.set(1 / this.tenA.width, 0);
+      this._pass(this.tblur, this.tenB);
+      this.tblur.uniforms.t.value = this.tenB.texture;
+      this.tblur.uniforms.dir.value.set(0, 1 / this.tenA.height);
+      this._pass(this.tblur, this.tenA);
+      const K = this.kuwa.uniforms;
+      K.tColor.value = this.ldrA.texture;
+      K.tTensor.value = this.tenA.texture;
+      K.srcTexel.value.set(1 / this.ldrA.width, 1 / this.ldrA.height);
+      K.radius.value = P.radius;
+      K.alpha.value = P.alpha;
+      K.q.value = P.q;
+      K.zeta.value = z;
+      K.eta.value = (z + Math.cos(P.zeroCross)) / (sz * sz);
+      this._pass(this.kuwa, this.paintRT);
+      const O = this.paintOut.uniforms;
+      O.tPaint.value = this.paintRT.texture;
+      O.tSharp.value = this.ldrA.texture;
+      O.res.value.set(this.ldrA.width, this.ldrA.height);
+      O.amt.value = P.amount;
+      O.vib.value = P.vibration;
+      O.canvas.value = P.canvas;
+      this._pass(this.paintOut, null);
     } else {
       U.feedback.value = 0;
       this._pass(this.comp, null);
@@ -1689,7 +1804,7 @@ var AtmoPost = class {
   dispose() {
     this._free();
     this.comp.dispose();
-    [this.bright, this.down, this.up, this.copy].forEach((m) => m.dispose());
+    [this.bright, this.down, this.up, this.copy, this.tensor, this.tblur, this.kuwa, this.paintOut].forEach((m) => m.dispose());
     this.lut && this.lut.dispose();
   }
 };
@@ -1763,7 +1878,10 @@ function createAtmosphere({ THREE, renderer, scene, camera, site = ASHDOD, tier 
     const L = st.dirty || !st.look ? recompute() : st.look;
     const target = L.exposure;
     if (st.exposure == null || dt <= 0 || Math.abs(Math.log(target / st.exposure)) > 2.5) st.exposure = target;
-    else st.exposure = Math.exp(Math.log(st.exposure) + (Math.log(target) - Math.log(st.exposure)) * (1 - Math.exp(-dt / 1.5)));
+    else {
+      const tau = target < st.exposure ? 0.5 : 2.5;
+      st.exposure = Math.exp(Math.log(st.exposure) + (Math.log(target) - Math.log(st.exposure)) * (1 - Math.exp(-dt / tau)));
+    }
     const gain = st.profile === "phone" ? 1 + 1 * Math.min(1, Math.max(0, (Math.log10(st.exposure) - 1) / 2)) : 1;
     const X = preExpose ? st.exposure * gain : 1;
     st.renderExposure = preExpose ? 1 : st.exposure * gain;
@@ -1928,9 +2046,20 @@ function createAtmosphere({ THREE, renderer, scene, camera, site = ASHDOD, tier 
       applyTier();
       return api;
     },
+    /** 'physical' (clean) · 'phone' (Ariel's night photos: starburst, bloom, grain) · 'impression' (painterly: AgX + anisotropic Kuwahara + broken colour). */
     setCameraProfile(p) {
-      st.profile = p === "phone" ? "phone" : "physical";
+      st.profile = p === "phone" || p === "impression" ? p : "physical";
       post.setProfile(st.profile);
+      return api;
+    },
+    /** null = per profile · 'aces' | 'agx' | 'neutral' (Khronos PBR Neutral — e.g. developer presentation with true facade colours). */
+    setToneMapper(name) {
+      post.toneMapper = ["aces", "agx", "neutral"].includes(name) ? name : null;
+      return api;
+    },
+    /** painterly parameters (impression profile): {radius, alpha, q, zeroCross, amount, vibration, canvas} */
+    setPaint(o = {}) {
+      Object.assign(post.paint, o);
       return api;
     },
     /** Centre of interest (shadow frustum follows it). radius = half-size of the shadow box (m). */
@@ -1984,7 +2113,7 @@ function createAtmosphere({ THREE, renderer, scene, camera, site = ASHDOD, tier 
   const sz = renderer.getSize(new T.Vector2());
   post.setSize(sz.x, sz.y);
   applyTier();
-  if (profile === "phone") api.setCameraProfile("phone");
+  if (profile !== "physical") api.setCameraProfile(profile);
   return api;
 }
 

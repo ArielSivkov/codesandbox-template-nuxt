@@ -27,7 +27,7 @@ float fbm(vec2 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++) { s += a 
 void main(){
   vec3 d = normalize(vD); if (d.y < 0.0) discard;
   vec2 uv = d.xz / (d.y + 0.10) * 0.9 * uScale + uWind * uTime;
-  float n = fbm(uv), cov = mix(0.66, 0.26, uCover);
+  float n = fbm(uv), cov = mix(mix(0.56, 0.20, uCover), mix(0.66, 0.26, uCover), uNight);   // ביום יותר עננים נראים ("אין עננים")
   float a = smoothstep(cov, cov + 0.20, n) * smoothstep(0.0, 0.18, d.y);
   if (a < 0.003) discard;
   float thick = smoothstep(cov, cov + 0.42, n);
@@ -36,10 +36,10 @@ void main(){
   vec3 day = mix(vec3(0.62, 0.66, 0.73), vec3(1.0), lit * (1.0 - thick * 0.55)) + vec3(1.0, 0.95, 0.85) * pow(sd, 10.0) * (1.0 - thick) * 0.6;
   day = mix(day, day * vec3(1.0, 0.70, 0.48) + vec3(0.18, 0.06, 0.0) * (1.0 - thick), uGolden);
   float md = max(dot(d, normalize(uMoon)), 0.0);
-  vec3 night = vec3(0.11, 0.13, 0.19) * (0.55 + 0.45 * lit) + uMoonOn * (vec3(0.30, 0.34, 0.42) * pow(md, 5.0) * (1.2 - thick) + vec3(0.06, 0.07, 0.09) * lit);
-  night += uGlow * pow(1.0 - d.y, 4.0) * (0.35 + 0.65 * thick);   // זוהר עירוני כתום על תחתית העננים
+  vec3 night = vec3(0.045, 0.055, 0.095) * (0.55 + 0.45 * lit) + uMoonOn * (vec3(0.30, 0.34, 0.42) * pow(md, 6.0) * (1.2 - thick) + vec3(0.03, 0.035, 0.05) * lit);   // כיול מול תמונות הלילה: עננים כהים-כחולים, מוארים רק סביב הירח
+  night += uGlow * pow(1.0 - d.y, 5.0) * (0.25 + 0.45 * thick);   // זוהר עירוני כתום על תחתית העננים
   vec3 col = mix(day, night, uNight);
-  gl_FragColor = vec4(col, a * mix(0.93, 0.85, uNight));
+  gl_FragColor = vec4(col, a * mix(0.93, 0.78, uNight));
 #include <tonemapping_fragment>
 #include <colorspace_fragment>
 }`;

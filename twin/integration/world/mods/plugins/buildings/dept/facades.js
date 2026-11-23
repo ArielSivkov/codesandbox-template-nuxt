@@ -140,10 +140,10 @@ vec3 eshEmit = vec3(0.0);
       alb = mix(farC, nearC, det);
       if (uNight > 0.01 && occ) {
         float on = step(eh(vec2(bi * 0.73 + fi * 5.31, seed * 0.029 + 1.9)), uLit + shop * step(fi, 0.5) * 0.7 + pil * step(fi, 0.5) * 0.6);
-        vec3 lc = mix(vec3(1.0, 0.76, 0.46), vec3(0.82, 0.90, 1.0), step(0.72, eh(vec2(fi + 0.5, bi + seed * 0.003))));
+        vec3 lc = mix(vec3(1.0, 0.72, 0.40), vec3(0.86, 0.88, 0.92), step(0.90, eh(vec2(fi + 0.5, bi + seed * 0.003))));
         float nearE = on * lightable * winMask;
         float farE = uLit * ww * wh * 1.6;
-        eshEmit = lc * mix(farE, nearE, det) * uNight * 0.85;
+        eshEmit = lc * mix(farE, nearE, det) * uNight * 0.5;
       }
     }
     vec3 outC = alb * ao;

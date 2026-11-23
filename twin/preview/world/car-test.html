@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><body style="margin:0;background:#9fc4e8"><canvas id=c width=1200 height=800></canvas>
+<script src="vendor/three.min.js"></script>
+<script>window.YZW={register(d){window._D=d}};</script>
+<script src="adapters/57-ariel-car.js"></script>
+<script>
+const r=new THREE.WebGLRenderer({canvas:c,antialias:true}); r.shadowMap.enabled=true;
+const sc=new THREE.Scene(); sc.background=new THREE.Color(0x9fc4e8);
+sc.add(new THREE.HemisphereLight(0xdfefff,0x6b6455,0.9)); const s=new THREE.DirectionalLight(0xfff1dd,1.6); s.position.set(-6,8,-4); s.castShadow=true; sc.add(s);
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(40,40),new THREE.MeshLambertMaterial({color:0x3a3a3c})); gnd.rotation.x=-Math.PI/2; gnd.receiveShadow=true; sc.add(gnd);
+const car=new THREE.Group(); car.userData.wheels=[]; sc.add(car);
+_D.init({scene:sc});
+const cam=new THREE.PerspectiveCamera(35,1.5,0.1,100);
+window.view=(a,e,d)=>{cam.position.set(Math.sin(a)*d,e,Math.cos(a)*d); cam.lookAt(0,0.6,0); r.render(sc,cam);};
+view(0.7,1.6,8); window.ready=1;
+</script></body></html>

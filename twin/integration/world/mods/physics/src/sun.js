@@ -5,7 +5,7 @@
  *   https://gml.noaa.gov/grad/solcalc/calcdetails.html  (spreadsheet NOAA_Solar_Calculations_day.xls)
  *   NOAA states ~1 min accuracy for sunrise/sunset within +/-72 deg latitude; the angle accuracy of
  *   this low-precision theory is ~0.01 deg for 1800–2100 (validated here against USNO and NREL SPA,
- *   see test/sun.test.mjs + test/spa_reference.json: max 0.013°, median 0.0036°, rise/set ≤ 3 s).
+ *   see test/sun.test.js).
  *
  * APPROXIMATIONS (labeled):
  *   [A1] ΔT (TT−UT ≈ 69 s) is ignored: shifts solar longitude by ~0.0008 deg — negligible.
