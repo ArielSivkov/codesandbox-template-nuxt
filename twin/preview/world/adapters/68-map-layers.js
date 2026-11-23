@@ -214,7 +214,7 @@
 #yzMap .yzP .yzK{font-size:12.5px;color:#cfd9e4;margin-bottom:6px;line-height:1.45}
 #yzMap .yzP .r .btn,#yzMap .pk .r .btn{min-height:42px;min-width:42px}
 #yzMap .tb .btn{min-height:42px;min-width:42px}
-#yzMap.yzPanel .zm{bottom:calc(env(safe-area-inset-bottom) + 178px)}
+#yzMap.yzPanel .zm{top:calc(env(safe-area-inset-top) + 64px);bottom:auto}
 #yzMap .yzP .r .btn:disabled{opacity:.45}
 #yzMap .yzTag{font-size:10.5px;background:#ffffff1f;border-radius:6px;padding:1px 5px;color:#f6cf7f}
 #yzMap .yzG{position:absolute;right:8px;bottom:calc(env(safe-area-inset-bottom) + 26px);display:none;align-items:center;gap:5px;font-size:10px;color:#222;background:#fffd;border-radius:6px;padding:1px 6px;direction:rtl}
