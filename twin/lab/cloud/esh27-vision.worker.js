@@ -37,8 +37,10 @@ async function runPhoto(env, t) {
   const uri = 'data:image/jpeg;base64,' + Buffer.from(buf).toString('base64');
   const ex = await examples(env, 'photo');
   const s = await env.AI.run(M.vision, { messages: [{ role: 'user', content: [{ type: 'text', text: PHOTO_PROMPT + (ex ? '\nLessons from review:\n' + ex : '') }, { type: 'image_url', image_url: { url: uri } }] }], max_tokens: 1200 });
-  let txt = (s.response || '').replace(/^```(json)?|```$/gm, '').trim(), parsed = null;
-  try { parsed = JSON.parse(txt); } catch (e) { }
+  // המודל מחזיר לפעמים אובייקט JSON מוכן ולא מחרוזת (תיקון: 9 תמונות נכשלו ב-replace)
+  let parsed = s.response && typeof s.response === 'object' ? s.response : null;
+  let txt = typeof s.response === 'string' ? s.response.replace(/^```(json)?|```$/gm, '').trim() : '';
+  if (!parsed) try { parsed = JSON.parse(txt); } catch (e) { }
   return { model: M.vision, parsed, raw: parsed ? undefined : txt };
 }
 async function runCode(env, t) {

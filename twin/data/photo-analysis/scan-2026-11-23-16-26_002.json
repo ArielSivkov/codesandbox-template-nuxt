@@ -1,0 +1,8 @@
+{"photo":"scan 2026-11-23-16-26/002_photo.jpg (סורק)","model":"llama-4-scout (מודל ענן)","reviewed_by":"claude","when":"2026-11-23T16:27Z","verdict":"approved",
+ "sensors":{"lat":31.7859691,"lon":34.662557,"gps_acc_m":7.9,"itm":{"E":168132.5,"N":632713.1},"heading_deg":218.7,"pitch_deg":-5.1,"f35_guess":24},
+ "time":"night","lighting":"streetlights",
+ "objects":[{"name":"car","colors_hex":["#FFFFFF"],"distance":"near","position":"left"},{"name":"gate","colors_hex":["#964B00"],"material":"metal","distance":"mid","position":"center"},{"name":"buildings","count":3,"colors_hex":["#F5F5DC","#F0E4CC","#969696"],"material":"concrete (plaster)"}],
+ "ground":{"type":"paving bricks","colors_hex":["#786C3B","#964B00"]},
+ "vegetation":[{"type":"tree","count":1}],
+ "reference_objects":["floor tile"],
+ "note":"צבעים בלילה מוטים מתאורת רחוב – משוער. גבהים מהמודל לא בשימוש."}

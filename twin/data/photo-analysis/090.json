@@ -1,0 +1,5 @@
+{"photo":"090.jpg","model":"llama-4-scout (מודל ענן)","reviewed_by":"claude","when":"2026-11-23","verdict":"approved-low-detail",
+ "time":"dusk","sky_hex":["#4567b7","#6495ed"],"lighting":"artificial",
+ "objects":[{"name":"buildings","colors_hex":["#ffffff","#808080"],"material":"concrete","distance":"mid"},{"name":"trees","colors_hex":["#008000"],"distance":"near","position":"left"}],
+ "ground":{"type":"asphalt","colors_hex":["#808080"]},
+ "note":"תיאור כללי בלבד; ספירות (100 בניינים, 50 עצים) לא אמינות. גבהים מהמודל לא בשימוש."}
