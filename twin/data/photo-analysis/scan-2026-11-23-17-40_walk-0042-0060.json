@@ -1,0 +1,76 @@
+{
+"model": "llama-4-scout (מודל ענן)",
+"reviewed_by": "claude",
+"when": "2026-11-24",
+"heights": "גבהים מהמודל לא אמינים – לא נכנסים",
+"frames": "0042–0060 (18; 0059 חסר)",
+"time": "night",
+"ground": "asphalt ב-18/18",
+"objects": [
+{
+"name": "car",
+"seen_in": 12,
+"colors_hex": [
+"#ffffff",
+"#ff0000",
+"#808080"
+]
+},
+{
+"name": "streetlight",
+"seen_in": 13,
+"material": "metal",
+"light": "white/yellow"
+},
+{
+"name": "tree",
+"seen_in": 10
+},
+{
+"name": "bus",
+"seen_in": 8,
+"colors_hex": [
+"#ffffff"
+]
+},
+{
+"name": "traffic light",
+"seen_in": 7
+},
+{
+"name": "grass",
+"seen_in": 5
+},
+{
+"name": "building",
+"seen_in": 4,
+"material": "concrete"
+},
+{
+"name": "stone wall",
+"seen_in": 3,
+"colors_hex": [
+"#808080",
+"#786c3b"
+],
+"material": "stone"
+},
+{
+"name": "crosswalk",
+"seen_in": 2,
+"colors_hex": [
+"#ffffff"
+]
+},
+{
+"name": "utility box",
+"seen_in": 1,
+"colors_hex": [
+"#ffffff"
+]
+}
+],
+"floors": "0 ספירות תקפות (0046: w547641690=5 נדחה – לא נראו גג וקרקע)",
+"privacy": "אדם אחד ב-0046 ורכבים – לא נכנסים לריפו כתמונות",
+"verdict": "approved – ערך נמוך (לילה, מרכב בנסיעה)"
+}
