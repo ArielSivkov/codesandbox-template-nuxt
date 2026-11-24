@@ -318,7 +318,19 @@ function buildRoadMeshes(t) {
   mk(P2, U2, N2, MAT.walk); mk(P, U, N, MAT.road);
   return g;
 }
-// דקל פרוצדורלי (~180 משולשים): גזע מתחדד עם טבעות, "חצאית" כפות יבשות, 9 כפות מתעקלות עם עורק מרכזי. צבעים בקודקודים.
+// ---------- עצים ודקלים (גדוד הצמחייה, 24.11.2026): הגאומטריה והטקסטורות ב-js/flora.js — גזע מעוגל עם קליפה, כתר מכרטיסי עלים
+// (alpha-test, אטלס עלים+normal), לילה/פנסים, צל רק לקרובים. כשמחלקת הצמחייה פעילה היא מציירת את כל העצים (גם המיקומים מכאן,
+// כמשבצות בלי כפילויות) → W.setTreesExternal(true) ו-world.js לא מצייר עצים בכלל. בלי flora.js נשארים הדגמים הישנים (גיבוי).
+const FLORA = () => (window.ESHFlora && window.ESHFlora.init) ? window.ESHFlora : null;
+function floraMat() { const F = FLORA(); if (!F) return null; if (!MAT.flora) { MAT.flora = F.material({ wind: true, name: 'flora-world' }); MAT.floraDepth = F.depthMaterial({ wind: true }); } return MAT.flora; }
+W.treesExternal = false;
+W.setTreesExternal = function (on) {
+  on = !!on; if (W.treesExternal === on) return; W.treesExternal = on;
+  for (const [im, i, m] of nearHidden) { im.setMatrixAt(i, m); im.instanceMatrix.needsUpdate = true; } nearHidden = [];
+  for (const t of W.tiles.values()) if (t.palms) t.palms.visible = t.lod === 1 && !on;
+  if (NEARP) NEARP.count = 0; if (TREES) TREES.count = 0; lastNP = lastTR = null;
+};
+// דקל פרוצדורלי (~180 משולשים): גזע מתחדד עם טבעות, "חצאית" כפות יבשות, 9 כפות מתעקלות עם עורק מרכזי. צבעים בקודקודים. (גיבוי בלי flora.js)
 function palmGeo(lo) {
   const P = [], C = [], I = []; const v = (x, y, z, r, g, b) => { P.push(x, y, z); C.push(r, g, b); return P.length / 3 - 1; };
   const H = 7, SEG = lo ? 5 : 7, RING = lo ? 2 : 6;
@@ -341,8 +353,10 @@ function palmGeo(lo) {
 /** הדקלים הקרובים (עד 48, רדיוס 140 מ'): גאומטריה מלאה + צל. מתעדכן כשזזים 12 מ'. העותק הזול באריח מוקטן לאפס במקומם. */
 let NEARP = null, nearHidden = [], lastNP = null; const _pm = new T.Matrix4(), _p0 = new T.Matrix4().makeScale(0, 0, 0);
 W.updatePalms = function (px, pz, scene) {
+  if (W.treesExternal) return;
   if (lastNP && Math.hypot(px - lastNP.x, pz - lastNP.z) < 12) return; lastNP = { x: px, z: pz };
-  if (!NEARP) { NEARP = new T.InstancedMesh(palmGeo(false), MAT.palm, 48); NEARP.castShadow = true; NEARP.frustumCulled = false; NEARP.count = 0; scene.add(NEARP); }
+  if (!NEARP) { const F = FLORA(), fm = floraMat(); NEARP = new T.InstancedMesh(F ? F.worldModel('palm', false).geo : palmGeo(false), fm || MAT.palm, 48); if (fm) NEARP.customDepthMaterial = MAT.floraDepth;
+    NEARP.castShadow = true; NEARP.frustumCulled = false; NEARP.count = 0; scene.add(NEARP); }
   for (const [im, i, m] of nearHidden) { im.setMatrixAt(i, m); im.instanceMatrix.needsUpdate = true; } nearHidden = [];
   const cand = [];
   for (const t of W.tiles.values()) { if (!t.palms || !t.palms.visible) continue; const im = t.palms.children[0], P = t.palms.userData.xz;
@@ -381,9 +395,10 @@ function furniture(t) {
     const visor = new T.BoxGeometry(0.36, 0.04, 0.2); visor.translate(0, 3.72, 0.32);
     POLE_GEO = mergeColored([{ geo: pole, color: [0.32, 0.33, 0.35] }, { geo: head, color: [0.13, 0.13, 0.14] }, { geo: visor, color: [0.1, 0.1, 0.1] }]);
     LAMP_GEO = new T.CircleGeometry(0.1, 6); LAMP_GEO.translate(0, 0, 0.255);
-    const tr = new T.CylinderGeometry(0.12, 0.17, 2.6, 5, 1, true); tr.translate(0, 1.3, 0); const cr = new T.IcosahedronGeometry(2.0, 0); cr.scale(1, 0.8, 1); cr.translate(0, 3.7, 0);
-    const cr2 = new T.IcosahedronGeometry(1.3, 0); cr2.translate(0.9, 4.4, 0.4);
-    TREE_GEO = mergeColored([{ geo: tr, color: [0.40, 0.31, 0.22] }, { geo: cr, color: [0.24, 0.40, 0.17] }, { geo: cr2, color: [0.30, 0.47, 0.20] }]);
+    if (FLORA()) TREE_GEO = FLORA().worldModel('street', false).geo;   // פיקוס רחוב מכרטיסי עלים (flora.js)
+    else { const tr = new T.CylinderGeometry(0.12, 0.17, 2.6, 5, 1, true); tr.translate(0, 1.3, 0); const cr = new T.IcosahedronGeometry(2.0, 0); cr.scale(1, 0.8, 1); cr.translate(0, 3.7, 0);
+      const cr2 = new T.IcosahedronGeometry(1.3, 0); cr2.translate(0.9, 4.4, 0.4);
+      TREE_GEO = mergeColored([{ geo: tr, color: [0.40, 0.31, 0.22] }, { geo: cr, color: [0.24, 0.40, 0.17] }, { geo: cr2, color: [0.30, 0.47, 0.20] }]); }
   }
   const g = new T.Group(), J = junctionsOf(t), m = new T.Matrix4(), q = new T.Quaternion(), one = new T.Vector3(1, 1, 1), up = new T.Vector3(0, 1, 0);
   // רמזורים: עמוד בצד ימין של כל זרוע נכנסת, פונה לתנועה המתקרבת
@@ -405,16 +420,18 @@ function furniture(t) {
   t.treeXZ = tp;
   return poles.length || zebra.length || tp.length ? g : null;   // קבוצה ריקה = סימון 'אריח קרוב' לשכבות הקרובות
 }
-/** עצי רחוב קרובים (עד 180, רדיוס 220 מ'), קריאת ציור אחת עם צל. מתעדכן כשזזים 15 מ'. */
-let TREES = null, lastTR = null;
+/** עצי רחוב קרובים (עד 180, רדיוס 220 מ'), קריאת ציור אחת עם צל (flora: צל רק ל-45–70 מ' הקרובים). מתעדכן כשזזים 15 מ'. */
+let TREES = null, lastTR = null; const _tc = new T.Color();
 W.updateTrees = function (px, pz, scene) {
+  { const F = FLORA(); if (F && F.ok) F.update(); }   // לילה/פנסים/רוח לחומרי העלים (פעם אחת לפריים)
+  if (W.treesExternal) return;
   if (lastTR && Math.hypot(px - lastTR.x, pz - lastTR.z) < 15) return; lastTR = { x: px, z: pz };
-  if (!TREES) { if (!TREE_GEO) return; TREES = new T.InstancedMesh(TREE_GEO, MAT.palm, 180); TREES.castShadow = true; TREES.frustumCulled = false; scene.add(TREES); }
+  if (!TREES) { if (!TREE_GEO) return; const fm = floraMat(); TREES = new T.InstancedMesh(TREE_GEO, fm || MAT.palm, 180); if (fm) TREES.customDepthMaterial = MAT.floraDepth; TREES.castShadow = true; TREES.frustumCulled = false; scene.add(TREES); }
   const cand = []; for (const t of W.tiles.values()) { const P = t.treeXZ; if (!P || !t.furn || !t.furn.visible) continue; for (let i = 0; i < P.length; i += 2) { const d = (P[i] - px) ** 2 + (P[i + 1] - pz) ** 2; if (d < 220 * 220) cand.push([d, P[i], P[i + 1], t]); } }
   cand.sort((a, b) => a[0] - b[0]); const m = new T.Matrix4(), q = new T.Quaternion(), e = new T.Euler(), s = new T.Vector3(); let k = 0;
   for (const [, x, z, t] of cand) { if (k >= 180) break; const hs = hash32(x.toFixed(1) + z.toFixed(1)), sc = 0.75 + (hs % 50) / 100; e.set(0, (hs % 628) / 100, 0); q.setFromEuler(e); s.set(sc, sc * (0.9 + (hs >> 5) % 20 / 100), sc);
-    m.compose(new T.Vector3(x, tileH(t, x + W.OX, W.OY - z) - 0.1, z), q, s); TREES.setMatrixAt(k++, m); }
-  TREES.count = k; TREES.instanceMatrix.needsUpdate = true;
+    m.compose(new T.Vector3(x, tileH(t, x + W.OX, W.OY - z) - 0.1, z), q, s); const tn = 0.88 + (hs >> 9) % 25 / 100, hu = ((hs >> 13) % 21 - 10) / 100; TREES.setColorAt(k, _tc.setRGB(tn * (1 + hu), tn, tn * (1 - hu))); TREES.setMatrixAt(k++, m); }   // גוון ובהירות לכל עץ
+  TREES.count = k; TREES.instanceMatrix.needsUpdate = true; if (TREES.instanceColor) TREES.instanceColor.needsUpdate = true;
 };
 /** רמזורים ומעברי חציה קרובים (רדיוס 250 מ', עד 64 עמודים): 3 קריאות ציור לכל העולם. מתעדכן כשזזים 15 מ'. */
 let STREET = null, lastST = null;
@@ -485,11 +502,11 @@ function palms(t) {
       acc = (acc - L) % 22; if (acc < 0) acc += 22; } }
   const ok = []; for (let i = 0; i < pos.length; i += 2) { const x = pos[i], z = pos[i + 1]; if (!W.buildingAt(x, z, 1.5)) ok.push(x, z); }
   const n = ok.length / 2; if (!n) return null;
-  if (!TRUNK_GEO) TRUNK_GEO = palmGeo(true);   // דקלי האריח: גרסה זולה (~70 משולשים) בלי הטלת צל; הקרובים מתחלפים בגרסה המלאה (W.updatePalms)
-  const a = new T.InstancedMesh(TRUNK_GEO, MAT.palm, n); const m = new T.Matrix4(), q = new T.Quaternion(), s = new T.Vector3(), e = new T.Euler();
+  if (!TRUNK_GEO) TRUNK_GEO = FLORA() ? FLORA().worldModel('palm', true).geo : palmGeo(true);   // דקלי האריח: גרסה זולה (~50–70 משולשים) בלי הטלת צל; הקרובים מתחלפים בגרסה המלאה (W.updatePalms)
+  const a = new T.InstancedMesh(TRUNK_GEO, floraMat() || MAT.palm, n); const m = new T.Matrix4(), q = new T.Quaternion(), s = new T.Vector3(), e = new T.Euler();
   for (let i = 0; i < n; i++) { const x = ok[i * 2], z = ok[i * 2 + 1], hs = hash32(x.toFixed(1) + z.toFixed(1)), sc = 0.8 + (hs % 50) / 100; e.set(((hs >> 3) % 10 - 5) / 100, (hs % 628) / 100, ((hs >> 7) % 10 - 5) / 100); q.setFromEuler(e); s.set(sc, sc, sc);
     m.compose(new T.Vector3(x, tileH(t, x + W.OX, W.OY - z) - 0.2, z), q, s); a.setMatrixAt(i, m); }
-  a.castShadow = false; const g = new T.Group(); g.add(a); g.userData.xz = ok; g.userData.n = n; return g;
+  a.castShadow = false; const g = new T.Group(); g.add(a); g.userData.xz = ok; g.userData.n = n; g.visible = !W.treesExternal; return g;
 }
 
 // ---------- קרקע
@@ -622,7 +639,7 @@ function setLOD(t, lod) {
   if (lod === 0 && !t.lo) { const r = buildBuildingGeo(t.blds, true); t.lo = new T.Mesh(r.geo, [MAT.lo]); t.loTris = r.tris; }
   if (t.hi) { if (lod === 1) t.grp.add(t.hi); else t.grp.remove(t.hi); }
   if (t.lo) { if (lod === 0) t.grp.add(t.lo); else t.grp.remove(t.lo); }
-  if (t.solar) t.solar.visible = lod === 1; if (t.palms) t.palms.visible = lod === 1; if (t.furn) t.furn.visible = lod === 1;
+  if (t.solar) t.solar.visible = lod === 1; if (t.palms) t.palms.visible = lod === 1 && !W.treesExternal; if (t.furn) t.furn.visible = lod === 1;
   t.lod = lod; W.stats.buildMs += performance.now() - t0;
   if (W.onTile) W.onTile(t, 'lod');
 }

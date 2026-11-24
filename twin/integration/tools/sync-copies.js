@@ -20,6 +20,9 @@ function manifest() {
       for (const w of WORLDS) pairs.push([mod + '/' + f, w + '/mods/' + mod + '/' + f]);
   }
   for (const w of WORLDS) pairs.push(['weather/weather.js', w + '/mods/weather/weather.js']);
+  // גדוד הצמחייה (24.11.2026): מודול המחלקה (מקור = twin/vegetation) → שני העולמות; flora.js והמתאם → preview
+  for (const w of WORLDS) for (const f of ['vegetation.js', 'species.data.js']) pairs.push(['vegetation/' + f, w + '/mods/vegetation/' + f]);
+  for (const f of ['js/flora.js', 'adapters/48-vegetation.js']) pairs.push(['integration/world/' + f, 'preview/world/' + f]);
   return pairs;
 }
 
