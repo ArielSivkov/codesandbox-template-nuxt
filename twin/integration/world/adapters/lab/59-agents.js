@@ -1,11 +1,11 @@
-// סוכני העיר בתוך העולם (מעבדה, 24.11.2026, קַו). רץ רק עם ?agents בכתובת, כדי לא לשנות את העולם החי בזמן ההקפאה (עד 30.11).
+// סוכני העיר בתוך העולם (מעבדה, 24.11.2026, קַו). פועל כברירת מחדל באישור אריאל (24.11: "כן, לעלות לחיים"), כחריגה מההקפאה. לכיבוי: ?agents=0
 // הנתונים: mods/agents/run.json, ריצה של esh27-core/lab/world/sim.py. כל סוכן גר בבניין אמיתי, הולך בגרף הרחובות
 // האמיתי של אשדוד (1.4 מ'/ש'), ועושה עבודות בדיקה דרך חוזה העולם. רק הבודק משלם CRD, והפנקס שרשרת hash.
 // צבע: אפור = 0 CRD, זהב = הכי הרבה. המסלול חוזר כל שעה לפי שעון העולם.
 (function () {
   'use strict';
   const qs = new URLSearchParams(location.search);
-  if (!qs.has('agents')) return;
+  if (qs.get('agents') === '0') return;
   const S = { run: null, mesh: null, n: 0, ticks: 0, tickS: 10, cols: null, ready: false };
   const M = new (window.THREE ? THREE.Matrix4 : function () {})();
 
