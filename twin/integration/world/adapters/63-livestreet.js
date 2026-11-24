@@ -289,7 +289,8 @@
     init(world, api) {
       S.world = world; S.api = api; S.root = api.group('livestreet'); if (OFF) return;
       if (hookHints(world)) api.emit('buildingHints', { src: 'livestreet' });
-      const tryBuild = () => { if (S.built) return; try { if (build(world)) { S.built = true; if (P.cars) cars(world, api).catch(e => console.warn('[livestreet] cars', e)); api.emit('livestreet', S.stats); } } catch (e) { console.warn('[livestreet] build', e); S.built = true; } };
+      S.t0 = performance.now();   // הבנייה (וטעינת הרכבים) נדחית ל-6 ש' אחרי העלייה — לא לגזול פריימים בהפעלה (בדיקת העשן: "העולם ממשיך לצייר")
+      const tryBuild = () => { if (S.built || performance.now() - S.t0 < 6000) return; try { if (build(world)) { S.built = true; if (P.cars) cars(world, api).catch(e => console.warn('[livestreet] cars', e)); api.emit('livestreet', S.stats); } } catch (e) { console.warn('[livestreet] build', e); S.built = true; } };
       S.tryBuild = tryBuild; api.eachTile((t, kind) => { if (kind === 'add' && !S.built) setTimeout(tryBuild, 0); });
       window.YZLiveStreet = S;
     },
