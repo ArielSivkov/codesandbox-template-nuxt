@@ -1,1601 +1,832 @@
-/* מתאם: הרכב של אריאל – אאודי A1 תלת-דלתית לבנה, לוחית 73-464-53 (באישור אריאל, 23.11.2026).
- * גרסה 4 = גרסת ה-QA של Gemini (דרייב 1-WoeWVP3lP_CC3lCDiHLzO1UmprH37PH, sha256 d3198f9c…), נכנסה 23.11.2026 אחרי בדיקה ו-3 תיקונים:
- * חיבור לעולם (בגרסה שנמסרה הרכב לא הופיע), לוחית במקפים, מראות 4.8 ס"מ פנימה. גרסה 2 שמורה ב-lab/ariel-car-v2/. ?ariel-car=0 מכבה.
- * צורה ופרטים לפי תמונות 075–082 – מודל ידני משוער, לא סריקה. */
+/* מתאם: הרכב של אריאל – אאודי A1 (8X) תלת-דלתית לבנה, לוחית 73-464-53 (באישור אריאל, 23.11.2026).
+ * גרסה 5 (גדוד הרכב, 24.11.2026) – בעקבות משוב אריאל ב-03:18 "גם האודי כזאת ריבועי" (צילומים מאחור בנסיעת לילה).
+ *   גוף חדש: לופט של 71 חתכי רוחב (61 + 5 בכל קצה מעוגל), כל חתך = עקומה סגורה דרך 18 נקודות (קובית מונוטונית לפי אורך מיתר –
+ *   עוברת דרך הנקודות בלי "קפיצות"), 52 דגימות; נורמלים חלקים; קשתות גלגלים עגולות עם בית גלגל כהה; קו כתף; שמשה קדמית ~57° ואחורית ~45°;
+ *   מכסה מנוע יורד; אחור מעוגל עם דלת תא מטען; צבע MeshPhysical עם clearcoat ומפת סביבה (באיכות "חסכונית" – MeshStandard).
+ *   חלונות, פנסים, גריל ופסים – "מדבקות" שמוטלות על הגוף בקרני הטלה (מנוע קרניים עצמי, מואץ לפי רצועות חתכים וגזרות).
+ *   גוף ראשון: לוח מחוונים, הגה ושעונים; בלילה כתם אור פנסים על הכביש (רק בנהיגה). הדגם מורם בגובה הכביש (הכבישים 10–16 ס"מ מעל הקרקע).
+ * מידות יצרן (A1 8X 3 דלתות): אורך 3,954, רוחב 1,740, גובה 1,416, בסיס גלגלים 2,469, מפשק 1,477/1,471 מ"מ, צמיגים 215/45 R16 או 205/55 R15
+ *   – carexpert.co.nz (Audi A1 2011, exterior and dimensions) ו-auto-data.net (A1 8X 1.4 TFSI). שלוחות 800/685 מ"מ, גלגל 17", רדיוס צמיג 0.30 – [לא אומת].
+ * צורה וצבעים: צילומי אריאל 075–083 (23.11.2026, תיקיית "צילומי שכונה – רחוב הארז"): גג לבן (לא שחור!), ספוילר גג שחור, מסגרות חלונות שחורות,
+ *   חישוקי 10 חישורים כסופים, ריפוד בז', אגזוז בשמאל. גג שחור (קשת קונטרסט) – אופציה: ?ariel-roof=black. ?ariel-car=0 מכבה.
+ * גרסה 4 (Gemini QA) – בהיסטוריית git ובצילומי lab/ariel-car-v4-check; גרסה 2 ב-lab/ariel-car-v2/. מודל ידני לפי צילומים, לא סריקה.
+ * תקציב: ≤ 15,000 משולשים, ≤ 30 קריאות ציור (בדיקה: tools/test-ariel-car-active.js). */
 (function () {
   'use strict';
 
-  // בס"ד — הרכב של אריאל: Audi A1 (8X) 3-Door Hatchback לבנה, לוחית 73-464-53 (תמונות 075–082)
-  // מהודק לבדיקות ה-QA של ענף twin-world: מעטפת אטומה 100% (0 צלעות פתוחות), נפח חתום חיובי (V > 0 ב-FrontSide),
-  // איחוד גיאומטריות סטטיות לפי חומר (< 25 קריאות ציור), <= 6,000 משולשים ושמות פונקציות קבועים.
-  const L = 3.954;
-  const Wd = 1.740;
-  const H = 1.416;
-  const WB = 2.469;
-  const TRK = 1.477;
-  const R = 0.305;
+  const L = 3.954, Wd = 1.740, H = 1.416, WB = 2.469, TRK = 1.477, TRK_R = 1.471, R = 0.300;
+  const OV_F = 0.800, OV_R = 0.685;                       // שלוחה קדמית/אחורית [לא אומת]; סכום = L − WB
+  const ZF = WB / 2 + OV_F, ZR = -(WB / 2 + OV_R);       // ‎+2.0345 / ‎−1.9195 (ראשית = אמצע בסיס הגלגלים, על הקרקע)
   const PLATE = '73-464-53';
 
-  let texPlateCache = null;
-  let texRimCache = null;
-  let texEnvCache = null;
+  let texPlateCache = null, texRimCache = null, texEnvCache = null, texShadowCache = null, texBeamCache = null;
+  const hasDoc = () => typeof document !== 'undefined' && document.createElement;
+  const canvas2d = (w, h) => { if (!hasDoc()) return null; const cv = document.createElement('canvas'); cv.width = w; cv.height = h; const x = cv.getContext && cv.getContext('2d'); return x ? { cv, x } : null; };
+  const srgb = t => { if ('colorSpace' in t && THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace; return t; };
+  const dataTex = rgba => { const t = new THREE.DataTexture(new Uint8Array(rgba), 1, 1); t.needsUpdate = true; return t; };
 
-  function plateTex() {
+  // ---------- טקסטורות (קנבס; בלי קבצים)
+  function plateTex() {                       // לוחית ישראלית צהובה + פס כחול IL + מסגרת סוכנות "GOOD CAR" (כמו בצילומים)
     if (texPlateCache) return texPlateCache;
-    if (typeof document !== 'undefined' && document.createElement) {
-      const cv = document.createElement('canvas');
-      cv.width = 512;
-      cv.height = 128;
-      const ctx = cv.getContext && cv.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = '#101215';
-        ctx.fillRect(0, 0, 512, 128);
-
-        ctx.fillStyle = '#f4be18';
-        ctx.fillRect(8, 8, 496, 98);
-
-        ctx.fillStyle = '#0b4ea2';
-        ctx.fillRect(8, 8, 56, 98);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(16, 16, 40, 26);
-        ctx.fillStyle = '#0b4ea2';
-        ctx.fillRect(16, 20, 40, 3);
-        ctx.fillRect(16, 35, 40, 3);
-        ctx.strokeStyle = '#0b4ea2';
-        ctx.lineWidth = 1.6;
-        ctx.beginPath();
-        ctx.moveTo(36, 23);
-        ctx.lineTo(40, 32);
-        ctx.lineTo(32, 32);
-        ctx.closePath();
-        ctx.stroke();
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 22px Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('IL', 36, 68);
-        ctx.font = 'bold 11px Arial, sans-serif';
-        ctx.fillText('ישראל', 36, 86);
-
-        ctx.fillStyle = '#111317';
-        ctx.font = '900 70px "Arial Narrow", Arial, sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(PLATE, 284, 58);
-
-        ctx.fillStyle = '#d8dee9';
-        ctx.font = 'bold 12px Arial, sans-serif';
-        ctx.fillText('GOOD CAR', 284, 117);
-
-        const t = new THREE.CanvasTexture(cv);
-        if ('colorSpace' in t && THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
-        t.anisotropy = 4;
-        texPlateCache = t;
-        return t;
-      }
+    const c = canvas2d(512, 128);
+    if (c) {
+      const x = c.x;
+      x.fillStyle = '#101215'; x.fillRect(0, 0, 512, 128);
+      x.fillStyle = '#f4be18'; x.fillRect(8, 8, 496, 98);
+      x.fillStyle = '#0b4ea2'; x.fillRect(8, 8, 56, 98);
+      x.fillStyle = '#ffffff'; x.fillRect(16, 16, 40, 26);
+      x.fillStyle = '#0b4ea2'; x.fillRect(16, 20, 40, 3); x.fillRect(16, 35, 40, 3);
+      x.fillStyle = '#ffffff'; x.font = 'bold 22px Arial, sans-serif'; x.textAlign = 'center'; x.fillText('IL', 36, 68);
+      x.font = 'bold 11px Arial, sans-serif'; x.fillText('ישראל', 36, 86);
+      x.fillStyle = '#111317'; x.font = '900 70px "Arial Narrow", Arial, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(PLATE, 284, 58);
+      x.fillStyle = '#d8dee9'; x.font = 'bold 12px Arial, sans-serif'; x.fillText('GOOD CAR', 284, 117);
+      const t = srgb(new THREE.CanvasTexture(c.cv)); t.anisotropy = 4; return (texPlateCache = t);
     }
-    const data = new Uint8Array([244, 190, 24, 255]);
-    const t = new THREE.DataTexture(data, 1, 1);
-    t.needsUpdate = true;
-    texPlateCache = t;
-    return t;
+    return (texPlateCache = dataTex([244, 190, 24, 255]));
   }
 
-  function rimTex() {
+  function rimTex() {                         // חישוק 10 חישורים כטקסטורה – נשמר מגרסה 4 בגלל הממשק (module.exports); החישוק עצמו עכשיו תלת-ממדי
     if (texRimCache) return texRimCache;
-    if (typeof document !== 'undefined' && document.createElement) {
-      const cv = document.createElement('canvas');
-      cv.width = 256;
-      cv.height = 256;
-      const ctx = cv.getContext && cv.getContext('2d');
-      if (ctx) {
-        const cx = 128;
-        const cy = 128;
-        ctx.fillStyle = '#101318';
-        ctx.fillRect(0, 0, 256, 256);
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, 88, 0, Math.PI * 2);
-        ctx.fillStyle = '#282d35';
-        ctx.fill();
-        ctx.lineWidth = 14;
-        ctx.strokeStyle = '#434b56';
-        ctx.stroke();
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(-0.6);
-        ctx.fillStyle = '#5e6673';
-        ctx.fillRect(48, -22, 26, 44);
-        ctx.restore();
-
-        const gradRing = ctx.createRadialGradient(cx, cy, 98, cx, cy, 125);
-        gradRing.addColorStop(0, '#9fa8b5');
-        gradRing.addColorStop(0.5, '#e8edf5');
-        gradRing.addColorStop(1, '#858e9c');
-        ctx.beginPath();
-        ctx.arc(cx, cy, 124, 0, Math.PI * 2);
-        ctx.arc(cx, cy, 98, 0, Math.PI * 2, true);
-        ctx.fillStyle = gradRing;
-        ctx.fill();
-
-        for (let i = 0; i < 10; i++) {
-          const ang = (i / 10) * Math.PI * 2;
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(ang);
-          const gSpoke = ctx.createLinearGradient(-10, 26, 10, 106);
-          gSpoke.addColorStop(0, '#cfd7e3');
-          gSpoke.addColorStop(0.5, '#f5f8fc');
-          gSpoke.addColorStop(1, '#98a1af');
-          ctx.beginPath();
-          ctx.moveTo(-9.5, 28);
-          ctx.lineTo(9.5, 28);
-          ctx.lineTo(7.0, 105);
-          ctx.lineTo(-7.0, 105);
-          ctx.closePath();
-          ctx.fillStyle = gSpoke;
-          ctx.fill();
-          ctx.restore();
-        }
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, 32, 0, Math.PI * 2);
-        ctx.fillStyle = '#c8d0dc';
-        ctx.fill();
-
-        for (let i = 0; i < 5; i++) {
-          const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
-          ctx.beginPath();
-          ctx.arc(cx + Math.cos(a) * 22, cy + Math.sin(a) * 22, 4.0, 0, Math.PI * 2);
-          ctx.fillStyle = '#20252d';
-          ctx.fill();
-        }
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, 14, 0, Math.PI * 2);
-        ctx.fillStyle = '#363c46';
-        ctx.fill();
-        ctx.strokeStyle = '#e2e8f0';
-        ctx.lineWidth = 1.5;
-        for (let r = -1.5; r <= 1.5; r += 1) {
-          ctx.beginPath();
-          ctx.arc(cx + r * 4.0, cy, 2.9, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-
-        const t = new THREE.CanvasTexture(cv);
-        if ('colorSpace' in t && THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
-        texRimCache = t;
-        return t;
-      }
+    const c = canvas2d(256, 256);
+    if (c) {
+      const x = c.x, cx = 128, cy = 128;
+      x.fillStyle = '#101318'; x.fillRect(0, 0, 256, 256);
+      x.beginPath(); x.arc(cx, cy, 88, 0, Math.PI * 2); x.fillStyle = '#282d35'; x.fill(); x.lineWidth = 14; x.strokeStyle = '#434b56'; x.stroke();
+      const g = x.createRadialGradient(cx, cy, 98, cx, cy, 125); g.addColorStop(0, '#9fa8b5'); g.addColorStop(0.5, '#e8edf5'); g.addColorStop(1, '#858e9c');
+      x.beginPath(); x.arc(cx, cy, 124, 0, Math.PI * 2); x.arc(cx, cy, 98, 0, Math.PI * 2, true); x.fillStyle = g; x.fill();
+      for (let i = 0; i < 10; i++) { x.save(); x.translate(cx, cy); x.rotate((i / 10) * Math.PI * 2); x.beginPath(); x.moveTo(-9.5, 28); x.lineTo(9.5, 28); x.lineTo(7, 105); x.lineTo(-7, 105); x.closePath(); x.fillStyle = '#e8edf5'; x.fill(); x.restore(); }
+      x.beginPath(); x.arc(cx, cy, 32, 0, Math.PI * 2); x.fillStyle = '#c8d0dc'; x.fill();
+      return (texRimCache = srgb(new THREE.CanvasTexture(c.cv)));
     }
-    const data = new Uint8Array([210, 216, 224, 255]);
-    const t = new THREE.DataTexture(data, 1, 1);
-    t.needsUpdate = true;
-    texRimCache = t;
-    return t;
+    return (texRimCache = dataTex([210, 216, 224, 255]));
   }
 
-  function build() {
-    const hz = L / 2; // 1.977
-    const hw = Wd / 2; // 0.870
-    const zF = WB / 2; // +1.2345
-    const zR = -WB / 2; // -1.2345
+  function envTex() {                         // סביבה אקוויריקטנגולרית: שמיים, אופק בהיר עם צלליות בניינים, אספלט – ההשתקפות היא שמראה את העיגול
+    if (texEnvCache) return texEnvCache;
+    const c = canvas2d(512, 256);
+    let t;
+    if (c) {
+      const x = c.x;
+      const sky = x.createLinearGradient(0, 0, 0, 128);
+      sky.addColorStop(0, '#2f6fc0'); sky.addColorStop(0.55, '#8fc0ee'); sky.addColorStop(0.9, '#e6f1fb'); sky.addColorStop(1, '#fff4de');
+      x.fillStyle = sky; x.fillRect(0, 0, 512, 128);
+      const gr = x.createLinearGradient(0, 128, 0, 256);
+      gr.addColorStop(0, '#77736c'); gr.addColorStop(0.25, '#4c4b49'); gr.addColorStop(1, '#2b2c2e');
+      x.fillStyle = gr; x.fillRect(0, 128, 512, 128);
+      x.fillStyle = 'rgba(205,200,188,0.85)';                 // קו בניינים (אבן בהירה) באופק
+      for (let i = 0; i < 26; i++) { const w = 10 + ((i * 37) % 23), h = 6 + ((i * 53) % 19), px = (i * 41) % 512; x.fillRect(px, 128 - h, w, h); }
+      x.fillStyle = 'rgba(70,92,70,0.7)';
+      for (let i = 0; i < 18; i++) { const px = (i * 61 + 17) % 512; x.beginPath(); x.ellipse(px, 126, 9 + (i % 4) * 3, 5, 0, 0, Math.PI * 2); x.fill(); }
+      for (const [cx, cy, rx] of [[120, 54, 50], [330, 42, 64], [470, 70, 40]]) {     // עננים רכים (בלי קווים חדים בהשתקפות)
+        const cg = x.createRadialGradient(cx, cy, 2, cx, cy, rx); cg.addColorStop(0, 'rgba(255,255,255,0.40)'); cg.addColorStop(1, 'rgba(255,255,255,0)');
+        x.fillStyle = cg; x.fillRect(cx - rx, cy - rx, rx * 2, rx * 2); }
+      const s = x.createRadialGradient(400, 60, 1, 400, 60, 26); s.addColorStop(0, 'rgba(255,255,250,1)'); s.addColorStop(0.4, 'rgba(255,236,190,0.7)'); s.addColorStop(1, 'rgba(255,236,190,0)');
+      x.fillStyle = s; x.fillRect(370, 30, 60, 60);
+      t = new THREE.CanvasTexture(c.cv);
+    } else {
+      t = new THREE.DataTexture(new Uint8Array([120, 175, 235, 255, 235, 244, 255, 255, 60, 60, 60, 255, 35, 36, 38, 255]), 2, 2); t.needsUpdate = true;
+    }
+    if (THREE.EquirectangularReflectionMapping) t.mapping = THREE.EquirectangularReflectionMapping;
+    return (texEnvCache = srgb(t));
+  }
 
-    const getEnvMap = () => {
-      if (texEnvCache) return texEnvCache;
-      if (typeof document !== 'undefined' && document.createElement) {
-        const cv = document.createElement('canvas');
-        cv.width = 256;
-        cv.height = 128;
-        const ctx = cv.getContext && cv.getContext('2d');
-        if (ctx) {
-          const grd = ctx.createLinearGradient(0, 0, 0, 128);
-          grd.addColorStop(0.0, '#2968c2');
-          grd.addColorStop(0.28, '#7ebaf7');
-          grd.addColorStop(0.45, '#eaf5ff');
-          grd.addColorStop(0.49, '#ffe2b0');
-          grd.addColorStop(0.53, '#252a32');
-          grd.addColorStop(1.0, '#101318');
-          ctx.fillStyle = grd;
-          ctx.fillRect(0, 0, 256, 128);
+  function shadowTex() {                      // צל מגע רך מתחת לרכב (נראה גם בלילה וגם באיכות חסכונית, כשאין מפת צללים)
+    if (texShadowCache) return texShadowCache;
+    const c = canvas2d(64, 128);
+    if (c) {
+      const x = c.x; x.clearRect(0, 0, 64, 128);
+      for (let i = 0; i < 14; i++) { const k = i / 13, a = 0.10 * (1 - k * 0.55); x.fillStyle = `rgba(0,0,0,${a.toFixed(3)})`;
+        const mx = 4 + k * 16, my = 6 + k * 20, r = 22 - k * 10; x.beginPath();
+        if (x.roundRect) x.roundRect(mx, my, 64 - 2 * mx, 128 - 2 * my, r); else x.rect(mx, my, 64 - 2 * mx, 128 - 2 * my); x.fill(); }
+      return (texShadowCache = new THREE.CanvasTexture(c.cv));
+    }
+    return (texShadowCache = dataTex([0, 0, 0, 90]));
+  }
 
-          ctx.fillStyle = 'rgba(255, 252, 244, 0.88)';
-          ctx.beginPath();
-          ctx.ellipse(62, 46, 50, 8, -0.06, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.ellipse(188, 42, 58, 9, 0.05, 0, Math.PI * 2);
-          ctx.fill();
+  function beamTex() {                        // כתם אור הפנסים על הכביש בלילה (שורה עליונה = ליד הרכב, תחתונה = רחוק)
+    if (texBeamCache) return texBeamCache;
+    const c = canvas2d(128, 256);
+    if (c) {
+      const x = c.x; x.clearRect(0, 0, 128, 256); x.globalCompositeOperation = 'lighter';
+      const blob = (cx, cy, r, sy, a) => { x.save(); x.translate(cx, cy); x.scale(1, sy); const gg = x.createRadialGradient(0, 0, 0, 0, 0, r);
+        gg.addColorStop(0, `rgba(255,242,215,${a})`); gg.addColorStop(0.55, `rgba(255,236,200,${(a * 0.45).toFixed(3)})`); gg.addColorStop(1, 'rgba(255,230,190,0)');
+        x.fillStyle = gg; x.beginPath(); x.arc(0, 0, r, 0, Math.PI * 2); x.fill(); x.restore(); };
+      blob(64, 120, 60, 2.1, 0.26);                                   // שטיפה רחבה (‎~10 מ' קדימה)
+      for (const cx of [51, 77]) { blob(cx, 40, 14, 2.4, 0.35); blob(cx + (cx - 64) * 0.6, 96, 30, 2.7, 0.70); blob(cx + (cx - 64) * 1.2, 170, 34, 2.2, 0.32); }
+      return (texBeamCache = new THREE.CanvasTexture(c.cv));
+    }
+    return (texBeamCache = dataTex([60, 56, 48, 255]));
+  }
+  function makeBeam() {
+    const geo = new THREE.PlaneGeometry(6.0, 22.0); geo.rotateX(-Math.PI / 2);
+    const mat = new THREE.MeshBasicMaterial({ map: beamTex(), color: 0xfff0d8, transparent: true, opacity: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4 });
+    const m = new THREE.Mesh(geo, mat); m.name = 'ariel-a1-beam'; m.position.set(0, 0.03, ZF + 0.5 + 11.0); m.visible = false; m.renderOrder = 2; m.frustumCulled = true;
+    return m;
+  }
 
-          const sun = ctx.createRadialGradient(184, 55, 2, 184, 55, 28);
-          sun.addColorStop(0, 'rgba(255,255,248,1.0)');
-          sun.addColorStop(0.45, 'rgba(255,222,160,0.75)');
-          sun.addColorStop(1, 'rgba(255,222,160,0)');
-          ctx.fillStyle = sun;
-          ctx.fillRect(150, 24, 68, 62);
-
-          const env = new THREE.CanvasTexture(cv);
-          if (THREE.EquirectangularReflectionMapping) {
-            env.mapping = THREE.EquirectangularReflectionMapping;
-          }
-          if ('colorSpace' in env && THREE.SRGBColorSpace) env.colorSpace = THREE.SRGBColorSpace;
-          texEnvCache = env;
-          return env;
-        }
-      }
-      const d = new Uint8Array([
-        120, 175, 235, 255, 235, 244, 255, 255,
-        40, 45, 52, 255, 25, 28, 34, 255
-      ]);
-      const env = new THREE.DataTexture(d, 2, 2);
-      if (THREE.EquirectangularReflectionMapping) {
-        env.mapping = THREE.EquirectangularReflectionMapping;
-      }
-      env.needsUpdate = true;
-      texEnvCache = env;
-      return env;
+  // ---------- עזרי מתמטיקה
+  const clamp = (v, a, b) => (v < a ? a : v > b ? b : v);
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const sstep = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+  const smax = (a, b, k) => { const h = clamp(0.5 + 0.5 * (a - b) / k, 0, 1); return lerp(b, a, h) + k * h * (1 - h); };
+  function mono(xs, ys) {                     // אינטרפולציה קובית מונוטונית (Fritsch–Carlson): חלקה, בלי "גלים" בין תחנות
+    const n = xs.length, d = [], m = new Array(n);
+    for (let i = 0; i < n - 1; i++) d.push((ys[i + 1] - ys[i]) / (xs[i + 1] - xs[i]));
+    m[0] = d[0]; m[n - 1] = d[n - 2];
+    for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (d[i - 1] + d[i]) / 2;
+    for (let i = 0; i < n - 1; i++) {
+      if (d[i] === 0) { m[i] = 0; m[i + 1] = 0; continue; }
+      const a = m[i] / d[i], b = m[i + 1] / d[i], s = a * a + b * b;
+      if (s > 9) { const t = 3 / Math.sqrt(s); m[i] = t * a * d[i]; m[i + 1] = t * b * d[i]; }
+    }
+    return v => {
+      if (v <= xs[0]) return ys[0]; if (v >= xs[n - 1]) return ys[n - 1];
+      let i = 0; while (i < n - 2 && v > xs[i + 1]) i++;
+      const h = xs[i + 1] - xs[i], t = (v - xs[i]) / h, t2 = t * t, t3 = t2 * t;
+      return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h * m[i] + (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h * m[i + 1];
     };
-
-    const envMap = getEnvMap();
-    const dbl = THREE.DoubleSide;
-
-    // paintMat uses FrontSide to prove 100% outward-facing watertight body winding (V > 0)
-    const paintMat = new THREE.MeshStandardMaterial({
-      color: 0xf4f6fa,
-      roughness: 0.19,
-      metalness: 0.06,
-      envMap,
-      envMapIntensity: 0.52,
-      side: THREE.FrontSide
-    });
-    const underMat = new THREE.MeshStandardMaterial({
-      color: 0x16191e,
-      roughness: 0.86,
-      metalness: 0.08,
-      side: dbl
-    });
-    const trimMat = new THREE.MeshStandardMaterial({
-      color: 0x15181e,
-      roughness: 0.40,
-      metalness: 0.18,
-      envMap,
-      envMapIntensity: 0.35,
-      side: dbl
-    });
-    const glossBlackMat = new THREE.MeshStandardMaterial({
-      color: 0x0b0d11,
-      roughness: 0.10,
-      metalness: 0.28,
-      envMap,
-      envMapIntensity: 1.0,
-      side: THREE.FrontSide
-    });
-    const seamMat = new THREE.MeshStandardMaterial({
-      color: 0x222730,
-      roughness: 0.58,
-      metalness: 0.10,
-      side: dbl,
-      polygonOffset: true,
-      polygonOffsetFactor: -1,
-      polygonOffsetUnits: -2
-    });
-    const glassMat = new THREE.MeshStandardMaterial({
-      color: 0x09131e,
-      roughness: 0.03,
-      metalness: 0.36,
-      envMap,
-      envMapIntensity: 2.15,
-      transparent: true,
-      opacity: 0.90,
-      side: THREE.FrontSide
-    });
-    const rearGlassMat = new THREE.MeshStandardMaterial({
-      color: 0x04080e,
-      roughness: 0.025,
-      metalness: 0.44,
-      envMap,
-      envMapIntensity: 2.35,
-      transparent: true,
-      opacity: 0.96,
-      side: THREE.FrontSide
-    });
-    const chromeMat = new THREE.MeshStandardMaterial({
-      color: 0xf0f4fa,
-      roughness: 0.07,
-      metalness: 0.95,
-      envMap,
-      envMapIntensity: 1.75,
-      side: dbl
-    });
-    const grilleDarkMat = trimMat;
-    const hlHousingMat = trimMat;
-    const drlMat = new THREE.MeshStandardMaterial({
-      color: 0xfffaf0,
-      emissive: 0xffe2a8,
-      emissiveIntensity: 1.05,
-      roughness: 0.12,
-      side: dbl
-    });
-    const hlLensMat = new THREE.MeshStandardMaterial({
-      color: 0xeaf3ff,
-      roughness: 0.02,
-      metalness: 0.18,
-      envMap,
-      envMapIntensity: 2.1,
-      transparent: true,
-      opacity: 0.34,
-      depthWrite: false,
-      side: dbl
-    });
-    const tailBodyMat = new THREE.MeshStandardMaterial({
-      color: 0xa30b15,
-      emissive: 0x4a0409,
-      emissiveIntensity: 0.38,
-      roughness: 0.09,
-      metalness: 0.20,
-      envMap,
-      envMapIntensity: 1.45,
-      side: dbl
-    });
-    const tailLedMat = new THREE.MeshStandardMaterial({
-      color: 0xff262a,
-      emissive: 0xf01820,
-      emissiveIntensity: 1.0,
-      roughness: 0.12,
-      side: dbl
-    });
-    const tailClearMat = new THREE.MeshStandardMaterial({
-      color: 0xf6eee8,
-      emissive: 0x40281a,
-      emissiveIntensity: 0.28,
-      roughness: 0.12,
-      metalness: 0.32,
-      envMap,
-      envMapIntensity: 1.15,
-      side: dbl
-    });
-    const mirrorGlassMat = rearGlassMat;
-    const plateFaceMat = new THREE.MeshStandardMaterial({
-      map: plateTex(),
-      roughness: 0.30,
-      metalness: 0.06
-    });
-    const tireMat = new THREE.MeshStandardMaterial({
-      color: 0x16181c,
-      roughness: 0.82,
-      metalness: 0.05,
-      side: dbl
-    });
-    const alloyMat = new THREE.MeshStandardMaterial({
-      color: 0xd9e0ea,
-      roughness: 0.20,
-      metalness: 0.82,
-      envMap,
-      envMapIntensity: 1.35,
-      side: dbl
-    });
-    const rimDiskMat = new THREE.MeshStandardMaterial({
-      map: rimTex(),
-      roughness: 0.26,
-      metalness: 0.72,
-      envMap,
-      envMapIntensity: 1.1,
-      side: dbl
-    });
-
-    const P_TOP = [
-      [-hz, 0.455],
-      [-1.970, 0.525],
-      [-1.942, 0.578],
-      [-1.895, 0.625],
-      [-1.862, 0.685],
-      [-1.852, 0.785],
-      [-1.825, 0.878],
-      [-1.775, 0.942],
-      [-1.620, 1.095],
-      [-1.455, 1.252],
-      [-1.290, 1.362],
-      [-0.880, 1.402],
-      [-0.360, 1.416],
-      [0.050, 1.408],
-      [0.210, 1.374],
-      [0.510, 1.158],
-      [0.825, 0.906],
-      [1.200, 0.858],
-      [1.540, 0.788],
-      [1.760, 0.726],
-      [1.875, 0.680],
-      [1.940, 0.635],
-      [1.968, 0.575],
-      [hz, 0.490]
-    ];
-
-    const P_BELT = [
-      [-hz, 0.435],
-      [-1.955, 0.525],
-      [-1.895, 0.608],
-      [-1.845, 0.840],
-      [-1.560, 0.922],
-      [-1.240, 0.960],
-      [-0.440, 0.935],
-      [0.760, 0.906],
-      [0.825, 0.900],
-      [1.200, 0.844],
-      [1.560, 0.770],
-      [1.780, 0.704],
-      [1.915, 0.635],
-      [1.965, 0.555],
-      [hz, 0.465]
-    ];
-
-    const P_BOT_BASE = [
-      [-hz, 0.360],
-      [-1.968, 0.295],
-      [-1.938, 0.252],
-      [-1.880, 0.224],
-      [-1.780, 0.208],
-      [-1.580, 0.195],
-      [-0.880, 0.176],
-      [0.880, 0.174],
-      [1.580, 0.186],
-      [1.820, 0.196],
-      [1.925, 0.212],
-      [1.962, 0.258],
-      [hz, 0.340]
-    ];
-
-    const P_PLAN = [
-      [-hz, 0.002],
-      [-1.972, 0.250],
-      [-1.946, 0.465],
-      [-1.902, 0.612],
-      [-1.852, 0.712],
-      [-1.760, 0.792],
-      [-1.620, 0.845],
-      [-1.380, 0.868],
-      [0.000, 0.870],
-      [1.340, 0.866],
-      [1.580, 0.830],
-      [1.740, 0.764],
-      [1.850, 0.668],
-      [1.925, 0.548],
-      [1.962, 0.405],
-      [1.974, 0.220],
-      [hz, 0.002]
-    ];
-
-    function prof(z, pts) {
-      if (z <= pts[0][0]) return pts[0][1];
-      const last = pts[pts.length - 1];
-      if (z >= last[0]) return last[1];
-      for (let i = 0; i < pts.length - 1; i++) {
-        const a = pts[i];
-        const b = pts[i + 1];
-        if (z >= a[0] && z <= b[0]) {
-          const span = b[0] - a[0];
-          if (span <= 1e-6) return b[1];
-          const t = (z - a[0]) / span;
-          const s = t * t * (3 - 2 * t);
-          return a[1] + (b[1] - a[1]) * (0.68 * t + 0.32 * s);
-        }
-      }
-      return last[1];
+  }
+  function chaikin(pts, it, closed) {
+    let p = pts;
+    for (let k = 0; k < it; k++) {
+      const q = [], n = p.length;
+      if (!closed) q.push(p[0]);
+      for (let i = 0; i < (closed ? n : n - 1); i++) { const a = p[i], b = p[(i + 1) % n]; q.push([a[0] * 0.75 + b[0] * 0.25, a[1] * 0.75 + b[1] * 0.25], [a[0] * 0.25 + b[0] * 0.75, a[1] * 0.25 + b[1] * 0.75]); }
+      if (!closed) q.push(p[n - 1]);
+      p = q;
     }
-
-    function yBot(z) {
-      const base = prof(z, P_BOT_BASE);
-      const rArch = 0.338;
-      const dF = Math.abs(z - zF);
-      if (dF < rArch) {
-        const archY = R + Math.sqrt(Math.max(0, rArch * rArch - dF * dF));
-        return Math.max(base, archY);
-      }
-      const dR = Math.abs(z - zR);
-      if (dR < rArch) {
-        const archY = R + Math.sqrt(Math.max(0, rArch * rArch - dR * dR));
-        return Math.max(base, archY);
-      }
-      return base;
+    return p;
+  }
+  function resample(pts, n) {                 // n נקודות במרחקים שווים לאורך קו שבור פתוח
+    const acc = [0];
+    for (let i = 1; i < pts.length; i++) acc.push(acc[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const tot = acc[acc.length - 1] || 1, out = [];
+    let j = 0;
+    for (let k = 0; k < n; k++) {
+      const s = (tot * k) / (n - 1);
+      while (j < acc.length - 2 && acc[j + 1] < s) j++;
+      const seg = acc[j + 1] - acc[j] || 1, t = clamp((s - acc[j]) / seg, 0, 1);
+      out.push([lerp(pts[j][0], pts[j + 1][0], t), lerp(pts[j][1], pts[j + 1][1], t)]);
     }
+    return out;
+  }
+  const circle = (cx, cy, rx, ry, n, a0) => { const o = []; for (let i = 0; i <= n; i++) { const a = (a0 || 0) + (i / n) * Math.PI * 2; o.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); } return o; };
 
-    function plan(z) {
-      return prof(z, P_PLAN);
+  // ---------- הגוף: טבלת חתכים לאורך הרכב (z קדימה). כל שורה = נקודות על חצי החתך השמאלי (x>0), מלמטה למעלה;
+  // העקומה (Catmull-Rom צנטריפטלית) עוברת דרכן בדיוק: תחתית, פינת סף, צד, קו כתף ("טורנדו"), קו חלון, פינת גג/עמוד, גג, מרכז.
+  //  z       yBot   wF    wL     yL     wS     yS     wSh    ySh    wB     yB     wR     yR     wC    yC     yTop
+  const BT = [
+    [-1.865, 0.262, 0.40, 0.690, 0.330, 0.718, 0.545, 0.690, 0.822, 0.625, 0.812, 0.520, 0.788, 0.30, 0.762, 0.766],
+    [-1.845, 0.246, 0.44, 0.738, 0.314, 0.770, 0.545, 0.745, 0.852, 0.668, 0.846, 0.548, 0.826, 0.30, 0.798, 0.804],
+    [-1.800, 0.230, 0.47, 0.780, 0.300, 0.812, 0.545, 0.786, 0.866, 0.700, 0.874, 0.580, 0.866, 0.30, 0.855, 0.860],
+    [-1.750, 0.222, 0.49, 0.803, 0.292, 0.836, 0.540, 0.808, 0.870, 0.722, 0.902, 0.620, 0.915, 0.32, 0.920, 0.924],
+    [-1.700, 0.218, 0.50, 0.815, 0.286, 0.848, 0.535, 0.826, 0.866, 0.745, 0.928, 0.655, 0.972, 0.45, 0.992, 0.998],
+    [-1.620, 0.211, 0.51, 0.827, 0.278, 0.859, 0.530, 0.848, 0.858, 0.755, 0.952, 0.648, 1.053, 0.45, 1.076, 1.083],
+    [-1.520, 0.205, 0.52, 0.835, 0.270, 0.864, 0.524, 0.862, 0.848, 0.760, 0.966, 0.642, 1.158, 0.45, 1.181, 1.188],
+    [-1.440, 0.201, 0.53, 0.838, 0.265, 0.866, 0.520, 0.868, 0.840, 0.762, 0.972, 0.636, 1.238, 0.45, 1.263, 1.270],
+    [-1.360, 0.198, 0.53, 0.840, 0.261, 0.866, 0.516, 0.870, 0.832, 0.762, 0.972, 0.632, 1.316, 0.47, 1.343, 1.350],
+    [-1.200, 0.191, 0.54, 0.841, 0.256, 0.866, 0.508, 0.871, 0.818, 0.762, 0.964, 0.632, 1.340, 0.50, 1.379, 1.387],
+    [-0.900, 0.184, 0.55, 0.838, 0.233, 0.859, 0.498, 0.868, 0.800, 0.772, 0.953, 0.645, 1.344, 0.53, 1.399, 1.407],
+    [-0.400, 0.177, 0.55, 0.835, 0.226, 0.856, 0.495, 0.864, 0.788, 0.781, 0.946, 0.650, 1.347, 0.55, 1.408, 1.416],
+    [0.000, 0.176, 0.55, 0.834, 0.225, 0.855, 0.495, 0.862, 0.785, 0.785, 0.944, 0.652, 1.338, 0.55, 1.398, 1.406],
+    [0.260, 0.178, 0.55, 0.835, 0.226, 0.855, 0.495, 0.861, 0.784, 0.786, 0.943, 0.656, 1.318, 0.55, 1.378, 1.386],
+    [0.450, 0.180, 0.55, 0.836, 0.227, 0.856, 0.497, 0.860, 0.784, 0.787, 0.942, 0.674, 1.198, 0.52, 1.238, 1.250],
+    [0.700, 0.182, 0.55, 0.837, 0.228, 0.857, 0.500, 0.859, 0.786, 0.789, 0.940, 0.700, 1.040, 0.52, 1.072, 1.082],
+    [0.900, 0.184, 0.55, 0.838, 0.229, 0.859, 0.503, 0.859, 0.790, 0.792, 0.918, 0.700, 0.952, 0.48, 0.957, 0.960],
+    [1.000, 0.185, 0.55, 0.839, 0.231, 0.860, 0.505, 0.859, 0.790, 0.795, 0.893, 0.660, 0.926, 0.45, 0.933, 0.936],
+    [1.250, 0.190, 0.55, 0.842, 0.237, 0.864, 0.510, 0.860, 0.786, 0.797, 0.858, 0.640, 0.887, 0.42, 0.893, 0.895],
+    [1.550, 0.200, 0.53, 0.827, 0.247, 0.850, 0.514, 0.845, 0.772, 0.784, 0.810, 0.620, 0.831, 0.40, 0.836, 0.838],
+    [1.750, 0.206, 0.50, 0.797, 0.253, 0.823, 0.514, 0.814, 0.756, 0.758, 0.772, 0.600, 0.786, 0.38, 0.790, 0.792],
+    [1.880, 0.216, 0.46, 0.750, 0.263, 0.774, 0.508, 0.759, 0.728, 0.714, 0.738, 0.560, 0.745, 0.36, 0.748, 0.750],
+    [1.965, 0.236, 0.40, 0.674, 0.279, 0.694, 0.496, 0.672, 0.682, 0.624, 0.692, 0.490, 0.700, 0.30, 0.703, 0.705],
+  ];
+  const Z0 = BT[0][0], Z1 = BT[BT.length - 1][0];
+  const CAP_R = { zc: Z0, ze: ZR, yp: 0.50, p: 2.2 }, CAP_F = { zc: Z1, ze: ZF, yp: 0.47, p: 2.4 };
+  const ARCH_F = 0.336, ARCH_R = 0.333;
+  const SPAN_N = [1, 2, 3, 3, 4, 3, 4, 3, 3];            // דגימות לכל מקטע בחצי חתך (26) → 52 נקודות בטבעת (הרצפה שטוחה – דגימה אחת)
+  const NS = SPAN_N.concat(SPAN_N.slice().reverse()), J_TOP = SPAN_N.reduce((a, b) => a + b, 0), NP = 2 * J_TOP;
+  const KNOT = k => SPAN_N.slice(0, k).reduce((a, b) => a + b, 0);   // אינדקס הדגימה של נקודה k בחצי החתך (P0=0, P1=1, P2a=2, P2=3 …)
+  const J_P2A = KNOT(2), J_P2 = KNOT(3), J_P5 = KNOT(6);
+  let BI = null;
+  const bodyInterp = () => BI || (BI = BT[0].slice(1).map((_, c) => mono(BT.map(r => r[0]), BT.map(r => r[c + 1]))));
+  function archY(z) {
+    let a = -1; const dF = z - WB / 2, dR = z + WB / 2;
+    if (Math.abs(dF) < ARCH_F) a = Math.max(a, R + Math.sqrt(ARCH_F * ARCH_F - dF * dF));
+    if (Math.abs(dR) < ARCH_R) a = Math.max(a, R + Math.sqrt(ARCH_R * ARCH_R - dR * dR));
+    return a;
+  }
+  function sectionCtrl(z) {
+    let [yBot, wF, wL, yL, wS, yS, wSh, ySh, wB, yB, wR, yR, wC, yC, yTop] = bodyInterp().map(f => f(z));
+    let wA = lerp(wF, wL, 0.62), yA = lerp(yBot, yL, 0.18), s = 0;
+    const a = archY(z);
+    if (a > 0) {                              // קשת גלגל: שפת הקשת למעלה, תקרת בית הגלגל, הרחבה קלה של הכנף
+      s = sstep(0, 0.05, a - yL);
+      yL = smax(yL, a + 0.012, 0.025); wL += 0.010 * s;
+      wA = lerp(wA, wF + 0.08, s); yA = lerp(yA, a + 0.002, s);
+      wS += 0.006 * s;
     }
-
-    function glassAt(z, y, x, top) {
-      const ax = Math.abs(x);
-      if (z >= 0.21 && z <= 0.81 && y > 0.915 && y < top - 0.025 && ax < 0.62 - (0.81 - z) * 0.13) {
-        return 1;
-      }
-      if (z >= -1.74 && z <= -1.21 && y > 0.945 && y < top - 0.028 && ax < 0.59 - (z + 1.74) * 0.14) {
-        return 2;
-      }
-      if (z >= -1.24 && z <= 0.74 && ax > 0.56) {
-        const yLow = 0.915 + (0.74 - z) * 0.025;
-        let yHigh = 1.320;
-        if (z > -0.15) {
-          const u = (z + 0.15) / 0.89;
-          yHigh = 1.320 - 0.405 * Math.pow(Math.max(0, u), 1.85);
-        } else {
-          const u = (-0.15 - z) / 1.09;
-          yHigh = 1.320 - 0.355 * Math.pow(Math.max(0, u), 2.05);
-        }
-        if (y > yLow && y < yHigh) {
-          return z < -0.44 ? 2 : 1;
-        }
-      }
-      return 0;
+    yS = Math.max(yS, yL + 0.06);
+    return { s, c: [[0, yBot], [wF, yBot], [wA, yA], [wL, yL], [wS, yS], [wSh, ySh], [wB, yB], [wR, yR], [wC, yC], [0, yTop]] };
+  }
+  // עקומה סגורה דרך נקודות החתך: קובית הרמיט לכל קואורדינטה לפי אורך מיתר, שיפועים מונוטוניים (Fritsch–Carlson, סימטרי)
+  // → עוברת בדיוק דרך הנקודות, בלי "קפיצות" מעל הגג או מתחת לרצפה, חלקה (C1) וסימטרית במראה
+  function loopCurve(C, counts) {
+    const n = C.length, s = [0], h = [], m = [new Array(n), new Array(n)], pts = [];
+    for (let i = 0; i < n; i++) { const a = C[i], b = C[(i + 1) % n], l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1e-6; h.push(l); s.push(s[i] + l); }
+    for (let c = 0; c < 2; c++) {
+      const d = []; for (let i = 0; i < n; i++) d.push((C[(i + 1) % n][c] - C[i][c]) / h[i]);
+      for (let i = 0; i < n; i++) { const ip = (i - 1 + n) % n, d0 = d[ip], d1 = d[i]; m[c][i] = d0 * d1 <= 0 ? 0 : (h[i] * d0 + h[ip] * d1) / (h[ip] + h[i]); }
+      const tau = d.map((di, i) => { if (di === 0) return 0; const al = m[c][i] / di, be = m[c][(i + 1) % n] / di, q = al * al + be * be; return q > 9 ? 3 / Math.sqrt(q) : 1; });
+      for (let i = 0; i < n; i++) m[c][i] *= Math.min(tau[(i - 1 + n) % n], tau[i]);
     }
-
-    function zone(z) {
-      if (z > 0.825) return 'front';
-      if (z >= -1.29) return 'cabin';
-      if (z >= -1.755) return 'hatch';
-      return 'rear';
+    for (let k = 0; k < n; k++) {
+      const a = C[k], b = C[(k + 1) % n], hk = h[k], kn = (k + 1) % n;
+      for (let q = 0; q < counts[k]; q++) {
+        const t = q / counts[k], t2 = t * t, t3 = t2 * t, h00 = 2 * t3 - 3 * t2 + 1, h10 = t3 - 2 * t2 + t, h01 = -2 * t3 + 3 * t2, h11 = t3 - t2;
+        pts.push([h00 * a[0] + h10 * hk * m[0][k] + h01 * b[0] + h11 * hk * m[0][kn], h00 * a[1] + h10 * hk * m[1][k] + h01 * b[1] + h11 * hk * m[1][kn]]);
+      }
     }
+    return pts;
+  }
+  function ringAt(z) {
+    const sc = sectionCtrl(z), h = sc.c, C = h.slice();
+    for (let k = 8; k >= 1; k--) C.push([-h[k][0], h[k][1]]);
+    return { pts: loopCurve(C, NS), arch: sc.s };
+  }
 
-    const archFlare = (z) => {
-      const rOuter = 0.42;
-      const dF = Math.abs(z - zF);
-      const dR = Math.abs(z - zR);
-      let f = 0;
-      if (dF < rOuter) f = Math.max(f, Math.cos((dF / rOuter) * (Math.PI / 2)));
-      if (dR < rOuter) f = Math.max(f, Math.cos((dR / rOuter) * (Math.PI / 2)));
-      return 0.022 * f * f;
+  // מעטפת אטומה: קוטב אחורי, 71 טבעות, קוטב קדמי. פאות בכיוון השעון-הפוך מבחוץ → נפח מסומן חיובי.
+  function buildBody(opts) {
+    const NM = 60, NC = 5, rings = [];
+    const b0 = ringAt(Z0), b1 = ringAt(Z1);
+    const capRing = (base, cap, m) => {
+      const phi = (m / (NC + 1)) * Math.PI / 2, k = Math.cos(phi), t = Math.pow(1 - Math.pow(k, cap.p), 1 / cap.p);
+      return { z: cap.zc + (cap.ze - cap.zc) * t, pts: base.pts.map(([x, y]) => [x * k, cap.yp + (y - cap.yp) * k]), arch: 0, cap: 1 - k };
     };
-
-    function ring(z) {
-      const y0 = yBot(z);
-      const yUnder = prof(z, P_BOT_BASE);
-      const yBelt = prof(z, P_BELT);
-      const yTop = Math.max(yBelt + 0.014, prof(z, P_TOP));
-      const w = Math.max(0.08, plan(z));
-      const fl = archFlare(z);
-      const zn = zone(z);
-
-      const hLow = Math.max(0.04, yBelt - y0);
-      const hUp = Math.max(0.014, yTop - yBelt);
-      const isGreenhouse = zn === 'cabin' || zn === 'hatch';
-      const cabRatio = isGreenhouse ? Math.min(1, hUp / 0.44) : 0;
-      const wRoof = w * (1 - 0.275 * cabRatio);
-      const wMidCab = w * (1 - 0.150 * cabRatio);
-
-      const half = [
-        [0.0, yUnder],
-        [0.54 * w, yUnder],
-        [0.90 * w, y0],
-        [0.98 * w + fl * 0.50, y0 + 0.16 * hLow],
-        [1.00 * w + fl * 0.95, y0 + 0.44 * hLow],
-        [0.985 * w + fl * 0.45, y0 + 0.76 * hLow],
-        [0.935 * w, yBelt],
-        [0.902 * w * (1 - 0.06 * cabRatio), yBelt + 0.22 * hUp],
-        [wMidCab, yBelt + 0.56 * hUp],
-        [wRoof, yBelt + 0.91 * hUp],
-        [wRoof * 0.65, yBelt + 0.982 * hUp],
-        [0.0, yTop]
-      ];
-
-      const pts = [];
-      for (let i = 0; i < half.length; i++) {
-        pts.push([half[i][0], half[i][1], z]);
-      }
-      for (let i = half.length - 2; i >= 1; i--) {
-        pts.push([-half[i][0], half[i][1], z]);
-      }
-      return pts;
-    }
-
-    const g = new THREE.Group();
-    g.name = 'ariel-a1';
-
-    // מנגנון איחוד גיאומטריות סטטיות לפי חומר (מוריד 115 קריאות ציור ל-15 בלבד!)
-    const staticBuckets = new Map();
-    const getBucket = (mat) => {
-      let b = staticBuckets.get(mat);
-      if (!b) {
-        b = { pos: [], norm: [], uv: [], idx: [], hasUV: false };
-        staticBuckets.set(mat, b);
-      }
-      return b;
+    for (let m = NC; m >= 1; m--) rings.push(capRing(b0, CAP_R, m));
+    for (let i = 0; i <= NM; i++) { const z = Z0 + ((Z1 - Z0) * i) / NM, r = i === 0 ? b0 : i === NM ? b1 : ringAt(z); rings.push({ z, pts: r.pts, arch: r.arch, cap: 0 }); }
+    for (let m = 1; m <= NC; m++) rings.push(capRing(b1, CAP_F, m));
+    let mx = 0; for (const r of rings) for (const p of r.pts) mx = Math.max(mx, Math.abs(p[0]));
+    const sx = Wd / 2 / mx;                   // רוחב מדויק 1.740
+    const NR = rings.length, pos = new Float32Array((NR * NP + 2) * 3), col = new Float32Array((NR * NP + 2) * 3), idx = [];
+    pos.set([0, CAP_R.yp, ZR], 0);
+    const roofBlack = !!(opts && opts.roofBlack);
+    const shade = (x, y, z, j, ring) => {     // צבע קודקוד: בתי גלגלים ותחתית כהים, פס תחתון אחורי שחור, גג שחור (אופציה)
+      const jj = j <= J_TOP ? j : NP - j;
+      let d = 0;
+      if (jj < J_P2A && !ring.cap) d = 1;                       // תחתית (לא על פני הפגושים)
+      if (ring.arch > 0.25 && jj < J_P2) d = 1;                 // בית גלגל
+      if (z > 1.93 && y < 0.250) d = Math.max(d, 1);            // שפה תחתונה קדמית
+      if (roofBlack && jj >= J_P5 && z > -1.62 && z < 0.92) return [0.03, 0.03, 0.035];
+      return d ? [0.07, 0.072, 0.078] : [1, 1, 1];
     };
-
-    const tmpMat4 = new THREE.Matrix4();
-    const tmpNormMat = new THREE.Matrix3();
-    const tmpPosV = new THREE.Vector3();
-    const tmpNormV = new THREE.Vector3();
-
-    const mergeGeo = (geo, mat, matrix4) => {
-      const gWork = geo.clone();
-      let flipWinding = false;
-      if (matrix4) {
-        if (matrix4.determinant() < 0) flipWinding = true;
-        gWork.applyMatrix4(matrix4);
+    for (let i = 0; i < NR; i++) {
+      const r = rings[i];
+      for (let j = 0; j < NP; j++) {
+        const o = (1 + i * NP + j) * 3, x = r.pts[j][0] * sx, y = r.pts[j][1];
+        pos[o] = x; pos[o + 1] = y; pos[o + 2] = r.z;
+        col.set(shade(x, y, r.z, j, r), o);
       }
-      const pAttr = gWork.getAttribute('position');
-      if (!pAttr) return;
-      let indexArr;
-      if (gWork.index) {
-        indexArr = Array.from(gWork.index.array);
-      } else {
-        indexArr = [];
-        for (let k = 0; k < pAttr.count; k++) indexArr.push(k);
+    }
+    const F = 1 + NR * NP; pos.set([0, CAP_F.yp, ZF], F * 3);
+    col.set(shade(0, CAP_R.yp, ZR, J_P2 + 4, rings[0]), 0); col.set(shade(0, CAP_F.yp, ZF, J_P2 + 4, rings[NR - 1]), F * 3);
+    const vid = (i, j) => 1 + i * NP + (((j % NP) + NP) % NP);
+    const bands = [];
+    bands.push({ z0: ZR, z1: rings[0].z, t0: 0, t1: NP });
+    for (let j = 0; j < NP; j++) idx.push(0, vid(0, j + 1), vid(0, j));
+    for (let i = 0; i < NR - 1; i++) {
+      const t0 = idx.length / 3;
+      for (let j = 0; j < NP; j++) {
+        const a = vid(i, j), b = vid(i, j + 1), c = vid(i + 1, j + 1), d = vid(i + 1, j);
+        if (j < J_TOP) idx.push(a, b, c, a, c, d); else idx.push(a, b, d, b, c, d);   // אלכסונים סימטריים במראה
       }
-      if (flipWinding) {
-        for (let k = 0; k < indexArr.length; k += 3) {
-          const tmp = indexArr[k + 1];
-          indexArr[k + 1] = indexArr[k + 2];
-          indexArr[k + 2] = tmp;
+      bands.push({ z0: Math.min(rings[i].z, rings[i + 1].z), z1: Math.max(rings[i].z, rings[i + 1].z), t0, t1: idx.length / 3 });
+    }
+    { const t0 = idx.length / 3; for (let j = 0; j < NP; j++) idx.push(F, vid(NR - 1, j), vid(NR - 1, j + 1)); bands.push({ z0: rings[NR - 1].z, z1: ZF, t0, t1: idx.length / 3 }); }
+    // כל רצועה מחולקת ל-8 גזרות עם תיבה חוסמת – הקרן בודקת רק גזרות שהיא חוצה (פי 4–8 פחות משולשים)
+    for (const B of bands) {
+      B.sec = []; const n = B.t1 - B.t0, per = Math.ceil(n / 8);
+      for (let t0 = B.t0; t0 < B.t1; t0 += per) {
+        const t1 = Math.min(B.t1, t0 + per), bb = [1e9, 1e9, 1e9, -1e9, -1e9, -1e9];
+        for (let t = t0 * 3; t < t1 * 3; t++) { const v = idx[t] * 3; for (let c = 0; c < 3; c++) { const q = pos[v + c]; if (q < bb[c]) bb[c] = q; if (q > bb[c + 3]) bb[c + 3] = q; } }
+        B.sec.push({ t0, t1, bb });
+      }
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    geo.computeBoundingSphere();
+    return { geo, bands, rings, sx };
+  }
+
+  // הטלת קרן על הגוף (Möller–Trumbore), רק על רצועות החתכים שהקרן חוצה; מחזיר נקודה + נורמל חלק
+  function makeCaster(geo, bands) {
+    const P = geo.attributes.position.array, N = geo.attributes.normal.array, I = geo.index.array;
+    return function cast(o, d, tMax) {
+      tMax = tMax || 4;
+      let bt = tMax, bi = -1, bu = 0, bv = 0;
+      const dz = d[2], nb = bands.length, flat = Math.abs(dz) < 1e-9;
+      for (let qq = 0; qq < nb; qq++) {           // הרצועות ממוינות לפי z: עוברים בכיוון הקרן ועוצרים אחרי הפגיעה הקרובה
+        const B = bands[dz < 0 ? nb - 1 - qq : qq];
+        if (flat) { if (B.z1 < o[2] - 1e-6 || B.z0 > o[2] + 1e-6) continue; }
+        else if (dz > 0) { if (B.z1 < o[2]) continue; if (B.z0 > o[2] + dz * bt) break; }
+        else { if (B.z0 > o[2]) continue; if (B.z1 < o[2] + dz * bt) break; }
+        for (const S of B.sec) {
+        const bb = S.bb; let ta = 0, tb = bt, miss = false;           // מבחן לוחות מול התיבה של הגזרה
+        for (let c = 0; c < 3 && !miss; c++) {
+          const oc = o[c], dc = d[c], lo = bb[c] - 1e-4, hi = bb[c + 3] + 1e-4;
+          if (Math.abs(dc) < 1e-12) { if (oc < lo || oc > hi) miss = true; continue; }
+          let u0 = (lo - oc) / dc, u1 = (hi - oc) / dc; if (u0 > u1) { const tq = u0; u0 = u1; u1 = tq; }
+          if (u0 > ta) ta = u0; if (u1 < tb) tb = u1; if (ta > tb) miss = true;
+        }
+        if (miss) continue;
+        for (let t = S.t0; t < S.t1; t++) {
+          const i0 = I[t * 3] * 3, i1 = I[t * 3 + 1] * 3, i2 = I[t * 3 + 2] * 3;
+          const ax = P[i0], ay = P[i0 + 1], az = P[i0 + 2];
+          const e1x = P[i1] - ax, e1y = P[i1 + 1] - ay, e1z = P[i1 + 2] - az, e2x = P[i2] - ax, e2y = P[i2 + 1] - ay, e2z = P[i2 + 2] - az;
+          const px = d[1] * e2z - d[2] * e2y, py = d[2] * e2x - d[0] * e2z, pz = d[0] * e2y - d[1] * e2x;
+          const det = e1x * px + e1y * py + e1z * pz;
+          if (det > -1e-12 && det < 1e-12) continue;
+          const inv = 1 / det, tx = o[0] - ax, ty = o[1] - ay, tz = o[2] - az;
+          const u = (tx * px + ty * py + tz * pz) * inv; if (u < -1e-7 || u > 1 + 1e-7) continue;   // סובלנות: קרן שעוברת בדיוק על צלע לא נופלת ב"סדק"
+          const qx = ty * e1z - tz * e1y, qy = tz * e1x - tx * e1z, qz = tx * e1y - ty * e1x;
+          const v = (d[0] * qx + d[1] * qy + d[2] * qz) * inv; if (v < -1e-7 || u + v > 1 + 1e-7) continue;
+          const tt = (e2x * qx + e2y * qy + e2z * qz) * inv; if (tt <= 1e-6 || tt >= bt) continue;
+          const fx = e1y * e2z - e1z * e2y, fy = e1z * e2x - e1x * e2z, fz = e1x * e2y - e1y * e2x;
+          if (fx * d[0] + fy * d[1] + fz * d[2] >= 0) continue;   // רק פאה חיצונית
+          bt = tt; bi = t; bu = u; bv = v;
+        }
         }
       }
-      gWork.setIndex(indexArr);
-      gWork.computeVertexNormals();
-
-      const nAttr = gWork.getAttribute('normal');
-      const uvAttr = gWork.getAttribute('uv');
-      const bucket = getBucket(mat);
-      const base = bucket.pos.length / 3;
-
-      for (let k = 0; k < pAttr.count; k++) {
-        bucket.pos.push(pAttr.getX(k), pAttr.getY(k), pAttr.getZ(k));
-        if (nAttr) {
-          bucket.norm.push(nAttr.getX(k), nAttr.getY(k), nAttr.getZ(k));
-        } else {
-          bucket.norm.push(0, 1, 0);
-        }
-        if (uvAttr) {
-          bucket.uv.push(uvAttr.getX(k), uvAttr.getY(k));
-          bucket.hasUV = true;
-        } else {
-          bucket.uv.push(0, 0);
-        }
-      }
-      for (let k = 0; k < indexArr.length; k++) {
-        bucket.idx.push(base + indexArr[k]);
-      }
+      if (bi < 0) return null;
+      const i0 = I[bi * 3] * 3, i1 = I[bi * 3 + 1] * 3, i2 = I[bi * 3 + 2] * 3, w = 1 - bu - bv;
+      let nx = N[i0] * w + N[i1] * bu + N[i2] * bv, ny = N[i0 + 1] * w + N[i1 + 1] * bu + N[i2 + 1] * bv, nz = N[i0 + 2] * w + N[i1 + 2] * bu + N[i2 + 2] * bv;
+      const nl = Math.hypot(nx, ny, nz) || 1; nx /= nl; ny /= nl; nz /= nl;
+      return { p: [o[0] + d[0] * bt, o[1] + d[1] * bt, o[2] + d[2] * bt], n: [nx, ny, nz] };
     };
+  }
 
-    const addPart = (geo, mat, pos, rot, scl, quat) => {
-      const p = pos ? new THREE.Vector3(pos[0], pos[1], pos[2]) : new THREE.Vector3();
-      const q = quat ? quat.clone() : new THREE.Quaternion();
-      if (rot && !quat) {
-        q.setFromEuler(new THREE.Euler(rot[0] || 0, rot[1] || 0, rot[2] || 0));
-      }
-      const s = scl ? new THREE.Vector3(scl[0], scl[1], scl[2]) : new THREE.Vector3(1, 1, 1);
-      tmpMat4.compose(p, q, s);
-      mergeGeo(geo, mat, tmpMat4);
+  function build(opts) {
+    opts = opts || {};
+    const envMap = envTex();
+    const std = p => new THREE.MeshStandardMaterial(p);
+    const M = {
+      paint: new THREE.MeshPhysicalMaterial({ color: 0xf2f3f1, roughness: 0.34, metalness: 0.0, clearcoat: 1.0, clearcoatRoughness: 0.07, envMap, envMapIntensity: 0.95, vertexColors: true }),
+      glass: std({ color: 0x06080b, roughness: 0.06, metalness: 0.15, envMap, envMapIntensity: 1.1 }),
+      black: std({ color: 0x08090b, roughness: 0.16, metalness: 0.25, envMap, envMapIntensity: 0.9 }),
+      plastic: std({ color: 0x141518, roughness: 0.72, metalness: 0.05, envMap, envMapIntensity: 0.3 }),
+      chrome: std({ color: 0xeef1f5, roughness: 0.08, metalness: 1.0, envMap, envMapIntensity: 1.35 }),
+      lamp: std({ color: 0x9aa3ad, roughness: 0.10, metalness: 0.9, envMap, envMapIntensity: 1.3, emissive: 0xfff1d6, emissiveIntensity: 0.0 }),
+      drl: std({ color: 0xffffff, roughness: 0.2, emissive: 0xfff4e2, emissiveIntensity: 0.6 }),
+      tail: std({ color: 0x7c0a10, roughness: 0.12, metalness: 0.1, envMap, envMapIntensity: 1.1, emissive: 0xff1810, emissiveIntensity: 0.10 }),
+      tailGlow: std({ color: 0xff2a22, roughness: 0.3, emissive: 0xff2014, emissiveIntensity: 0.55 }),
+      plate: std({ map: plateTex(), roughness: 0.35, metalness: 0.05, emissive: 0xffffff, emissiveMap: plateTex(), emissiveIntensity: 0 }),
+      interior: std({ vertexColors: true, roughness: 0.75, metalness: 0.05 }),
+      tire: std({ color: 0x121315, roughness: 0.9, metalness: 0.0 }),
+      alloy: std({ color: 0xc9cdd3, roughness: 0.26, metalness: 0.85, envMap, envMapIntensity: 1.15 }),
+      shadow: new THREE.MeshBasicMaterial({ map: shadowTex(), color: 0x000000, transparent: true, opacity: 0.85, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 }),
     };
+    const g = new THREE.Group(); g.name = 'ariel-a1';
 
-    const quadBatches = new Map();
-    const getQuadBatch = (mat) => {
-      let b = quadBatches.get(mat);
-      if (!b) {
-        b = { pos: [], idx: [] };
-        quadBatches.set(mat, b);
-      }
-      return b;
-    };
-
-    function quad(a, b, w, mat, off, x0 = 0) {
-      const ax = a[0] + x0;
-      const ay = a[1];
-      const az = a[2];
-      const bx = b[0] + x0;
-      const by = b[1];
-      const bz = b[2];
-
-      const dx = bx - ax;
-      const dy = by - ay;
-      const dz = bz - az;
-      const len = Math.hypot(dx, dy, dz) || 1e-5;
-
-      const nx = off[0];
-      const ny = off[1];
-      const nz = off[2];
-      const nLen = Math.hypot(nx, ny, nz) || 1;
-      const ox = nx / nLen;
-      const oy = ny / nLen;
-      const oz = nz / nLen;
-
-      let sx = (dy * oz - dz * oy) / len;
-      let sy = (dz * ox - dx * oz) / len;
-      let sz = (dx * oy - dy * ox) / len;
-      const sLen = Math.hypot(sx, sy, sz) || 1;
-      sx = (sx / sLen) * (w * 0.5);
-      sy = (sy / sLen) * (w * 0.5);
-      sz = (sz / sLen) * (w * 0.5);
-
-      const batch = getQuadBatch(mat);
-      const base = batch.pos.length / 3;
-      batch.pos.push(
-        ax - sx + nx, ay - sy + ny, az - sz + nz,
-        ax + sx + nx, ay + sy + ny, az + sz + nz,
-        bx + sx + nx, by + sy + ny, bz + sz + nz,
-        bx - sx + nx, by - sy + ny, bz - sz + nz
-      );
-      batch.idx.push(base, base + 1, base + 2, base, base + 2, base + 3);
-    }
-
-    // 1. מעטפת המרכב הלבנה המעוגלת — 100% אטומה (0 קצוות פתוחים!) ונפח חתום חיובי (V > +3.8 m³ ב-FrontSide!)
-    const ZS_INNER = [
-      -1.968, -1.940, -1.898, -1.862, -1.848, -1.820, -1.755,
-      -1.620, -1.455, -1.290, -0.860, -0.440, 0.050, 0.210, 0.520,
-      0.825, 1.235, 1.540, 1.740, 1.855, 1.928, 1.964
-    ];
-
-    const rings = ZS_INNER.map((z) => ring(z));
-    const nR = rings.length;
-    const nP = rings[0].length;
-
-    const bodyVerts = [];
-    const bodyIdx = [];
-
-    // קודקוד 0: כיפת קצה פגוש אחורי (-hz)
-    bodyVerts.push(0.0, 0.415, -hz);
-    for (let i = 0; i < nR; i++) {
-      for (let j = 0; j < nP; j++) {
-        const p = rings[i][j];
-        bodyVerts.push(p[0], p[1], p[2]);
-      }
-    }
-    // קודקוד אחרון: כיפת קצה פגוש קדמי (+hz)
-    const vFrontIdx = 1 + nR * nP;
-    bodyVerts.push(0.0, 0.425, hz);
-
-    // סגירה אחורית אטומה (נורמלים החוצה לכיוון -Z)
-    for (let j = 0; j < nP; j++) {
-      const jNext = (j + 1) % nP;
-      const a = 1 + j;
-      const b = 1 + jNext;
-      bodyIdx.push(0, b, a);
-    }
-
-    // צינור מרכב רציף עם ליפוף פאות כלפי חוץ (נפח חתום חיובי V > 0!)
-    for (let i = 0; i < nR - 1; i++) {
-      for (let j = 0; j < nP; j++) {
-        const jNext = (j + 1) % nP;
-        const a = 1 + i * nP + j;
-        const b = 1 + i * nP + jNext;
-        const c = 1 + (i + 1) * nP + jNext;
-        const d = 1 + (i + 1) * nP + j;
-        bodyIdx.push(a, b, c, a, c, d);
-      }
-    }
-
-    // סגירה קדמית אטומה (נורמלים החוצה לכיוון +Z)
-    const lastRingBase = 1 + (nR - 1) * nP;
-    for (let j = 0; j < nP; j++) {
-      const jNext = (j + 1) % nP;
-      const d = lastRingBase + j;
-      const c = lastRingBase + jNext;
-      bodyIdx.push(vFrontIdx, d, c);
-    }
-
-    const bodyGeo = new THREE.BufferGeometry();
-    bodyGeo.setAttribute('position', new THREE.Float32BufferAttribute(bodyVerts, 3));
-    bodyGeo.setIndex(bodyIdx);
-    bodyGeo.computeVertexNormals();
-
-    const nAttr = bodyGeo.getAttribute('normal');
-    const pAttr = bodyGeo.getAttribute('position');
-    for (let k = 0; k < pAttr.count; k++) {
-      if (Math.abs(pAttr.getX(k)) < 0.004) {
-        const ny = nAttr.getY(k);
-        const nz = nAttr.getZ(k);
-        const l = Math.hypot(ny, nz) || 1;
-        nAttr.setXYZ(k, 0, ny / l, nz / l);
-      }
-    }
-    nAttr.needsUpdate = true;
-
-    const bodyMesh = new THREE.Mesh(bodyGeo, paintMat);
-    bodyMesh.name = 'ariel-a1-body';
-    bodyMesh.castShadow = true;
-    bodyMesh.receiveShadow = true;
-    bodyMesh.updateMatrixWorld(true);
+    // --- גוף
+    const body = buildBody(opts);
+    const bodyMesh = new THREE.Mesh(body.geo, M.paint); bodyMesh.name = 'ariel-a1-body'; bodyMesh.castShadow = true; bodyMesh.receiveShadow = true;
     g.add(bodyMesh);
+    const cast = makeCaster(body.geo, body.bands);
 
-    // 2. Raycaster מדויק על bodyMesh — כל פנס, גריל, שמשה, ידית ופס נצמדים לפני המרכב
-    const rc = new THREE.Raycaster();
-    const rOrig = new THREE.Vector3();
-    const rDir = new THREE.Vector3();
-
-    const hitFront = (x, y, outM = 0.006) => {
-      rOrig.set(x, y, 3.2);
-      rDir.set(0, 0, -1);
-      rc.set(rOrig, rDir);
-      const hits = rc.intersectObject(bodyMesh, false);
-      if (hits.length > 0) {
-        const h = hits[0];
-        const n = h.face ? h.face.normal : { x: 0, y: 0, z: 1 };
-        const sgn = n.z < 0 ? -1 : 1;
-        return [
-          h.point.x + n.x * sgn * outM,
-          h.point.y + n.y * sgn * outM,
-          h.point.z + n.z * sgn * outM
-        ];
-      }
-      return [x, y, hz + outM];
-    };
-
-    const hitRear = (x, y, outM = 0.006) => {
-      rOrig.set(x, y, -3.2);
-      rDir.set(0, 0, 1);
-      rc.set(rOrig, rDir);
-      const hits = rc.intersectObject(bodyMesh, false);
-      if (hits.length > 0) {
-        const h = hits[0];
-        const n = h.face ? h.face.normal : { x: 0, y: 0, z: -1 };
-        const sgn = n.z > 0 ? -1 : 1;
-        return [
-          h.point.x + n.x * sgn * outM,
-          h.point.y + n.y * sgn * outM,
-          h.point.z + n.z * sgn * outM
-        ];
-      }
-      return [x, y, -hz - outM];
-    };
-
-    const hitSide = (sx, y, z, outM = 0.005) => {
-      rOrig.set(sx * 2.2, y, z);
-      rDir.set(-sx, 0, 0);
-      rc.set(rOrig, rDir);
-      const hits = rc.intersectObject(bodyMesh, false);
-      if (hits.length > 0) {
-        const h = hits[0];
-        return [h.point.x + sx * outM, h.point.y, h.point.z];
-      }
-      return [sx * (hw + outM), y, z];
-    };
-
-    const hitCornerFront = (sx, ax, y, outM = 0.008) => {
-      rOrig.set(sx * (ax + 0.55), y + 0.08, 2.85);
-      rDir.set(-sx * 0.52, -0.08, -1.0).normalize();
-      rc.set(rOrig, rDir);
-      const hits = rc.intersectObject(bodyMesh, false);
-      if (hits.length > 0) {
-        const h = hits[0];
-        const n = h.face ? h.face.normal : { x: sx * 0.4, y: 0.1, z: 0.9 };
-        const dot = n.x * -rDir.x + n.y * -rDir.y + n.z * -rDir.z;
-        const sgn = dot < 0 ? -1 : 1;
-        return [
-          h.point.x + n.x * sgn * outM,
-          h.point.y + n.y * sgn * outM,
-          h.point.z + n.z * sgn * outM
-        ];
-      }
-      return hitFront(sx * ax, y, outM);
-    };
-
-    // בטנות בית גלגל כהות
-    const addWheelWell = (sx, zCenter) => {
-      const segs = 8;
-      const rIn = 0.342;
-      const xOuter = sx * (plan(zCenter) * 0.96);
-      const xInner = sx * (hw - 0.285);
-      const batch = getQuadBatch(underMat);
-      const base = batch.pos.length / 3;
-      for (let i = 0; i <= segs; i++) {
-        const ang = (i / segs) * Math.PI;
-        const zz = zCenter + Math.cos(ang) * rIn;
-        const yy = R + Math.sin(ang) * rIn;
-        batch.pos.push(xOuter, yy, zz, xInner, yy, zz);
-      }
-      const cIdx = batch.pos.length / 3;
-      batch.pos.push(xInner, R - 0.08, zCenter);
-      for (let i = 0; i < segs; i++) {
-        const a = base + i * 2;
-        const b = a + 1;
-        const c = a + 3;
-        const d = a + 2;
-        batch.idx.push(a, b, c, a, c, d, b, cIdx, c);
-      }
-    };
-    addWheelWell(1, zF);
-    addWheelWell(-1, zF);
-    addWheelWell(1, zR);
-    addWheelWell(-1, zR);
-
-    const buildCurvedSurface = (uSteps, vSteps, evalPt, mat, flip = false, outHint = null) => {
-      const verts = [];
-      const idx = [];
-      for (let iu = 0; iu <= uSteps; iu++) {
-        const u = iu / uSteps;
-        for (let iv = 0; iv <= vSteps; iv++) {
-          const v = iv / vSteps;
-          const p = evalPt(u, v);
-          verts.push(p[0], p[1], p[2]);
-        }
-      }
-      const stride = vSteps + 1;
-      for (let iu = 0; iu < uSteps; iu++) {
-        for (let iv = 0; iv < vSteps; iv++) {
-          const a = iu * stride + iv;
-          const b = a + 1;
-          const c = (iu + 1) * stride + iv + 1;
-          const d = (iu + 1) * stride + iv;
-          if (flip) {
-            idx.push(a, c, b, a, d, c);
-          } else {
-            idx.push(a, b, c, a, c, d);
-          }
-        }
-      }
-      if (outHint) {
-        // Check center triangle normal against outHint; flip all indices if pointing inward
-        const ia = idx[0] * 3, ib = idx[1] * 3, ic = idx[2] * 3;
-        const ux = verts[ib] - verts[ia], uy = verts[ib + 1] - verts[ia + 1], uz = verts[ib + 2] - verts[ia + 2];
-        const vx = verts[ic] - verts[ia], vy = verts[ic + 1] - verts[ia + 1], vz = verts[ic + 2] - verts[ia + 2];
-        const nx = uy * vz - uz * vy, ny = uz * vx - ux * vz, nz = ux * vy - uy * vx;
-        if (nx * outHint[0] + ny * outHint[1] + nz * outHint[2] < 0) {
-          for (let k = 0; k < idx.length; k += 3) {
-            const t = idx[k + 1]; idx[k + 1] = idx[k + 2]; idx[k + 2] = t;
-          }
-        }
-      }
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
-      geo.setIndex(idx);
-      mergeGeo(geo, mat, null);
-    };
-
-    // 3. חלונות כהים עם השתקפות שמיים (שמשה קדמית, אחורית וחלונות צד 3-דלתות)
-    buildCurvedSurface(10, 5, (u, v) => {
-      const s = u * 2 - 1;
-      const y = 0.918 * (1 - v) + 1.356 * v;
-      const wHalf = 0.682 * (1 - v) + 0.548 * v;
-      return hitFront(s * wHalf, y, 0.0045);
-    }, glossBlackMat, true, [0, 0.5, 1]);
-
-    buildCurvedSurface(10, 5, (u, v) => {
-      const s = u * 2 - 1;
-      const y = 0.934 * (1 - v) + 1.344 * v;
-      const wHalf = 0.658 * (1 - v) + 0.526 * v;
-      return hitFront(s * wHalf, y, 0.0075);
-    }, glassMat, true, [0, 0.5, 1]);
-
-    buildCurvedSurface(10, 5, (u, v) => {
-      const s = u * 2 - 1;
-      const y = 0.952 * (1 - v) + 1.342 * v;
-      const wHalf = 0.625 * (1 - v) + 0.505 * v;
-      return hitRear(s * wHalf, y, 0.0045);
-    }, glossBlackMat, false, [0, 0.4, -1]);
-
-    buildCurvedSurface(10, 5, (u, v) => {
-      const s = u * 2 - 1;
-      const y = 0.968 * (1 - v) + 1.328 * v;
-      const wHalf = 0.598 * (1 - v) + 0.482 * v;
-      return hitRear(s * wHalf, y, 0.0075);
-    }, rearGlassMat, false, [0, 0.4, -1]);
-
-    const sideWinBounds = (z) => {
-      const yLo = 0.916 + (0.745 - z) * 0.025;
-      let yHi;
-      if (z >= -0.16) {
-        const t = Math.max(0, Math.min(1, (z + 0.16) / 0.905));
-        yHi = 1.318 - 0.394 * Math.pow(t, 1.78);
-      } else {
-        const t = Math.max(0, Math.min(1, (-0.16 - z) / 1.095));
-        yHi = 1.318 - 0.350 * Math.pow(t, 1.95);
-      }
-      return [yLo, Math.max(yLo + 0.012, yHi)];
-    };
-
-    for (const sx of [1, -1]) {
-      const flipSide = sx > 0;
-      buildCurvedSurface(10, 3, (u, v) => {
-        const z = 0.750 * (1 - u) + -1.255 * u;
-        const [y0, y1] = sideWinBounds(z);
-        const y = (y0 - 0.010) * (1 - v) + (y1 + 0.010) * v;
-        return hitSide(sx, y, z, 0.0035);
-      }, glossBlackMat, flipSide, [sx, 0.15, 0]);
-
-      buildCurvedSurface(8, 4, (u, v) => {
-        const z = 0.730 * (1 - u) + -0.422 * u;
-        const [y0, y1] = sideWinBounds(z);
-        const pad = 0.010;
-        const y = (y0 + pad) * (1 - v) + Math.max(y0 + pad + 0.006, y1 - pad) * v;
-        return hitSide(sx, y, z, 0.0065);
-      }, glassMat, flipSide, [sx, 0.15, 0]);
-
-      buildCurvedSurface(7, 4, (u, v) => {
-        const z = -0.468 * (1 - u) + -1.230 * u;
-        const [y0, y1] = sideWinBounds(z);
-        const pad = 0.010;
-        const y = (y0 + pad) * (1 - v) + Math.max(y0 + pad + 0.005, y1 - pad) * v;
-        return hitSide(sx, y, z, 0.0065);
-      }, rearGlassMat, flipSide, [sx, 0.15, 0]);
+    // --- דליים לאיחוד לפי חומר (קריאת ציור אחת לחומר)
+    const buckets = new Map();
+    const bucket = m => { let b = buckets.get(m); if (!b) { b = { pos: [], nrm: [], col: [], uv: [], idx: [], uvOn: false }; buckets.set(m, b); } return b; };
+    const pushTri = (b, a, c, d) => b.idx.push(a, c, d);
+    function addGeo(geo, mat, matrix, color) {
+      const gg = geo.index ? geo.clone() : geo.clone();
+      if (matrix) gg.applyMatrix4(matrix);
+      if (!gg.attributes.normal) gg.computeVertexNormals();
+      const p = gg.attributes.position, n = gg.attributes.normal, uv = gg.attributes.uv, b = bucket(mat), base = b.pos.length / 3;
+      const flip = matrix && matrix.determinant() < 0, c = color || [1, 1, 1];
+      for (let k = 0; k < p.count; k++) { b.pos.push(p.getX(k), p.getY(k), p.getZ(k)); b.nrm.push(n.getX(k), n.getY(k), n.getZ(k)); b.col.push(c[0], c[1], c[2]); if (uv) { b.uv.push(uv.getX(k), uv.getY(k)); b.uvOn = true; } else b.uv.push(0, 0); }
+      const ix = gg.index ? gg.index.array : [...Array(p.count).keys()];
+      for (let k = 0; k < ix.length; k += 3) { if (flip) b.idx.push(base + ix[k], base + ix[k + 2], base + ix[k + 1]); else b.idx.push(base + ix[k], base + ix[k + 1], base + ix[k + 2]); }
     }
+    const M4 = (p, r, s) => new THREE.Matrix4().compose(new THREE.Vector3(...p), new THREE.Quaternion().setFromEuler(new THREE.Euler(...(r || [0, 0, 0]))), new THREE.Vector3(...(s || [1, 1, 1])));
 
-    // פנים תא נוסעים כהה (נהג משמאל +X)
-    addPart(new THREE.BoxGeometry(1.02, 0.18, 0.34), underMat, [0, 0.85, 0.54]);
-    addPart(new THREE.TorusGeometry(0.135, 0.018, 4, 10), trimMat, [0.31, 0.93, 0.36], [-0.35, 0, 0]);
-    for (const sx of [0.26, -0.26]) {
-      addPart(new THREE.BoxGeometry(0.30, 0.30, 0.12), trimMat, [sx, 0.90, -0.10], [-0.18, 0, 0]);
-      addPart(new THREE.BoxGeometry(0.16, 0.12, 0.08), trimMat, [sx, 1.10, -0.14]);
+    // --- קרני הטלה: (a,b) → מוצא + כיוון
+    const raySide = sx => (a, b) => ({ o: [sx * 1.6, b, a], d: [-sx, 0, 0] });          // (z,y)
+    const rayFront = (a, b) => ({ o: [a, b, ZF + 0.8], d: [0, 0, -1] });               // (x,y)
+    const rayRear = (a, b) => ({ o: [a, b, ZR - 0.8], d: [0, 0, 1] });                 // (x,y)
+    const rayTilt = (C, U, V, D) => (a, b) => ({ o: [C[0] + a * U[0] + b * V[0] - D[0], C[1] + a * U[1] + b * V[1] - D[1], C[2] + a * U[2] + b * V[2] - D[2]], d: D });
+    // מסלול עוטף פינה (מבט על): ישר לאורך הפנים → קשת → ישר לאורך הצד; s = אורך לאורך המסלול, b = גובה
+    function rayWrap(sx, front, xIn, xc, zc, rc, side) {
+      const pts = [], dirs = [], fz = front ? 1 : -1;
+      const zFace = zc + fz * rc;
+      for (let i = 0; i <= 8; i++) { const x = lerp(xIn, xc, i / 8); pts.push([x, zFace]); dirs.push([0, -fz]); }
+      for (let i = 1; i <= 16; i++) { const th = (i / 16) * Math.PI / 2; pts.push([xc + Math.sin(th) * rc, zc + fz * Math.cos(th) * rc]); dirs.push([-Math.sin(th), -fz * Math.cos(th)]); }
+      for (let i = 1; i <= 8; i++) { pts.push([xc + rc, zc - fz * (i / 8) * side]); dirs.push([-1, 0]); }
+      const acc = [0]; for (let i = 1; i < pts.length; i++) acc.push(acc[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+      const fn = (a, b) => {
+        let i = 0; while (i < acc.length - 2 && acc[i + 1] < a) i++;
+        const t = clamp((a - acc[i]) / (acc[i + 1] - acc[i] || 1), 0, 1), x = lerp(pts[i][0], pts[i + 1][0], t), z = lerp(pts[i][1], pts[i + 1][1], t);
+        let dx = lerp(dirs[i][0], dirs[i + 1][0], t), dz = lerp(dirs[i][1], dirs[i + 1][1], t); const dl = Math.hypot(dx, dz) || 1; dx /= dl; dz /= dl;
+        return { o: [sx * (x - dx * 0.25), b, z - dz * 0.25], d: [sx * dx, 0, dz] };
+      };
+      fn.len = acc[acc.length - 1];
+      return fn;
     }
+    const hit = (ray, a, b, off) => { const r = ray(a, b), h = cast(r.o, r.d, 3); if (!h) return null; return { p: [h.p[0] + h.n[0] * off, h.p[1] + h.n[1] * off, h.p[2] + h.n[2] * off], n: h.n }; };
 
-    // 4. ספוילר גג אחורי שחור מבריק + מגבים
-    buildCurvedSurface(8, 3, (u, v) => {
-      const s = u * 2 - 1;
-      const wHalf = 0.535 * (1 - 0.05 * v);
-      const x = s * wHalf;
-      const zFrontSp = -1.255;
-      const zBackSp = -1.455 - (1 - s * s) * 0.028;
-      const z = zFrontSp * (1 - v) + zBackSp * v;
-      const y = (1.366 + v * 0.006) - s * s * 0.024;
-      return [x, y, z];
-    }, glossBlackMat, true, [0, 1, 0]);
-
-    const wpR0 = hitRear(0.03, 0.962, 0.008);
-    const wpR1 = hitRear(-0.33, 0.970, 0.008);
-    quad(wpR0, wpR1, 0.018, glossBlackMat, [0, 0, -0.004]);
-    addPart(new THREE.CylinderGeometry(0.016, 0.020, 0.024, 8), glossBlackMat, [wpR0[0], wpR0[1], wpR0[2] - 0.004], [Math.PI / 2, 0, 0]);
-
-    quad(hitFront(-0.02, 0.936, 0.009), hitFront(0.40, 0.942, 0.009), 0.014, glossBlackMat, [0, 0.003, 0.004]);
-    quad(hitFront(-0.42, 0.938, 0.009), hitFront(-0.02, 0.936, 0.009), 0.014, glossBlackMat, [0, 0.003, 0.004]);
-
-    // 5. גריל Singleframe משושה + מסגרת כרום סגורה + 4 טבעות אאודי + לוחית 73-464-53
-    const grilleHalfW = (y) => {
-      if (y >= 0.555) {
-        const t = Math.max(0, Math.min(1, (y - 0.555) / (0.635 - 0.555)));
-        return 0.435 * (1 - t) + 0.365 * t;
+    // מדבקה: אזור בין שני קווים (תחתון/עליון) בדו-ממד, מוטל על הגוף ומורם בהיסט קטן לאורך הנורמל
+    function patch(mat, ray, lo, up, nu, nv, off, o) {
+      o = o || {};
+      const A = resample(lo, nu + 1), U = resample(up, nu + 1), b = bucket(mat), base = b.pos.length / 3, ok = [];
+      const col = o.color || [1, 1, 1];
+      for (let i = 0; i <= nu; i++) for (let k = 0; k <= nv; k++) {
+        const t = o.vf ? o.vf(k / nv) : k / nv, h = hit(ray, lerp(A[i][0], U[i][0], t), lerp(A[i][1], U[i][1], t), off + (o.dome ? o.dome * Math.sin(Math.PI * k / nv) * Math.sin(Math.PI * i / nu) : 0));
+        ok.push(!!h);
+        if (h) { b.pos.push(...h.p); b.nrm.push(...h.n); } else { b.pos.push(0, 0, 0); b.nrm.push(0, 1, 0); }
+        b.col.push(col[0], col[1], col[2]);
+        if (o.uv) { b.uv.push(i / nu, k / nv); b.uvOn = true; } else b.uv.push(0, 0);
       }
-      const t = Math.max(0, Math.min(1, (y - 0.278) / (0.555 - 0.278)));
-      return 0.358 * (1 - t) + 0.435 * t;
-    };
-
-    buildCurvedSurface(8, 5, (u, v) => {
-      const s = u * 2 - 1;
-      const y = 0.278 * (1 - v) + 0.635 * v;
-      const x = s * grilleHalfW(y);
-      return hitFront(x, y, 0.007);
-    }, grilleDarkMat, true);
-
-    const hexLoop = [];
-    const pushSeg = (x0, y0, x1, y1, n) => {
+      const V = nv + 1, vtx = q => base + q;
+      for (let i = 0; i < nu; i++) for (let k = 0; k < nv; k++) {
+        const q00 = i * V + k, q01 = q00 + 1, q10 = q00 + V, q11 = q10 + 1;
+        for (const tri of [[q00, q10, q11], [q00, q11, q01]]) {
+          if (!ok[tri[0]] || !ok[tri[1]] || !ok[tri[2]]) continue;
+          orient(b, vtx(tri[0]), vtx(tri[1]), vtx(tri[2]));
+        }
+      }
+    }
+    function orient(b, a, c, d) {             // סדר קודקודים כך שהפאה פונה לכיוון הנורמל (כלפי חוץ)
+      const P = b.pos, N = b.nrm;
+      const ux = P[c * 3] - P[a * 3], uy = P[c * 3 + 1] - P[a * 3 + 1], uz = P[c * 3 + 2] - P[a * 3 + 2];
+      const vx = P[d * 3] - P[a * 3], vy = P[d * 3 + 1] - P[a * 3 + 1], vz = P[d * 3 + 2] - P[a * 3 + 2];
+      const fx = uy * vz - uz * vy, fy = uz * vx - ux * vz, fz = ux * vy - uy * vx;
+      if (fx * fx + fy * fy + fz * fz < 1e-14) return;
+      const nx = N[a * 3] + N[c * 3] + N[d * 3], ny = N[a * 3 + 1] + N[c * 3 + 1] + N[d * 3 + 1], nz = N[a * 3 + 2] + N[c * 3 + 2] + N[d * 3 + 2];
+      if (fx * nx + fy * ny + fz * nz >= 0) pushTri(b, a, c, d); else pushTri(b, a, d, c);
+    }
+    // פס לאורך קו (תפרים, מסגרות, טבעות): רוחב w, גובה off מעל הגוף; קיר צד אופציונלי עד הגוף
+    function strip(mat, ray, pts, w, off, o) {
+      o = o || {};
+      const b = bucket(mat), n = pts.length, col = o.color || [1, 1, 1], L0 = [], L1 = [];
       for (let i = 0; i < n; i++) {
-        const t = i / n;
-        hexLoop.push([x0 + (x1 - x0) * t, y0 + (y1 - y0) * t]);
+        const p0 = pts[Math.max(0, i - 1)], p1 = pts[Math.min(n - 1, i + 1)];
+        let tx = p1[0] - p0[0], ty = p1[1] - p0[1]; const tl = Math.hypot(tx, ty) || 1; tx /= tl; ty /= tl;
+        const nx = -ty * w / 2, ny = tx * w / 2;
+        L0.push(hit(ray, pts[i][0] + nx, pts[i][1] + ny, off)); L1.push(hit(ray, pts[i][0] - nx, pts[i][1] - ny, off));
       }
-    };
-    pushSeg(-0.365, 0.635, 0.365, 0.635, 6);
-    pushSeg(0.365, 0.635, 0.435, 0.555, 2);
-    pushSeg(0.435, 0.555, 0.358, 0.278, 4);
-    pushSeg(0.358, 0.278, -0.358, 0.278, 6);
-    pushSeg(-0.358, 0.278, -0.435, 0.555, 4);
-    pushSeg(-0.435, 0.555, -0.365, 0.635, 2);
-
-    const framePos = [];
-    const frameIdx = [];
-    const nHex = hexLoop.length;
-    for (let i = 0; i < nHex; i++) {
-      const [px, py] = hexLoop[i];
-      const dx = px;
-      const dy = py - 0.465;
-      const dl = Math.hypot(dx, dy) || 1;
-      const pIn = hitFront(px - (dx / dl) * 0.016, py - (dy / dl) * 0.016, 0.011);
-      const pOut = hitFront(px + (dx / dl) * 0.006, py + (dy / dl) * 0.006, 0.010);
-      framePos.push(pIn[0], pIn[1], pIn[2], pOut[0], pOut[1], pOut[2]);
-      const a = i * 2;
-      const b = a + 1;
-      const c = ((i + 1) % nHex) * 2 + 1;
-      const d = ((i + 1) % nHex) * 2;
-      frameIdx.push(a, b, c, a, c, d);
-    }
-    const frameGeo = new THREE.BufferGeometry();
-    frameGeo.setAttribute('position', new THREE.Float32BufferAttribute(framePos, 3));
-    frameGeo.setIndex(frameIdx);
-    mergeGeo(frameGeo, chromeMat, null);
-
-    for (const gy of [0.322, 0.495, 0.538, 0.580, 0.610]) {
-      const wBar = grilleHalfW(gy) - 0.016;
-      for (let s = -3; s < 3; s++) {
-        const x0b = (s / 3) * wBar;
-        const x1b = ((s + 1) / 3) * wBar;
-        quad(hitFront(x0b, gy, 0.010), hitFront(x1b, gy, 0.010), 0.007, trimMat, [0, 0, 0.002]);
+      const base = b.pos.length / 3;
+      for (let i = 0; i < n; i++) for (const h of [L0[i], L1[i]]) { if (h) { b.pos.push(...h.p); b.nrm.push(...h.n); } else { b.pos.push(0, 0, 0); b.nrm.push(0, 1, 0); } b.col.push(...col); b.uv.push(0, 0); }
+      for (let i = 0; i < n - 1; i++) {
+        const a = base + i * 2, c = a + 1, d = a + 3, e = a + 2;
+        if (L0[i] && L1[i] && L1[i + 1]) orient(b, a, c, d);
+        if (L0[i] && L1[i + 1] && L0[i + 1]) orient(b, a, d, e);
       }
-    }
-
-    const ringGeoF = new THREE.TorusGeometry(0.035, 0.0055, 4, 12);
-    const ringGeoR = new THREE.TorusGeometry(0.031, 0.005, 4, 12);
-    for (let r = 0; r < 4; r++) {
-      const rx = (r - 1.5) * 0.054;
-      const pf = hitFront(rx, 0.568, 0.016);
-      addPart(ringGeoF, chromeMat, pf);
-      const pr = hitRear(rx, 0.848, 0.014);
-      addPart(ringGeoR, chromeMat, pr, [-0.16, 0, 0]);
-    }
-
-    const pfPlate = hitFront(0, 0.415, 0.016);
-    addPart(new THREE.BoxGeometry(0.525, 0.122, 0.016), trimMat, [0, 0.415, pfPlate[2]]);
-    addPart(new THREE.PlaneGeometry(0.510, 0.112), plateFaceMat, [0, 0.415, pfPlate[2] + 0.009]);
-
-    const prPlateTop = hitRear(0, 0.755, 0.015);
-    const prPlateC = hitRear(0, 0.700, 0.015);
-    const prPlateBot = hitRear(0.25, 0.645, 0.015);
-    const zRearPlate = Math.min(prPlateTop[2], prPlateC[2], prPlateBot[2]) - 0.016;
-    addPart(new THREE.BoxGeometry(0.525, 0.118, 0.016), trimMat, [0, 0.702, zRearPlate], [0, 0, 0]);
-    addPart(new THREE.PlaneGeometry(0.510, 0.108), plateFaceMat, [0, 0.702, zRearPlate - 0.009], [0, Math.PI, 0]);
-    // קורות A פנימיות + מראה מרכזית לתצוגת קוקפיט נהג (FPV)
-    for (const sx of [1, -1]) {
-      const qPil = new THREE.Quaternion().setFromUnitVectors(
-        new THREE.Vector3(0, 1, 0),
-        new THREE.Vector3(-sx * 0.13, 0.42, -0.58).normalize()
-      );
-      addPart(new THREE.BoxGeometry(0.045, 0.72, 0.045), trimMat, [sx * 0.60, 1.13, 0.52], null, [1, 1, 1], qPil);
-    }
-    addPart(new THREE.BoxGeometry(0.18, 0.048, 0.025), trimMat, [0, 1.30, 0.28]);
-
-    for (const sx of [1, -1]) {
-      buildCurvedSurface(6, 3, (u, v) => {
-        const ax = (0.440 + 0.02 * v) * (1 - u) + (0.735 - 0.015 * (1 - v)) * u;
-        const yLo = 0.252 + 0.020 * u;
-        const yHi = 0.345 + 0.022 * u;
-        const y = yLo * (1 - v) + yHi * v;
-        return hitCornerFront(sx, ax, y, 0.007);
-      }, grilleDarkMat, sx < 0);
-
-      for (let s = 0; s < 4; s++) {
-        const u0 = s / 4;
-        const u1 = (s + 1) / 4;
-        const ax0 = 0.448 * (1 - u0) + 0.728 * u0;
-        const ax1 = 0.448 * (1 - u1) + 0.728 * u1;
-        const y0 = 0.298 + 0.020 * u0;
-        const y1 = 0.298 + 0.020 * u1;
-        quad(
-          hitCornerFront(sx, ax0, y0, 0.011),
-          hitCornerFront(sx, ax1, y1, 0.011),
-          0.013,
-          glossBlackMat,
-          [sx * 0.002, 0, 0.003]
-        );
-      }
-    }
-
-    // 6. פנסים קדמיים בצורה האמיתית של Audi A1 8X
-    for (const sx of [1, -1]) {
-      const hlPoint = (u, v, outShift) => {
-        const ax = 0.425 * (1 - u) + 0.790 * u;
-        const yTopH = 0.650 * (1 - u) + 0.752 * u;
-        const wave = Math.sin(u * Math.PI) * 0.020;
-        const yBotH = 0.582 * (1 - u) + 0.656 * u - wave;
-        const y = yBotH * (1 - v) + yTopH * v;
-        return hitCornerFront(sx, ax, y, outShift);
-      };
-
-      buildCurvedSurface(7, 4, (u, v) => hlPoint(u, v, 0.006), hlHousingMat, sx < 0);
-
-      for (const [pu, rad] of [[0.34, 0.023], [0.66, 0.027]]) {
-        const c = hlPoint(pu, 0.54, 0.013);
-        addPart(
-          new THREE.CylinderGeometry(rad, rad * 0.75, 0.016, 7, 1, true),
-          chromeMat,
-          c,
-          [Math.PI / 2, 0, -sx * (0.25 + pu * 0.35)]
-        );
-        addPart(
-          new THREE.SphereGeometry(rad * 0.50, 5, 4),
-          drlMat,
-          [c[0] + sx * 0.002, c[1], c[2] + 0.005]
-        );
-      }
-
-      for (let s = 0; s < 5; s++) {
-        const u0 = 0.05 + (s / 5) * 0.90;
-        const u1 = 0.05 + ((s + 1) / 5) * 0.90;
-        const v0 = 0.16 + (u0 > 0.68 ? (u0 - 0.68) * 0.85 : 0);
-        const v1 = 0.16 + (u1 > 0.68 ? (u1 - 0.68) * 0.85 : 0);
-        quad(hlPoint(u0, v0, 0.016), hlPoint(u1, v1, 0.016), 0.014, drlMat, [sx * 0.002, 0.001, 0.004]);
-      }
-
-      for (let s = 0; s < 5; s++) {
-        const u0 = s / 5;
-        const u1 = (s + 1) / 5;
-        quad(hlPoint(u0, 0.96, 0.015), hlPoint(u1, 0.96, 0.015), 0.011, glossBlackMat, [sx * 0.002, 0.002, 0.003]);
-      }
-
-      buildCurvedSurface(7, 4, (u, v) => hlPoint(u, v, 0.023), hlLensMat, sx < 0);
-    }
-
-    // 7. פנסים אחוריים עם נפח תלת-ממדי עוטף (Clamshell 3D Taillights)
-    for (const sx of [1, -1]) {
-      const tlPoint = (u, v, reliefM) => {
-        if (u <= 0.62) {
-          const t = u / 0.62;
-          const ax = (0.375 + 0.028 * v) * (1 - t) + 0.742 * t;
-          const yLo = 0.726 * (1 - t) + 0.715 * t;
-          const yHi = 0.812 * (1 - t) + 0.855 * t;
-          const y = yLo * (1 - v) + yHi * v;
-          rOrig.set(sx * (ax + 0.35 * t), y, -2.9);
-          rDir.set(-sx * 0.35 * t, 0, 1).normalize();
-          rc.set(rOrig, rDir);
-          const hits = rc.intersectObject(bodyMesh, false);
-          if (hits.length > 0) {
-            const h = hits[0];
-            const nx = sx * (0.15 + 0.58 * t);
-            const ny = 0.08;
-            const nz = -(0.96 - 0.36 * t);
-            const nl = Math.hypot(nx, ny, nz) || 1;
-            return [
-              h.point.x + (nx / nl) * reliefM,
-              h.point.y + (ny / nl) * reliefM,
-              h.point.z + (nz / nl) * reliefM
-            ];
-          }
-          return hitRear(sx * ax, y, reliefM);
-        }
-        const t = (u - 0.62) / 0.38;
-        const corner = hitRear(sx * 0.742, 0.785, 0.0);
-        const z = corner[2] * (1 - t) + -1.560 * t;
-        const yHi = 0.855 * (1 - t) + 0.870 * t;
-        const yLo = 0.715 * (1 - t) + 0.858 * t;
-        const y = yLo * (1 - v) + yHi * v;
-        const sideHit = hitSide(sx, y, z, 0.0);
-        const nx = sx * 0.94;
-        const ny = 0.12;
-        const nz = -0.32 * (1 - t);
-        const nl = Math.hypot(nx, ny, nz) || 1;
-        return [
-          sideHit[0] + (nx / nl) * reliefM,
-          sideHit[1] + (ny / nl) * reliefM,
-          sideHit[2] + (nz / nl) * reliefM
-        ];
-      };
-
-      buildCurvedSurface(10, 4, (u, v) => {
-        const edgeU = Math.sin(Math.pow(u, 0.82) * Math.PI);
-        const edgeV = Math.sin(v * Math.PI);
-        const bevel = Math.min(1, edgeU * 2.8) * Math.min(1, edgeV * 2.8);
-        const relief = 0.005 + 0.025 * bevel;
-        return tlPoint(u, v, relief);
-      }, tailBodyMat, sx > 0);
-
-      const ledRibbonPts = [
-        [0.05, 0.78],
-        [0.32, 0.82],
-        [0.58, 0.80],
-        [0.80, 0.68],
-        [0.56, 0.42],
-        [0.24, 0.46],
-        [0.06, 0.52]
-      ];
-      for (let s = 0; s < ledRibbonPts.length - 1; s++) {
-        const pA = tlPoint(ledRibbonPts[s][0], ledRibbonPts[s][1], 0.032);
-        const pB = tlPoint(ledRibbonPts[s + 1][0], ledRibbonPts[s + 1][1], 0.032);
-        quad(pA, pB, 0.015, tailLedMat, [sx * 0.002, 0.001, -0.003]);
-      }
-
-      for (let s = 0; s < 3; s++) {
-        const u0 = 0.07 + (s / 3) * 0.48;
-        const u1 = 0.07 + ((s + 1) / 3) * 0.48;
-        quad(tlPoint(u0, 0.22, 0.031), tlPoint(u1, 0.22, 0.031), 0.015, tailClearMat, [sx * 0.002, 0, -0.003]);
-      }
-    }
-
-    // דיפיוזר אחורי תחתון + מחזירי אור + זוג אגזוזים בשמאל (+X) + 4 חיישנים
-    buildCurvedSurface(8, 2, (u, v) => {
-      const s = u * 2 - 1;
-      const x = s * 0.60;
-      const y = 0.250 + v * 0.062;
-      return hitRear(x, y, 0.006);
-    }, trimMat, false);
-
-    for (const sx of [1, -1]) {
-      quad(
-        hitRear(sx * 0.46, 0.275, 0.009),
-        hitRear(sx * 0.57, 0.280, 0.009),
-        0.015,
-        tailLedMat,
-        [0, 0, -0.003]
-      );
-    }
-
-    for (const exX of [0.415, 0.480]) {
-      const pEx = hitRear(exX, 0.265, 0.0);
-      addPart(new THREE.CylinderGeometry(0.026, 0.026, 0.09, 8, 1, true), chromeMat, [exX, 0.238, pEx[2] + 0.012], [Math.PI / 2, 0, 0]);
-      addPart(new THREE.CylinderGeometry(0.021, 0.021, 0.08, 6), underMat, [exX, 0.238, pEx[2] + 0.015], [Math.PI / 2, 0, 0]);
-    }
-
-    for (const px of [-0.50, -0.18, 0.18, 0.50]) {
-      const ps = hitRear(px, 0.475, 0.006);
-      addPart(new THREE.RingGeometry(0.008, 0.012, 6), seamMat, ps, [0, Math.PI + px * 0.28, 0]);
-    }
-    quad(hitRear(0.535, 0.685, 0.006), hitRear(0.485, 0.685, 0.006), 0.020, chromeMat, [0, 0, -0.004]);
-    quad(hitRear(-0.465, 0.685, 0.006), hitRear(-0.545, 0.685, 0.006), 0.016, chromeMat, [0, 0, -0.004]);
-
-    // 8. קווי דלת רציפים וחדים (3 דלתות), קו כתף, ידית תלת-ממדית לבנה ומכסה דלק בצד ימין (-X)
-    const sideAccessoryPaintMat = paintMat;
-
-    for (const sx of [1, -1]) {
-      const doorLoop = [
-        [0.745, 0.912],
-        [0.802, 0.740],
-        [0.800, 0.480],
-        [0.775, 0.235],
-        [0.140, 0.228],
-        [-0.505, 0.232],
-        [-0.485, 0.520],
-        [-0.465, 0.760],
-        [-0.445, 0.932]
-      ];
-      for (let i = 0; i < doorLoop.length - 1; i++) {
-        const [zA, yA] = doorLoop[i];
-        const [zB, yB] = doorLoop[i + 1];
-        const steps = i === 4 ? 3 : 2;
-        for (let s = 0; s < steps; s++) {
-          const t0 = s / steps;
-          const t1 = (s + 1) / steps;
-          const zz0 = zA + (zB - zA) * t0;
-          const yy0 = yA + (yB - yA) * t0;
-          const zz1 = zA + (zB - zA) * t1;
-          const yy1 = yA + (yB - yA) * t1;
-          quad(
-            hitSide(sx, yy0, zz0, 0.004),
-            hitSide(sx, yy1, zz1, 0.004),
-            0.009,
-            seamMat,
-            [sx * 0.002, 0, 0]
-          );
+      if (o.wall) {                           // קיר מהשפה החיצונית אל הגוף – נותן עובי (מסגרת גריל, שוליים)
+        for (const Ls of [L0, L1]) {          // שני הקירות (חיצוני ופנימי), דו-צדדיים, נורמל = כיוון הרוחב
+          const wb = b.pos.length / 3;
+          for (let i = 0; i < n; i++) { const h = Ls[i], o2 = Ls === L0 ? L1[i] : L0[i];
+            if (h && o2) { let sx2 = h.p[0] - o2.p[0], sy2 = h.p[1] - o2.p[1], sz2 = h.p[2] - o2.p[2]; const sl = Math.hypot(sx2, sy2, sz2) || 1; sx2 /= sl; sy2 /= sl; sz2 /= sl;
+              b.pos.push(...h.p, h.p[0] - h.n[0] * off * 0.95, h.p[1] - h.n[1] * off * 0.95, h.p[2] - h.n[2] * off * 0.95); b.nrm.push(sx2, sy2, sz2, sx2, sy2, sz2); }
+            else { b.pos.push(0, 0, 0, 0, 0, 0); b.nrm.push(0, 1, 0, 0, 1, 0); }
+            b.col.push(...col, ...col); b.uv.push(0, 0, 0, 0); }
+          for (let i = 0; i < n - 1; i++) { if (!Ls[i] || !Ls[i + 1] || !L1[i] || !L0[i]) continue; const a = wb + i * 2, c = a + 1, d = a + 3, e = a + 2; orient(b, a, c, d); orient(b, a, d, e); }
         }
       }
-
-      const creaseZ = [1.52, 1.05, 0.50, -0.10, -0.68, -1.20, -1.56];
-      for (let i = 0; i < creaseZ.length - 1; i++) {
-        const zA = creaseZ[i];
-        const zB = creaseZ[i + 1];
-        const yA = 0.748 + (1.52 - zA) * 0.038;
-        const yB = 0.748 + (1.52 - zB) * 0.038;
-        quad(
-          hitSide(sx, yA, zA, 0.0035),
-          hitSide(sx, yB, zB, 0.0035),
-          0.006,
-          seamMat,
-          [sx * 0.002, 0.001, 0]
-        );
-      }
-
-      const hZ = -0.315;
-      const hY = 0.818;
-      const hSurf = hitSide(sx, hY, hZ, 0.0);
-      const hX = hSurf[0];
-
-      addPart(new THREE.CylinderGeometry(0.032, 0.032, 0.006, 8), seamMat, [hX + sx * 0.004, hY, hZ], [0, 0, Math.PI / 2], [0.60, 1, 1.95]);
-      addPart(new THREE.BoxGeometry(0.022, 0.026, 0.165), sideAccessoryPaintMat, [hX + sx * 0.019, hY, hZ + 0.012]);
-      addPart(new THREE.BoxGeometry(0.018, 0.024, 0.028), sideAccessoryPaintMat, [hX + sx * 0.010, hY, hZ + 0.080]);
-      addPart(new THREE.BoxGeometry(0.020, 0.026, 0.038), sideAccessoryPaintMat, [hX + sx * 0.012, hY, hZ - 0.088]);
-
-      if (sx > 0) {
-        addPart(new THREE.CylinderGeometry(0.005, 0.005, 0.022, 6), chromeMat, [hX + sx * 0.014, hY, hZ - 0.088], [0, 0, Math.PI / 2]);
-      }
     }
 
-    const fSurf = hitSide(-1, 0.845, -1.06, 0.005);
-    addPart(new THREE.RingGeometry(0.064, 0.072, 12), seamMat, fSurf, [0.12, -Math.PI / 2 - 0.04, 0]);
-
-    // 9. מראות צד לבנות מעוגלות עם רגל כהה על פח הדלת
+    // ===== חלונות (צילומים 079/080/082: מסגרת שחורה, עמוד B שחור, זכוכית כהה מאוד)
     for (const sx of [1, -1]) {
-      const mBaseZ = 0.635;
-      const mBaseY = 0.875;
-      const mSurf = hitSide(sx, mBaseY, mBaseZ, 0.0);
-      const mBaseX = mSurf[0];
-
-      addPart(new THREE.CylinderGeometry(0.018, 0.028, 0.024, 6), glossBlackMat, [mBaseX + sx * 0.008, mBaseY, mBaseZ], [0, 0, -sx * 1.25], [1.0, 1.0, 2.1]);
-
-      const stalkCurve = [
-        [mBaseX + sx * 0.010, mBaseY + 0.004, mBaseZ],
-        [mBaseX + sx * 0.045, mBaseY + 0.034, mBaseZ - 0.015],
-        [mBaseX + sx * 0.078, mBaseY + 0.064, mBaseZ - 0.032]
-      ];
-      for (let s = 0; s < stalkCurve.length - 1; s++) {
-        const a = stalkCurve[s];
-        const b = stalkCurve[s + 1];
-        const mid = [(a[0] + b[0]) * 0.5, (a[1] + b[1]) * 0.5, (a[2] + b[2]) * 0.5];
-        const len = Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]);
-        const qStrut = new THREE.Quaternion().setFromUnitVectors(
-          new THREE.Vector3(0, 1, 0),
-          new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]).normalize()
-        );
-        addPart(new THREE.CylinderGeometry(0.015, 0.019, len + 0.01, 6), glossBlackMat, mid, null, [0.85, 1, 1.65], qStrut);
-      }
-
-      const headGroup = new THREE.Group();
-      headGroup.position.set(mBaseX + sx * 0.070, mBaseY + 0.084, mBaseZ - 0.045);
-      headGroup.rotation.y = -sx * 0.16;
-      headGroup.updateMatrixWorld(true);
-
-      const addHeadPart = (geo, mat, pos, rot, scl) => {
-        const mChild = new THREE.Matrix4();
-        const p = pos ? new THREE.Vector3(pos[0], pos[1], pos[2]) : new THREE.Vector3();
-        const q = rot ? new THREE.Quaternion().setFromEuler(new THREE.Euler(rot[0] || 0, rot[1] || 0, rot[2] || 0)) : new THREE.Quaternion();
-        const s = scl ? new THREE.Vector3(scl[0], scl[1], scl[2]) : new THREE.Vector3(1, 1, 1);
-        mChild.compose(p, q, s);
-        const mWorld = new THREE.Matrix4().multiplyMatrices(headGroup.matrixWorld, mChild);
-        mergeGeo(geo, mat, mWorld);
-      };
-
-      const capGeo = new THREE.SphereGeometry(0.080, 10, 6);
-      capGeo.scale(1.14, 0.68, 0.84);
-      addHeadPart(capGeo, sideAccessoryPaintMat);
-      addHeadPart(new THREE.CylinderGeometry(0.076, 0.068, 0.016, 8), glossBlackMat, [0, -0.038, 0.018], null, [1.10, 1, 0.45]);
-      addHeadPart(new THREE.CircleGeometry(0.074, 10), mirrorGlassMat, [0, 0.002, -0.069], [0, Math.PI, 0], [1.06, 0.62, 1]);
-      addHeadPart(new THREE.BoxGeometry(0.055, 0.008, 0.018), drlMat, [sx * 0.052, -0.004, 0.048], [0, sx * 0.42, 0]);
+      const rs = raySide(sx);
+      const belt = z => lerp(0.952, 0.972, clamp((0.86 - z) / 2.06, 0, 1));        // קו חלון עולה מעט לאחור (צילום 079)
+      // מסגרת DLO אחת (שחור מבריק), גדולה ב-1.2 ס"מ מהזכוכית; חלון אחורי משולש עם קצה חד לאחור
+      const dloLo = [];
+      for (let i = 0; i <= 24; i++) { const z = lerp(0.640, -1.225, i / 24); dloLo.push([z, belt(z) - 0.012]); }
+      const dloUp = chaikin([[0.640, belt(0.640) - 0.012], [0.560, 1.040], [0.460, 1.140], [0.360, 1.240], [0.270, 1.318], [0.150, 1.342], [0.0, 1.346], [-0.40, 1.347], [-0.68, 1.340], [-0.84, 1.318], [-0.96, 1.272], [-1.06, 1.195], [-1.15, 1.080], [-1.225, belt(-1.225) - 0.012]], 3, false);
+      patch(M.black, rs, dloLo, dloUp, 28, 5, 0.0058, { vf: t => 1 - (1 - t) * (1 - t) * (1 - t) });
+      patch(M.black, rs, [[0.645, belt(0.645) - 0.010], [0.790, belt(0.79) - 0.010]], [[0.645, 1.035], [0.790, belt(0.79) + 0.004]], 4, 2, 0.0045);   // משולש מראה שחור
+      // זכוכית דלת
+      const dl = [];
+      for (let i = 0; i <= 12; i++) { const z = lerp(0.600, -0.355, i / 12); dl.push([z, belt(z)]); }
+      const dU = chaikin([[0.600, belt(0.600)], [0.530, 1.040], [0.430, 1.140], [0.335, 1.240], [0.255, 1.310], [0.140, 1.330], [0.0, 1.334], [-0.30, 1.334], [-0.355, 1.326], [-0.355, belt(-0.355)]], 2, false);
+      patch(M.glass, rs, dl, dU, 16, 4, 0.0095, { vf: t => 1 - (1 - t) * (1 - t) });
+      const ql = [], qu = chaikin([[-0.445, belt(-0.445)], [-0.445, 1.326], [-0.68, 1.328], [-0.83, 1.307], [-0.95, 1.262], [-1.05, 1.188], [-1.13, 1.085], [-1.205, belt(-1.205)]], 2, false);
+      for (let i = 0; i <= 10; i++) { const z = lerp(-0.445, -1.205, i / 10); ql.push([z, belt(z)]); }
+      patch(M.glass, rs, ql, qu, 12, 4, 0.0095, { vf: t => 1 - (1 - t) * (1 - t) });
+    }
+    // שמשה קדמית: מסגרת מוטה ~57° מהאנך, נורמל (0, 0.84, 0.545)
+    {
+      const D = [0, -0.84, -0.545], Vv = [0, 0.545, -0.84], C = [0, 1.15, 0.62];
+      const rt = rayTilt(C, [1, 0, 0], Vv, D);
+      const lo = [], up = [];
+      for (let i = 0; i <= 16; i++) { const a = lerp(-1, 1, i / 16); lo.push([a * 0.655, -0.355 + 0.035 * a * a]); up.push([a * 0.565, 0.400 - 0.022 * a * a]); }
+      patch(M.black, rt, lo.map(p => [p[0] * 1.0, p[1] - 0.012]), up.map(p => [p[0] * 1.012, p[1] + 0.012]), 22, 4, 0.004);
+      patch(M.glass, rt, lo, up, 20, 4, 0.0075);
+      // מגבים קדמיים (שחור, בבסיס השמשה)
+      strip(M.black, rt, [[-0.62, -0.300], [-0.05, -0.322]], 0.016, 0.016);
+      strip(M.black, rt, [[0.02, -0.318], [0.50, -0.300]], 0.016, 0.016);
+    }
+    // שמשה אחורית: מוטה ~45° מהאנך (צילום 079: מהספוילר בגובה 1.33 ועד 1.00 מעל הפנסים), טרפז עם פינות מעוגלות
+    {
+      const D = [0, -0.702, 0.712], Vv = [0, 0.712, 0.702], C = [0, 1.165, -1.535];
+      const rt = rayTilt(C, [1, 0, 0], Vv, D);
+      const lo = [], up = [];
+      for (let i = 0; i <= 14; i++) { const a = lerp(-1, 1, i / 14), c = Math.pow(Math.abs(a), 8); lo.push([a * (0.622 - 0.03 * c), -0.212 + 0.035 * c]); up.push([a * (0.570 - 0.03 * c), 0.208 - 0.028 * c]); }
+      patch(M.black, rt, lo.map(p => [p[0] * 1.025, p[1] - 0.016]), up.map(p => [p[0] * 1.025, p[1] + 0.02]), 20, 3, 0.004);
+      patch(M.glass, rt, lo, up, 20, 4, 0.0075);
+      strip(M.black, rt, [[0.03, -0.175], [-0.34, -0.150]], 0.014, 0.017);            // מגב אחורי
     }
 
-    // מיזוג סרטי ה-quad לתוך דליי החומרים המאוחדים
-    for (const [mat, batch] of quadBatches.entries()) {
-      if (batch.idx.length === 0) continue;
-      const qGeo = new THREE.BufferGeometry();
-      qGeo.setAttribute('position', new THREE.Float32BufferAttribute(batch.pos, 3));
-      qGeo.setIndex(batch.idx);
-      mergeGeo(qGeo, mat, null);
+    // ===== ספוילר גג שחור בקצה הגג (צילומים 079/080/082) – בולט מעל השמשה האחורית
+    {
+      const rows = [], NU = 14;
+      for (let i = 0; i <= NU; i++) {
+        const a = lerp(-1, 1, i / NU), xx = a * 0.575;
+        const h0 = cast([xx, 2.5, -1.300], [0, -1, 0], 3); const y0 = h0 ? h0.p[1] : 1.36;
+        const tipZ = -1.445 + 0.022 * a * a, droop = 0.020 * Math.pow(Math.abs(a), 3);
+        rows.push([[xx, y0 + 0.003, -1.270], [xx * 1.004, y0 + 0.011 - droop * 0.4, -1.350], [xx * 1.008, y0 - 0.004 - droop, tipZ], [xx * 1.008, y0 - 0.030 - droop, tipZ + 0.024], [xx, y0 - 0.052 - droop * 0.6, -1.330]]);
+      }
+      const K = rows[0].length, sp = [], si = [];
+      for (const r of rows) for (const p of r) sp.push(...p);
+      for (let i = 0; i < NU; i++) for (let k = 0; k < K - 1; k++) { const a = i * K + k; si.push(a, a + K, a + K + 1, a, a + K + 1, a + 1); }
+      for (const [i, sg2] of [[0, -1], [NU, 1]]) { const c = sp.length / 3; let cx = 0, cy = 0, cz = 0; for (let k = 0; k < K; k++) { cx += sp[(i * K + k) * 3]; cy += sp[(i * K + k) * 3 + 1]; cz += sp[(i * K + k) * 3 + 2]; } sp.push(cx / K, cy / K, cz / K);
+        for (let k = 0; k < K; k++) { const a = i * K + k, b2 = i * K + ((k + 1) % K); if (sg2 > 0) si.push(c, a, b2); else si.push(c, b2, a); } }
+      const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(sp, 3)); sg.setIndex(si); sg.computeVertexNormals();
+      addGeo(sg, M.black);
     }
 
-    // יצירת Mesh אחד מאוחד לכל חומר סטטי
-    for (const [mat, b] of staticBuckets.entries()) {
-      if (b.idx.length === 0) continue;
-      const mGeo = new THREE.BufferGeometry();
-      mGeo.setAttribute('position', new THREE.Float32BufferAttribute(b.pos, 3));
-      mGeo.setAttribute('normal', new THREE.Float32BufferAttribute(b.norm, 3));
-      if (b.hasUV) {
-        mGeo.setAttribute('uv', new THREE.Float32BufferAttribute(b.uv, 2));
+    // ===== פנסים אחוריים בצורת A1 8X: טריז שעוטף את הפינה אל הצד, קצה פנימי מחודד, קצה קדמי אלכסוני (צילומים 079–082)
+    for (const sx of [1, -1]) {
+      const rw = rayWrap(sx, false, 0.20, 0.60, ZR + 0.26, 0.36, 0.30);
+      const up = chaikin([[0.180, 0.812], [0.215, 0.838], [0.300, 0.858], [0.400, 0.870], [0.560, 0.880], [0.720, 0.885], [0.860, 0.884], [0.960, 0.878], [1.000, 0.868]], 2, false);
+      const lo = chaikin([[0.180, 0.812], [0.210, 0.792], [0.300, 0.768], [0.450, 0.754], [0.600, 0.748], [0.740, 0.750], [0.840, 0.764], [0.930, 0.806], [1.000, 0.868]], 2, false);
+      patch(M.black, rw, lo.map(p => [p[0], p[1] - 0.009]), up.map(p => [p[0], p[1] + 0.008]), 20, 2, 0.003);
+      patch(M.tail, rw, lo, up, 22, 4, 0.010, { dome: 0.007 });
+      // מוביל אור בהיר (פס עליון שעוטף + קשת תחתונה) ואזור שקוף (רוורס) בחלק הפנימי
+      strip(M.tailGlow, rw, chaikin([[0.240, 0.840], [0.420, 0.856], [0.640, 0.866], [0.850, 0.866], [0.950, 0.860]], 2, false), 0.014, 0.0175);
+      strip(M.tailGlow, rw, chaikin([[0.300, 0.788], [0.480, 0.772], [0.660, 0.768], [0.800, 0.780]], 2, false), 0.008, 0.0175);
+    }
+
+    // ===== פנסים קדמיים (גל בקו התחתון, עוטפים אל הכנף; צילומים 075–078)
+    for (const sx of [1, -1]) {
+      const rw = rayWrap(sx, true, 0.22, 0.58, ZF - 0.27, 0.36, 0.34);
+      const s0 = 0.155;
+      const up = chaikin([[0.00, 0.612], [0.05, 0.640], [0.16, 0.676], [0.28, 0.706], [0.38, 0.724], [0.48, 0.736], [0.57, 0.742], [0.65, 0.738], [0.72, 0.726]].map(p => [s0 + p[0], p[1]]), 2, false);
+      const lo = chaikin([[0.00, 0.612], [0.06, 0.584], [0.14, 0.566], [0.22, 0.568], [0.30, 0.588], [0.40, 0.604], [0.50, 0.618], [0.60, 0.640], [0.72, 0.726]].map(p => [s0 + p[0], p[1]]), 2, false);
+      patch(M.black, rw, lo.map(p => [p[0], p[1] - 0.007]), up.map(p => [p[0], p[1] + 0.006]), 16, 2, 0.003);
+      patch(M.lamp, rw, lo, up, 18, 4, 0.009, { dome: 0.006 });
+      strip(M.drl, rw, chaikin([[s0 + 0.05, 0.620], [s0 + 0.20, 0.652], [s0 + 0.36, 0.684], [s0 + 0.52, 0.706], [s0 + 0.66, 0.716]], 2, false), 0.009, 0.0165);
+      for (const [cs, cy, rr] of [[s0 + 0.25, 0.632, 0.032], [s0 + 0.42, 0.664, 0.036]]) strip(M.chrome, rw, circle(cs, cy, rr, rr * 0.9, 10), 0.008, 0.016);
+    }
+
+    // ===== גריל Singleframe (מסגרת כרום, רשת שחורה עם פסים אופקיים), טבעות, לוחית קדמית
+    {
+      const G = [[-0.300, 0.648], [0.300, 0.648], [0.400, 0.590], [0.398, 0.420], [0.382, 0.310], [0.330, 0.258], [-0.330, 0.258], [-0.382, 0.310], [-0.398, 0.420], [-0.400, 0.590]];
+      const loop = chaikin(G, 2, true); loop.push(loop[0]);
+      const lo = [], up = [];
+      const gBot = x => 0.258 + Math.max(0, Math.abs(x) - 0.33), gTop = x => 0.648 - Math.max(0, Math.abs(x) - 0.30) * 0.58;
+      const gHalf = y => (y > 0.59 ? 0.30 + (0.648 - y) * 1.724 : y < 0.31 ? 0.33 + (y - 0.258) : 0.395);
+      for (let i = 0; i <= 16; i++) { const x = lerp(-0.392, 0.392, i / 16); lo.push([x, gBot(x)]); up.push([x, gTop(x)]); }
+      patch(M.plastic, rayFront, lo, up, 16, 4, 0.006);
+      for (const y of [0.300, 0.345, 0.390, 0.500, 0.540, 0.580, 0.618]) { const hw = gHalf(y) - 0.016; strip(M.black, rayFront, [[-hw, y], [hw, y]], 0.010, 0.010); }
+      strip(M.chrome, rayFront, loop, 0.022, 0.016, { wall: true });
+      for (let r = 0; r < 4; r++) strip(M.chrome, rayFront, circle((r - 1.5) * 0.058, 0.575, 0.034, 0.034, 12), 0.0065, 0.022);
+      const tp = hit(rayFront, 0, 0.462, 0.012), bp = hit(rayFront, 0, 0.348, 0.012);
+      if (tp && bp) {
+        const cy = (tp.p[1] + bp.p[1]) / 2, cz = (tp.p[2] + bp.p[2]) / 2, tilt = Math.atan2(tp.p[2] - bp.p[2], tp.p[1] - bp.p[1]);
+        addGeo(new THREE.BoxGeometry(0.535, 0.125, 0.012), M.plastic, M4([0, cy, cz - 0.004], [-tilt, 0, 0]));
+        addGeo(new THREE.PlaneGeometry(0.520, 0.114), M.plate, M4([0, cy, cz + 0.0025], [-tilt, 0, 0]));
       }
-      mGeo.setIndex(b.idx);
-      const mesh = new THREE.Mesh(mGeo, mat);
-      if (mat === sideAccessoryPaintMat || mat === glossBlackMat) mesh.castShadow = true;
+      // פנסי ערפל/פתחי אוויר צדדיים (רשת שחורה) + פס תחתון
+      for (const sx of [1, -1]) {
+        const rw = rayWrap(sx, true, 0.40, 0.58, ZF - 0.27, 0.36, 0.2);
+        patch(M.plastic, rw, [[0.10, 0.282], [0.34, 0.300]], [[0.08, 0.352], [0.35, 0.376]], 8, 2, 0.005);
+        strip(M.black, rw, chaikin([[0.08, 0.355], [0.35, 0.379], [0.36, 0.300], [0.11, 0.279], [0.08, 0.355]], 1, false), 0.008, 0.008);
+      }
+    }
+
+    // ===== אחור: לוחית (מוטה כמו הדלת), טבעות, תגים, תפר פגוש, מחזירי אור, אגזוז בשמאל (צילום 081)
+    {
+      const tp = hit(rayRear, 0, 0.758, 0.012), bp = hit(rayRear, 0, 0.642, 0.012);
+      if (tp && bp) {
+        const cy = (tp.p[1] + bp.p[1]) / 2, cz = (tp.p[2] + bp.p[2]) / 2, tilt = Math.atan2(tp.p[2] - bp.p[2], tp.p[1] - bp.p[1]);
+        addGeo(new THREE.BoxGeometry(0.540, 0.128, 0.012), M.plastic, M4([0, cy, cz + 0.004], [-tilt, 0, 0]));
+        addGeo(new THREE.PlaneGeometry(0.520, 0.114), M.plate, M4([0, cy, cz - 0.0025], [-tilt, Math.PI, 0]));
+      }
+      for (let r = 0; r < 4; r++) strip(M.chrome, rayRear, circle(-(r - 1.5) * 0.050, 0.826, 0.028, 0.023, 12), 0.0055, 0.008);
+      strip(M.chrome, rayRear, [[0.44, 0.662], [0.37, 0.662]], 0.016, 0.006);            // "A1" (משמאל לצופה = +x)
+      strip(M.chrome, rayRear, [[-0.36, 0.652], [-0.44, 0.652]], 0.012, 0.006);          // "TFSI"
+      strip(M.black, rayRear, chaikin([[-0.46, 0.618], [-0.30, 0.624], [0, 0.626], [0.30, 0.624], [0.46, 0.618]], 2, false), 0.004, 0.002);   // תפר פגוש/דלת תא מטען
+      for (const px of [-0.50, -0.17, 0.17, 0.50]) strip(M.plastic, rayRear, circle(px, 0.470, 0.011, 0.011, 8), 0.006, 0.002);   // חיישני חניה
+      for (const sx of [1, -1]) {             // פס פלסטיק שחור תחתון שעוטף את פינות הפגוש + מחזירי אור אדומים
+        const rw = rayWrap(sx, false, 0.0, 0.60, ZR + 0.26, 0.36, 0.25);
+        patch(M.plastic, rw, chaikin([[0.0, 0.268], [0.50, 0.270], [0.80, 0.286], [0.98, 0.300], [1.10, 0.318]], 1, false), chaikin([[0.0, 0.332], [0.50, 0.334], [0.80, 0.340], [0.98, 0.338], [1.10, 0.330]], 1, false), 14, 2, 0.004);
+        patch(M.tailGlow, rw, [[0.86, 0.350], [0.98, 0.352]], [[0.86, 0.372], [0.98, 0.374]], 3, 1, 0.006);
+      }
+      const ex = hit(rayRear, 0.475, 0.262, 0);
+      if (ex) {
+        const ez = ex.p[2] - 0.02;
+        addGeo(new THREE.CylinderGeometry(0.036, 0.036, 0.11, 12, 1, true), M.chrome, M4([0.475, 0.252, ez], [Math.PI / 2, 0, 0]));
+        addGeo(new THREE.CircleGeometry(0.031, 10), M.plastic, M4([0.475, 0.252, ez - 0.04], [0, Math.PI, 0]));
+      }
+    }
+
+    // ===== צד: קווי דלת, ידית לבנה, מכסה דלק (ימין), מראות לבנות על בסיס שחור
+    for (const sx of [1, -1]) {
+      const rs = raySide(sx);
+      const door = chaikin([[0.848, 0.945], [0.866, 0.860], [0.874, 0.640], [0.858, 0.420], [0.812, 0.262], [0.760, 0.234], [-0.420, 0.234], [-0.468, 0.262], [-0.478, 0.420], [-0.458, 0.700], [-0.436, 0.880], [-0.430, 0.960]], 2, false);
+      strip(M.black, rs, resample(door, 26), 0.0045, 0.0018);
+      // ידית (לבנה) + שקע כהה
+      const hp = hit(rs, -0.300, 0.812, 0);
+      if (hp) {
+        const hx = hp.p[0];
+        addGeo(new THREE.BoxGeometry(0.016, 0.040, 0.150), M.black, M4([hx + sx * 0.001, 0.812, -0.300]));
+        addGeo(new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.011, 0.11, 3, 8) : new THREE.CylinderGeometry(0.011, 0.011, 0.13, 8), M.paint, M4([hx + sx * 0.014, 0.818, -0.296], [Math.PI / 2, 0, 0]));
+      }
+      if (sx < 0) strip(M.black, rs, circle(-1.355, 0.870, 0.068, 0.068, 24), 0.004, 0.0018);   // מכסה דלק – צד ימין
+      // מראה: רגל שחורה על הדלת, כיפה לבנה, זכוכית לאחור, איתות
+      const mb = hit(rs, 0.700, 0.985, 0);
+      if (mb) {
+        const bx = mb.p[0];
+        addGeo(new THREE.BoxGeometry(0.060, 0.050, 0.110), M.black, M4([bx + sx * 0.022, 0.997, 0.705], [0, 0, -sx * 0.18]));
+        addGeo(new THREE.BoxGeometry(0.085, 0.030, 0.060), M.black, M4([bx + sx * 0.070, 1.017, 0.690], [0, -sx * 0.10, -sx * 0.25]));
+        const cx = sx * Math.min(Math.abs(bx) + 0.092, 0.876), cy = 1.053, cz = 0.665;      // קצה המראה ≤ 0.966 (רוחב כולל ≤ 1.94)
+        addGeo(new THREE.SphereGeometry(1, 12, 8), M.paint, M4([cx, cy, cz], [0, -sx * 0.12, 0], [0.090, 0.062, 0.058]));
+        addGeo(new THREE.CircleGeometry(1, 14), M.glass, M4([cx - sx * 0.006, cy - 0.002, cz - 0.0585], [0, Math.PI - sx * 0.12, 0], [0.080, 0.050, 1]));
+        addGeo(new THREE.BoxGeometry(0.150, 0.020, 0.080), M.black, M4([cx, cy - 0.044, cz + 0.004], [0, -sx * 0.12, 0]));
+        addGeo(new THREE.BoxGeometry(0.055, 0.007, 0.012), M.drl, M4([cx + sx * 0.040, cy - 0.028, cz + 0.040], [0, sx * 0.5, 0]));
+      }
+    }
+    // קווי מכסה מנוע (לאורך הכנפיים ומעל הגריל)
+    for (const sx of [1, -1]) strip(M.black, raySide(sx), chaikin([[0.93, 0.806], [1.20, 0.798], [1.45, 0.786], [1.62, 0.772]], 2, false), 0.0045, 0.0018);   // מכסה מנוע "צדפה": התפר בצד, בגובה קו הכתף (צילום 079)
+
+    // ===== פנים (נראה בגוף ראשון): לוח מחוונים, גגון שעונים, הגה, מסך MMI, עמודי A, מראה פנימית
+    {
+      const IC = { dash: [0.17, 0.175, 0.185], dark: [0.07, 0.072, 0.078], beige: [0.72, 0.60, 0.45], vent: [0.6, 0.62, 0.65] };
+      const dash = new THREE.Shape(); dash.moveTo(0.860, 0.935); dash.lineTo(0.700, 0.975); dash.quadraticCurveTo(0.530, 0.995, 0.470, 0.945); dash.lineTo(0.440, 0.820); dash.lineTo(0.520, 0.700); dash.lineTo(0.880, 0.700); dash.closePath();
+      const dg = new THREE.ExtrudeGeometry(dash, { depth: 1.24, bevelEnabled: false, curveSegments: 4 });
+      dg.rotateY(-Math.PI / 2); dg.translate(0.62, 0, 0);      // צורה (z,y) → מתיחה לאורך x
+      addGeo(dg, M.interior, null, IC.dash);
+      addGeo(new THREE.CylinderGeometry(0.16, 0.16, 0.10, 12, 1, false, -Math.PI / 2, Math.PI), M.interior, M4([0.37, 0.985, 0.585], [0, 0, Math.PI / 2], [1, 1, 0.55]), IC.dark);   // גגון שעונים
+      for (const gx of [0.30, 0.44]) { addGeo(new THREE.RingGeometry(0.036, 0.041, 14), M.chrome, M4([gx, 0.975, 0.528], [0.35, Math.PI, 0])); addGeo(new THREE.CircleGeometry(0.036, 14), M.interior, M4([gx, 0.974, 0.531], [0.35, Math.PI, 0]), IC.dark); }
+      addGeo(new THREE.TorusGeometry(0.170, 0.016, 4, 16), M.interior, M4([0.37, 0.930, 0.430], [0.40, 0, 0]), IC.dark);           // הגה
+      addGeo(new THREE.CylinderGeometry(0.050, 0.056, 0.05, 8), M.interior, M4([0.37, 0.930, 0.442], [Math.PI / 2 + 0.40, 0, 0]), IC.dark);
+      addGeo(new THREE.BoxGeometry(0.29, 0.020, 0.03), M.interior, M4([0.37, 0.905, 0.438], [0.40, 0, 0]), IC.dark);
+      addGeo(new THREE.BoxGeometry(0.20, 0.100, 0.012), M.interior, M4([-0.02, 1.000, 0.600], [0.15, 0, 0]), IC.dark);             // MMI
+      for (const vx of [-0.18, 0.12]) addGeo(new THREE.TorusGeometry(0.034, 0.008, 4, 10), M.interior, M4([vx, 0.880, 0.468], [0, 0, 0]), IC.vent);
+      for (const sx of [1, -1]) {             // עמודי A פנימיים + מדפן
+        const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(-sx * 0.065, 0.32, -0.50).normalize());
+        addGeo(new THREE.BoxGeometry(0.045, 0.56, 0.030), M.interior, new THREE.Matrix4().compose(new THREE.Vector3(sx * 0.600, 1.090, 0.585), q, new THREE.Vector3(1, 1, 1)), IC.dash);
+      }
+      addGeo(new THREE.BoxGeometry(0.22, 0.060, 0.020), M.interior, M4([0, 1.250, 0.240], [0.1, 0, 0]), IC.dark);   // מראה פנימית
+      for (const sx of [1, -1]) {             // מושבים (בז') – נראים דרך השמשה
+        addGeo(new THREE.BoxGeometry(0.46, 0.13, 0.50), M.interior, M4([sx * 0.37, 0.50, -0.05]), IC.beige);
+        addGeo(new THREE.BoxGeometry(0.46, 0.62, 0.11), M.interior, M4([sx * 0.37, 0.86, -0.33], [-0.22, 0, 0]), IC.beige);
+      }
+    }
+
+    // ===== צל מגע (משטח שקוף מתחת לרכב)
+    { const sg = new THREE.PlaneGeometry(1.90, 3.96); sg.rotateX(-Math.PI / 2); const sm = new THREE.Mesh(sg, M.shadow); sm.position.set(0, 0.012, (ZF + ZR) / 2); sm.renderOrder = -1; sm.name = 'ariel-a1-shadow'; g.add(sm); }
+
+    // איחוד: Mesh אחד לכל חומר
+    for (const [mat, b] of buckets) {
+      if (!b.idx.length) continue;
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(b.pos, 3));
+      geo.setAttribute('normal', new THREE.Float32BufferAttribute(b.nrm, 3));
+      if (mat.vertexColors) geo.setAttribute('color', new THREE.Float32BufferAttribute(b.col, 3));
+      if (b.uvOn) geo.setAttribute('uv', new THREE.Float32BufferAttribute(b.uv, 2));
+      geo.setIndex(b.idx);
+      const mesh = new THREE.Mesh(geo, mat); mesh.name = 'ariel-a1-' + (Object.keys(M).find(k => M[k] === mat) || 'part');
+      if (mat === M.paint) mesh.castShadow = true;
+      if (mat === M.interior) g.userData.interior = mesh;
       g.add(mesh);
     }
 
-    // 10. ארבעה גלגלי סגסוגת 10-חישורים תלת-ממדיים (2 קריאות ציור לגלגל בלבד = 8 קריאות לכל 4 הגלגלים!)
+    // ===== גלגלים: צמיג (+ דיסק כהה פנימי) וחישוק 10 חישורים – 2 קריאות ציור לגלגל
     const wheels = [];
-    const wheelW = 0.215;
-    const rimR = 0.205;
-
-    const sharedTireProf = [
-      new THREE.Vector2(rimR - 0.008, -wheelW * 0.44),
-      new THREE.Vector2(R - 0.018, -wheelW * 0.48),
-      new THREE.Vector2(R, 0.0),
-      new THREE.Vector2(R - 0.018, wheelW * 0.48),
-      new THREE.Vector2(rimR - 0.008, wheelW * 0.44)
-    ];
-
-    const buildWheelGroup = (sx, sz) => {
-      const wg = new THREE.Group();
-      wg.position.set(sx * (hw - 0.115), R, sz * (WB / 2));
-
-      // דלי 1 לגלגל: צמיג + גב פנימי + חישוק סגסוגת 3D (מאוחד ל-alloy/tire או 2 חומרים: tireMat + rimDiskMat/alloyMat)
-      const wBuckets = new Map();
-      const addWGeo = (geo, mat, pos, rot) => {
-        const gClone = geo.clone();
-        const m4 = new THREE.Matrix4();
-        const p = pos ? new THREE.Vector3(pos[0], pos[1], pos[2]) : new THREE.Vector3();
-        const q = rot ? new THREE.Quaternion().setFromEuler(new THREE.Euler(rot[0] || 0, rot[1] || 0, rot[2] || 0)) : new THREE.Quaternion();
-        m4.compose(p, q, new THREE.Vector3(1, 1, 1));
-        gClone.applyMatrix4(m4);
-        gClone.computeVertexNormals();
-        const pA = gClone.getAttribute('position');
-        const nA = gClone.getAttribute('normal');
-        const uvA = gClone.getAttribute('uv');
-        const idxA = gClone.index ? Array.from(gClone.index.array) : Array.from({ length: pA.count }, (_, k) => k);
-        let wb = wBuckets.get(mat);
-        if (!wb) {
-          wb = { pos: [], norm: [], uv: [], idx: [], hasUV: false };
-          wBuckets.set(mat, wb);
-        }
-        const base = wb.pos.length / 3;
-        for (let k = 0; k < pA.count; k++) {
-          wb.pos.push(pA.getX(k), pA.getY(k), pA.getZ(k));
-          wb.norm.push(nA ? nA.getX(k) : 0, nA ? nA.getY(k) : 1, nA ? nA.getZ(k) : 0);
-          if (uvA) {
-            wb.uv.push(uvA.getX(k), uvA.getY(k));
-            wb.hasUV = true;
-          } else {
-            wb.uv.push(0, 0);
-          }
-        }
-        for (let k = 0; k < idxA.length; k++) wb.idx.push(base + idxA[k]);
-      };
-
-      const tireGeo = new THREE.LatheGeometry(sharedTireProf, 14);
-      tireGeo.rotateZ(Math.PI / 2);
-      addWGeo(tireGeo, tireMat);
-      addWGeo(new THREE.CircleGeometry(rimR, 10), tireMat, [-sx * (wheelW * 0.42), 0, 0], [0, sx > 0 ? -Math.PI / 2 : Math.PI / 2, 0]);
-
-      addWGeo(new THREE.CircleGeometry(rimR - 0.004, 16), rimDiskMat, [sx * (wheelW * 0.39), 0, 0], [0, sx > 0 ? Math.PI / 2 : -Math.PI / 2, 0]);
-
-      const hubGeo = new THREE.CylinderGeometry(0.048, 0.054, 0.024, 8);
-      hubGeo.rotateZ(Math.PI / 2);
-      addWGeo(hubGeo, alloyMat, [sx * (wheelW * 0.42), 0, 0]);
-      addWGeo(new THREE.RingGeometry(rimR - 0.024, rimR + 0.004, 16), alloyMat, [sx * (wheelW * 0.445), 0, 0], [0, sx > 0 ? Math.PI / 2 : -Math.PI / 2, 0]);
-
-      const spPos = [];
-      const spIdx = [];
-      for (let sp = 0; sp < 10; sp++) {
-        const ang = (sp / 10) * Math.PI * 2;
-        const ca = Math.cos(ang);
-        const sa = Math.sin(ang);
-        const tx = -sa * 0.011;
-        const ty = ca * 0.011;
-        const r0 = 0.044;
-        const r1 = rimR - 0.016;
-        const xIn = sx * (wheelW * 0.425);
-        const xOut = sx * (wheelW * 0.443);
-        const b0 = spPos.length / 3;
-        spPos.push(
-          xIn, ca * r0 - tx, sa * r0 - ty,
-          xIn, ca * r0 + tx, sa * r0 + ty,
-          xOut, ca * r1 + tx * 0.78, sa * r1 + ty * 0.78,
-          xOut, ca * r1 - tx * 0.78, sa * r1 - ty * 0.78
-        );
-        if (sx > 0) {
-          spIdx.push(b0, b0 + 1, b0 + 2, b0, b0 + 2, b0 + 3);
-        } else {
-          spIdx.push(b0, b0 + 2, b0 + 1, b0, b0 + 3, b0 + 2);
-        }
+    const tireProf = [[0.226, -0.094], [0.262, -0.106], [0.287, -0.103], [0.298, -0.088], [0.300, -0.050], [0.300, 0.050], [0.298, 0.088], [0.287, 0.103], [0.262, 0.106], [0.226, 0.094]].map(p => new THREE.Vector2(p[0], p[1]));
+    const tireGeo = new THREE.LatheGeometry(tireProf, 16); tireGeo.rotateZ(Math.PI / 2);
+    const lipProf = [[0.212, 0.058], [0.222, 0.084], [0.229, 0.090], [0.230, 0.096], [0.222, 0.097]].map(p => new THREE.Vector2(p[0], p[1]));
+    function rimGeometry(sx) {
+      const parts = [];
+      const lip = new THREE.LatheGeometry(lipProf, 16); lip.rotateZ(-Math.PI / 2); parts.push(lip);
+      const pos = [], idx = [];
+      for (let k = 0; k < 10; k++) {          // חישור: מנסרה משולשת (רכס) מהטבור אל השפה, קעורה פנימה
+        const a = (k / 10) * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a), tx = -sa, ty = ca;
+        const P = (r, w, h) => [h, ca * r + tx * w, sa * r + ty * w];
+        const r0 = 0.050, r1 = 0.214, w0 = 0.016, w1 = 0.011, h0 = 0.072, h1 = 0.088, hr0 = 0.086, hr1 = 0.096;
+        const v = [P(r0, -w0, h0), P(r0, 0, hr0), P(r0, w0, h0), P(r1, -w1, h1), P(r1, 0, hr1), P(r1, w1, h1)];
+        const b = pos.length / 3; for (const q of v) pos.push(...q);
+        idx.push(b, b + 3, b + 4, b, b + 4, b + 1, b + 1, b + 4, b + 5, b + 1, b + 5, b + 2);
       }
-      const spGeo = new THREE.BufferGeometry();
-      spGeo.setAttribute('position', new THREE.Float32BufferAttribute(spPos, 3));
-      spGeo.setIndex(spIdx);
-      addWGeo(spGeo, alloyMat);
-
-      for (const [mat, wb] of wBuckets.entries()) {
-        const wGeo = new THREE.BufferGeometry();
-        wGeo.setAttribute('position', new THREE.Float32BufferAttribute(wb.pos, 3));
-        wGeo.setAttribute('normal', new THREE.Float32BufferAttribute(wb.norm, 3));
-        if (wb.hasUV) wGeo.setAttribute('uv', new THREE.Float32BufferAttribute(wb.uv, 2));
-        wGeo.setIndex(wb.idx);
-        const wm = new THREE.Mesh(wGeo, mat);
-        if (mat === tireMat) wm.castShadow = true;
-        wg.add(wm);
+      const sg = new THREE.BufferGeometry(); sg.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); sg.setIndex(idx); sg.computeVertexNormals(); parts.push(sg);
+      const hub = new THREE.CylinderGeometry(0.058, 0.062, 0.03, 8); hub.rotateZ(Math.PI / 2); hub.translate(0.084, 0, 0); parts.push(hub);
+      const out = { pos: [], nrm: [], idx: [] };
+      for (const pg of parts) {
+        const gg = pg.index ? pg : pg; const p = gg.attributes.position, n = gg.attributes.normal, base = out.pos.length / 3;
+        for (let i = 0; i < p.count; i++) { out.pos.push(sx * p.getX(i), p.getY(i), p.getZ(i)); out.nrm.push(sx * n.getX(i), n.getY(i), n.getZ(i)); }
+        const ix = gg.index ? gg.index.array : [...Array(p.count).keys()];
+        for (let i = 0; i < ix.length; i += 3) { if (sx > 0) out.idx.push(base + ix[i], base + ix[i + 1], base + ix[i + 2]); else out.idx.push(base + ix[i], base + ix[i + 2], base + ix[i + 1]); }
       }
-
-      g.add(wg);
-      return wg;
-    };
-
-    for (const sz of [1, -1]) {
-      for (const sx of [1, -1]) {
-        wheels.push(buildWheelGroup(sx, sz));
-      }
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(out.pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(out.nrm, 3)); geo.setIndex(out.idx);
+      return geo;
+    }
+    const rimL = rimGeometry(1), rimRt = rimGeometry(-1);
+    const backL = new THREE.CircleGeometry(0.228, 14); backL.rotateY(Math.PI / 2); backL.translate(0.045, 0, 0);
+    const backR = new THREE.CircleGeometry(0.228, 14); backR.rotateY(-Math.PI / 2); backR.translate(-0.045, 0, 0);
+    const tireL = mergeTwo(tireGeo, backL), tireRt = mergeTwo(tireGeo, backR);
+    function mergeTwo(a, b2) {
+      const out = { pos: [], nrm: [], idx: [] };
+      for (const gg of [a, b2]) { const p = gg.attributes.position, n = gg.attributes.normal, base = out.pos.length / 3; for (let i = 0; i < p.count; i++) { out.pos.push(p.getX(i), p.getY(i), p.getZ(i)); out.nrm.push(n.getX(i), n.getY(i), n.getZ(i)); } const ix = gg.index ? gg.index.array : [...Array(p.count).keys()]; for (const v of ix) out.idx.push(base + v); }
+      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(out.pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(out.nrm, 3)); geo.setIndex(out.idx); return geo;
+    }
+    for (const sz of [1, -1]) for (const sx of [1, -1]) {
+      const wg = new THREE.Group(); wg.name = 'ariel-a1-wheel';
+      wg.position.set(sx * (sz > 0 ? TRK : TRK_R) / 2, R, sz * WB / 2);
+      const tm = new THREE.Mesh(sx > 0 ? tireL : tireRt, M.tire); tm.castShadow = true; wg.add(tm);
+      wg.add(new THREE.Mesh(sx > 0 ? rimL : rimRt, M.alloy));
+      g.add(wg); wheels.push(wg);
     }
 
     g.userData.ownWheels = wheels;
+    g.userData.mats = M;
+    g.userData.body = { rings: body.rings.length, perRing: NP };
     return g;
   }
 
-  // ---- חיבור לעולם (נכתב מחדש ב-ESH27, 23.11.2026): גרסת ג'מיני חיפשה S.car גלובלי – ב-game.js ‏S סגור בתוך IIFE
-  // ו-S.car הוא אובייקט מצב (x,z,h…) ולא קבוצת תלת־ממד, כך שהרכב לא הופיע בכלל. כאן – כמו בגרסה 2: מחפשים בסצנה
-  // את קבוצת רכב השחקן (userData.wheels), מסתירים את ילדיה (גם את דגם ה-CC0 שנטען באיחור) ומחזירים הכול ב-dispose.
-  const ST = { car: null, model: null, hidden: [], wheelsOrig: null, world: null };
-  const off = () => typeof location !== 'undefined' && /[?&]ariel-car=0(?:&|$)/.test(location.search);
+  // ---- חיבור לעולם: מחפשים בסצנה את קבוצת רכב השחקן (userData.wheels), מסתירים את ילדיה (גם דגם CC0 שנטען באיחור) ומחזירים הכול ב-dispose.
+  const ST = { car: null, model: null, beam: null, hidden: [], wheelsOrig: null, world: null, day: -1, lights: null, tier: null, paintStd: null, unsub: null, lift: 0, liftCur: 0, roadT: 0 };
+  const qp = k => { try { return typeof location !== 'undefined' ? new URLSearchParams(location.search).get(k) : null; } catch (e) { return null; } };
+  const off = () => qp('ariel-car') === '0';
+  function setTier(tier) {                    // מכשיר חלש: צבע בלי ציפוי שקוף (MeshStandard) – זול יותר בשיידר
+    if (!ST.model || tier === ST.tier) return; ST.tier = tier;
+    const body = ST.model.getObjectByName('ariel-a1-body'), paint2 = ST.model.getObjectByName('ariel-a1-paint'), M = ST.model.userData.mats;
+    if (!ST.paintStd) ST.paintStd = new THREE.MeshStandardMaterial({ color: M.paint.color, roughness: 0.3, metalness: 0, envMap: M.paint.envMap, envMapIntensity: M.paint.envMapIntensity, vertexColors: true });
+    const m = tier === 'low' ? ST.paintStd : M.paint;
+    if (body) body.material = m; if (paint2) paint2.material = m;
+  }
+  const driving = world => !!(world && world.player && world.player.mode === 'car');   // פנסים דולקים רק כשנוהגים
+  function daylight(world) {                  // אותו חישוב כמו המשחק: יום מלא מעל 10°, לילה מתחת ל־4°−
+    const el = world && world.sun && isFinite(world.sun.elevation) ? world.sun.elevation : 30;
+    return clamp((el + 4) / 14, 0, 1);
+  }
+  function applyLight(day, lightsOn) {        // יום/לילה: עוצמת השתקפויות, פנסים (בנהיגה בלבד), כתם אור על הכביש
+    if (!ST.model || (Math.abs(day - ST.day) < 0.01 && lightsOn === ST.lights)) return; ST.day = day; ST.lights = lightsOn;
+    const M = ST.model.userData.mats, env = 0.25 + 0.75 * day, n = lightsOn ? 1 - day : 0;
+    M.paint.envMapIntensity = 0.95 * env; if (ST.paintStd) ST.paintStd.envMapIntensity = 0.95 * env;
+    M.glass.envMapIntensity = 1.1 * env; M.black.envMapIntensity = 0.9 * env; M.chrome.envMapIntensity = 1.35 * env; M.alloy.envMapIntensity = 1.15 * env;
+    M.lamp.envMapIntensity = 1.3 * env; M.tail.envMapIntensity = 1.1 * env; M.plastic.envMapIntensity = 0.3 * env;
+    M.tail.emissiveIntensity = 0.10 + 0.95 * n; M.tailGlow.emissiveIntensity = 0.55 + 2.2 * n;
+    M.lamp.emissiveIntensity = 0.0 + 1.1 * n; M.drl.emissiveIntensity = 0.6 + 1.4 * n;
+    M.shadow.opacity = 0.85 - 0.25 * (1 - day); M.plate.emissiveIntensity = 0.22 * n;   // תאורת לוחית
+    if (ST.beam) { ST.beam.material.opacity = 0.95 * n; ST.beam.visible = n > 0.04; }
+  }
   const adapter = {
     id: 'ariel-car',
     name: 'הרכב של אריאל (אאודי A1)',
     dept: 'assets',
     order: 57,
-    init(world) {
+    init(world, api) {
       if (off()) return;
       ST.world = world || null;
       world.scene.traverse(o => { if (!ST.car && o.userData && o.userData.wheels && o.isGroup) ST.car = o; });
       if (!ST.car) throw new Error('רכב המשחק לא נמצא');
-      const m = build();
+      const m = build({ roofBlack: qp('ariel-roof') === 'black' });
       for (const c of ST.car.children) { if (c.visible) { c.visible = false; ST.hidden.push(c); } }
       ST.car.add(m); ST.model = m;
       ST.wheelsOrig = ST.car.userData.wheels; ST.car.userData.wheels = m.userData.ownWheels;
-      world.arielCar = { plate: PLATE, model: 'Audi A1 8X 3-door', source: 'photos 075–082', version: 'gemini-qa-4' };
+      ST.beam = makeBeam(); ST.car.add(ST.beam);   // אור על הכביש – אפקט עולם, לא חלק ממידות הרכב (לכן לא בתוך build)
+      world.arielCar = { plate: PLATE, model: 'Audi A1 8X 3-door', source: 'photos 075–082', version: 'car-battalion-5' };
+      setTier(world.quality && world.quality.tier); applyLight(daylight(world), driving(world));
+      if (api && typeof api.on === 'function') ST.unsub = api.on('quality', q => setTier(q && q.tier));
     },
-    update() {   // נכסי CC0 נטענים באיחור ומסתירים את כל הילדים – מוודאים שהרכב שלנו נראה והשאר מוסתר
+    update(dt, world) {   // נכסי CC0 נטענים באיחור ומסתירים את כל הילדים – מוודאים שהרכב שלנו נראה והשאר מוסתר
       if (!ST.car || !ST.model) return; if (!ST.model.visible) ST.model.visible = true;
-      for (const c of ST.car.children) if (c !== ST.model && c.visible) { c.visible = false; if (!ST.hidden.includes(c)) ST.hidden.push(c); }
+      for (const c of ST.car.children) if (c !== ST.model && c !== ST.beam && c.visible) { c.visible = false; if (!ST.hidden.includes(c)) ST.hidden.push(c); }
+      const w = world || ST.world; applyLight(daylight(w), driving(w));
+      // כבישי העולם מורמים 10–16 ס"מ מעל פני הקרקע (world.js: ribbon lift) והמשחק מציב את הרכב על הקרקע – בכביש הגלגלים "שוקעים".
+      // מרימים את הדגם שלנו בגובה הכביש (4 בדיקות בשנייה, מעבר רך); הפנים נשאר במקומו כדי שמבט הנהג לא ישתנה.
+      const S = w && w.G27 && w.G27.S, dd = w && w.data;
+      if (S && S.car && dd && typeof dd.onRoad === 'function') {
+        ST.roadT -= dt || 0; if (ST.roadT <= 0) { ST.roadT = 0.25; let r = false; try { r = dd.onRoad(S.car.x, S.car.z); } catch (e) { r = false; } ST.lift = r ? 0.10 + (r.c || 0) * 0.015 : 0; }
+        ST.liftCur += (ST.lift - ST.liftCur) * Math.min(1, (dt || 0.016) * 8);
+        ST.model.position.y = ST.liftCur; const im = ST.model.userData.interior; if (im) im.position.y = -ST.liftCur;
+        if (ST.beam) ST.beam.position.y = 0.03 + ST.liftCur;
+      }
+      for (const wh of ST.model.userData.ownWheels) {   // המשחק מסובב לפי רדיוס 0.36; לצמיג A1 (0.30) מוסיפים את ההפרש כדי שהגלגל לא "יחליק"
+        const r = wh.rotation.x; if (wh.userData.prevRot !== undefined) wh.rotation.x += (r - wh.userData.prevRot) * (0.36 / R - 1); wh.userData.prevRot = wh.rotation.x;
+      }
     },
     dispose() {
       if (ST.model && ST.car) ST.car.remove(ST.model);
+      if (ST.beam && ST.car) { ST.car.remove(ST.beam); ST.beam.geometry.dispose(); ST.beam.material.dispose(); }
       if (ST.car && ST.wheelsOrig) ST.car.userData.wheels = ST.wheelsOrig;
       for (const c of ST.hidden) c.visible = true;
       if (ST.world && ST.world.arielCar) delete ST.world.arielCar;
-      ST.hidden = []; ST.model = null; ST.car = null; ST.wheelsOrig = null; ST.world = null;
+      if (typeof ST.unsub === 'function') try { ST.unsub(); } catch (e) { /* */ }
+      ST.lift = 0; ST.liftCur = 0; ST.roadT = 0;
+      ST.hidden = []; ST.model = null; ST.beam = null; ST.car = null; ST.wheelsOrig = null; ST.world = null; ST.day = -1; ST.lights = null; ST.tier = null; ST.paintStd = null; ST.unsub = null;
     }
   };
 
