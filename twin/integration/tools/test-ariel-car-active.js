@@ -1,5 +1,5 @@
-// בדיקת הרכב הפעיל של אריאל (גרסה 4 – Gemini QA) בלי דפדפן: node tools/test-ariel-car-active.js [תיקיית עולם]
-// גוף אטום ופונה החוצה, תקציב קריאות ציור/משולשים, 0 NaN, מידות יצרן, חיבור/ניתוק מהעולם (כמו ב-game.js: קבוצה עם userData.wheels).
+// בדיקת הרכב הפעיל של אריאל (גרסה 5 – גדוד הרכב, 24.11.2026; לפני כן גרסה 4 – Gemini QA) בלי דפדפן: node tools/test-ariel-car-active.js [תיקיית עולם]
+// גוף אטום ופונה החוצה, תקציב קריאות ציור/משולשים (גרסה 5: עד 30 / 15,000 – לפי התדריך), 0 NaN, מידות יצרן, חיבור/ניתוק מהעולם (כמו ב-game.js: קבוצה עם userData.wheels).
 const path = require('path'); global.self = global; global.window = global;
 global.document = { createElement: () => ({ getContext: () => new Proxy({}, { get: (t, k) => k === 'measureText' ? () => ({ width: 10 }) : /Gradient$/.test(k) ? () => ({ addColorStop() {} }) : (typeof k === 'string' ? () => {} : undefined), set: () => true }), width: 0, height: 0 }) };
 const here = path.resolve(process.argv[2] || path.join(__dirname, '../world')); require(path.join(here, 'vendor/three.min.js')); const T = global.THREE;
@@ -15,8 +15,8 @@ ok(!!body, 'יש גוף ראשי (ariel-a1-body)');
   let open = 0, nm = 0; for (const c of E.values()) { if (c === 1) open++; else if (c > 2) nm++; }
   ok(open === 0 && nm === 0, `גוף אטום: ${idx.length / 3} משולשים, ${open} צלעות פתוחות, ${nm} שאינן יריעה`);
   const V = sv(g); ok(V > 4 && V < 8, `גוף פונה החוצה: נפח מסומן ${V.toFixed(2)} מ"ק (גרסה 3 הייתה ‎−4.66)`); }
-ok(m <= 34, `קריאות ציור ${m} (תקציב: לא יותר מגרסה 2 – 34)`);
-ok(tr <= 6000, `משולשים ${tr} (תקציב 6,000)`);
+ok(m <= 30, `קריאות ציור ${m} (תקציב 30; גרסה 2 – 34)`);
+ok(tr <= 15000, `משולשים ${tr} (תקציב 15,000 – גוף מעוגל מלופט; גרסה 4 – 5,578)`);
 ok(nan === 0, '0 ערכי NaN');
 const W = car.userData.ownWheels; ok(W && W.length === 4, `4 גלגלים (${W && W.length})`);
 const zs = W.map(w => w.position.z).sort((a, b) => a - b), xs = W.map(w => w.position.x).sort((a, b) => a - b);
