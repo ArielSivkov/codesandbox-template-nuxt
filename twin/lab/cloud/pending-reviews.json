@@ -1,0 +1,9 @@
+{"why":"24.11.2026: מכסת הכתיבה היומית החינמית של KV נגמרה (שגיאה 10048) – לא ניתן היה לסמן reviewed. אחרי 00:00 UTC: לסמן reviewed=true על כל המשימות כאן ולהוסיף את הלקחים ל-ex:code / ex:photo, ואז למחוק קובץ זה.",
+"approved":["lab-home-playground","lab-lido-railing","lab-street-gate-v2","photo-083-b12a530","photo-084-af79f4d","scan-2026-11-23-16-26_* (001,004)","scan-2026-11-23-16-48_* (0001,0002,0007,0008)","scan-2026-11-23-17-03_0001","scan-2026-11-23-17-15_* (0002–0011)","scan-2026-11-23-17-40_* (0001–0041)"],
+"rejected":["lab-port-cranes-v3"],
+"ex:code":[
+{"verdict":"approved","note":"Keep the group in a closure variable so dispose() can remove it; this.group is undefined."},
+{"verdict":"approved","note":"YZW_placeITM overwrites group.position, so put local offsets (like z=-1) on an inner child group."},
+{"verdict":"approved","note":"Place a tilted part from its pivot with cos/sin of the angle; build A-frames from tilted legs, not one tube."},
+{"verdict":"rejected","note":"Do not both translate geometry by H/2 and add H/2 in the matrix; never reach objects via scene.children index in update."}],
+"ex:photo":[{"verdict":"approved","note":"Set floors_counted only when roof and ground are both visible."}]}
