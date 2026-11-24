@@ -18,11 +18,15 @@
     aniso: 8, anisoLow: 4,   // בשכבה החסכונית נשארים על 4 של המשחק (עלות סינון בטלפון)
     // יום בצהריים (13:30) — כיול מול תמונות השטח 054–065 (23.11.2026): שמיים כחולים עמוקים בלי עננים, אופק תכלת, קירות טיח לבנים, אספלט אפור-בהיר.
     // פועל רק כש-dayK>0 (שמש מעל 4°) — הלילה ושעת הזהב לא משתנים. ?beautyday=0 מכבה להשוואה.
+    // דמדומים (24.11.2026, לולאת "כמו בתמונות" – photomatch על 14 צילומים מגבעת יונה 17:09–17:11, שמש ‎−6.8° עד ‎−7.2°):
+    // בצילום השמיים עוד בהירים (L* 50.6) – ברינדור כבר לילה (L* 29.7, ΔE2000 20.6). לילה מלא רק ב-‎−14°; צבעים = חציון הצילומים
+    // (מערב: למעלה #6e7b95 / אופק #c1ada6 · מזרח: #515d78 / #8f8c97). ?twilight=0 מכבה להשוואה.
+    twilight: { on: true, top: 0x5d6a86, horSun: 0xc1ada6, horAway: 0x8f8c97, exposure: 1.34, glow: 0.8, glowColor: 0xd9a58a },
     day: { on: true, only: false, top: 0x2c6cc4, hor: 0x9ec6ee, fog: 0xbcd3ea, clearCloud: 0.25, exposure: 1.55, road: [1.45, 1.41, 1.32], walk: [1.0, 0.80, 0.70], hemi: 0.9, sun: 1.1 },   // walk: גוון מרצפות אדומות (055/062/064: ~190,150,135 sRGB)
   }, window.YZBeauty || {});
-  { const q = new URLSearchParams(location.search); if (q.get('beautyday') === '0') B.day.on = false;
+  { const q = new URLSearchParams(location.search); if (q.get('beautyday') === '0') B.day.on = false; if (q.get('twilight') === '0') B.twilight.on = false;
     for (const k of ['exposure', 'hemi', 'sun', 'clearCloud']) if (q.has('bd_' + k)) B.day[k] = +q.get('bd_' + k); }
-  const Z = { dome: null, mat: null, golden: 0, night: 0 };
+  const Z = { dome: null, mat: null, golden: 0, night: 0, twi: 0, glow: null };
   const clamp = (x, a, b) => x < a ? a : x > b ? b : x;
   const VS = 'varying vec3 vD; void main(){ vD = position; vec4 p = modelViewMatrix * vec4(position, 1.0); gl_Position = projectionMatrix * p; gl_Position.z = gl_Position.w * 0.99985; }';
   const FS = `uniform float uTime, uCover, uNight, uGolden, uScale, uClear; uniform vec3 uSun, uMoon, uMoonOn, uGlow; uniform vec2 uWind; varying vec3 vD;
@@ -54,9 +58,13 @@ void main(){
     if (Z.dome) Z.dome.visible = domeOK;
     const el = world.sun.elevation, w = world.weather, r = world.renderer, G = world.G27;
     if (B.day.only && el < 4) { if (Z.dome) Z.dome.visible = false; if (Z.mat) Z.mat.uniforms.uClear.value = 0; roadTone(world, 0); return; }   // "יום בלבד" (בסיס סבב 3): לילה ושעת זהב כמו בסבב 3
-    Z.night = clamp((2 - el) / 8, 0, 1); Z.golden = clamp(1 - Math.abs(el - 6) / 9, 0, 1) * (1 - w.cloud * 0.7);
+    const TW = B.twilight;
+    Z.night = TW.on ? clamp((-4 - el) / 10, 0, 1) : clamp((2 - el) / 8, 0, 1);   // דמדומים: לילה מתחיל ב-‎−4° ומלא ב-‎−14° (היה: מלא כבר ב-‎−6°)
+    Z.twi = TW.on ? clamp(1 - Math.abs(el + 5) / 7, 0, 1) * (1 - w.cloud * 0.5) : 0;   // שיא ב-‎−5°, אפס ב-‎+2° ו-‎−12°
+    Z.golden = clamp(1 - Math.abs(el - 6) / 9, 0, 1) * (1 - w.cloud * 0.7);
     Z.day = B.day.on ? clamp((el - 4) / 12, 0, 1) * (1 - Z.golden) : 0; const dk = Z.day, D = B.day;
     r.toneMappingExposure = Z.night > 0.5 ? B.exposure.night : B.exposure.day + (B.exposure.golden - B.exposure.day) * Z.golden + (D.exposure - B.exposure.day) * dk;
+    if (Z.twi > 0) r.toneMappingExposure += (TW.exposure - r.toneMappingExposure) * Z.twi;
     if (dk > 0) { const clr = clamp(1 - w.cloud / Math.max(0.05, D.clearCloud), 0, 1) * dk;   // יום בהיר: צבעי השמיים מהתמונות
       const u0 = world.sky && world.sky.material.uniforms;
       if (u0 && u0.top) { u0.top.value.lerp(new THREE.Color(D.top), dk * (0.4 + 0.6 * clr)); u0.hor.value.lerp(new THREE.Color(D.hor), dk * (0.4 + 0.6 * clr)); }
@@ -71,7 +79,10 @@ void main(){
     const u = world.sky && world.sky.material.uniforms;
     if (u) { if (domeOK) u.cloud.value = 0;   // העננים של כיפת המשחק כבויים — שכבת העננים כאן מחליפה אותם (בשכבה החסכונית: נשארים)
       if (Z.golden > 0.02) { u.hor.value.lerp(new THREE.Color(1.0, 0.66, 0.38), Z.golden * B.golden.sky); if (world.scene.fog) world.scene.fog.color.lerp(new THREE.Color(0.98, 0.72, 0.50), Z.golden * B.golden.sky * 0.8); }
-      if (Z.night > 0.3) { u.hor.value.lerp(new THREE.Color(0.20, 0.15, 0.13), Z.night * 0.35); } }   // אופק עירוני חמים בלילה (נבדק בשער: 0.422 עם / 0.443 בלי)
+      if (Z.night > 0.3) { u.hor.value.lerp(new THREE.Color(0.20, 0.15, 0.13), Z.night * 0.35); }
+      if (Z.twi > 0.02) { const k = Z.twi * 0.85; u.top.value.lerp(new THREE.Color(TW.top), k); u.hor.value.lerp(new THREE.Color(TW.horAway).lerp(new THREE.Color(TW.horSun), 0.5), k);
+        if (world.scene.fog) world.scene.fog.color.lerp(new THREE.Color(TW.horAway), k * 0.6); } }
+    if (Z.glow) { Z.glow.material.opacity = Z.twi * TW.glow; Z.glow.visible = Z.twi > 0.02 && !world.providers.atmosphere; }   // זוהר האופק בצד השמש (בצילומים: ורוד-כתום במערב)   // אופק עירוני חמים בלילה (נבדק בשער: 0.422 עם / 0.443 בלי)
     if (Z.mat) { const U = Z.mat.uniforms, sd = world.sun.dir; U.uSun.value.set(sd.x, Math.max(sd.y, 0.02), sd.z); U.uNight.value = Z.night; U.uGolden.value = Z.golden;
       U.uCover.value = clamp(Math.max(B.clouds.min, w.cloud), 0, 1); const wv = w.wind || { x: 0, z: 0 }; U.uWind.value.set(wv.x * B.clouds.speed * 0.05 + 0.004, wv.z * B.clouds.speed * 0.05 + 0.002);
       let mo = null; try { mo = world.providers.moon && world.providers.moon(); } catch (e) { /* */ }
@@ -98,6 +109,11 @@ void main(){
       Z.mat = new THREE.ShaderMaterial({ vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false, side: THREE.BackSide, fog: false,
         uniforms: { uTime: { value: 0 }, uClear: { value: 0 }, uCover: { value: 0.4 }, uNight: { value: 0 }, uGolden: { value: 0 }, uScale: { value: B.clouds.scale }, uSun: { value: new THREE.Vector3(0, 1, 0) },
           uMoon: { value: new THREE.Vector3(0, 1, 0) }, uMoonOn: { value: new THREE.Vector3() }, uGlow: { value: new THREE.Color(0.42, 0.22, 0.10) }, uWind: { value: new THREE.Vector2(0.004, 0.002) } } });
+      { const c = document.createElement('canvas'); c.width = 256; c.height = 128; const x = c.getContext('2d'), g = x.createRadialGradient(128, 128, 4, 128, 128, 128);
+        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.45, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, 256, 128);
+        const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+        Z.glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, color: new THREE.Color(B.twilight.glowColor || B.twilight.horSun), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, fog: false, opacity: 0 }));
+        Z.glow.scale.set(2600, 650, 1); Z.glow.renderOrder = -0.45; Z.glow.visible = false; Z.glow.frustumCulled = false; api.group().add(Z.glow); }   // קריאת ציור אחת, רק בדמדומים
       Z.dome = new THREE.Mesh(new THREE.SphereGeometry(1350, 32, 14, 0, Math.PI * 2, 0, Math.PI / 2), Z.mat); Z.dome.frustumCulled = false; Z.dome.renderOrder = -0.4; api.group().add(Z.dome);
       api.on('env', () => env(world)); api.on('quality', () => { shadows(world); aniso(world); if (world.quality.tier === 'low' && !B.clouds.domeLow && Z.dome) { Z.dome.visible = false; const u = world.sky && world.sky.material.uniforms; if (u) u.cloud.value = world.weather.cloud; } });   // בלי env() כאן: env מכפיל עוצמות ורק אחרי applyEnv api.on('tile', () => aniso(world));
       env(world); shadows(world); aniso(world);
@@ -105,10 +121,11 @@ void main(){
     update(dt, world) {
       if (world.providers.atmosphere && Z.dome.visible) Z.dome.visible = false;
       Z.dome.position.copy(world.camera.position); Z.mat.uniforms.uTime.value += dt;
+      if (Z.glow && Z.glow.visible) { const sd = world.sun.dir, h = Math.hypot(sd.x, sd.z) || 1, cp = world.camera.position; Z.glow.position.set(cp.x + sd.x / h * 1200, cp.y + 300, cp.z + sd.z / h * 1200); }   // תחתית הספרייט (החלק הבהיר) על קו האופק
       const L = world.sunLight, t = world.quality.tier, E = B.shadow.extent[t] || 85;
       if (L && world.player.mode !== 'dev') { const sc = L.shadow.camera; if (sc.right !== E) { sc.left = sc.bottom = -E; sc.right = sc.top = E; sc.updateProjectionMatrix(); } }
     },
-    dispose(world) { const r = world.renderer; r.toneMappingExposure = 1.05; if (Z.road0 && world.data.MAT && world.data.MAT.road) world.data.MAT.road.color.copy(Z.road0); if (Z.walk0 && world.data.MAT && world.data.MAT.walk) world.data.MAT.walk.color.copy(Z.walk0); const u = world.sky && world.sky.material.uniforms; if (u) u.cloud.value = world.weather.cloud;
+    dispose(world) { const r = world.renderer; r.toneMappingExposure = 1.05; if (Z.glow) { Z.glow.material.map.dispose(); Z.glow.material.dispose(); Z.glow = null; } if (Z.road0 && world.data.MAT && world.data.MAT.road) world.data.MAT.road.color.copy(Z.road0); if (Z.walk0 && world.data.MAT && world.data.MAT.walk) world.data.MAT.walk.color.copy(Z.walk0); const u = world.sky && world.sky.material.uniforms; if (u) u.cloud.value = world.weather.cloud;
       const L = world.sunLight; if (L) { const sc = L.shadow.camera; sc.left = sc.bottom = -85; sc.right = sc.top = 85; sc.updateProjectionMatrix(); } },
   });
 })();
