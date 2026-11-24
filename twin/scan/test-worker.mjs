@@ -1,0 +1,18 @@
+import { DatabaseSync } from 'node:sqlite';
+const w = (await import('./worker.js')).default;
+const db = new DatabaseSync(':memory:');
+db.exec("CREATE TABLE photos(session TEXT NOT NULL, name TEXT NOT NULL, bytes INTEGER, at INTEGER, meta TEXT, nchunks INTEGER, PRIMARY KEY(session,name)); CREATE TABLE chunks(session TEXT NOT NULL, name TEXT NOT NULL, idx INTEGER NOT NULL, data BLOB, PRIMARY KEY(session,name,idx));");
+const prep = sql => ({ bind: (...a) => ({ run: () => db.prepare(sql).run(...a), all: async () => ({ results: db.prepare(sql).all(...a) }) }) });
+let failD1 = false;
+const DB = { prepare: prep, batch: async st => { if (failD1) throw new Error('d1 down'); db.exec('BEGIN'); try { st.forEach(s => s.run()); db.exec('COMMIT'); } catch (e) { db.exec('ROLLBACK'); throw e; } } };
+const kv = {}; let kvQuota = true;
+const env = { DB, SCAN_KEY: 'k', SCAN: { put: async (k, v) => { if (kvQuota) throw new Error('KV put() limit exceeded for the day'); kv[k] = v; } } };
+const img = new Uint8Array(2500123).map((_, i) => (i * 7) & 255);
+const up = (n) => w.fetch(new Request('https://x/api/upload?session=s1&name=' + n, { method: 'POST', headers: { 'X-Key': 'k', 'X-Meta': btoa(JSON.stringify({ a: 1 })) }, body: img }), env, {});
+let r = await up('f1.jpg'); console.log('upload', r.status, await r.json());
+r = await w.fetch(new Request('https://x/api/img?session=s1&name=f1.jpg', { headers: { 'X-Key': 'k' } }), env, {});
+const back = new Uint8Array(await r.arrayBuffer()); console.log('roundtrip', back.length === img.length && back.every((v, i) => v === img[i]));
+r = await w.fetch(new Request('https://x/api/list', { headers: { 'X-Key': 'k' } }), env, {}); console.log('list', (await r.json()).photos.length);
+failD1 = true; r = await up('f2.jpg'); console.log('both down', r.status);
+kvQuota = false; r = await up('f3.jpg'); console.log('kv fallback', r.status, (await r.json()).store);
+r = await w.fetch(new Request('https://x/api/upload?session=s1&name=x', { method: 'POST', body: img }), env, {}); console.log('nokey', r.status);
