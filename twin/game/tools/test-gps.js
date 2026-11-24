@@ -7,7 +7,7 @@ const { chromium } = require(process.env.PW || 'playwright');
   for (const [name, lat, lon, inside] of [['קיי טאוורס, אשדוד', 31.79472, 34.64083, true], ['תל אביב (מחוץ לאזור)', 32.0853, 34.7818, false]]) {
     const ctx = await b.newContext({ viewport: { width: 360, height: 800 }, hasTouch: true, isMobile: true, geolocation: { latitude: lat, longitude: lon, accuracy: 8 }, permissions: ['geolocation'] });
     const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
-    await p.goto(base + '?auto&gps=1'); await p.waitForFunction(() => window.G27 && G27.S.started, null, { timeout: 120000 });
+    await p.goto(base + (base.includes('?') ? '&' : '?') + 'auto&gps=1'); await p.waitForFunction(() => window.G27 && G27.S.started, null, { timeout: 120000 });
     await p.waitForFunction(() => /התחלת במיקום|מחוץ לאזור/.test((document.getElementById('toast') || {}).textContent || ''), null, { timeout: 40000 }).catch(() => {});
     const r = await p.evaluate(() => { const S = G27.S, W = G27.W, E = S.p.x + W.OX, N = W.OY - S.p.z, rr = ITM.sampleToItm(E, N), g = ITM.itmToWgs84(rr.E, rr.N); return { lat: g.lat, lon: g.lon, y: S.p.y - Math.max(W.H(S.p.x, S.p.z), 0), inB: !!W.buildingAt(S.p.x, S.p.z) }; });
     const d = Math.hypot((r.lat - lat) * 110900, (r.lon - lon) * 94700);

@@ -26,7 +26,7 @@ browser() {
   run "עשן game" node game/tools/smoke.js "http://localhost:$G/index.html?auto&nat=0"
   run "פיזיקה בדפדפן (הליכה, רכב)" node game/tools/test-phys.js "http://localhost:$G/index.html?auto&nat=0"
   run "יכולות רחוב" node game/tools/test-features.js "http://localhost:$G/index.html?auto&nat=0"
-  run "GPS" node game/tools/test-gps.js "http://localhost:$G/index.html"
+  run "GPS" node game/tools/test-gps.js "http://localhost:$G/index.html?nat=0"
   run "עשן integration (העולם החי)" node integration/tools/smoke.js "http://localhost:$I/world/index.html?auto&nat=0"
 }
 
