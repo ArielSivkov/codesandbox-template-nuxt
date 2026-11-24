@@ -1,12 +1,14 @@
 /* יומן בדיקה לבודקים: פועל רק בקישור עם ?p=<שם> (למשל ?p=שון) – הבודק יודע שהוא בבדיקה (תג 🧪 על המסך).
  * כל 2 ש': מצב (רגלי/רכב/מסוק…), מיקום מקומי, גובה, מהירות, FPS, בתוך בניין. אירועים: החלפת מצב, שגיאות JS, יציאה/חזרה לדף.
- * נשלח כל 15 ש' ובסגירה לשרת esh27-telemetry (קלאודפלייר KV, נמחק אחרי 90 יום). ?tel=<כתובת> מחליף שרת (לבדיקות).
+ * נשלח כל 15 ש' ובסגירה לשרת esh27-telemetry (קלאודפלייר KV, נמחק אחרי 90 יום). ?tel=<כתובת> מחליף שרת – רק ב-localhost ורק לשרת מקומי (לבדיקות).
  */
 (function () {
   'use strict';
   const q = new URLSearchParams(location.search), name = (q.get('p') || '').trim().slice(0, 40);
   if (!name) return;
-  const API = q.get('tel') || 'https://esh27-telemetry.ariel-sivkov.workers.dev/e';
+  // אבטחה (בדיקת מעבדת הפנים, אותה משפחה כמו C2): ?tel= מתקבל רק בפיתוח מקומי – אחרת קישור זדוני היה שולח שם, מיקום ושגיאות לשרת זר
+  const TEL_Q = q.get('tel'), LOCAL = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const API = (LOCAL && TEL_Q && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?(\/[^\s]*)?$/.test(TEL_Q)) ? TEL_Q : 'https://esh27-telemetry.ariel-sivkov.workers.dev/e';
   const sid = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-') + '-' + Math.random().toString(36).slice(2, 6);
   const T = { ev: [], lastMode: null, t0: Date.now(), sent: 0 };
   window.__w27tel = T;
