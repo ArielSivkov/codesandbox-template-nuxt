@@ -15,6 +15,9 @@
 ## תור העבודה (מ-23.11.2026)
 **לפני כל עבודה: לקרוא את `twin/QUEUE.md`** – התור המשותף ופסק הסנהדרין (מי עושה מה, הקפאת יכולות חדשות עד 30.11.2026). מקור האמת לקוד: `twin/integration/world`.
 
+## בדיקה אוטומטית
+כל דחיפה ל-twin-world מריצה `.github/workflows/twin-tests.yml`. מקומית: `bash twin/integration/tools/ci.sh unit|browser|canary|all`. ריצה אדומה קודמת לכל עבודה.
+
 ## מבנה
 - pipeline/ – צינור הנתונים לכל ישראל ומודל מיזוג הגבהים (גדוד 5). בדיקות: `python -m pytest pipeline/tests`.
 - engine/ – מנוע תלת־ממד לטלפון: אריחים, זיכרון, שרטוט מגרש (גדוד 6).
