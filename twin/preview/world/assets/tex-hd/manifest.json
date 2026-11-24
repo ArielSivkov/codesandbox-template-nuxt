@@ -1,0 +1,1029 @@
+{
+ "generator": "twin/integration/tools/texfactory/make.py",
+ "license": "מקורי (פרוצדורלי, ESH27) - אין נכסים חיצוניים",
+ "n_src": 4096,
+ "targets_lin": {
+  "asphalt": [
+   0.1541,
+   0.1496,
+   0.1421
+  ],
+  "pavers_gray": [
+   0.275,
+   0.2696,
+   0.2588
+  ],
+  "pavers_red": [
+   0.328,
+   0.1946,
+   0.1538
+  ],
+  "concrete": [
+   0.3058,
+   0.2998,
+   0.2848
+  ],
+  "curb_gray": [
+   0.303,
+   0.3,
+   0.291
+  ],
+  "paint_white": [
+   0.5708,
+   0.5596,
+   0.5317
+  ],
+  "paint_red": [
+   0.3988,
+   0.0391,
+   0.0313
+  ],
+  "plaster": [
+   0.6325,
+   0.5967,
+   0.537
+  ],
+  "stone": [
+   0.4942,
+   0.4461,
+   0.3586
+  ],
+  "palm": [
+   0.1808,
+   0.1573,
+   0.1258
+  ],
+  "grass": [
+   0.0679,
+   0.1292,
+   0.0438
+  ],
+  "drygrass": [
+   0.1924,
+   0.1736,
+   0.068
+  ],
+  "sand": [
+   0.3466,
+   0.3231,
+   0.2115
+  ]
+ },
+ "sets": {
+  "asphalt": {
+   "tile_m": [
+    4.0,
+    4.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/asphalt_c_4096.jpg": {
+     "bytes": 12309870,
+     "sha": "dfbf15c9cd2ec7a4"
+    },
+    "src/asphalt_n_4096.jpg": {
+     "bytes": 23395778,
+     "sha": "5e25e65e38a91709"
+    },
+    "2048/asphalt_c.jpg": {
+     "bytes": 1540806,
+     "sha": "f676a95b9441e6bd",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/asphalt_n.jpg": {
+     "bytes": 3637430,
+     "sha": "51786accadaccab6",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/asphalt_c.jpg": {
+     "bytes": 316057,
+     "sha": "28e74b8d394a666f",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/asphalt_n.jpg": {
+     "bytes": 690202,
+     "sha": "2b20bd95a963fda4",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/asphalt_c.jpg": {
+     "bytes": 52700,
+     "sha": "ce1852d70f86eb1e",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/asphalt_n.jpg": {
+     "bytes": 64264,
+     "sha": "39cb44ccf31d2856",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.1442,
+    0.1411,
+    0.1359
+   ],
+   "height_range_m": [
+    -0.00199,
+    0.00292
+   ]
+  },
+  "pavers": {
+   "tile_m": [
+    2.0,
+    2.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/pavers_c_4096.jpg": {
+     "bytes": 5877378,
+     "sha": "51ea242a2501a9de"
+    },
+    "src/pavers_n_4096.jpg": {
+     "bytes": 18819718,
+     "sha": "3fd5be135e7cc18d"
+    },
+    "src/pavers_c_red_4096.jpg": {
+     "bytes": 6556578,
+     "sha": "03e3541ed5fbded3"
+    },
+    "2048/pavers_c.jpg": {
+     "bytes": 784306,
+     "sha": "ae5c2bcf53ae565c",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/pavers_n.jpg": {
+     "bytes": 2541700,
+     "sha": "48178ad39f3e0b40",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/pavers_c_red.jpg": {
+     "bytes": 762234,
+     "sha": "78358db4e70473d4",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/pavers_c.jpg": {
+     "bytes": 181999,
+     "sha": "044d16ac2b5429bf",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/pavers_n.jpg": {
+     "bytes": 484544,
+     "sha": "1cdccb878245091e",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/pavers_c_red.jpg": {
+     "bytes": 176649,
+     "sha": "fe07db3316b639a2",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/pavers_c.jpg": {
+     "bytes": 42279,
+     "sha": "81a190d7fe4c7a97",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/pavers_n.jpg": {
+     "bytes": 90852,
+     "sha": "598905845fb1fe03",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/pavers_c_red.jpg": {
+     "bytes": 40581,
+     "sha": "4670c4df16ea6575",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.259,
+    0.2496,
+    0.2422
+   ],
+   "height_range_m": [
+    -0.00281,
+    0.00488
+   ]
+  },
+  "curb": {
+   "tile_m": [
+    2.0,
+    0.25
+   ],
+   "px": [
+    4096,
+    512
+   ],
+   "files": {
+    "src/curb_c_4096.jpg": {
+     "bytes": 722711,
+     "sha": "90371a89a1d3f6f4"
+    },
+    "src/curb_n_4096.jpg": {
+     "bytes": 2455365,
+     "sha": "41bebb5e4b17fec3"
+    },
+    "src/curb_c_gray_4096.jpg": {
+     "bytes": 826652,
+     "sha": "97795fe2ba713c9c"
+    },
+    "2048/curb_c.jpg": {
+     "bytes": 64566,
+     "sha": "24091cd3f425f202",
+     "px": [
+      2048,
+      256
+     ]
+    },
+    "2048/curb_n.jpg": {
+     "bytes": 268586,
+     "sha": "f98f75e85064c4c3",
+     "px": [
+      2048,
+      256
+     ]
+    },
+    "2048/curb_c_gray.jpg": {
+     "bytes": 80034,
+     "sha": "db4288e75e3c6ea3",
+     "px": [
+      2048,
+      256
+     ]
+    },
+    "1024/curb_c.jpg": {
+     "bytes": 14429,
+     "sha": "e946b928d6241a12",
+     "px": [
+      1024,
+      128
+     ]
+    },
+    "1024/curb_n.jpg": {
+     "bytes": 32670,
+     "sha": "c5414a24b382b46b",
+     "px": [
+      1024,
+      128
+     ]
+    },
+    "1024/curb_c_gray.jpg": {
+     "bytes": 17071,
+     "sha": "5282522cde928b12",
+     "px": [
+      1024,
+      128
+     ]
+    },
+    "512/curb_c.jpg": {
+     "bytes": 3700,
+     "sha": "d3b868c1f373cd56",
+     "px": [
+      512,
+      64
+     ]
+    },
+    "512/curb_n.jpg": {
+     "bytes": 6337,
+     "sha": "eefad4a675722c7f",
+     "px": [
+      512,
+      64
+     ]
+    },
+    "512/curb_c_gray.jpg": {
+     "bytes": 4311,
+     "sha": "63d226f3060ae30c",
+     "px": [
+      512,
+      64
+     ]
+    }
+   },
+   "mean_lin": [
+    0.4417,
+    0.2728,
+    0.2573
+   ],
+   "height_range_m": [
+    -0.0073,
+    0.04065
+   ]
+  },
+  "concrete": {
+   "tile_m": [
+    2.0,
+    2.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/concrete_c_4096.jpg": {
+     "bytes": 5410782,
+     "sha": "8f6b9a997950f22b"
+    },
+    "src/concrete_n_4096.jpg": {
+     "bytes": 19564201,
+     "sha": "08c0206591965935"
+    },
+    "2048/concrete_c.jpg": {
+     "bytes": 578320,
+     "sha": "977e20479bb375e0",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/concrete_n.jpg": {
+     "bytes": 2683714,
+     "sha": "7e98381ed341b525",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/concrete_c.jpg": {
+     "bytes": 132871,
+     "sha": "5537b762229ab7e2",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/concrete_n.jpg": {
+     "bytes": 423023,
+     "sha": "c1d56d39c0f748ae",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/concrete_c.jpg": {
+     "bytes": 30579,
+     "sha": "d02af93a484d2f74",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/concrete_n.jpg": {
+     "bytes": 46038,
+     "sha": "078adf938cdf678c",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.3146,
+    0.3073,
+    0.2882
+   ],
+   "height_range_m": [
+    -0.00333,
+    0.00408
+   ]
+  },
+  "plaster": {
+   "tile_m": [
+    1.0,
+    1.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/plaster_c_4096.jpg": {
+     "bytes": 4409393,
+     "sha": "7802bd594c447ab1"
+    },
+    "src/plaster_n_4096.jpg": {
+     "bytes": 24400499,
+     "sha": "b8d0891c313ad603"
+    },
+    "2048/plaster_c.jpg": {
+     "bytes": 277946,
+     "sha": "febbbb05fced673f",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/plaster_n.jpg": {
+     "bytes": 4428392,
+     "sha": "85c7cd786c6f82f6",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/plaster_c.jpg": {
+     "bytes": 44554,
+     "sha": "7af8df22bdb85f44",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/plaster_n.jpg": {
+     "bytes": 996344,
+     "sha": "63dd0f00950cfa63",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/plaster_c.jpg": {
+     "bytes": 9153,
+     "sha": "07e354a6f3b5f3d0",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/plaster_n.jpg": {
+     "bytes": 111561,
+     "sha": "2502363dc9a1842a",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.5459,
+    0.5281,
+    0.4985
+   ],
+   "height_range_m": [
+    -0.00072,
+    0.00152
+   ]
+  },
+  "stone": {
+   "tile_m": [
+    1.2,
+    1.2
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/stone_c_4096.jpg": {
+     "bytes": 2072330,
+     "sha": "7df7c21e6a6718d3"
+    },
+    "src/stone_n_4096.jpg": {
+     "bytes": 8463595,
+     "sha": "877eae1f9534da75"
+    },
+    "2048/stone_c.jpg": {
+     "bytes": 377023,
+     "sha": "dfd7df2dc4227a17",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/stone_n.jpg": {
+     "bytes": 2154442,
+     "sha": "17b5c8a71556f1a7",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/stone_c.jpg": {
+     "bytes": 135741,
+     "sha": "d89e44acc8f22e79",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/stone_n.jpg": {
+     "bytes": 769661,
+     "sha": "3e3fd1ae0b799ce2",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/stone_c.jpg": {
+     "bytes": 34848,
+     "sha": "d8ee8870fcd44117",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/stone_n.jpg": {
+     "bytes": 133283,
+     "sha": "ba3e8fe93af43207",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.4527,
+    0.3457,
+    0.2887
+   ],
+   "height_range_m": [
+    -0.00115,
+    0.00419
+   ]
+  },
+  "palm": {
+   "tile_m": [
+    1.0,
+    0.54
+   ],
+   "px": [
+    4096,
+    2212
+   ],
+   "files": {
+    "src/palm_c_4096.jpg": {
+     "bytes": 4333352,
+     "sha": "612d36d400c19ba7"
+    },
+    "src/palm_n_4096.jpg": {
+     "bytes": 13901907,
+     "sha": "3ab8502a16d91fd0"
+    },
+    "2048/palm_c.jpg": {
+     "bytes": 362997,
+     "sha": "cb394fe87df7a514",
+     "px": [
+      2048,
+      1106
+     ]
+    },
+    "2048/palm_n.jpg": {
+     "bytes": 1879931,
+     "sha": "703926bb45778e7a",
+     "px": [
+      2048,
+      1106
+     ]
+    },
+    "1024/palm_c.jpg": {
+     "bytes": 68432,
+     "sha": "c88cbaadd8845dfb",
+     "px": [
+      1024,
+      553
+     ]
+    },
+    "1024/palm_n.jpg": {
+     "bytes": 314634,
+     "sha": "c0d1a59f93790b4d",
+     "px": [
+      1024,
+      553
+     ]
+    },
+    "512/palm_c.jpg": {
+     "bytes": 18210,
+     "sha": "d8a2728f566933f5",
+     "px": [
+      512,
+      276
+     ]
+    },
+    "512/palm_n.jpg": {
+     "bytes": 65414,
+     "sha": "11b9e5f3cff92b22",
+     "px": [
+      512,
+      276
+     ]
+    }
+   },
+   "mean_lin": [
+    0.1824,
+    0.1633,
+    0.1247
+   ],
+   "height_range_m": [
+    0.0,
+    0.02307
+   ]
+  },
+  "grass": {
+   "tile_m": [
+    2.0,
+    2.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/grass_c_4096.jpg": {
+     "bytes": 12118105,
+     "sha": "989ff378f537fca1"
+    },
+    "src/grass_n_4096.jpg": {
+     "bytes": 26762196,
+     "sha": "5c2386330ecf5ce8"
+    },
+    "2048/grass_c.jpg": {
+     "bytes": 1019559,
+     "sha": "a295fa2a3725c0d6",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/grass_n.jpg": {
+     "bytes": 5038189,
+     "sha": "6811be232456749b",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/grass_c.jpg": {
+     "bytes": 244583,
+     "sha": "f123f0c7a391d03f",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/grass_n.jpg": {
+     "bytes": 1185968,
+     "sha": "09734c064f7cb972",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/grass_c.jpg": {
+     "bytes": 49745,
+     "sha": "cb4e4d896588868a",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/grass_n.jpg": {
+     "bytes": 204902,
+     "sha": "55340f56ed53ffc2",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.0661,
+    0.1246,
+    0.0462
+   ],
+   "height_range_m": [
+    -0.00582,
+    0.01262
+   ]
+  },
+  "drygrass": {
+   "tile_m": [
+    2.0,
+    2.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/drygrass_c_4096.jpg": {
+     "bytes": 13487992,
+     "sha": "0d83c7905c94d0fd"
+    },
+    "src/drygrass_n_4096.jpg": {
+     "bytes": 28289875,
+     "sha": "e14f1b2809ecce01"
+    },
+    "2048/drygrass_c.jpg": {
+     "bytes": 1331068,
+     "sha": "591599125ac62871",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/drygrass_n.jpg": {
+     "bytes": 5313523,
+     "sha": "f88de08d288fd9ec",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/drygrass_c.jpg": {
+     "bytes": 310999,
+     "sha": "79f9981c3e098953",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/drygrass_n.jpg": {
+     "bytes": 1217828,
+     "sha": "b5f685f28ddf76d6",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/drygrass_c.jpg": {
+     "bytes": 64250,
+     "sha": "340bc74ad32cdad4",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/drygrass_n.jpg": {
+     "bytes": 203776,
+     "sha": "5ca7b6a6341ce952",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.1934,
+    0.1759,
+    0.0662
+   ],
+   "height_range_m": [
+    -0.00588,
+    0.01191
+   ]
+  },
+  "sand": {
+   "tile_m": [
+    4.0,
+    4.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/sand_c_4096.jpg": {
+     "bytes": 1501590,
+     "sha": "f06f102bba842255"
+    },
+    "src/sand_n_4096.jpg": {
+     "bytes": 4158921,
+     "sha": "8ff7068f6f729935"
+    },
+    "2048/sand_c.jpg": {
+     "bytes": 225636,
+     "sha": "cb30b8fa4e28abab",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "2048/sand_n.jpg": {
+     "bytes": 986740,
+     "sha": "17d07c1d417e923a",
+     "px": [
+      2048,
+      2048
+     ]
+    },
+    "1024/sand_c.jpg": {
+     "bytes": 77384,
+     "sha": "3e380ec8d682ba37",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/sand_n.jpg": {
+     "bytes": 350151,
+     "sha": "b63ea20113cc41f6",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/sand_c.jpg": {
+     "bytes": 22572,
+     "sha": "c87de6368d121897",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/sand_n.jpg": {
+     "bytes": 130323,
+     "sha": "8e50f7f055677e80",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.3762,
+    0.3205,
+    0.2128
+   ],
+   "height_range_m": [
+    -0.01746,
+    0.01618
+   ]
+  },
+  "asphalt_macro": {
+   "tile_m": [
+    64,
+    64
+   ],
+   "px": [
+    1024,
+    1024
+   ],
+   "files": {
+    "macro/asphalt_m_1024.jpg": {
+     "bytes": 144842,
+     "sha": "fb7cdc99c437aaee"
+    },
+    "macro/asphalt_m_512.jpg": {
+     "bytes": 55364,
+     "sha": "57200155e88f6b6c"
+    },
+    "macro/asphalt_m_256.jpg": {
+     "bytes": 20702,
+     "sha": "648c6bc0e15fbb52"
+    }
+   },
+   "note": "R=בהירות (0.5=1.0), G=טלאי זפת, B=קווי איטום"
+  },
+  "roof": {
+   "tile_m": [
+    2.0,
+    2.0
+   ],
+   "px": [
+    4096,
+    4096
+   ],
+   "files": {
+    "src/roof_c_4096.jpg": {
+     "bytes": 5511159,
+     "sha": "7f8d78124785073c"
+    },
+    "src/roof_n_4096.jpg": {
+     "bytes": 19562769,
+     "sha": "bc3e7cd0fc1583ec"
+    },
+    "1024/roof_c.jpg": {
+     "bytes": 136054,
+     "sha": "dadfb5aa37353da3",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "1024/roof_n.jpg": {
+     "bytes": 422484,
+     "sha": "828a638a18606111",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/roof_c.jpg": {
+     "bytes": 31544,
+     "sha": "361fe60961406e81",
+     "px": [
+      512,
+      512
+     ]
+    },
+    "512/roof_n.jpg": {
+     "bytes": 45898,
+     "sha": "c2f2b5cedd0bdf06",
+     "px": [
+      512,
+      512
+     ]
+    }
+   },
+   "mean_lin": [
+    0.3703,
+    0.3588,
+    0.3244
+   ],
+   "height_range_m": [
+    -0.00321,
+    0.00407
+   ]
+  },
+  "ground_pack": {
+   "tile_m": [
+    2,
+    2
+   ],
+   "note": "R=דשא G=עשב יבש B=חול (בהירות מנורמלת, 0.5=1.0)",
+   "files": {
+    "1024/ground_d.jpg": {
+     "bytes": 1046608,
+     "sha": "69cc61da7e351ba4",
+     "px": [
+      1024,
+      1024
+     ]
+    },
+    "512/ground_d.jpg": {
+     "bytes": 219778,
+     "sha": "62e5af3b1d92377f",
+     "px": [
+      512,
+      512
+     ]
+    }
+   }
+  }
+ },
+ "runtime_tiers": {
+  "low": {
+   "files": 11,
+   "download_kb": 393,
+   "gpu_mb_est": 10.2
+  },
+  "medium": {
+   "files": 15,
+   "download_kb": 2286,
+   "gpu_mb_est": 38.0
+  },
+  "high": {
+   "files": 15,
+   "download_kb": 7958,
+   "gpu_mb_est": 98.0
+  }
+ },
+ "runtime_note": "רק הקבצים שהמתאם טוען נשארים במשחק; השאר נבנים מחדש מהמקור (make.py)"
+}
