@@ -4,6 +4,8 @@
 // כש-R2 יופעל בחשבון – לעבור אליו (10GB חינם) ולשמור את אותו ממשק. נפרס ל-esh27-scan ב-24.11.2026 (D1 9fe38da6-65f4-4228-b776-83c0e72fd9b8).
 const SRC = 'https://raw.githubusercontent.com/ArielSivkov/codesandbox-template-nuxt/twin-world/twin/scan/scan-site.html';
 const CHUNK = 1000000;
+// סוג הקובץ לפי הסיומת – תמונות, מקטעי וידאו (webm/mp4) ויומני החיישנים שלהם
+const mimeOf = n => /\.webm$/i.test(n) ? 'video/webm' : /\.mp4$/i.test(n) ? 'video/mp4' : /\.json$/i.test(n) ? 'application/json' : /\.png$/i.test(n) ? 'image/png' : 'image/jpeg';
 const okKey = (req, env) => { const k = req.headers.get('X-Key'); return !!k && (k === env.SCAN_KEY || k === env.LINK_KEY); };
 const clean = s => (s || '').replace(/[^\w.\-]/g, '_').slice(0, 120);
 
@@ -49,14 +51,14 @@ export default {
       const r = await env.DB.prepare('SELECT session,name,bytes,at,meta FROM photos WHERE at>? ORDER BY at LIMIT 500').bind(since).all();
       return Response.json({ ok: true, photos: r.results });
     }
-    if (url.pathname === '/api/img') {
+    if (url.pathname === '/api/img' || url.pathname === '/api/file') {
       if (!okKey(req, env)) return new Response('unauthorized', { status: 401 });
       const session = clean(url.searchParams.get('session')), name = clean(url.searchParams.get('name'));
       const r = await env.DB.prepare('SELECT data FROM chunks WHERE session=? AND name=? ORDER BY idx').bind(session, name).all();
       if (!r.results.length) return new Response('not found', { status: 404 });
       const parts = r.results.map(x => new Uint8Array(x.data)), out = new Uint8Array(parts.reduce((a, p) => a + p.length, 0));
       let o = 0; for (const p of parts) { out.set(p, o); o += p.length; }
-      return new Response(out, { headers: { 'content-type': 'image/jpeg' } });
+      return new Response(out, { headers: { 'content-type': mimeOf(name), 'content-disposition': 'inline; filename="' + name + '"' } });
     }
     if (url.pathname === '/api/ping') return Response.json({ ok: true, key_ok: okKey(req, env) });
     return new Response('not found', { status: 404 });

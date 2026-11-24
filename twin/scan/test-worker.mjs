@@ -16,3 +16,8 @@ r = await w.fetch(new Request('https://x/api/list', { headers: { 'X-Key': 'k' } 
 failD1 = true; r = await up('f2.jpg'); console.log('both down', r.status);
 kvQuota = false; r = await up('f3.jpg'); console.log('kv fallback', r.status, (await r.json()).store);
 r = await w.fetch(new Request('https://x/api/upload?session=s1&name=x', { method: 'POST', body: img }), env, {}); console.log('nokey', r.status);
+// וידאו: מקטע 15 ש' ב-5Mbps ≈ 9.4MB – נשמר ב-10 חתיכות ויורד בשלמותו עם סוג וידאו
+const vid = new Uint8Array(9400000).map((_, i) => (i * 13) & 255); failD1 = false;
+r = await w.fetch(new Request('https://x/api/upload?session=s1&name=0001_video.webm', { method: 'POST', headers: { 'X-Key': 'k' }, body: vid }), env, {}); console.log('video upload', r.status);
+r = await w.fetch(new Request('https://x/api/file?session=s1&name=0001_video.webm', { headers: { 'X-Key': 'k' } }), env, {});
+const vb = new Uint8Array(await r.arrayBuffer()); console.log('video download', r.headers.get('content-type'), vb.length === vid.length && vb.every((v, i) => v === vid[i]));
