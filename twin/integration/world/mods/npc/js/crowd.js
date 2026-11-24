@@ -331,7 +331,7 @@ C.create = async function (opts) {
         _p.set(it.x, it.y || 0, it.z); _q.setFromAxisAngle(_up, it.heading || 0); _s.set(h * w, h, h * w);
         _m.compose(_p, _q, _s); im.setMatrixAt(i, _m);
         const c = bodies[k].clips[it.anim] || bodies[k].clips.idle;
-        let fps = c.fps; if (c.nom && it.speed > 0.05) fps *= Math.max(0.6, Math.min(1.7, it.speed / (c.nom * h)));
+        let fps = c.fps; if (c.nom && it.speed > 0.05) fps *= Math.max(0.35, Math.min(1.7, it.speed / (c.nom * h)));   // צוות תנועה: 0.6→0.35 – הליכה איטית בלי החלקת רגליים
         if (it._fk == null || Math.abs(it._fk - fps) > 0.15 * c.fps || it._fa !== it.anim) { it._fk = fps; it._fa = it.anim; }
         A.iAnim.setXYZW(i, c.row, c.frames, -((it.seed || 0) % 997) * 0.173, it._fk);
         A.iSkin.setXYZW(i, pk.sk[0], pk.sk[1], pk.sk[2], partsMask(L, it.anim));

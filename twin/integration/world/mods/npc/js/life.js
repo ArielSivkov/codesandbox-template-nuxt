@@ -173,7 +173,7 @@ L.astar = function (g, s, t, maxIter) {
   return null;
 };
 /** מסלול צמתים → קו הליכה במדרכה הימנית (היסט רוחב/2 + 1.4 מ'), עם חיבור מנקודת המוצא ולנקודת היעד */
-L.sidewalkPath = function (g, nodes, from, to, side, jitter) {
+L.sidewalkPath = function (g, nodes, from, to, side, jitter, blocked) {
   const out = [from.x, from.z]; side = side || 1; jitter = jitter || 0;
   const n = nodes.length;
   for (let i = 0; i < n; i++) {
@@ -188,7 +188,10 @@ L.sidewalkPath = function (g, nodes, from, to, side, jitter) {
     const off = (g.ws[a] / 2 + 1.4 + jitter) * side;
     if (rl < 0.2) { rx = -d1z; rz = d1x; } else { rx /= rl; rz /= rl; }
     const cosh = Math.max(0.5, Math.abs(rx * -d1z + rz * d1x));
-    out.push(x + rx * off / cosh, z + rz * off / cosh);
+    let px2 = x + rx * off / cosh, pz2 = z + rz * off / cosh;
+    // צוות תנועה: נקודת מדרכה בתוך בניין (בניין צמוד לכביש / פינה חדה) → קרוב יותר לשפת הכביש, ואז הצד השני
+    if (blocked && blocked(px2, pz2)) { const hw = g.ws[a] / 2; for (const o2 of [hw + 0.7, hw + 2.2, -(hw + 1.4)]) { const ox = x + rx * o2 * side / cosh, oz = z + rz * o2 * side / cosh; if (!blocked(ox, oz)) { px2 = ox; pz2 = oz; break; } } }
+    out.push(px2, pz2);
   }
   out.push(to.x, to.z);
   return out;
@@ -415,6 +418,8 @@ L.createSim = function (world, opts) {
     let to;
     if (pl.cx != null && !dest.inside) to = spotNear(a, pl, from);
     else if (pl.cx != null) to = door(pl, from); else to = { x: pl.x + (rng(a.seed)() - 0.5) * 14, z: pl.z + (rng(a.seed ^ 9)() - 0.5) * 14 };
+    if (pl.cx == null && sim.graph && ((world.blocked && world.blocked(to.x, to.z)) || (world.onRoadway && world.onRoadway(to.x, to.z)))) { // צוות תנועה: יעד שיטוט על הכביש/בתוך בניין → מדרכה ליד הצומת הקרוב
+      const n = L.nearestNode(sim.graph, to.x, to.z, 120); if (n >= 0) { const sp = L.sidewalkPath(sim.graph, [n], to, to, a.side, a.jit, badWalk); to = { x: sp[2], z: sp[3] }; } }
     a.target = to; a.path = null;
     sim.pathQueue.push(a);
   }
@@ -424,9 +429,11 @@ L.createSim = function (world, opts) {
     const s = L.nearestNode(g, a.x, a.z, 200), t = L.nearestNode(g, to.x, to.z, 200);
     const nodes = (s >= 0 && t >= 0) ? L.astar(g, s, t, 6000) : null;
     if (!nodes) { sim.stats.pathFail++; a.path = [a.x, a.z, to.x, to.z]; a.pi = 1; return; }
-    a.path = L.sidewalkPath(g, nodes, { x: a.x, z: a.z }, to, a.side, a.jit); a.pi = 1;
+    a.path = L.sidewalkPath(g, nodes, { x: a.x, z: a.z }, to, a.side, a.jit, badWalk); a.pi = 1;
   }
   sim.solvePath = solvePath;
+  /** נקודת הליכה פסולה: בתוך בניין, או על הכביש של כביש אחר (שדרה כפולה / כביש מקביל צמוד) */
+  const badWalk = (x, z) => (world.blocked && world.blocked(x, z)) || (world.onRoadway && world.onRoadway(x, z));
 
   function setAnim(a, n) { if (a.anim !== n) { a.anim = n; a.animT = sim.t; } }
 
@@ -459,9 +466,10 @@ L.createSim = function (world, opts) {
   function joinOrStartGroup(a) {
     for (const g of groups) { if (g.m.length && g.m.length < 4 && (g.x - a.x) ** 2 + (g.z - a.z) ** 2 < 25) {
       g.m.push(a); a.group = g; const k = g.m.length, ang = (k * 2.1 + g.r) % 6.283; a.gx = g.x + Math.cos(ang) * 0.95; a.gz = g.z + Math.sin(ang) * 0.95;
+      if (world.blocked && world.blocked(a.gx, a.gz)) { a.gx = g.x - Math.cos(ang) * 0.95; a.gz = g.z - Math.sin(ang) * 0.95; if (world.blocked(a.gx, a.gz)) { a.gx = a.x; a.gz = a.z; } }   // צוות תנועה: לא עומדים בתוך קיר
       for (const m of g.m) setAnim(m, g.sit ? 'sittalk' : 'talk'); return true; } }
     const g = { x: a.x, z: a.z, m: [a], r: rng(a.seed)() * 6, sit: a.dest && a.dest.spot === 'beach' && rng(a.seed ^ 3)() < 0.6 };
-    a.gx = g.x + Math.cos(g.r) * 0.95; a.gz = g.z + Math.sin(g.r) * 0.95; groups.push(g); a.group = g; return false;
+    a.gx = g.x + Math.cos(g.r) * 0.95; a.gz = g.z + Math.sin(g.r) * 0.95; if (world.blocked && world.blocked(a.gx, a.gz)) { a.gx = a.x; a.gz = a.z; } groups.push(g); a.group = g; return false;
   }
 
   // --- הגעה ליעד
@@ -469,6 +477,7 @@ L.createSim = function (world, opts) {
     const d = a.dest || {}; a.path = null; a.vx = a.vz = 0;
     if (d.inside) { a.state = 'inside'; a.atPlace = d.place; setAnim(a, 'idle'); if (d.after === 'gather') a.afterGather = sim.t; return; }
     a.state = 'stay'; a.stayT = sim.t; a.atPlace = d.place;
+    if (world.blocked && world.exitPoint && world.blocked(a.x, a.z)) { const e = world.exitPoint(a.x, a.z); if (e) { a.x = e.x; a.z = e.z; } }   // צוות תנועה: נקודת שהייה בתוך בניין → לשפה
     const SR = rng(a.seed ^ Math.floor(sim.t));
     switch (d.spot) {
       case 'site': setAnim(a, wpick(SR, [['kneel', 3], ['arms', 1], ['carry', 2], ['idle', 1]])); if (a.anim === 'carry') { a.wander = 1; } break;
@@ -484,6 +493,8 @@ L.createSim = function (world, opts) {
   function follow(a, dt) {
     // רמות 1–2: התקדמות מדויקת לאורך הקו (בלי חריגה גם בצעד גדול)
     const p = a.path; let rem = (a.flee > 0 ? SPEED.run : a.pref) * dt, hx = 0, hz = 0;
+    if (dt < 1.5 && world.crossWait && a.pi < p.length / 2) { const tx = p[a.pi * 2], tz = p[a.pi * 2 + 1], d = Math.hypot(tx - a.x, tz - a.z) || 1, k = Math.min(1, rem / d);
+      if (world.crossWait(a.x, a.z, a.x + (tx - a.x) * k, a.z + (tz - a.z) * k) && (a.waitT = (a.waitT || 0) + dt) < 40) { a.speed = 0; a.vx = a.vz = 0; setAnim(a, 'idle'); return; } a.waitT = 0; }
     while (rem > 0 && a.pi < p.length / 2) {
       const tx = p[a.pi * 2], tz = p[a.pi * 2 + 1], dx = tx - a.x, dz = tz - a.z, d = Math.hypot(dx, dz);
       if (d > 1e-4) { hx = dx; hz = dz; }
@@ -502,7 +513,7 @@ L.createSim = function (world, opts) {
       let dx = tx - a.x, dz = tz - a.z, d = Math.hypot(dx, dz);
       while (d < (full ? 1.2 : 2.5) && a.pi < p.length / 2 - 1) { a.pi++; tx = p[a.pi * 2]; tz = p[a.pi * 2 + 1]; dx = tx - a.x; dz = tz - a.z; d = Math.hypot(dx, dz); }
       if (d < 0.6 && a.pi >= p.length / 2 - 1) { arrive(a); return; }
-    } else return;
+    } else { a.vx = a.vz = 0; a.speed = 0; setAnim(a, 'idle'); return; }   // צוות תנועה: מחכים למסלול — עומדים (לא נסחפים עם המהירות הקודמת)
     let dx = tx - a.x, dz = tz - a.z; const d = Math.hypot(dx, dz) || 1; let spd = a.flee > 0 ? SPEED.run : a.pref;
     let vx = dx / d * spd, vz = dz / d * spd;
     if (full) {
@@ -524,10 +535,16 @@ L.createSim = function (world, opts) {
     // החלקה של המהירות (אינרציה קלה)
     const k = full ? Math.min(1, dt * 6) : 1; a.vx += (vx - a.vx) * k; a.vz += (vz - a.vz) * k;
     let nx = a.x + a.vx * dt, nz = a.z + a.vz * dt;
-    if (full && world.blocked && (sim._tick + a.id) % 3 === 0 && world.blocked(nx, nz)) { // לא נכנסים לבניינים (חוץ מביציאה/כניסה לדלת)
-      const dd = a.path ? Math.hypot(a.path[a.path.length - 2] - nx, a.path[a.path.length - 1] - nz) : 99;
-      if (dd > 3 && !world.blocked(a.x, a.z)) { if (!world.blocked(nx, a.z)) nz = a.z; else if (!world.blocked(a.x, nz)) nx = a.x; else { nx = a.x; nz = a.z; } } }
-    a.x = nx; a.z = nz; a.speed = Math.hypot(a.vx, a.vz);
+    // לא נכנסים לבניינים (חוץ מביציאה/כניסה לדלת). צוות תנועה: בדיקה בכל צעד היגוי (היה כל צעד שלישי), רכיב המהירות החסום מתאפס
+    // (אחרת האינטגרציה שבין הצעדים ממשיכה לדחוף לתוך הקיר), ומי שכבר בפנים נדחף החוצה לשפה הקרובה.
+    if (full && world.blocked) { const dd = a.path ? Math.hypot(a.path[a.path.length - 2] - nx, a.path[a.path.length - 1] - nz) : 99, d0 = a.path ? Math.hypot(a.path[0] - a.x, a.path[1] - a.z) : 99;
+      if (dd > 3 && world.blocked(nx, nz)) {
+        if (!world.blocked(a.x, a.z)) { if (!world.blocked(nx, a.z)) { nz = a.z; a.vz = 0; } else if (!world.blocked(a.x, nz)) { nx = a.x; a.vx = 0; } else { nx = a.x; nz = a.z; a.vx = a.vz = 0; if ((a.blockT = (a.blockT || 0) + dt) > 2 && a.path && a.pi < a.path.length / 2 - 1) { a.pi++; a.blockT = 0; } } }   // חסום בשני הצירים 2 ש' → לנקודת המסלול הבאה
+        else if (world.exitPoint) { const e = world.exitPoint(a.x, a.z); if (e) { const ex = e.x - a.x, ez = e.z - a.z, el = Math.hypot(ex, ez) || 1, st = Math.min(el, a.pref * 1.5 * dt); nx = a.x + ex / el * st; nz = a.z + ez / el * st; a.vx = ex / el * a.pref; a.vz = ez / el * a.pref; } } } }
+    // מעבר חציה ברמזור / רכב חוסם: עומדים על המדרכה עד שמותר (world.crossWait מהמתאם)
+    if (full && world.crossWait && world.crossWait(a.x, a.z, nx, nz) && (a.waitT = (a.waitT || 0) + dt) < 40) { nx = a.x; nz = a.z; a.vx = a.vz = 0; } else if (full) a.waitT = 0;
+    const mv = Math.hypot(nx - a.x, nz - a.z);
+    a.x = nx; a.z = nz; a.speed = dt > 0 ? Math.min(Math.hypot(a.vx, a.vz), mv / dt) : 0;   // מהירות אמיתית → קצב צעדים תואם (בלי החלקת רגליים)
     if (a.speed > 0.15) { const h = Math.atan2(a.vx, a.vz); a.heading += angD(a.heading, h) * Math.min(1, dt * 8); }
     setAnim(a, a.flee > 0 || a.speed > 3 ? 'run' : a.speed > 0.2 ? (a.carry ? 'carry' : 'walk') : 'idle');
   }
@@ -548,6 +565,8 @@ L.createSim = function (world, opts) {
     a.group = leaveGroup(a); sim.events.push({ t: sim.t, type: 'flee', id: a.id });
   }
 
+  /** צוות תנועה: מרחב אישי של השחקן ברגל — אף דמות לא נכנסת לתוכו (0.55 מ'), גם ילד שהולך אחרי הורה */
+  function keepOff(a) { if (PL.mode !== 'foot') return; const dx = a.x - PL.x, dz = a.z - PL.z, d2 = dx * dx + dz * dz; if (d2 > 0.3025 || d2 < 1e-8) return; const d = Math.sqrt(d2); a.x = PL.x + dx / d * 0.55; a.z = PL.z + dz / d * 0.55; }
   function updAgent(a, dt, tier) {
     if (a.flee > 0) a.flee -= dt;
     // ילד שהולך עם ההורה
@@ -560,18 +579,23 @@ L.createSim = function (world, opts) {
       let tx = p.x - hs * back + hc * lat, tz = p.z - hc * back - hs * lat;
       if (p.state === 'stay') { const R2 = rng(a.seed ^ Math.floor(sim.t / 6)); tx = p.x + (R2() - 0.5) * 7; tz = p.z + (R2() - 0.5) * 7; }
       const dx = tx - a.x, dz = tz - a.z, d = Math.hypot(dx, dz);
-      if (d > 30) { a.x = tx; a.z = tz; }
+      if (d > 30) { a.x = tx; a.z = tz; if (world.blocked && world.blocked(tx, tz)) { a.x = p.x; a.z = p.z; } }
       const s = d < 0.3 ? 0 : Math.min(d * 1.5, p.state === 'stay' ? 2.6 : Math.max(p.speed, 0.6) * 1.25);
-      a.vx = d > 1e-3 ? dx / d * s : 0; a.vz = d > 1e-3 ? dz / d * s : 0; a.x += a.vx * dt; a.z += a.vz * dt; a.speed = s; a.state = 'walk';
+      a.vx = d > 1e-3 ? dx / d * s : 0; a.vz = d > 1e-3 ? dz / d * s : 0; a.state = 'walk';
+      { let nx = a.x + a.vx * dt, nz = a.z + a.vz * dt; if (world.blocked && world.blocked(nx, nz) && !world.blocked(a.x, a.z)) { if (!world.blocked(nx, a.z)) { nz = a.z; a.vz = 0; } else if (!world.blocked(a.x, nz)) { nx = a.x; a.vx = 0; } else { nx = a.x; nz = a.z; a.vx = a.vz = 0; } }
+        else if (world.blocked && world.blocked(a.x, a.z)) { const e = world.exitPoint && world.exitPoint(a.x, a.z);   // ילד בתוך בניין: החוצה לשפה; אם גם שם בניין (בניינים צמודים) – ליד ההורה
+          if (e && !world.blocked(e.x, e.z)) { const ex = e.x - a.x, ez = e.z - a.z, el = Math.hypot(ex, ez) || 1; nx = a.x + ex / el * Math.min(el, 1.6 * dt); nz = a.z + ez / el * Math.min(el, 1.6 * dt); } else if (!world.blocked(p.x, p.z)) { nx = p.x; nz = p.z; } }
+        a.speed = dt > 0 ? Math.min(s, Math.hypot(nx - a.x, nz - a.z) / dt) : 0; a.x = nx; a.z = nz; }
       if (s > 0.15) a.heading += angD(a.heading, Math.atan2(a.vx, a.vz)) * Math.min(1, dt * 8);
       else if (p.state === 'stay') a.heading += angD(a.heading, Math.atan2(p.x - a.x, p.z - a.z)) * Math.min(1, dt * 3);
-      setAnim(a, s > 2.2 ? 'run' : s > 0.2 ? 'walk' : 'idle'); return;
+      setAnim(a, a.speed > 2.2 ? 'run' : a.speed > 0.2 ? 'walk' : 'idle'); keepOff(a); return;
     }
     if (tier === 0) react(a);
+    if (a.state === 'walk' || a.state === 'stay') keepOff(a);
     if (a.state === 'walk') { if (a.path) steer(a, dt, tier === 0); return; }
     if (a.state === 'stay') {
       if (a.group && a.gx != null) { const dx = a.gx - a.x, dz = a.gz - a.z, d = Math.hypot(dx, dz);
-        if (d > 0.1) { const s = Math.min(1.2, d * 2); a.x += dx / d * s * dt; a.z += dz / d * s * dt; if (d > 0.4) setAnim(a, 'walk'); }
+        if (d > 0.1) { const s = Math.min(1.2, d * 2); a.x += dx / d * s * dt; a.z += dz / d * s * dt; a.speed = s; if (s > 0.25) { setAnim(a, 'walk'); a.heading += angD(a.heading, Math.atan2(dx, dz)) * Math.min(1, dt * 6); } }
         else { setAnim(a, a.group.sit ? 'sittalk' : (a.group.m.length > 1 ? 'talk' : 'idle')); a.heading += angD(a.heading, Math.atan2(a.group.x - a.x, a.group.z - a.z)) * Math.min(1, dt * 4); } }
       // מסתכלים על השחקן כשהוא קרוב ועומד
       if (tier === 0) { const px = PL.x - a.x, pz = PL.z - a.z; if (px * px + pz * pz < 25 && PL.speed < 2 && PL.mode === 'foot') { if (!a.group || a.group.m.length < 2) a.heading += angD(a.heading, Math.atan2(px, pz)) * Math.min(1, dt * 3); a.lookAt = sim.t + 1; } }
@@ -621,7 +645,8 @@ L.createSim = function (world, opts) {
       const every = a.tier === 0 ? 2 : a.tier === 1 ? 6 : 24;
       if ((tick + a.id) % every) {
         // רמה 0 בין צעדי ההיגוי: רק אינטגרציה של המיקום (חלק לעין, חצי מהעלות)
-        if (a.tier === 0 && a.state === 'walk' && a.speed > 0.05) { a.x += a.vx * dt; a.z += a.vz * dt; }
+        if (a.tier === 0 && a.state === 'walk' && (a.path || a.followOn) && a.speed > 0.05) { const nx = a.x + a.vx * dt, nz = a.z + a.vz * dt;
+          if (!(world.blocked && world.blocked(nx, nz) && !world.blocked(a.x, a.z)) && !(world.crossWait && world.crossWait(a.x, a.z, nx, nz))) { a.x = nx; a.z = nz; }  keepOff(a); }
         continue;
       }
       let adt = Math.min(sim.t - (a.lastUpd || sim.t - dt), a.tier === 2 ? 150 : 2); a.lastUpd = sim.t;

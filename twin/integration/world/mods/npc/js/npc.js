@@ -25,6 +25,17 @@ function worldAdapter(W) {
   return {
     buildings, roads, H: W.H, isSea: W.isSea,
     blocked: (x, z) => !!W.buildingAt(x, z),
+    // צוות תנועה: נקודת יציאה מבניין (השפה הקרובה + 0.6 מ'), ועל הכביש עצמו (לא על המדרכה)
+    exitPoint: (x, z) => { const b = W.buildingAt(x, z); if (!b || !W.edgeDist) return null; const e = W.edgeDist(b, x, z), dx = e.px - x, dz = e.pz - z, d = Math.hypot(dx, dz) || 1; return { x: e.px + dx / d * 0.6, z: e.pz + dz / d * 0.6 }; },
+    onRoadway: (x, z) => { const E = x + W.OX, N = W.OY - z, t = W.tiles.get(Math.floor(E / 1000) + '_' + Math.floor(N / 1000)); if (!t || !t.roads) return false;
+      // רשת מקטעים לכל אריח (20 מ'), נבנית פעם אחת — בדיקה זולה גם בתכנון מסלול
+      if (!t._rg || t._rgN !== t.roads.length) { const g = t._rg = new Map(); t._rgN = t.roads.length;
+        for (const r of t.roads) { const p = r.p; for (let i = 0; i < p.length / 2 - 1; i++) { const ax = p[i * 2], az = p[i * 2 + 1], bx = p[i * 2 + 2], bz = p[i * 2 + 3], m = r.w / 2 + 1;
+          for (let cx = Math.floor((Math.min(ax, bx) - m) / 20); cx <= Math.floor((Math.max(ax, bx) + m) / 20); cx++) for (let cz = Math.floor((Math.min(az, bz) - m) / 20); cz <= Math.floor((Math.max(az, bz) + m) / 20); cz++) {
+            const k = cx * 7919 + cz; let a = g.get(k); if (!a) g.set(k, a = []); a.push(ax, az, bx, bz, r.w); } } } }
+      const a = t._rg.get(Math.floor(x / 20) * 7919 + Math.floor(z / 20)); if (!a) return false;
+      for (let i = 0; i < a.length; i += 5) { const ax = a[i], az = a[i + 1], dx = a[i + 2] - ax, dz = a[i + 3] - az, hw = a[i + 4] / 2 - 0.2, l2 = dx * dx + dz * dz || 1e-9;
+        let s = ((x - ax) * dx + (z - az) * dz) / l2; s = s < 0 ? 0 : s > 1 ? 1 : s; const qx = ax + dx * s - x, qz = az + dz * s - z; if (qx * qx + qz * qz < hw * hw) return true; } return false; },
     nearBuilding: (x, z, r) => { const a = W.near(x, z, r); for (const b of a) { if (W.pip(b, x, z) || W.edgeDist(b, x, z).d < r) return true; } return false; },
     nearRoad: null,
     // נמל (מקורב): בניין תעשייה גדול שיש ים עד 700 מ' ממערב לו
@@ -42,19 +53,26 @@ NPC.create = async function (o) {
   let world = null, center = null;
 
   // ---------- אוכלוסייה סביב נקודה (בנייה מחדש כשמתרחקים 450 מ')
-  npc.spawnAround = function (x, z) {
-    world = worldAdapter(W); center = { x, z };
-    const g = L.buildGraph(world.roads);
-    world.nearRoad = (px, pz, r) => !!W.onRoad(px, pz) || (r > 20 && L.nearestNode(g, px, pz, r) >= 0);
-    const sp = L.findSpots(world, x, z, Math.min(o.radius + 200, 900), 26);
-    world.openSpots = sp.open; world.beachSpots = sp.beach.length ? sp.beach : L.findBeach(world, x, z, 1200, 30);
-    const sim = L.createSim(world, { maxAgents: o.maxAgents, center: { x, z }, radius: o.radius, seed: 27 });
-    sim.graph = g; sim.populate(); npc.sim = sim; npc.graph = g;
-    if (npc._weather) sim.setWeather(npc._weather);
-    sim.settle(npc.clock());
-    placeNamed(x, z);
-    return { agents: sim.agents.length, nodes: g.n, open: sp.open.length, beach: sp.beach.length, buildings: world.buildings.length };
-  };
+  // צוות תנועה וטעינה: הגרף נבנה מחדש רק כשסט האריחים עם כבישים השתנה (חוסך ~22 מ"ש ×6 בכל אכלוס מחדש),
+  // והאכלוס מחדש תוך כדי משחק מתפצל לשני פריימים (בנייה / "התיישבות") — במקום עצירה אחת ארוכה.
+  let gCache = null;
+  const roadsKey = () => { const a = []; for (const t of W.tiles.values()) if (t.roads && t.roads.length) a.push(t.key + ':' + t.roads.length); return a.sort().join(';'); };
+  function buildSim(x, z) {
+    const wd = worldAdapter(W); if (o.crossWait) wd.crossWait = o.crossWait;
+    const key = roadsKey(); if (!gCache || gCache.key !== key) gCache = { key, g: L.buildGraph(wd.roads) };
+    const g = gCache.g;
+    wd.nearRoad = (px, pz, r) => !!W.onRoad(px, pz) || (r > 20 && L.nearestNode(g, px, pz, r) >= 0);
+    const sp = L.findSpots(wd, x, z, Math.min(o.radius + 200, 900), 26);
+    wd.openSpots = sp.open; wd.beachSpots = sp.beach.length ? sp.beach : L.findBeach(wd, x, z, 1200, 30);
+    const sim = L.createSim(wd, { maxAgents: o.maxAgents, center: { x, z }, radius: o.radius, seed: 27 });
+    sim.graph = g; sim.populate(); if (npc._weather) sim.setWeather(npc._weather);
+    return { wd, g, sim, sp, x, z };
+  }
+  function finishSim(j) {
+    j.sim.settle(npc.clock()); world = j.wd; center = { x: j.x, z: j.z }; npc.sim = j.sim; npc.graph = j.g; placeNamed(j.x, j.z);
+    return { agents: j.sim.agents.length, nodes: j.g.n, open: j.sp.open.length, beach: j.sp.beach.length, buildings: j.wd.buildings.length };
+  }
+  npc.spawnAround = function (x, z) { npc._job = null; return finishSim(buildSim(x, z)); };
 
   // ---------- דמויות בעלות שם
   function nearestTyped(re, x, z, maxD) { let best = null, bd = (maxD || 4000) ** 2; for (const b of world.buildings) { if (!re.test(b.type)) continue; const d = (b.cx - x) ** 2 + (b.cz - z) ** 2; if (d < bd) { bd = d; best = b; } } return best; }
@@ -102,7 +120,8 @@ NPC.create = async function (o) {
     const sim = npc.sim; if (!sim) return;
     const p = o.player(); sim.setPlayer(p);
     if (o.weather) { const w = o.weather(); npc._weather = w; if ((w.rain > 0.2) !== (sim.weather.rain > 0.2)) sim.setWeather(w); }
-    if (center && Math.hypot(p.x - center.x, p.z - center.z) > 200 && W.pending && W.pending() === 0) npc.spawnAround(p.x, p.z);
+    if (npc._job) { const j = npc._job; npc._job = null; finishSim(j); }   // פריים 2: התיישבות והחלפה
+    else if (center && Math.hypot(p.x - center.x, p.z - center.z) > 200 && W.pending && W.pending() === 0) npc._job = buildSim(p.x, p.z);   // פריים 1: בנייה
     sim.update(dt * o.timeScale, npc.clock());
     npc.draw(dt);
   };
