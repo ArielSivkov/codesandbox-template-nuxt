@@ -22,7 +22,7 @@
     const t = +world.clock.date; if (!force && Math.abs(t - lastSampleT) < 20 * 60000) return; lastSampleT = t;
     const s = WX.sampleAt(data.hourly, t) || data.current; if (!s) return;
     YZW.setWeather({ windSpeed: +(s.wind_10m_ms || 0).toFixed(1), windFrom: Math.round(s.wind_dir_deg || 0), gust: s.wind_10m_ms > 0.5 && s.gust_ms ? Math.min(2.5, s.gust_ms / s.wind_10m_ms) : 1.3,
-      cloud: (s.cloud_cover || 0) / 100, rain: s.precip_mm || 0, tempC: s.temp_c, visibility: s.visibility_m || 20000, source: 'Open-Meteo · ' + world.weather.status });
+      cloud: (s.cloud_cover || 0) / 100, rain: s.precip_mm || 0, tempC: s.temp_c, pressureHpa: Number.isFinite(s.pressure_hpa) ? s.pressure_hpa : null, visibility: s.visibility_m || 20000, source: 'Open-Meteo · ' + world.weather.status });
   }
   YZW.register({
     id: 'weather', name: 'מזג אוויר (Open-Meteo, חי/ידני)', dept: 'weather', order: 12,

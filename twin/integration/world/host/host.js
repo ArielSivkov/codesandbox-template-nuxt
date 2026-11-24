@@ -191,7 +191,11 @@ function autoQuality(dt) {
 const ilOff = d => world.G27.SIM.israelOffsetMin(d);
 function ilParts(d) { const off = ilOff(d), l = new Date(d.getTime() + off * 60000); return { y: l.getUTCFullYear(), mo: l.getUTCMonth(), d: l.getUTCDate(), wd: l.getUTCDay(), min: l.getUTCHours() * 60 + l.getUTCMinutes() }; }
 function fromIL(y, mo, d, min) { const g = new Date(Date.UTC(y, mo, d, 0, min)); return new Date(g.getTime() - ilOff(g) * 60000); }
-function sunPos(date) { if (world.providers.sun) { try { return world.providers.sun(date, LAT, LON); } catch (e) { console.warn('[yzw] sun provider', e); } } return world.G27.SIM.sunPosition(date, LAT, LON); }
+// שבירת אור לפי מזג האוויר של העולם: לחץ (hPa) מ-Open-Meteo במצב חי (pressure_msl ≈ לחץ תחנה באשדוד, גובה <60 מ' → <0.7%), אחרת 1010 תקני; טמפרטורה = טמפרטורת העולם
+function atmo() { const w = world.weather, P = Number.isFinite(w.pressureHpa) ? w.pressureHpa : 1010, T = Number.isFinite(w.tempC) ? w.tempC : 10;
+  return { pressure: P, temperature: T, source: Number.isFinite(w.pressureHpa) ? 'מזג אוויר (' + (w.source || '') + ')' : 'לחץ תקני 1010 hPa · טמפרטורת העולם' }; }
+function sunPos(date) { const a = atmo(), o = { pressure: a.pressure, temperature: a.temperature };
+  if (world.providers.sun) { try { return world.providers.sun(date, LAT, LON, o); } catch (e) { console.warn('[yzw] sun provider', e); } } return world.G27.SIM.sunPosition(date, LAT, LON, o); }
 const jdMs = jd => (jd - 2440587.5) * 86400000;
 function zman(y, mo, d, key) { if (!world.providers.zmanim) return null; try { const z = world.providers.zmanim(y, mo + 1, d, LAT, LON); const v = z && z.times && z.times[key]; return v ? jdMs(v) : null; } catch (e) { return null; } }
 function sunsetUTC(y, mo, d) { // ms; זמני היום ממחלקת השמיים → פיזיקה → חיפוש בינארי על גובה −0.833°
@@ -227,7 +231,7 @@ function applyEnvAll() {
     const v = world.providers.sunVector(sp); world.sky.material.uniforms.sun.value.set(v.x, v.y, v.z).normalize(); G.ENV.sun = sp;
   }
   const dv = world.sky ? world.sky.material.uniforms.sun.value : { x: 0, y: 1, z: 0 };
-  Object.assign(world.sun, { elevation: sp.elevation, azimuth: sp.azimuth, dir: { x: dv.x, y: dv.y, z: dv.z } });
+  Object.assign(world.sun, { elevation: sp.elevation, azimuth: sp.azimuth, dir: { x: dv.x, y: dv.y, z: dv.z }, refraction: sp.elevation - (sp.elevationGeometric ?? sp.elevation), atmosphere: atmo() });
   snapshotWeather(); computeShabbat();
   envKey = keyOf(); bus.emit('env', { date: world.clock.date, sun: world.sun, weather: world.weather });
 }
@@ -247,7 +251,7 @@ function setWeather(o) {
   const w = world.weather, sw = world.G27.SIM.weather;
   if (o.mode) w.mode = o.mode;
   for (const k of ['windSpeed', 'windFrom', 'gust', 'cloud', 'rain']) if (o[k] != null) sw[k] = +o[k];
-  for (const k of ['tempC', 'visibility', 'aqi', 'source', 'status']) if (o[k] != null) w[k] = o[k];
+  for (const k of ['tempC', 'pressureHpa', 'visibility', 'aqi', 'source', 'status']) if (o[k] != null) w[k] = o[k];
   if (o.source) sw.source = o.source; else if (w.mode === 'manual') { sw.source = 'ידני'; w.source = 'ידני'; }
   applyEnvAll();
 }
@@ -456,6 +460,7 @@ function diagText() {
     `geometries ${s.geoms}  textures ${s.texs}  heap ${s.heapMB ? s.heapMB.toFixed(0) + ' MB' : 'n/a'}`,
     `tiles ${G.W.tiles.size}  load→start ${s.startMs ? (s.startMs / 1000).toFixed(1) + ' s' : '—'}  plugins ${s.pluginMs.toFixed(2)} ms/frame`,
     `mode ${curId}  sun ${world.sun.elevation.toFixed(1)}°/${world.sun.azimuth.toFixed(0)}° (${world.providers.sun ? 'physics' : 'game sim'})`,
+    `שבירת אור ${((world.sun.refraction || 0) * 60).toFixed(1)}′ · ${world.sun.atmosphere ? world.sun.atmosphere.pressure.toFixed(0) + ' hPa, ' + world.sun.atmosphere.temperature.toFixed(0) + '°C' : '1010 hPa, 10°C'} (מקורב: שכבה אחת; ליד האופק ±0.2°)`,
     `gfx ${world.gfx.backend} (requested ${world.gfx.requested}, webgpu ${world.gfx.webgpuAvailable ? 'yes' : 'no'})`,
     `faults ${faults.length}${faults.length ? ': ' + faults.slice(-3).map(f => f.id + '/' + f.phase).join(', ') : ''}`];
   return lines.join('\n');

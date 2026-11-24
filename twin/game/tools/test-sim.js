@@ -152,5 +152,20 @@ const a = SIM.windAt(0, 2, 0, 0, flat).speed, b = SIM.windAt(0, 60, 0, 0, flat).
     ok(ns > 50 && es < 20000, `זריחה ושקיעה במשחק מול NREL SPA: סטייה מרבית ${(es / 1000).toFixed(1)} ש' ב-${ns} ימים (סף 20 ש')`);
     const rs = SIM.sunRiseSet('2026-06-21', LAT, LON), hm = m => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, '0')}`;
     ok(rs.rise > 5 * 60 + 25 && rs.rise < 5 * 60 + 40 && rs.set > 19 * 60 + 40 && rs.set < 19 * 60 + 55, `זריחה/שקיעה 21.6 באשדוד (גאומטרי −0.833°): ${hm(rs.rise)} / ${hm(rs.set)}`); }
+  // שבירה לפי מזג האוויר (24.11.2026): (P/1010)·(283/(273+T)) – זהות למודול הקנוני ובדיקה מול NREL SPA עם 12 צירופי לחץ/טמפרטורה
+  { const C = await import('../../physics/src/sun.js'), R = require('../../physics/test/spa_refraction_pt.json').rows; let mi = 0;
+    for (let h = -2; h <= 86; h += 0.05) for (const P of [950, 1010, 1035]) for (const T of [-10, 10, 25, 45]) mi = Math.max(mi, Math.abs(SIM.refraction(h, P, T) - C.refractionNOAA(h, P, T)));
+    ok(mi < 1e-12 && SIM.refraction(10) === SIM.refraction(10, 1010, 10), `שבירה עם לחץ/טמפרטורה במשחק = המודול הקנוני (סטייה ${mi.toExponential(1)}, 1,761 גבהים × 12 צירופים); בלי P/T = 1010 hPa/10°C`);
+    const LIM = -0.8333; const base = {}; for (const r of R) if (r.p === 1010 && r.t === 10) base[r.ms] = r;
+    let dd = 0, nd = 0, eAft = 0, eBef = 0, na = 0;
+    for (const r of R) { if (r.elGeo < LIM + 0.3) continue;   // SPA מוסיף שבירה רק מעל האופק הנראה; מרווח 0.3° מהסף
+      const b = base[r.ms]; if (!b) continue;
+      const dSpa = (r.elApp - r.elGeo) - (b.elApp - b.elGeo), dG = SIM.refraction(r.elGeo, r.p, r.t) - SIM.refraction(b.elGeo);
+      dd = Math.max(dd, Math.abs(dG - dSpa)); nd++;
+      if (r.elGeo >= 2) { const g = SIM.sunPosition(new Date(r.ms), 31.8014, 34.6435, { pressure: r.p, temperature: r.t }), g0 = SIM.sunPosition(new Date(r.ms), 31.8014, 34.6435);
+        eAft = Math.max(eAft, Math.abs(g.elevation - r.elApp)); eBef = Math.max(eBef, Math.abs(g0.elevation - r.elApp)); na++; } }
+    ok(nd > 400 && dd < 0.003, `תגובת השבירה ללחץ/טמפרטורה מול NREL SPA: סטייה מרבית ${dd.toFixed(4)}° ב-${nd} דגימות (גובה −0.5°…15°, 980–1030 hPa, 0–40°C; סף 0.003°)`);
+    ok(na > 200 && eAft < 0.02 && eAft < eBef, `גובה שמש נראה ≥2° מול SPA עם מזג אוויר: סטייה מרבית ${eBef.toFixed(4)}° → ${eAft.toFixed(4)}° ב-${na} דגימות (סף 0.02°)`);
+    const h0 = T => SIM.refraction(0, 1010, T); ok(h0(36) < h0(10) && h0(0) > h0(10), `שבירה באופק: שרב 36°C ‏${h0(36).toFixed(3)}° · תקני 10°C ‏${h0(10).toFixed(3)}° · קור 0°C ‏${h0(0).toFixed(3)}°`); }
   console.log(fail ? `${fail} נכשלו` : 'הכול עבר'); process.exit(fail ? 1 : 0);
 })();

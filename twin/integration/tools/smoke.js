@@ -38,6 +38,8 @@ const { chromium } = (() => { try { return require('playwright'); } catch (e) { 
     YZDev.D.draw = false; YZW.setMode('walk'); await sleep(300);
     // הגדרות
     YZW.setTime({ preset: 'night' }); await sleep(300); out.night = W.sun.elevation; YZW.setTime({ preset: 'noon' }); out.noon = W.sun.elevation; YZW.setTime({ preset: 'golden' });
+    { const t0 = W.weather.tempC; YZW.setWeather({ tempC: 36, pressureHpa: 1006 }); const a = W.sun.refraction, el = W.sun.elevation; YZW.setWeather({ tempC: 0, pressureHpa: 1030 }); const b = W.sun.refraction;   // שבירה לפי מזג האוויר
+      out.refr = { hot: a, cold: b, el, src: W.sun.atmosphere && W.sun.atmosphere.source }; delete W.weather.pressureHpa; YZW.setWeather({ tempC: t0 }); out.refr.back = W.sun.atmosphere.pressure; }
     YZW.setWeather({ rain: 10, cloud: 0.9 }); await sleep(300); YZW.setWeather({ rain: 0, cloud: 0.2, aqi: 180 }); await sleep(300); YZW.setWeather({ aqi: 45 });
     YZW.setShabbat('on'); out.shabbatOn = W.shabbat.active; YZW.setShabbat('auto');
     for (const t of ['low', 'medium', 'high', 'auto']) { YZW.setTier(t); await sleep(200); } out.tier = W.quality.tier;
@@ -59,6 +61,7 @@ const { chromium } = (() => { try { return require('playwright'); } catch (e) { 
   ok(r.drawAdded && r.drawFinish && Math.abs(r.plotArea - 2400) < 5, `מגרש 60×40 = ${r.plotArea} מ"ר`);
   ok(r.badRejected, 'מצולע "שמונה" שנוגע בעצמו נדחה'); ok(r.crossRejected, 'מצולע חותך נדחה');
   ok(r.night < -5 && r.noon > 25, `לילה ${r.night.toFixed(1)}°, צהריים ${r.noon.toFixed(1)}°`);
+  { const q = r.refr, k = (1030 / 1006) * (309 / 273); ok(q && Math.abs(q.cold / q.hot - k) < 1e-6 && q.back === 1010, `שבירה לפי מזג האוויר בעולם החי: בגובה ${q && q.el.toFixed(1)}° שרב 36°C/1006 ‏${q && (q.hot * 60).toFixed(2)}′ מול קור 0°C/1030 ‏${q && (q.cold * 60).toFixed(2)}′ (יחס ${q && (q.cold / q.hot).toFixed(4)} = ${k.toFixed(4)}); חזרה ל-1010 תקני`); }
   ok(r.shabbatOn === true, 'מצב שבת ידני'); ok(['low', 'medium', 'high'].includes(r.tier), 'איכות אוטומטית: ' + r.tier);
   ok(r.sheetModes >= 9, `תפריט מצבים: ${r.sheetModes} (${r.sheetDisabled} בעבודה)`);
   ok(r.faults.length === 0, 'אין כשלי מודולים' + (r.faults.length ? ': ' + JSON.stringify(r.faults.slice(0, 3)) : ''));

@@ -10,7 +10,7 @@ const SIM = {};
 
 // ---------------- 1. שמש
 /** @returns {azimuth: מעלות מצפון אמיתי עם כיוון השעון, elevation: גובה נראה במעלות (כולל שבירה – אותה נוסחת NOAA כמו physics/src/sun.js), elevationGeometric: בלי שבירה}
- *  o.refraction === false → elevation גאומטרי. */
+ *  o.refraction === false → elevation גאומטרי. o.pressure (hPa, ברירת מחדל 1010) ו-o.temperature (°C, ברירת מחדל 10) – שבירה לפי מזג האוויר, כמו physics/src/sun.js. */
 SIM.sunPosition = function (date, latDeg, lonDeg, o) {
   const jd = date.getTime() / 86400000 + 2440587.5, T = (jd - 2451545) / 36525;
   const L0 = ((280.46646 + T * (36000.76983 + T * 0.0003032)) % 360 + 360) % 360;
@@ -28,19 +28,22 @@ SIM.sunPosition = function (date, latDeg, lonDeg, o) {
   const ha = (tst / 4 - 180) * D2R, lat = latDeg * D2R;
   const cz = Math.min(1, Math.max(-1, Math.sin(lat) * Math.sin(decl) + Math.cos(lat) * Math.cos(decl) * Math.cos(ha)));
   const elGeo = 90 - Math.acos(cz) * R2D;
-  const el = o && o.refraction === false ? elGeo : elGeo + SIM.refraction(elGeo);
+  const el = o && o.refraction === false ? elGeo : elGeo + SIM.refraction(elGeo, o && o.pressure, o && o.temperature);
   let az = Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(lat) - Math.tan(decl) * Math.cos(lat)) * R2D + 180;
   az = (az % 360 + 360) % 360;
   return { azimuth: az, elevation: el, elevationGeometric: elGeo, declination: decl * R2D, eot };
 };
-/** שבירה אטמוספרית (מעלות, להוסיף לגובה הגאומטרי) – נוסחת NOAA המלאה (gml.noaa.gov/grad/solcalc/calcdetails.html), 1010 hPa, 10°C.
- *  כולל הענף מתחת ל-−0.575° (−20.774/tan h): בלעדיו השמש 'קפצה' 0.57° בדיוק באופק (באג שתוקן 24.11.2026). מקורב: אטמוספרה תקנית, בלי תלות במזג האוויר. */
-SIM.refraction = function (h) {
+/** שבירה אטמוספרית (מעלות, להוסיף לגובה הגאומטרי) – נוסחת NOAA המלאה (gml.noaa.gov/grad/solcalc/calcdetails.html), מוגדרת ל-1010 hPa ו-10°C,
+ *  ומוכפלת ב-(P/1010)·(283/(273+T)) (Meeus פרק 16, Saemundsson; אותו מקדם כמו NREL SPA משוואה 42). בלי P/T → אטמוספרה תקנית.
+ *  כולל הענף מתחת ל-−0.575° (−20.774/tan h): בלעדיו השמש 'קפצה' 0.57° בדיוק באופק (באג שתוקן 24.11.2026).
+ *  מקורב: שכבה אחת ליד הקרקע (לא פרופיל טמפרטורה אמיתי) – ליד האופק השבירה האמיתית משתנה ±0.2° גם בלחץ וטמפרטורה ידועים. */
+SIM.refraction = function (h, pressureHPa, tempC) {
   if (h > 85) return 0;
   let r; if (h > 5) { const t = Math.tan(h * D2R); r = 58.1 / t - 0.07 / t ** 3 + 0.000086 / t ** 5; }
   else if (h > -0.575) r = 1735 + h * (-518.2 + h * (103.4 + h * (-12.79 + h * 0.711)));
   else r = -20.774 / Math.tan(h * D2R);
-  return r / 3600;
+  const P = Number.isFinite(pressureHPa) ? pressureHPa : 1010, T = Number.isFinite(tempC) ? tempC : 10;
+  return r / 3600 * (P / 1010) * (283 / (273 + T));
 };
 /** וקטור יחידה לשמש בצירי העולם. gamma = התכנסות רשת ITM (מעלות): אזימוט רשת = אמיתי − gamma */
 SIM.sunVector = function (sp, gammaDeg) {

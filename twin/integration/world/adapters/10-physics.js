@@ -37,7 +37,7 @@
     requires: () => !!window.ESH27Physics,
     init(world) {
       PH = window.ESH27Physics; GAMMA = PH.itmConvergence(LAT, LON);
-      world.providers.sun = (date, lat, lon) => PH.sunPosition(date, lat, lon);
+      world.providers.sun = (date, lat, lon, o) => PH.sunPosition(date, lat, lon, o);   // o = {pressure, temperature} מהמארח – שבירה לפי מזג האוויר
       world.providers.sunVector = sp => PH.sunVector(sp.elevation, sp.azimuth, GAMMA);
       world.providers.sunTimes = (y, mo, d, lat, lon) => PH.sunTimes(y, mo + 1, d, lat, lon);
       world.providers.gammaDeg = GAMMA; world.sun.source = 'physics ' + (PH.VERSION || '') + ' (NOAA, ±0.005°)';
