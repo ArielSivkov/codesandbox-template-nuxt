@@ -19,8 +19,8 @@
  "glintTilt_deg": 31.5,
  "windowLightProbability": 0.365,
  "render": {
-  "s2400": 0.862,
-  "s8k": null,
+  "s2400": 0.89,
+  "s8k": 5.231,
   "fonts": {
    "heebo": true,
    "frank": true

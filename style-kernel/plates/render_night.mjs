@@ -193,7 +193,7 @@ if (!args.has('--no8k')) {
   if (args.has('--crops')) execFileSync('python3', ['-I', '-c', `
 from PIL import Image
 im = Image.open(${JSON.stringify(out8)})
-for name, box in {"towers": (1500, 1000, 3420, 2080), "sea": (300, 300, 2220, 1380), "front": (200, 2700, 2120, 3780), "cartouche": (5800, 120, 7680, 2200), "legend": (5800, 2000, 7680, 4320), "fabric": (3600, 2300, 5520, 3380)}.items():
+for name, box in {"towers": (2600, 1560, 4520, 3140), "sea": (300, 300, 2220, 1380), "front": (200, 2700, 2120, 3780), "cartouche": (5800, 120, 7680, 2200), "legend": (5800, 2000, 7680, 4320), "fabric": (3600, 2300, 5520, 3380)}.items():
     im.crop(box).save(${JSON.stringify(WORK)} + "/crop8k_" + name + ".png")
 `]);
 }

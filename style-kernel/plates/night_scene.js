@@ -107,7 +107,7 @@ export async function draw(P, SKY) {
   // ═════════════ 4. ground (land cells of the twin's 10 m land mask; tone from the moon-facing slope)
   const cellZ = (i, j) => T.z_m[j * T.nu + i] ?? 0;
   {
-    const flat = Mz;
+    const flat = Mz, [go, gc] = off(), [mo, mc] = off();
     for (let j = T.nv - 2; j >= 0; j--) for (let i = 0; i < T.nu - 1; i++) {
       const land = T.land[j * T.nu + i] + T.land[j * T.nu + i + 1] + T.land[(j + 1) * T.nu + i] + T.land[(j + 1) * T.nu + i + 1];
       if (!land) continue;
@@ -117,9 +117,19 @@ export async function draw(P, SKY) {
       const lam = (-du * Mu - dv * Mv + Mz) / n;
       const t = Math.max(0, Math.min(1, 0.5 + (lam - flat) * 9));
       const a = land / 4;
-      ctx.beginPath(); ctx.moveTo(...pj(u, v, z00)); ctx.lineTo(...pj(u + g, v, z10)); ctx.lineTo(...pj(u + g, v + g, z11)); ctx.lineTo(...pj(u, v + g, z01)); ctx.closePath();
-      ctx.fillStyle = a < 1 ? rgba(mix(C.groundLo, C.groundHi, t), 0.5 + 0.5 * a) : mix(C.groundLo, C.groundHi, t);
-      ctx.fill(); ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = lw(0.3); ctx.stroke();
+      for (const c of [gc, mc]) {
+        c.beginPath(); c.moveTo(...pj(u, v, z00)); c.lineTo(...pj(u + g, v, z10)); c.lineTo(...pj(u + g, v + g, z11)); c.lineTo(...pj(u, v + g, z01)); c.closePath();
+        c.fillStyle = c === mc ? rgba('#000000', 0.5 + 0.5 * a) : mix(C.groundLo, C.groundHi, t);
+        c.fill(); c.strokeStyle = c.fillStyle; c.lineWidth = lw(0.3); c.stroke();
+      }
+    }
+    // smooth the 10 m facets (blur the tones), keep the crisp outline of the land (mask = unblurred cells)
+    {
+      const [bo, bc] = off(); bc.setTransform(1, 0, 0, 1, 0, 0);
+      bc.filter = `blur(${(6 * s * DPR).toFixed(1)}px)`; bc.drawImage(go, 0, 0); bc.filter = 'none';
+      bc.globalCompositeOperation = 'destination-over'; bc.drawImage(go, 0, 0);                 // fill blur fringes at the edges
+      bc.globalCompositeOperation = 'destination-in'; bc.drawImage(mo, 0, 0);
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(bo, 0, 0); ctx.restore();
     }
     // stipple (engraving of open ground; style only)
     const rnd = R('ground-stipple|2026-11-23');
