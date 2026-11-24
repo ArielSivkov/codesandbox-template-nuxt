@@ -4,9 +4,13 @@
  "city": "ashdod",
  "crs_note": "osm_way_id refers to twin/pipeline/sample-out-ashdod; lat/lon WGS84 as given by source",
  "georef_offset_itm_m": {
-  "dx": 1524.6,
-  "dy": 753.6,
-  "note": "sample coordinates = real ITM - offset (yz_sample ASSUMED_ORIGIN was wrong); derived from Monart, checked by Dimri Tower and K Towers coords (both land inside the named footprints)"
+  "dx": 1507.82,
+  "dy": 757.76,
+  "sigma_m": [
+   0.4,
+   0.38
+  ],
+  "note": "sample coordinates = real ITM - offset (twin/pipeline/frame.py: median of 7,427 buildings shared with national-v1, 23.11.2026). The first value 1524.6/753.6 (one rounded anchor, Monart) was 17.29 m off and is retired"
  },
  "columns": [
   "ref_id",

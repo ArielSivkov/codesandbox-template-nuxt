@@ -9,16 +9,22 @@ HONESTY LABELS (also inside the JSON):
   * 'schematic': breakwaters, basin, marina, anchorage, fairway, buoys, lights — plausible layout only,
     placed from general knowledge (entrance facing north, main breakwater on the west). NOT surveyed.
     Must be replaced by the pipeline's 'mar' layer (real OSM tags) as soon as the pipeline runs with network.
-The sample tiles are in the OLD sample frame; real ITM = sample + (1524.6, 753.6) (twin/groundtruth/README.txt).
+The sample tiles are in the sample frame; real ITM = sample + SAMPLE_TO_ITM (twin/pipeline/frame.py, 1507.82/757.76).
 Coordinates below are written in the sample frame (so they line up with the sample's coastline) and shifted.
+(Until 24.11.2026 the shift here was the old wrong 1524.6/753.6 while the world adapter already subtracted
+1507.82/757.76, so every sea feature sat 17.29 m off the traced coastline in the world.)
 """
-import json, os
+import json, os, sys
 
-DE, DN = 1524.6, 753.6
-S = lambda pts: [[round(e + DE, 1), round(n + DN, 1)] for e, n in pts]
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "pipeline"))
+from frame import SAMPLE_TO_ITM  # noqa: E402
+DE, DN = SAMPLE_TO_ITM
+S = lambda pts: [[round(e + DE, 2), round(n + DN, 2)] for e, n in pts]
 
 F = []
+RAW = {}   # id -> authored sample-frame coords (for the round-trip test)
 def add(kind, geom, pts, src, **kw):
+    RAW[f"fx-{kind}-{len(F)}"] = [list(pts)] if geom == "point" else [list(p) for p in pts]
     F.append({"id": f"fx-{kind}-{len(F)}", "kind": kind, "geom": geom,
               "coords": S(pts) if geom != "point" else S([pts])[0], "src": src, **kw})
 
@@ -66,9 +72,14 @@ out = {
                 "שוברי גלים, אגן, מרינה, מעגן, נתיב ומצופים – סכמטיים משוערים בלבד.",
     "src_codes": {"traced-srtm": "שורטט ידנית מרשת הגובה/ים של הדגימה (SRTM 2000), דיוק ±50 מ'",
                   "schematic": "פריסה סכמטית משוערת – לא מדידה, לא OSM"},
-    "frame_note": "coords are REAL ITM = sample frame + (1524.6, 753.6)",
+    "frame_note": f"coords are REAL ITM = sample frame + ({DE}, {DN}) (twin/pipeline/frame.py)",
+    "sample_to_itm": [DE, DN],
     "features": F,
 }
-p = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "fixtures", "ashdod_maritime_fixture.json")
-json.dump(out, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
-print("wrote", p, len(F), "features")
+if __name__ == "__main__":
+    here = os.path.dirname(os.path.abspath(__file__))
+    twin = os.path.join(here, "..", "..")
+    for rel in ("maritime/fixtures", "integration/world/mods/maritime/fixtures", "preview/world/mods/maritime/fixtures"):
+        p = os.path.normpath(os.path.join(twin, rel, "ashdod_maritime_fixture.json"))
+        json.dump(out, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        print("wrote", p, len(F), "features")

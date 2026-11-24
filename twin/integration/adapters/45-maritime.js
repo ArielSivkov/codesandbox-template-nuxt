@@ -1,11 +1,11 @@
 /* מתאם: המחלקה הימית (swarm/maritime/maritime.js — ES module): ים עם גלים לפי הרוח, נמל, מרינה, אוניות, חוף, ומצב "סירה".
- * מסגרות: מאפייני הים (fixtures) ב-ITM אמיתי → toScene מזיז למסגרת הדגימה (אמיתי = דגימה + 1524.6/753.6), כמו בהדגמה שלהם.
+ * מסגרות: מאפייני הים (fixtures) ב-ITM אמיתי → toScene מזיז למסגרת הדגימה (אמיתי = דגימה + 1507.82/757.76), כמו בהדגמה שלהם.
  * סיווג יבשה/ים: W27.H (אותו מקור קרקע של העולם). הים הפשוט של המשחק מוסתר כשהמודול פעיל ומוחזר אם נכשל.
  * שמש/שמיים/ערפל/רוח – ממקור האמת האחד (אירוע env).
  */
 (function () {
   'use strict';
-  const SHIFT = { dE: 1524.6, dN: 753.6 };
+  const SHIFT = { dE: 1507.82, dN: 757.76 };   // = ITM.SAMPLE_OFFSET (twin/pipeline/frame.py)
   const X = { M: null, boat: null, mod: null, seaWas: true };
   const angDiff = (a, b) => { let d = b - a; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; };
   function sky(world) { const M = X.M; if (!M) return; const u = world.sky && world.sky.material.uniforms, f = world.scene.fog;

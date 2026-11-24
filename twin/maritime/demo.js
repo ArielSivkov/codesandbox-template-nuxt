@@ -11,7 +11,7 @@ const T = window.THREE, W = window.W27;
 const Q = new URLSearchParams(location.search);
 const SHOT = Q.has('shot'), VIEW = Q.get('view') || 'boat';
 const TWIN = window.TWIN, DATA = Q.get('data') || 'demo-data/';   // demo-data = sample copy with offshore OUTSIDE→SEA (tools/fix_sample_sea.py)
-const SAMPLE_SHIFT = { dE: 1524.6, dN: 753.6 };          // real ITM = sample + shift (twin/groundtruth/README.txt)
+const SAMPLE_SHIFT = { dE: 1507.82, dN: 757.76 };        // real ITM = sample + shift (twin/pipeline/frame.py; old 1524.6/753.6 was 17.29 m off)
 const $ = id => document.getElementById(id);
 const TOUCH = matchMedia('(pointer:coarse)').matches || 'ontouchstart' in window;
 if (!TOUCH) document.body.classList.add('desk');

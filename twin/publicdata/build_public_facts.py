@@ -9,8 +9,12 @@ import csv, json, math, os, gzip, glob
 
 OUT = os.path.dirname(os.path.abspath(__file__))
 TILES = "/home/claude/codesandbox-template-nuxt/twin/pipeline/sample-out-ashdod/tiles/v"
-DX, DY = 1524.6, 753.6          # sample -> real ITM (from groundtruth/README.txt)
-HAEREZ_ITM = (166276, 634918)   # centroid of OSM street 'הארז' in the tiles, shifted to real ITM
+import sys
+sys.path.insert(0, os.path.join(OUT, "..", "pipeline"))
+from frame import SAMPLE_TO_ITM  # noqa: E402
+DX, DY = SAMPLE_TO_ITM          # sample -> real ITM (twin/pipeline/frame.py)
+HAEREZ_SAMPLE = (164751.4, 634164.4)   # centroid of OSM street 'הארז' in the sample tiles
+HAEREZ_ITM = (round(HAEREZ_SAMPLE[0] + DX, 1), round(HAEREZ_SAMPLE[1] + DY, 1))
 
 try:
     from pyproj import Transformer

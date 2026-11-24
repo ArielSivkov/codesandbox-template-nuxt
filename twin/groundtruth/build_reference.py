@@ -1,7 +1,9 @@
 """Builds ashdod_reference.csv / .json from the hand-curated records below.
 Every number here was read from the cited page (2026-11-23). null = not stated by any source.
 Run: python3 build_reference.py"""
-import csv, json, os
+import csv, json, os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pipeline"))
+from frame import SAMPLE_TO_ITM, SAMPLE_TO_ITM_SIGMA  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 COLS = ["ref_id", "name", "name_alt", "address", "osm_way_id", "id_match_method", "match_note",
@@ -135,8 +137,9 @@ def main():
             w.writerow({k: ("" if v is None else v) for k, v in r.items()})
     meta = {"version": 1, "built": "2026-11-23", "city": "ashdod", "crs_note":
             "osm_way_id refers to twin/pipeline/sample-out-ashdod; lat/lon WGS84 as given by source",
-            "georef_offset_itm_m": {"dx": 1524.6, "dy": 753.6, "note":
-            "sample coordinates = real ITM - offset (yz_sample ASSUMED_ORIGIN was wrong); derived from Monart, checked by Dimri Tower and K Towers coords (both land inside the named footprints)"},
+            "georef_offset_itm_m": {"dx": SAMPLE_TO_ITM[0], "dy": SAMPLE_TO_ITM[1], "sigma_m": list(SAMPLE_TO_ITM_SIGMA), "note":
+            "sample coordinates = real ITM - offset (twin/pipeline/frame.py: median of 7,427 buildings shared with national-v1, 23.11.2026). "
+            "The first value 1524.6/753.6 (one rounded anchor, Monart) was 17.29 m off and is retired"},
             "columns": COLS, "records": rows}
     json.dump(meta, open(os.path.join(HERE, "ashdod_reference.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(len(rows), "records;", sum(1 for r in rows if r["osm_way_id"]), "matched;", sum(r["use_in_eval"] for r in rows), "in eval")

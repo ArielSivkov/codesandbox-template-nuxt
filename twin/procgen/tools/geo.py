@@ -1,7 +1,8 @@
 """גאומטריה משותפת: מצלמת חריר (pinhole), אזימוטים, פענוח אריחים, המרת קואורדינטות."""
-import math, gzip, json, os
+import math, gzip, json, os, sys
 
-SAMPLE_TO_ITM = (1524.6, 753.6)   # ITM אמיתי = מסגרת הדגימה + היסט (לפי HQ)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'pipeline'))
+from frame import SAMPLE_TO_ITM   # ITM אמיתי = מסגרת הדגימה + היסט – מקור אחד (twin/pipeline/frame.py)
 FOV_LONG, FOV_SHORT = 69.4, 54.9   # משוער: מצלמה ראשית ~26 מ"מ שקול, אין EXIF
 
 def pixel_dir(u, v, portrait, heading, pitch):

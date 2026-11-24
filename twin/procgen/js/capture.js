@@ -4,7 +4,7 @@
   'use strict';
   const I = window.ESH_ITM, $ = id => document.getElementById(id);
   const S = { geo: null, ori: null, iosHeading: null, absolute: false, decl: I.DECL_DEFAULT, n: +(localStorage.getItem('esh_cap_n') || 0) };
-  const SAMPLE_TO_ITM = [1524.6, 753.6];
+  const SAMPLE_TO_ITM = [1507.82, 757.76];   // twin/pipeline/frame.py (הישן 1524.6/753.6 הזיז כל צילום GPS ב-17.29 מ')
   const set = (id, txt, cls) => { const e = $(id); e.textContent = txt; e.className = cls || ''; };
 
   function startGeo() {
