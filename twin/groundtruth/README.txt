@@ -35,3 +35,9 @@ Georeference finding
 
 Reference height in evaluate.py: height_m if stated ("stated"), else floors*FLOOR_H+parapet ("derived" -
 uses the model's own 3.0 m assumption, so for those rows only the floor count is really tested).
+
+haerez_scorecard.py / haerez_scorecard.json (24.11.2026)
+  כרטיס ציון לשכונת הניסוי של שלב 1 (רחוב הארז, רדיוס 500 מ' = HOME ב-integration/world/host/host.js) מול
+  ההגדרה: מיקום ±2 מ', קומות ±1, קרקע ±2 מ'. נבדק ב-pipeline/tests/test_haerez_scorecard.py; שינוי באריחי
+  השכונה מכשיל את הבדיקה עד שמריצים את הסקריפט מחדש ומתעדים. הערה: ההיסט 1524.6/753.6 למעלה הוחלף ב-
+  1507.82/757.76 (±0.56/0.58, 7,386 בניינים) – ראו twin/LOG.md 23.11.2026 23:20.

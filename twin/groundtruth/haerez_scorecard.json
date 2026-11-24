@@ -1,0 +1,132 @@
+{
+ "v": 1,
+ "boundary": {
+  "kind": "circle",
+  "frame": "מסגרת האריחים (ITM אמיתי = מסגרת + 1507.82/757.76)",
+  "E": 164751.0,
+  "N": 634164.0,
+  "r_m": 500.0,
+  "src": "twin/integration/world/host/host.js HOME"
+ },
+ "targets": {
+  "position_m": 2.0,
+  "floors": 1.0,
+  "terrain_m": 2.0
+ },
+ "tiles": [
+  "164_633",
+  "164_634",
+  "165_633",
+  "165_634"
+ ],
+ "buildings": 335,
+ "decoder_check": {
+  "max_rel_area_err": 0.0028,
+  "note": "שטח מהטבעת המפוענחת מול השדה a באריח – מוכיח שהפענוח נכון"
+ },
+ "height_sources": {
+  "P": 2,
+  "R": 333
+ },
+ "height_sigma_m_median": 6.0,
+ "floors": {
+  "pass": 32,
+  "pass_pct": 9.6,
+  "half_width_median": 2.0,
+  "rule": "חצי רוחב [fl,fh] ≤ 1 קומה; fl/fh = קומות של h∓σ (heights.py)",
+  "note": "'עובר' כאן = σ שהמודל מצהיר עליו, לא אימות מול אמת שטח"
+ },
+ "position": {
+  "status": "לא נמדד",
+  "frame_offset_sigma_m": [
+   0.56,
+   0.58
+  ],
+  "frame_offset_radial_sigma_m": 0.81,
+  "note": "רק היסט המסגרת נמדד (7,386 בניינים). דיוק טביעות OSM עצמן מול מדידה (מפ\"י/אורתופוטו) – לא נמדד; משימה 4 בתור. לכן אף בניין לא מסומן 'עובר' במיקום."
+ },
+ "terrain": {
+  "source": "SRTM grid embedded in current map (DSM, 2000)",
+  "kind": "DSM (כולל בניינים/צמחייה – לא קרקע חשופה)",
+  "sigma_m_documented": 3.77,
+  "sigma_src": "Rodriguez et al. 2006, PE&RS 72(3) טבלה 2: LE90 אירואסיה 6.2 מ' → σ≈LE90/1.645",
+  "pass": false,
+  "ground_m_range": [
+   7.2,
+   38.6
+  ],
+  "base_vs_grid_m": {
+   "n": 335,
+   "median": 0.0,
+   "max_abs": 0.94,
+   "note": "z של הבניין מול רשת הקרקע 25 מ' במרכז הבניין (עקביות פנימית, לא דיוק)"
+  }
+ },
+ "known_discrepancies_in_boundary": [
+  {
+   "id": "tower_height_w1280878706",
+   "severity": "גבוהה",
+   "building": "w1280878706"
+  },
+  {
+   "id": "tower_height_w1013192689",
+   "severity": "גבוהה",
+   "building": "w1013192689"
+  },
+  {
+   "id": "dekel_missing_towers",
+   "severity": "בינונית",
+   "building": null
+  },
+  {
+   "id": "old_house_haoren_corner",
+   "severity": "נמוכה",
+   "building": "w543568892"
+  },
+  {
+   "id": "match_seaview_tower",
+   "severity": "התאמה",
+   "building": "w238846044"
+  },
+  {
+   "id": "infra_hv_pole",
+   "severity": "בינונית",
+   "building": null
+  },
+  {
+   "id": "future_dekel_render",
+   "severity": "מידע",
+   "building": null
+  },
+  {
+   "id": "chess_club_unmapped",
+   "severity": "נמוכה",
+   "building": null
+  },
+  {
+   "id": "haerez_segment_end",
+   "severity": "לבדיקה",
+   "building": null
+  }
+ ],
+ "groundtruth_buildings_in_boundary": [
+  {
+   "ref_id": "ASH-008",
+   "osm": "w236834134",
+   "ref_floors": 4,
+   "reliability": "low",
+   "use_in_eval": false,
+   "model_floors": 8,
+   "model_floors_range": [
+    5,
+    11
+   ],
+   "floor_err": 4
+  }
+ ],
+ "phase1_met": {
+  "position": false,
+  "floors": false,
+  "terrain": false
+ }
+}
