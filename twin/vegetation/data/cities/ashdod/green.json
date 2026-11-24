@@ -1,10 +1,10 @@
 {
- "plants": 189234,
+ "plants": 189360,
  "osm_cells": 0,
  "tiles": 79,
  "by_src": {
-  "3": 32303,
-  "5": 156931
+  "3": 32291,
+  "5": 157069
  },
  "v": 1,
  "layer": "tiles/g",
@@ -39,5 +39,6 @@
   "land_cover": "ESTIMATED from buildings/roads/coast (no OSM green input)"
  },
  "built_at": "2026-11-22T23:36:29Z",
- "licence": "OSM © OpenStreetMap contributors ODbL; Sentinel-2 © Copernicus (if used)"
+ "licence": "OSM © OpenStreetMap contributors ODbL; Sentinel-2 © Copernicus (if used)",
+ "note_natural_open": "24.11.2026: פסגת גבעת יונה → בתה/שיחים (NATURAL_OPEN ב-pipeline/yazam/vegetation.py); נבנו מחדש 165_634, 165_635"
 }

@@ -13,6 +13,8 @@
 
    צירים: סצנה x = E − OX, z = −(N − OY), y = למעלה (כמו swarm/game/js/world.js).
    LOD: רשת מלאה קרוב → כרטיס (impostor) מאטלס שנאפה בזמן ריצה → כלום. צל רק לרשת הקרובה.
+   opts.flora (גדוד הצמחייה, 24.11.2026 — integration/world/js/flora.js): מודלים מכרטיסי עלים + גזע מעוגל עם קליפה, אטלס עלים+normal,
+   תאורת לילה/פנסים, צל רק לעצים קרובים. בלי opts.flora — המודלים המצולעים הישנים (תאימות לאחור, demo.html).
    תקציב: ≤ 3 קריאות ציור למין (קרוב + צל קרוב + רחוק), סכום משולשים בטווח ראייה ≤ budget.tris. */
 import SPECIES_DB from './species.data.js';
 
@@ -23,6 +25,11 @@ export const SRC_HE = ['OSM עץ בודד', 'OSM שורת עצים', 'משבצת
 export const BUDGETS = {
   phone: { tris: 30000, nearTris: 23000, farMax: 3500, near: 150, far: 1100, shrubNear: 70, dwarfNear: 60, shadows: true, atlasCell: 128 },
   desktop: { tris: 160000, nearTris: 130000, farMax: 15000, near: 260, far: 2200, shrubNear: 140, dwarfNear: 90, shadows: true, atlasCell: 192 },
+};
+// עם flora (כרטיסי עלים): מרחק הרשת הקרובה קצר יותר — הכרטיס הרחוק נאפה מאותו מודל ונראה כמעט אותו דבר, והחיסכון הולך לפרטים מקרוב
+export const FLORA_BUDGETS = {
+  phone: { nearTris: 26000, near: 120, palmNear: 70, shrubNear: 55, dwarfNear: 40 },
+  desktop: { nearTris: 60000, near: 170, palmNear: 95, shrubNear: 90, dwarfNear: 60, atlasCell: 256 },
 };
 export { SPECIES_DB };
 
@@ -57,7 +64,7 @@ export function decodeGreenTile(g) {
   const t = g.t || [], n = (t.length / 5) | 0;
   const E = new Float64Array(n), N = new Float64Array(n), h = new Float32Array(n), sp = new Uint8Array(n), src = new Uint8Array(n);
   for (let i = 0; i < n; i++) { E[i] = g.o[0] + t[i * 5] / 10; N[i] = g.o[1] + t[i * 5 + 1] / 10; sp[i] = t[i * 5 + 2]; h[i] = t[i * 5 + 3] / 10; src[i] = t[i * 5 + 4]; }
-  return { key: g.k, ox: g.o[0], oy: g.o[1], step: g.lc_step || 10, lc: g.lc ? b64bytes(g.lc) : new Uint8Array(10000), n, E, N, h, sp, src, codes: g.sp || [], stats: g.stats || {} };
+  return { key: g.k, ox: g.o[0], oy: g.o[1], step: g.lc_step || 10, lc: g.lc ? b64bytes(g.lc) : g.lc === null ? null : new Uint8Array(10000), n, E, N, h, sp, src, codes: g.sp || [], stats: g.stats || {} };
 }
 /** street-tree slot -> species code. Deterministic: one species per street (85%), mixed 15%. */
 export function hash32(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -271,15 +278,16 @@ const VEG_COLOR = `#include <color_vertex>
   vec3 base = aPart < 0.5 ? uTrunk : (aPart < 1.5 ? leafC * 1.18 : (aPart < 2.5 ? uFruit : uDry));
   vColor.rgb *= base; }`;
 
-function patchVeg(mat, uni, withColor) {
+function patchVeg(mat, uni, withColor, FL) {
   mat.onBeforeCompile = sh => {
     Object.assign(sh.uniforms, uni);
     sh.vertexShader = VEG_HEAD + sh.vertexShader
       .replace('#include <begin_vertex>', VEG_BEGIN)
       .replace('#include <project_vertex>', VEG_PROJECT);
     if (withColor) sh.vertexShader = sh.vertexShader.replace('#include <color_vertex>', VEG_COLOR);
+    if (FL) FL.patch(sh, { depth: !withColor });   // flora: עלים דו-צדדיים, לילה ופנסים, אלפא במרחק, צל רק לקרובים
   };
-  mat.customProgramCacheKey = () => 'veg27' + (withColor ? 'c' : 'd');
+  mat.customProgramCacheKey = () => 'veg27' + (withColor ? 'c' : 'd') + (FL ? 'f' : '');
   return mat;
 }
 const FAR_PROJECT = `
@@ -289,9 +297,10 @@ vec3 camR = vec3(viewMatrix[0][0], viewMatrix[1][0], viewMatrix[2][0]);
 vec3 camU = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
 vec3 upV = normalize(mix(vec3(0.0, 1.0, 0.0), camU, uTilt));
 vec3 ctr = iO + vec3(0.0, uCy * iS, 0.0);
-vec3 vegW = ctr + camR * position.x * uSize * iS + upV * position.y * uSize * iS;
+vec3 vegW = ctr + camR * position.x * uSize * uAspect * iS + upV * position.y * uSize * iS;   // רוחב לפי צורת העץ (דקל צר ≠ ריבוע) — פחות מילוי שקוף
 vec4 mvPosition = viewMatrix * vec4(vegW, 1.0);
 gl_Position = projectionMatrix * mvPosition;`;
+const FAR_FLORA_FRAG = `diffuseColor.rgb *= uLight;`;   // רחוק: בלי לולאת פנסים (חיסכון במילוי); הבהירות לפי יחס התאורה (setLight)
 
 // ------------------------------------------------------------------ ground cover textures (procedural canvas)
 function canvasTex(THREE, n, draw) {
@@ -328,13 +337,15 @@ const GROUND_FRAG = `#include <color_fragment>
 
 // ------------------------------------------------------------------ the system
 export function createVegetation(THREE, opts = {}) {
-  const B = Object.assign({}, BUDGETS[opts.budget || 'phone'] || BUDGETS.phone, opts.budgetOverride || {});
+  const FL = opts.flora && opts.flora.init ? opts.flora.init() : null, bk = opts.budget === 'desktop' ? 'desktop' : 'phone';
+  const B = Object.assign({}, BUDGETS[bk] || BUDGETS.phone, FL ? FLORA_BUDGETS[bk] : {}, opts.budgetOverride || {});
   const scene = opts.scene, renderer = opts.renderer;
   const OX = opts.origin ? opts.origin.OX : 0, OY = opts.origin ? opts.origin.OY : 0;
   const heightAt = opts.heightAt || (() => 0);
   const root = new THREE.Group(); root.name = 'vegetation27'; if (scene) scene.add(root);
   const SP = SPECIES_DB.species, IDX = new Map(SP.map((s, i) => [s.code, i]));
   const kinds = SP.map(s => s.arch === 'dwarf' || s.arch === 'tussock' ? 'dwarf' : s.kind === 'shrub' ? 'shrub' : 'tree');
+  const isPalm = SP.map(s => s.arch === 'palm_fan' || s.arch === 'palm_feather');
   const time = { value: 0 }, wind = { value: new THREE.Vector3(3, 0, 0) };
   let date = opts.date ? new Date(opts.date) : new Date();
   const models = [], nearMeshes = [], farMeshes = [], uniforms = [], farUni = [];
@@ -342,16 +353,17 @@ export function createVegetation(THREE, opts = {}) {
 
   // ---- per-species meshes
   for (let i = 0; i < SP.length; i++) {
-    const sp = SP[i], m = buildSpeciesGeometry(THREE, sp); models.push(m);
+    const sp = SP[i], m = FL ? FL.speciesModel(sp, bk === 'desktop') : buildSpeciesGeometry(THREE, sp); models.push(m);
     const u = { uTime: time, uWind: wind, uLeafAmt: { value: 1 }, uFlowerAmt: { value: 0 }, uFlowerCov: { value: sp.fcov || 0 },
       uAutumnAmt: { value: 0 }, uFlex: { value: sp.flex || 1 }, uH: { value: m.H },
       uTrunk: { value: col(sp.trunk_c) }, uLeaf: { value: col(sp.leaf_c) }, uFlower: { value: col(sp.flower_c) },
       uAutumn: { value: col(sp.autumn_c || sp.leaf_c) }, uDry: { value: col('#8d7a55') }, uFruit: { value: col(sp.flower_c) } };
     uniforms.push(u);
-    const mat = patchVeg(new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.FrontSide }), u, true);
+    const mat = patchVeg(FL ? new THREE.MeshLambertMaterial({ vertexColors: true, map: FL.tex.map, normalMap: opts.floraNormal === false ? null : FL.tex.normal, normalScale: new THREE.Vector2(0.9, 0.9), alphaTest: 0.5, side: THREE.DoubleSide, color: new THREE.Color().setScalar(FL.gain || 1.3) })
+      : new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.FrontSide }), u, true, FL);
     const near = new THREE.InstancedMesh(m.geo, mat, 16); near.count = 0; near.frustumCulled = false;
     near.castShadow = !!B.shadows && kinds[i] !== 'dwarf'; near.receiveShadow = true; near.name = 'veg-near-' + sp.code;
-    near.customDepthMaterial = patchVeg(new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking }), u, false);
+    near.customDepthMaterial = patchVeg(new THREE.MeshDepthMaterial(FL ? { depthPacking: THREE.RGBADepthPacking, map: FL.tex.map, alphaTest: 0.5 } : { depthPacking: THREE.RGBADepthPacking }), u, false, FL);
     near.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(16 * 3).fill(1), 3);
     nearMeshes.push(near); root.add(near);
   }
@@ -361,18 +373,20 @@ export function createVegetation(THREE, opts = {}) {
   const farGeo = new THREE.PlaneGeometry(1, 1);
   for (let i = 0; i < SP.length; i++) {
     const m = models[i], size = Math.max(m.box.w, m.box.h) * 1.04;
-    const fu = { uSize: { value: size }, uCy: { value: m.box.cy }, uTilt: { value: 0 }, uLight: { value: new THREE.Color(1, 1, 1) } };
+    const aspect = Math.min(1, Math.max(0.25, m.box.w * 1.2 / size));   // החלק הרוחבי של התא שהעץ תופס באפייה (מסובב 0.5 ראד)
+    const fu = { uSize: { value: size }, uAspect: { value: aspect }, uCy: { value: m.box.cy }, uTilt: { value: 0 }, uLight: { value: new THREE.Color(1, 1, 1) } };
     farUni.push(fu);
     const cx = i % COLS, cy = Math.floor(i / COLS);
     const mat = new THREE.MeshBasicMaterial({ map: atlas ? atlas.texture : null, alphaTest: 0.45, side: THREE.DoubleSide });
     mat.onBeforeCompile = sh => {
       Object.assign(sh.uniforms, fu, { uCell: { value: new THREE.Vector4(cx / COLS, cy / ROWS, 1 / COLS, 1 / ROWS) } });
-      sh.vertexShader = 'uniform float uSize, uCy, uTilt; uniform vec4 uCell;\n' + sh.vertexShader
+      sh.vertexShader = 'uniform float uSize, uAspect, uCy, uTilt; uniform vec4 uCell;\n' + sh.vertexShader
         .replace('#include <project_vertex>', FAR_PROJECT)
-        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_MAP\nvMapUv = uCell.xy + uv * uCell.zw;\n#endif');
-      sh.fragmentShader = 'uniform vec3 uLight;\n' + sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\ndiffuseColor.rgb *= uLight;');
+        .replace('#include <uv_vertex>', '#include <uv_vertex>\n#ifdef USE_MAP\nvMapUv = uCell.xy + vec2( 0.5 + ( uv.x - 0.5 ) * uAspect, uv.y ) * uCell.zw;\n#endif');
+      sh.fragmentShader = 'uniform vec3 uLight;\n' + sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n' + (FL ? FAR_FLORA_FRAG : 'diffuseColor.rgb *= uLight;'));
+      if (FL) sh.fragmentShader = sh.fragmentShader.replace('#include <alphatest_fragment>', FL.ABOOST || '#include <alphatest_fragment>');
     };
-    mat.customProgramCacheKey = () => 'veg27far';
+    mat.customProgramCacheKey = () => 'veg27far' + (FL ? 'f' : '');
     const far = new THREE.InstancedMesh(farGeo, mat, SP[i].kind === 'tree' || SP[i].kind === 'palm' ? 64 : 16);
     far.count = 0; far.frustumCulled = false; far.castShadow = false; far.receiveShadow = false; far.name = 'veg-far-' + SP[i].code;
     farMeshes.push(far); root.add(far);
@@ -385,7 +399,7 @@ export function createVegetation(THREE, opts = {}) {
     const prevT = renderer.getRenderTarget(), prevC = new THREE.Color(); renderer.getClearColor(prevC); const prevA = renderer.getClearAlpha();
     atlas.scissorTest = false; atlas.viewport.set(0, 0, CELL * COLS, CELL * ROWS);
     renderer.setRenderTarget(atlas); renderer.setClearColor(0x6f7f5a, 0); renderer.clear(true, true, true);
-    const savedW = wind.value.clone(); wind.value.set(0, 0, 0);
+    const savedW = wind.value.clone(); wind.value.set(0, 0, 0); if (FL) FL.bakeDay(true);
     for (let i = 0; i < SP.length; i++) {
       const m = models[i], size = farUni[i].uSize.value, cx = i % COLS, cy = Math.floor(i / COLS);
       const cam = new THREE.OrthographicCamera(-size / 2, size / 2, size / 2, -size / 2, 0.1, 200);
@@ -396,19 +410,19 @@ export function createVegetation(THREE, opts = {}) {
       renderer.setRenderTarget(atlas); renderer.render(bs, cam); bs.remove(mesh);
     }
     atlas.scissorTest = false; atlas.viewport.set(0, 0, CELL * COLS, CELL * ROWS);
-    wind.value.copy(savedW);
+    wind.value.copy(savedW); if (FL) FL.bakeDay(false);
     renderer.setRenderTarget(prevT); renderer.setClearColor(prevC, prevA);
   }
 
   // ---- season
-  let lawnTint = 1;
+  let lawnTint = 1, bakeKey = '';
   function setDate(d) {
-    date = new Date(d);
-    for (let i = 0; i < SP.length; i++) { const p = phenology(SP[i], date); uniforms[i].uLeafAmt.value = p.leaf; uniforms[i].uFlowerAmt.value = p.flower; uniforms[i].uAutumnAmt.value = p.autumn; }
+    date = new Date(d); let key = '';
+    for (let i = 0; i < SP.length; i++) { const p = phenology(SP[i], date); uniforms[i].uLeafAmt.value = p.leaf; uniforms[i].uFlowerAmt.value = p.flower; uniforms[i].uAutumnAmt.value = p.autumn; key += p.leaf.toFixed(2) + p.flower.toFixed(2) + p.autumn.toFixed(2); }
     lawnTint = lawnGreen(date);
     const L = SPECIES_DB.ground.lawn; groundU.uGrassC.value.copy(col(L.c_dormant)).lerp(col(L.c), lawnTint);
     const Me = SPECIES_DB.ground.meadow; groundU.uMeadowC.value.copy(col(Me.c_dry)).lerp(col(Me.c), monthly(Me.green, date));
-    bakeAtlas();
+    if (key !== bakeKey) { bakeKey = key; bakeAtlas(); }   // אפייה מחדש רק כשהעונה זזה (setDate נקרא כל 5–15 ש')
   }
 
   // ---- ground cover
@@ -464,32 +478,41 @@ export function createVegetation(THREE, opts = {}) {
   }
   function addTile(key, g) {
     const d = g && g.t ? decodeGreenTile(g) : g;
-    const n = d.n, X = new Float32Array(n), Y = new Float32Array(n), Z = new Float32Array(n), S = new Float32Array(n), SPI = new Uint8Array(n), ROT = new Float32Array(n), TINT = new Float32Array(n);
+    const n = d.n, X = new Float32Array(n), Y = new Float32Array(n), Z = new Float32Array(n), S = new Float32Array(n), SPI = new Uint8Array(n), ROT = new Float32Array(n), TINT = new Float32Array(n), HUE = new Float32Array(n);
     let k = 0;
     for (let i = 0; i < n; i++) {
       const code = d.codes[d.sp[i]], si = IDX.get(code); if (si === undefined) continue;
       const x = d.E[i] - OX, z = -(d.N[i] - OY);
       X[k] = x; Z[k] = z; Y[k] = heightAt(x, z) - 0.15; S[k] = Math.max(0.35, d.h[i] / models[si].H); SPI[k] = si;
-      ROT[k] = hashXY(d.E[i] * 10, d.N[i] * 10, 9) * 6.2832; TINT[k] = 0.86 + hashXY(d.E[i] * 7, d.N[i] * 3, 11) * 0.28; k++;
+      ROT[k] = hashXY(d.E[i] * 10, d.N[i] * 10, 9) * 6.2832; TINT[k] = 0.86 + hashXY(d.E[i] * 7, d.N[i] * 3, 11) * 0.28; HUE[k] = hashXY(d.E[i] * 5, d.N[i] * 9, 13) * 2 - 1; k++;
     }
-    const T = { key, ox: d.ox, oy: d.oy, n: k, X, Y, Z, S, SPI, ROT, TINT, lc: d.lc, src: d.src, splat: d.lc ? splatTexture(d.lc) : null, groundMeshes: [], extra: [],
+    const T = { key, ox: d.ox, oy: d.oy, n: k, X, Y, Z, S, SPI, ROT, TINT, HUE, lc: d.lc, src: d.src, splat: d.lc ? splatTexture(d.lc) : null, groundMeshes: [], extra: [],
       cx: d.ox + 500 - OX, cz: -(d.oy + 500 - OY) };
     indexTile(T); removeTile(key); tiles.set(key, T); dirty = true; return { plants: k };
   }
-  /** street-tree slots from the transport team: [{E,N,cls,street}] (ITM) or [{x,z,cls,street}] (scene) */
-  function fillSlots(key, slots) {
+  /** street-tree slots from the transport team: [{E,N,cls,street}] (ITM) or [{x,z,cls,street}] (scene)
+      opts.dedupe = r (מ'): משבצת שיש לידה עץ קיים (או משבצת שכבר נוספה) ברדיוס r — מדולגת (עצי world.js שנמסרים לכאן) */
+  function fillSlots(key, slots, opts) {
     const T = tiles.get(key); if (!T) return 0;
-    const add = [];
+    const add = [], dd = opts && opts.dedupe ? opts.dedupe : 0, d2 = dd * dd;
+    const taken = (x, z) => {
+      for (const a of add) if ((a[0] - x) ** 2 + (a[2] - z) ** 2 < d2) return true;
+      const c = Math.min(9, Math.max(0, ((x - T.x0) / 100) | 0)), r = Math.min(9, Math.max(0, ((z - T.z0) / 100) | 0));
+      for (let rr = Math.max(0, r - 1); rr <= Math.min(9, r + 1); rr++) for (let cc = Math.max(0, c - 1); cc <= Math.min(9, c + 1); cc++) {
+        const cell = rr * 10 + cc; for (let q = T.cellStart[cell]; q < T.cellStart[cell + 1]; q++) { const i = T.cellIdx[q]; if (kinds[T.SPI[i]] === 'tree' && (T.X[i] - x) ** 2 + (T.Z[i] - z) ** 2 < d2) return true; } }
+      return false; };
     for (const s of slots) {
       const E = s.E !== undefined ? s.E : s.x + OX, N = s.N !== undefined ? s.N : OY - s.z;
       const code = s.species || slotSpecies({ E, N, cls: s.cls, street: s.street }), si = IDX.get(code); if (si === undefined) continue;
       const sp = SP[si], u = hashXY(E * 3, N * 3, 5), h = sp.h[0] + (sp.h[1] - sp.h[0]) * (0.15 + 0.85 * u) ** 0.9;
       let sc = h / models[si].H; if (s.maxCrown) sc = Math.min(sc, s.maxCrown / Math.max(1, models[si].box.w));
-      const x = E - OX, z = -(N - OY); add.push([x, heightAt(x, z) - 0.15, z, sc, si, hashXY(E * 10, N * 10, 9) * 6.2832, 0.86 + u * 0.28]);
+      const x = E - OX, z = -(N - OY); if (dd && taken(x, z)) continue;
+      add.push([x, heightAt(x, z) - 0.15, z, sc, si, hashXY(E * 10, N * 10, 9) * 6.2832, 0.86 + u * 0.28, hashXY(E * 5, N * 9, 13) * 2 - 1]);
     }
+    if (!add.length) return 0;
     const n = T.n + add.length, grow = a => { const b = new a.constructor(n); b.set(a.subarray(0, T.n)); return b; };
-    ['X', 'Y', 'Z', 'S', 'SPI', 'ROT', 'TINT'].forEach(f => T[f] = grow(T[f]));
-    add.forEach((a, j) => { const i = T.n + j; T.X[i] = a[0]; T.Y[i] = a[1]; T.Z[i] = a[2]; T.S[i] = a[3]; T.SPI[i] = a[4]; T.ROT[i] = a[5]; T.TINT[i] = a[6]; });
+    ['X', 'Y', 'Z', 'S', 'SPI', 'ROT', 'TINT', 'HUE'].forEach(f => T[f] = grow(T[f]));
+    add.forEach((a, j) => { const i = T.n + j; T.X[i] = a[0]; T.Y[i] = a[1]; T.Z[i] = a[2]; T.S[i] = a[3]; T.SPI[i] = a[4]; T.ROT[i] = a[5]; T.TINT[i] = a[6]; T.HUE[i] = a[7]; });
     T.n = n; indexTile(T); dirty = true; return add.length;
   }
   function removeTile(key) {
@@ -551,9 +574,9 @@ export function createVegetation(THREE, opts = {}) {
     const pick = new Uint8Array(nc);   // 0 none 1 near 2 far
     for (let b = 0; b < NB; b++) for (let c = bucketHead[b]; c !== -1; c = next[c]) {
       const T = Tl[candT[c]], i = candI[c], si = T.SPI[i], kd = kinds[si], d = candD[c];
-      const lim = kd === 'tree' ? B.near : kd === 'shrub' ? B.shrubNear : B.dwarfNear;
-      // big trees keep the mesh further away (screen size ~ height / distance)
-      const big = kd === 'tree' ? Math.min(1.6, Math.max(0.7, T.S[i] * models[si].H / 10)) : 1;
+      const palm = isPalm[si], lim = kd === 'tree' ? (palm && B.palmNear ? B.palmNear : B.near) : kd === 'shrub' ? B.shrubNear : B.dwarfNear;
+      // big trees keep the mesh further away (screen size ~ height / distance); דקל: צללית דקה — הכרטיס הרחוק מספיק מוקדם יותר (מילוי)
+      const big = kd === 'tree' ? Math.min(palm && B.palmNear ? 1.15 : 1.6, Math.max(0.7, T.S[i] * models[si].H / 10)) : 1;
       if (d < lim * big && nearTris + models[si].tris <= B.nearTris) { pick[c] = 1; nearTris += models[si].tris; nearCount[si]++; }
       else if (kd !== 'dwarf' && farN < B.farMax) { pick[c] = 2; farN++; farCount[si]++; }
     }
@@ -561,14 +584,14 @@ export function createVegetation(THREE, opts = {}) {
       nearMeshes[si] = ensure(nearMeshes[si], nearCount[si], false); farMeshes[si] = ensure(farMeshes[si], farCount[si], true);
     }
     const nf = new Int32Array(SP.length), ff = new Int32Array(SP.length);
-    for (let c = 0; c < nc; c++) {
+    for (let b = 0; b < NB; b++) for (let c = bucketHead[b]; c !== -1; c = next[c]) {   // מהקרוב לרחוק (עומק מוקדם לכרטיסי העלים)
       if (!pick[c]) continue;
       const T = Tl[candT[c]], i = candI[c], si = T.SPI[i], s = T.S[i];
       if (pick[c] === 1) {
         const mesh = nearMeshes[si], a = mesh.instanceMatrix.array, o = nf[si] * 16, r = T.ROT[i], co = Math.cos(r) * s, sn = Math.sin(r) * s;
         a[o] = co; a[o + 1] = 0; a[o + 2] = -sn; a[o + 3] = 0; a[o + 4] = 0; a[o + 5] = s; a[o + 6] = 0; a[o + 7] = 0;
         a[o + 8] = sn; a[o + 9] = 0; a[o + 10] = co; a[o + 11] = 0; a[o + 12] = T.X[i]; a[o + 13] = T.Y[i]; a[o + 14] = T.Z[i]; a[o + 15] = 1;
-        const ca = mesh.instanceColor.array, q = nf[si] * 3, tt = T.TINT[i]; ca[q] = tt; ca[q + 1] = tt * (0.97 + (tt - 1) * 0.3); ca[q + 2] = tt * 0.95;
+        const ca = mesh.instanceColor.array, q = nf[si] * 3, tt = T.TINT[i], hu = T.HUE ? T.HUE[i] : 0; ca[q] = tt * (1 + 0.07 * hu); ca[q + 1] = tt * (0.97 + (tt - 1) * 0.3); ca[q + 2] = tt * 0.95 * (1 - 0.1 * hu);   // גודל, סיבוב, בהירות וגוון לכל עץ
         nf[si]++;
       } else {
         const mesh = farMeshes[si], a = mesh.instanceMatrix.array, o = ff[si] * 16;
@@ -612,8 +635,10 @@ export function createVegetation(THREE, opts = {}) {
   setDate(date);
   return {
     root, addTile, removeTile, fillSlots, applyGroundCover, setDate, setWind, setLight, update, dispose,
-    get date() { return date; }, get atlas() { return atlas; }, models, species: SP, budget: B,
+    get date() { return date; }, get atlas() { return atlas; }, models, species: SP, budget: B, flora: !!FL,
     stats: () => ({ ...st }),
+    /** צמחים ברדיוס r סביב (x,z) בצירי הסצנה — לבדיקות ולכרטיסי ממשק: [{code, x, z, h}] */
+    plantsNear(x, z, r) { const out = []; for (const T of tiles.values()) for (let i = 0; i < T.n; i++) { const d2 = (T.X[i] - x) ** 2 + (T.Z[i] - z) ** 2; if (d2 < r * r) out.push({ code: SP[T.SPI[i]].code, x: T.X[i], z: T.Z[i], h: +(T.S[i] * models[T.SPI[i]].H).toFixed(1) }); } return out; },
     /** what grows at a point (for UI cards): land-cover class and whether it's estimated */
     coverAt(x, z) { const E = x + OX, N = OY - z, key = Math.floor(E / 1000) + '_' + Math.floor(N / 1000), T = tiles.get(key); if (!T || !T.lc) return null;
       const c = Math.min(99, Math.floor((E - T.ox) / 10)), r = Math.min(99, Math.floor((T.oy + 1000 - N) / 10)), v = T.lc[r * 100 + c]; return { cls: v & 0x7f, estimated: (v & EST) !== 0 }; },

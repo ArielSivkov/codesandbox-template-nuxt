@@ -1276,6 +1276,11 @@
    "ARTE": 2,
    "TAMA": 1
   },
+  "natural_open": {
+   "RETA": 5,
+   "ARTE": 4,
+   "OLEA": 0.35
+  },
   "dune": {
    "ARTE": 6,
    "RETA": 2

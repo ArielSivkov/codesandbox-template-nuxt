@@ -62,6 +62,13 @@ RULES = {
     LC["ORCHARD"]: (6.0, 0.95, "orchard", 0.9),
 }
 SHRUB_RULES = {LC["PARK"]: (7.0, 0.10, "park_shrub"), LC["GARDEN"]: (6.0, 0.10, "park_shrub")}
+# שטח פתוח טבעי שהכלל "פער סגור בעיר = פארק" טועה בו (גדוד "כמו בתמונות", 24.11.2026: 14 צילומים מהפסגה – שיחייה נמוכה,
+# עצים בודדים, מבט פתוח לעיר ולנמל). כאן כיסוי *משוער* בלבד (EST) הופך לבתה/שיחים, הצמחים: פלטת natural_open
+# (רתם/לענה, זית בודד) — במקום עצי פארק של 9–17 מ'. קואורדינטות במסגרת הדגימה (ITM אמיתי = דגימה + 1507.82/757.76).
+NATURAL_OPEN = [
+    {"name": "givat-yona-summit", "E": 165103.2, "N": 635061.2, "r": 75.0},   # המגדלור: ITM אמיתי 166611,635819
+]
+NATURAL_RULE = (5.0, 0.30, "natural_open")
 
 
 # ---------------------------------------------------------------- species
@@ -342,6 +349,15 @@ def build_green(data_dir, keys, green=(), trees=(), rows=(), slots=None, ndvi=No
     # open land away from buildings/roads that matched nothing above: annual vegetation (green in
     # winter, straw in summer) – the typical look of unbuilt plots on the coastal plain. ESTIMATED.
     lc[free & (d_bld > 40) & (d_road > 10)] = LC["MEADOW"] | EST
+    # שטח פתוח טבעי (NATURAL_OPEN): כיסוי משוער → בתה; OSM אמיתי לא נוגעים
+    nat = np.zeros(land.shape, bool)
+    if NATURAL_OPEN:
+        cy_, cx_ = np.mgrid[0:M.H, 0:M.W]
+        CXm = M.x0 + (cx_ + 0.5) * STEP; CYm = M.y1 - (cy_ + 0.5) * STEP
+        for z in NATURAL_OPEN:
+            nat |= (CXm - z["E"]) ** 2 + (CYm - z["N"]) ** 2 <= z["r"] ** 2
+        nat &= land & ~bld & (((lc & EST) > 0) | (lc == 0))
+        lc[nat & ~road] = LC["SCRUB"] | EST
 
     ndvi_m = None
     if ndvi is not None:
@@ -420,6 +436,7 @@ def build_green(data_dir, keys, green=(), trees=(), rows=(), slots=None, ndvi=No
                     r_, c_, _ = M.cell(P[:, 0], P[:, 1])
                     r_ = np.clip(r_, 0, M.H - 1); c_ = np.clip(c_, 0, M.W - 1)
                     good &= ~np.isin(lc[r_, c_] & 0x7F, [LC["BEACH"], LC["SEA"], LC["MOBILE"], LC["DUNE"]])
+                    good &= ~nat[r_, c_]                                   # שטח פתוח טבעי: אין עצי רחוב משוערים
                     mix = hash_u(qi, qj, 4, 1)
                     alt = pick(pal[key], hash_u(qi, qj, 4, 2))
                     for k in np.nonzero(good)[0]:
@@ -427,7 +444,7 @@ def build_green(data_dir, keys, green=(), trees=(), rows=(), slots=None, ndvi=No
                         plants.append((float(P[k, 0]), float(P[k, 1]), str(code),
                                        tree_height(code, hash_u(qi[k], qj[k], 4, 3)), SRC["slot_est"]))
     # 3d area rules on a global jittered grid
-    def area_rule(cls, spacing, prob, palette, prob_est, salt):
+    def area_rule(cls, spacing, prob, palette, prob_est, salt, mask=None):
         x0, y1 = M.x0, M.y1; x1 = x0 + M.W * STEP; y0 = y1 - M.H * STEP
         I = np.arange(math.floor(x0 / spacing), math.ceil(x1 / spacing))
         J = np.arange(math.floor(y0 / spacing), math.ceil(y1 / spacing))
@@ -439,6 +456,7 @@ def build_green(data_dir, keys, green=(), trees=(), rows=(), slots=None, ndvi=No
         r = np.clip(r, 0, M.H - 1); c = np.clip(c, 0, M.W - 1)
         cell = lc[r, c]
         sel = ok & ((cell & 0x7F) == cls) & land[r, c] & ~bld[r, c] & ~road[r, c]
+        sel &= nat[r, c] if mask == "nat" else ~nat[r, c]
         est = (cell & EST) > 0
         p = np.where(est, prob_est, prob)
         u = hash_u(II, JJ, salt, 2)
@@ -455,6 +473,8 @@ def build_green(data_dir, keys, green=(), trees=(), rows=(), slots=None, ndvi=No
         area_rule(cls, sp_, pr, pa, pe, 10 + cls)
     for cls, (sp_, pr, pa) in SHRUB_RULES.items():
         area_rule(cls, sp_, pr, pa, pr * 0.8, 40 + cls)
+    if nat.any():
+        area_rule(LC["SCRUB"], NATURAL_RULE[0], NATURAL_RULE[1], NATURAL_RULE[2], NATURAL_RULE[1], 70, mask="nat")
 
     # 3e NDVI canopy in otherwise unplanted urban cells (tree canopy reads NDVI >= 0.5 at 10 m)
     if ndvi_m is not None:
