@@ -1,0 +1,53 @@
+# בדיקה אוטומטית על כל דחיפה לענף twin-world (משימה 3 בתור, פסק הסנהדרין 23.11.2026).
+# שלושה שלבים, כולם דרך twin/integration/tools/ci.sh (אותו סקריפט רץ גם מקומית):
+#   unit    – pytest צינור+מודיעין, test-sim (שמש מול NREL SPA, רחפן, רוח), פיזיקה קנונית, ITM, סנכרון עותקים
+#   browser – עשן game + integration ופיזיקה בדפדפן בגודל טלפון 360×800 (עיבוד תוכנה, בלי GPU)
+#   canary  – שבירה מכוונת בעותק זמני: עובר רק אם השער *נכשל* על שמש שבורה ועל סטיית עותק
+# לא מפרסם, לא פורס, לא נוגע בקלאודפלייר. הרשאות קריאה בלבד.
+name: twin-tests
+on:
+  push:
+    branches: [twin-world]
+    paths: ['twin/**', '.github/workflows/twin-tests.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: twin-tests-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: pip install -q -r twin/pipeline/requirements.txt pytest
+      - run: bash twin/integration/tools/ci.sh unit
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: bash twin/integration/tools/ci.sh canary
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: playwright
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw && npm init -y >/dev/null && npm i -s playwright@1.49.1
+          npx playwright install --with-deps chromium
+          ls -l /usr/bin/google-chrome
+      - run: bash twin/integration/tools/ci.sh browser
+        env:
+          PW: /tmp/pw/node_modules/playwright
+          NODE_PATH: /tmp/pw/node_modules
