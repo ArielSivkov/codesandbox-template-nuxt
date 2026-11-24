@@ -1,0 +1,148 @@
+# הצעה בלבד – לא פעיל. כדי להפעיל: להעתיק ל-.github/workflows/photomatch.yml אחרי אישור אריאל ובדיקת קלוד.
+# "100 סוכנים": כל ריצה במטריצה = סוכן אחד שמקבל רסיס (shard) של משימות (משימה = מיקום אחד), מרנדר ומשווה.
+# אבטחה: הרשאות קריאה בלבד, בלי סודות, persist-credentials: false, בלי דחיפה לריפו – התוצאות רק כ-artifacts.
+# מגבלות GitHub (docs.github.com/en/actions/reference/limits): עד 20 ריצות מקבילות בתוכנית חינמית, עד 256 ריצות במטריצה, עד 6 שעות לריצה.
+# עלות: חינם לריפו ציבורי על runners סטנדרטיים (docs.github.com/en/actions/reference/usage-limits-billing-and-administration).
+# לפני הפעלה: לנעוץ כל action ל-SHA של קומיט (במקום @v4) – כאן מתויגים כדי לא להמציא SHA.
+# פרטיות: בריפו ציבורי artifacts גלויים. לכן לא מעלים קבצים שמכילים צילומים (תמונות צד-מול-צד *.jpg, זוגות vlm) – רק רינדורים ו-JSON.
+name: photomatch (example)
+
+on:
+  workflow_dispatch:
+    inputs:
+      shards:
+        description: 'מספר רסיסים (סוכנים) – עד 20 במקביל בחינם'
+        default: '20'
+      sizes:
+        description: 'גדלי רינדור'
+        default: '360x800,1080x1920'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: photomatch-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PM_OUT: ${{ github.workspace }}/photomatch-out
+  PM_BASE: http://127.0.0.1:8944/integration/world/index.html
+  PM_CHROME: /usr/bin/google-chrome          # מותקן מראש ב-ubuntu-latest
+  TOOLS: twin/integration/tools/photomatch
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      shards: ${{ steps.mk.outputs.shards }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install numpy scipy opencv-python-headless scikit-image pillow
+      - name: calib + poses (משימות)
+        run: |
+          python3 -I $TOOLS/calib.py --out $PM_OUT
+          python3 -I $TOOLS/poses.py --out $PM_OUT
+      - id: mk
+        run: python3 -c "import json,os; n=int('${{ inputs.shards }}'); print('shards='+json.dumps(list(range(n))))" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plan
+          path: photomatch-out/
+
+  agent:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: pip install numpy scipy opencv-python-headless scikit-image pillow
+      - run: npm install --no-save --prefix $TOOLS playwright@1.48.0      # רק הספרייה; הדפדפן הוא google-chrome של ה-runner
+      - uses: actions/download-artifact@v4
+        with:
+          name: plan
+          path: photomatch-out/
+      - name: שרת מקומי לעולם (127.0.0.1 בלבד)
+        run: (cd twin && python3 -m http.server 8944 --bind 127.0.0.1 >/tmp/http.log 2>&1 &) && sleep 2
+      - name: render (הסוכן ${{ matrix.shard }})
+        run: node $TOOLS/render.js --jobs $PM_OUT/jobs.json --out $PM_OUT --sizes ${{ inputs.sizes }} --shard ${{ matrix.shard }}/${{ strategy.job-total }}
+      - name: compare
+        run: python3 -I $TOOLS/compare.py --out $PM_OUT --sizes ${{ inputs.sizes }} --shard ${{ matrix.shard }}/${{ strategy.job-total }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shard-${{ matrix.shard }}
+          path: |
+            photomatch-out/renders/
+            photomatch-out/compare/**/*.json
+            photomatch-out/compare/**/*.npz
+          retention-days: 7
+
+  aggregate:
+    needs: agent
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: pip install numpy scipy opencv-python-headless scikit-image pillow
+      - uses: actions/download-artifact@v4
+        with:
+          name: plan
+          path: photomatch-out/
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: shard-*
+          path: shards/
+      - name: מיזוג רסיסים
+        run: |
+          python3 - <<'PY'
+          import json, glob, os, shutil
+          out = os.environ['PM_OUT']; allm = {}
+          for d in sorted(glob.glob('shards/shard-*')):
+              for sub in ('renders', 'compare'):
+                  if os.path.isdir(os.path.join(d, sub)): shutil.copytree(os.path.join(d, sub), os.path.join(out, sub), dirs_exist_ok=True)
+              mp = os.path.join(d, 'compare', 'metrics.json')
+              if os.path.exists(mp):
+                  for k, v in json.load(open(mp)).items(): allm.setdefault(k, {}).update(v)
+          json.dump(allm, open(os.path.join(out, 'compare', 'metrics.json'), 'w'), ensure_ascii=False)
+          print('merged', len(allm))
+          PY
+      - name: frustum + fixes
+        run: |
+          node $TOOLS/frustum_jobs.mjs --out $PM_OUT --size 360x800
+          python3 -I $TOOLS/fixes.py --out $PM_OUT --size 360x800
+          python3 -I $TOOLS/vlm/hook.py --out $PM_OUT --size 360x800      # שופט דמה; הזוגות (עם צילומים) לא עולים כ-artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: photomatch-result
+          path: |
+            photomatch-out/fixes.json
+            photomatch-out/compare/metrics.json
+            photomatch-out/vlm/*/*.json
+          retention-days: 14
