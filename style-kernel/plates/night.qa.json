@@ -1,0 +1,118 @@
+{
+ "plate": "night",
+ "moment": "2026-11-23T20:30:00Z",
+ "local": "23.11.2026 22:30",
+ "hebrewDate": "ליל י״ד בכסלו תשפ״ז",
+ "area": "ashdod-tayelet-dekel-v0",
+ "sun": {
+  "alt": -72.784,
+  "az": 307.658
+ },
+ "moon": {
+  "alt": 80.635,
+  "az": 168.091,
+  "illumination": 0.9895
+ },
+ "sunset_local": "16:38",
+ "fullMoon_local": "24.11.2026 16:53",
+ "moonShadow_per_m": 0.1649,
+ "glintTilt_deg": 31.5,
+ "windowLightProbability": 0.365,
+ "render": {
+  "s2400": 0.862,
+  "s8k": null,
+  "fonts": {
+   "heebo": true,
+   "frank": true
+  },
+  "errors": [],
+  "logs": []
+ },
+ "page": {
+  "notes": [],
+  "counts": {
+   "coastSegments": 7,
+   "windows": 4550,
+   "windowsLit": 1714,
+   "windowLitShare": 0.377,
+   "buildings": 120
+  },
+  "moonShadow": {
+   "per_m": 0.16491973114255104,
+   "toward_az": 348.09064212894225
+  },
+  "colBottom": 960,
+  "layout": {
+   "s": 2.56,
+   "EL": 34,
+   "OX": 893.2,
+   "OY": 1110.8494238336239,
+   "slabTop": 166.03709412945,
+   "sectionBottom": 1127.8281133195512
+  }
+ },
+ "budget": {
+  "size_tested": [
+   1080,
+   608
+  ],
+  "focusY": 1,
+  "p99Outside": 0.0573,
+  "limit": 0.35,
+  "ratio": 0.0573,
+  "pass": true,
+  "maxOutside": 0.5565,
+  "pixelsOutsideOver055": 1,
+  "meanY": 0.011,
+  "quietShareY<0.02": 0.921
+ },
+ "data": {
+  "source": {
+   "repo_branch": "twin-world",
+   "commit": "4fd64eea4456f3eca18cddff8605010817f35baf",
+   "tiles_path": "twin/integration/world/data/tiles",
+   "tiles": [
+    "163_633",
+    "163_634",
+    "164_633",
+    "164_634"
+   ],
+   "manifest": "twin/integration/world/data/cities/ashdod/manifest.json",
+   "manifest_built_at": "2026-11-22T22:00:24Z",
+   "manifest_sources": {
+    "osm": "sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+    "dem": "SRTM grid embedded in current map (DSM, 2000)"
+   },
+   "manifest_attribution": "SRTM grid embedded in current map (DSM, 2000) | sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+   "manifest_sigma_m": {
+    "M_laser": 0.3,
+    "M_lidar": 0.5,
+    "M_floors": null,
+    "O_3d": 1,
+    "H_osm": 1.5,
+    "L_osm": null,
+    "V_overture": 4,
+    "S_ai": null,
+    "P_plan": null,
+    "G_gba": 8.9,
+    "F_globfp": 14.6,
+    "D_ndsm": 6.92,
+    "B_ghsl": 8,
+    "N_knn": null,
+    "R_rule": 6
+   },
+   "crs": "EPSG:2039 (sample frame: real ITM = sample + offset)"
+  },
+  "stats": {
+   "buildings": 120,
+   "cut": 11,
+   "roads": 56,
+   "sea_polys": 2,
+   "src": {
+    "P": 2,
+    "R": 118
+   },
+   "max_h_m": 100
+  }
+ }
+}

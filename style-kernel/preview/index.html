@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>גרעין הסגנון v0</title>
+<link rel="stylesheet" href="../fonts/fonts.css">
+<style>
+  :root { --night: #08102A; --mist: #8E9BC2; --muted: #6F7A9C; --brass: #C9A66B; --ivory: #D9C9A3; }
+  html, body { margin: 0; background: var(--night); }
+  #sheet { position: relative; width: 2400px; height: 1680px; overflow: hidden; background: linear-gradient(#08102A, #0E1838 55%, #070B1C); }
+  #sheet > canvas, #sheet > svg { position: absolute; inset: 0; }
+  @media (max-width: 2400px) { body { overflow-x: auto; } }
+</style>
+</head>
+<body>
+<div id="sheet"><canvas id="c" width="2400" height="1680"></canvas><svg id="s" width="2400" height="1680" viewBox="0 0 2400 1680" xmlns="http://www.w3.org/2000/svg"></svg></div>
+<script type="module">
+import * as K from '../sky.js';
+const STYLE = await (await fetch('../style.json')).json();
+const W = 2400, NS = 'http://www.w3.org/2000/svg', svg = document.getElementById('s'), ctx = document.getElementById('c').getContext('2d');
+const el = (tag, a, parent = svg) => { const e = document.createElementNS(NS, tag); for (const k in a) if (a[k] != null) e.setAttribute(k, a[k]); parent.appendChild(e); return e; };
+const text = (str, o) => { const t = el('text', { x: o.x, y: o.y, 'font-family': o.family || 'Heebo', 'font-weight': o.weight || 400, 'font-size': o.size || 24, fill: o.fill || '#8E9BC2', 'fill-opacity': o.opacity, 'text-anchor': o.anchor || 'start', direction: o.ltr ? 'ltr' : 'rtl', 'unicode-bidi': 'plaintext', lang: 'he' }); t.textContent = str; return t; };
+const LRI = '⁦', PDI = '⁩', ltr = s => LRI + s + PDI;
+const fonts = ['300 24px Heebo', '400 24px Heebo', '700 24px Heebo', '500 24px "Frank Ruhl Libre"', '700 24px "Frank Ruhl Libre"'];
+await Promise.all(fonts.map(f => document.fonts.load(f, 'אבגדהוזחטיכלמנסעפצקרשת0123456789״׳')));
+const fontsOk = fonts.every(f => document.fonts.check(f, 'אבג'));
+
+// ── header ──
+text('גרעין הסגנון של אשדוד החיה', { x: 2320, y: 128, family: 'Frank Ruhl Libre', weight: 700, size: 66, fill: '#D9C9A3' });
+text(`גרסה ${ltr(STYLE.version)} (גרעין ${ltr('v0')}) · אסימוני סגנון לסוכנים שחיים על חלקות אמיתיות · שמי אשדוד ביום 24.11.2026, מחושבים ב-${ltr('sky.js')}`, { x: 2320, y: 182, weight: 300, size: 28, fill: '#8E9BC2' });
+
+// ── the day strip: 24.11.2026, every minute, right → left ──
+const X0 = 80, X1 = 2320, Y0 = 270, Y1 = 690, GROUND = 740;
+const day0 = Date.parse('2026-11-23T22:00:00Z'), PX = (X1 - X0) / 1440, xAt = ms => X1 - (ms - day0) / 60000 * PX;
+const R = STYLE.palette.roles;
+const sunPts = [], moonPts = [];
+for (let m = 0; m < 1440; m++) {
+  const t = day0 + m * 60000, k = K.skyColors(t), x = X1 - (m + 1) * PX;
+  const g = ctx.createLinearGradient(0, Y0, 0, Y1);
+  for (const s of k.stops) g.addColorStop(s.at, s.hex);
+  ctx.fillStyle = g; ctx.fillRect(Math.floor(x), Y0, Math.ceil(PX) + 1, Y1 - Y0);
+  const sg = ctx.createLinearGradient(0, Y1, 0, GROUND); sg.addColorStop(0, K.roleColor(R.sea_surface, k)); sg.addColorStop(1, K.roleColor(R.sea_deep, k));
+  ctx.fillStyle = sg; ctx.fillRect(Math.floor(x), Y1, Math.ceil(PX) + 1, GROUND - Y1);
+  const yA = alt => Y1 - (alt + 20) / 75 * (Y1 - Y0);
+  if (m % 4 === 0) { sunPts.push([x, yA(k.sun.alt)]); moonPts.push([x, yA(k.moon.alt)]); }
+}
+const clipId = 'strip'; const cp = el('clipPath', { id: clipId }); el('rect', { x: X0, y: Y0, width: X1 - X0, height: Y1 - Y0 }, cp);
+el('polyline', { points: sunPts.map(p => p.map(v => v.toFixed(1)).join(',')).join(' '), fill: 'none', stroke: '#C9A66B', 'stroke-opacity': .55, 'stroke-width': 1.5, 'clip-path': `url(#${clipId})` });
+el('polyline', { points: moonPts.map(p => p.map(v => v.toFixed(1)).join(',')).join(' '), fill: 'none', stroke: '#E9DDB8', 'stroke-opacity': .4, 'stroke-width': 1.2, 'stroke-dasharray': '6 6', 'clip-path': `url(#${clipId})` });
+el('rect', { x: X0, y: Y1 - .5, width: X1 - X0, height: 1, fill: '#8E9BC2', 'fill-opacity': .25 });
+el('rect', { x: X0 - .5, y: Y0 - .5, width: X1 - X0 + 1, height: GROUND - Y0 + 1, fill: 'none', stroke: '#C9A66B', 'stroke-opacity': .25 });
+for (let h = 0; h <= 24; h += 3) {
+  const x = X1 - h * 60 * PX;
+  el('rect', { x: x - .5, y: GROUND, width: 1, height: 10, fill: '#8E9BC2', 'fill-opacity': .45 });
+  text(String(h % 24).padStart(2, '0') + ':00', { x, y: GROUND + 38, size: 22, weight: 300, fill: '#6F7A9C', anchor: 'middle', ltr: true });
+}
+const st = K.sunTimes('2026-11-24T10:00:00Z'), mt = K.moonTimes('2026-11-24T10:00:00Z');
+const ev = [['astronomicalDawn', 'שחר', 'end'], ['sunrise', 'זריחה', 'start'], ['solarNoon', 'חצות היום', 'middle'], ['sunset', 'שקיעה', 'end'], ['astronomicalDusk', 'לילה', 'start']];
+for (const [key, he, anchor] of ev) {
+  const x = xAt(st[key].getTime());
+  el('rect', { x: x - .5, y: Y0 - 14, width: 1, height: 14, fill: '#C9A66B', 'fill-opacity': .6 });
+  text(`${he} ${ltr(st.local[key])}`, { x: anchor === 'end' ? x - 6 : anchor === 'start' ? x + 6 : x, y: Y0 - 24, size: 24, weight: 400, fill: '#C2AE86', anchor });
+}
+text(`הקו המוזהב הוא המוקד היחיד בגיליון: רגע מחושב, לא מוקלד · עקומה רציפה: גובה השמש · מקווקוות: גובה הירח (זריחה ${ltr(mt.local.rise)}, שקיעה ${ltr(mt.local.set)}) · הסקאלה ‎−20°…+55°`, { x: X1, y: GROUND + 76, size: 22, weight: 300, fill: '#6F7A9C' });
+
+// ── the one focus: the full moon, 24.11 (computed) ──
+const full = K.moonPhases('2026-11-20T00:00:00Z').fullMoon, fx = xAt(full.getTime());
+for (const [w, a] of [[60, .05], [22, .14], [8, .35]]) { const g = ctx.createLinearGradient(fx - w, 0, fx + w, 0); g.addColorStop(0, 'rgba(255,200,107,0)'); g.addColorStop(.5, `rgba(255,200,107,${a})`); g.addColorStop(1, 'rgba(255,200,107,0)'); ctx.fillStyle = g; ctx.fillRect(fx - w, Y0, 2 * w, Y1 - Y0); }
+ctx.fillStyle = '#FFF6E0'; ctx.fillRect(fx - 1.5, Y0, 3, Y1 - Y0);
+text(`ירח מלא ${ltr(K.localTime(full).hhmm)}`, { x: fx - 22, y: 330, size: 30, weight: 700, fill: '#FFF4DC', anchor: 'start' });
+
+// ── four moments ──
+const moments = [['2026-11-23T20:30:00Z', 'ליל 23.11'], ['2026-11-24T04:10:00Z', 'בוקר'], ['2026-11-24T09:40:00Z', 'צהריים'], ['2026-11-24T14:45:00Z', 'ערב']];
+const PW = 520, PH = 170, PY = 890, GAP = 53;
+const AZ0 = 180, AZ1 = 360, ALT1 = 40;
+moments.forEach(([iso, he], i) => {
+  const k = K.skyColors(iso), x1 = X1 - i * (PW + GAP), x0 = x1 - PW, hz = PY + PH * .618;
+  const ax = az => x0 + (az - AZ0) / (AZ1 - AZ0) * PW, ay = alt => hz - alt / ALT1 * (hz - PY), inView = az => az >= AZ0 && az <= AZ1;
+  ctx.save(); ctx.beginPath(); ctx.rect(x0, PY, PW, hz - PY); ctx.clip();
+  const g = ctx.createLinearGradient(0, PY, 0, hz); for (const s of k.stops) g.addColorStop(s.at, s.hex);
+  ctx.fillStyle = g; ctx.fillRect(x0, PY, PW, hz - PY);
+  const glow = (az, hex, r, a) => { if (!inView(((az % 360) + 360) % 360)) return; const x = ax(((az % 360) + 360) % 360), rg = ctx.createRadialGradient(x, hz, 0, x, hz, r); rg.addColorStop(0, hex); rg.addColorStop(1, hex + '00'); ctx.globalAlpha = a; ctx.fillStyle = rg; ctx.fillRect(x0, PY, PW, hz - PY); ctx.globalAlpha = 1; };
+  glow(k.antisun.azimuth, k.antisun.hex, 200, .7); glow(k.sunward.azimuth, k.sunward.hex, 260, .9);
+  if (k.sun.visible && inView(k.sun.az)) { ctx.fillStyle = '#FFF8F0'; ctx.beginPath(); ctx.arc(ax(k.sun.az), ay(k.sun.alt), 2, 0, 7); ctx.fill(); }
+  if (k.moon.visible && inView(k.moon.az) && k.moon.alt < ALT1) { ctx.fillStyle = '#EEF2FA'; ctx.globalAlpha = .85; ctx.beginPath(); ctx.arc(ax(k.moon.az), ay(k.moon.alt), 2, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+  ctx.restore();
+  const sea = ctx.createLinearGradient(0, hz, 0, PY + PH); sea.addColorStop(0, K.roleColor(R.sea_surface, k)); sea.addColorStop(1, K.roleColor(R.sea_deep, k)); ctx.fillStyle = sea; ctx.fillRect(x0, hz, PW, PY + PH - hz);
+  el('rect', { x: x0 - .5, y: PY - .5, width: PW + 1, height: PH + 1, fill: 'none', stroke: '#C9A66B', 'stroke-opacity': .25 });
+  for (const [az, lbl] of [[180, 'ד'], [270, 'מ'], [360, 'צ']]) text(lbl, { x: ax(az), y: PY + PH - 8, size: 16, weight: 300, fill: '#8E9BC2', opacity: .6, anchor: 'middle' });
+  const lt = K.localTime(iso);
+  text(`${he} ${ltr(lt.hhmm)} · ${k.phase.he}`, { x: x1, y: PY + PH + 38, size: 28, weight: 700, fill: '#D9C9A3' });
+  text(`שמש ${ltr(k.sun.alt.toFixed(1) + '°')} · ירח ${ltr(Math.round(k.moon.illumination * 100) + '%')} ${k.moon.visible ? 'בגובה ' + ltr(k.moon.alt.toFixed(0) + '°') + ' באזימוט ' + ltr(k.moon.az.toFixed(0) + '°') : 'מתחת לאופק'}`, { x: x1, y: PY + PH + 68, size: 22, weight: 300, fill: '#8E9BC2' });
+  text(`חלון דולק: ${ltr(Math.round(k.windowLightProbability * 100) + '%')} · פנסים: ${k.streetLight.on ? 'דולקים' : 'כבויים'} · מוקד: ${k.focus.mode === 'ink' ? 'דיו מוזהב' : 'אור'}`, { x: x1, y: PY + PH + 96, size: 22, weight: 300, fill: '#6F7A9C' });
+  [['סביבה', k.ambient.hex], ['צל', k.shadowTint.hex], ['שמש', k.sunLight.intensity > 0 ? k.sunLight.hex : null]].forEach(([n, hex], j) => {
+    if (!hex) return; const sx = x1 - 62 - j * 60;
+    el('rect', { x: sx, y: PY + PH - 30, width: 44, height: 16, rx: 3, fill: hex, stroke: '#FFFFFF', 'stroke-opacity': .25 });
+  });
+});
+text('מבט מערבה אל הים (דרום ← מערב → צפון, גובה 0°–40°): השמש, הירח וזוהר האופק במקומם האמיתי · בפינה: אור סביבה · צל · שמש', { x: X1, y: PY - 22, size: 22, weight: 300, fill: '#6F7A9C' });
+
+// ── palette by role (right) and materials under three lights (left) ──
+const TY = 1330;
+text('פלטה לפי תפקיד', { x: X1, y: TY, family: 'Frank Ruhl Libre', weight: 500, size: 34, fill: '#8C7A55' });
+const vars = [['night', 'לילה'], ['dawn', 'שחר'], ['day', 'יום'], ['dusk', 'שקיעה']];
+const roles = [['sky_zenith', 'זנית'], ['sky_horizon', 'אופק'], ['sea_surface', 'ים'], ['ink', 'דיו'], ['hairline', 'קו שיער'], ['ember', 'גחלת'], ['pearl', 'פנינה']];
+vars.forEach(([v, he], j) => text(he, { x: X1 - 150 - j * 150 - 56, y: TY + 40, size: 22, weight: 400, fill: '#6F7A9C', anchor: 'middle' }));
+roles.forEach(([r, he], i) => {
+  const y = TY + 52 + i * 32;
+  text(he, { x: X1, y: y + 19, size: 22, weight: 300, fill: '#8E9BC2' });
+  vars.forEach(([v], j) => { const hex = R[r][v]; if (!hex) return; el('rect', { x: X1 - 150 - j * 150 - 112, y, width: 112, height: 24, rx: 3, fill: hex, stroke: '#FFFFFF', 'stroke-opacity': .12 }); });
+});
+const fy = TY + 52 + roles.length * 32;
+text('מוקד', { x: X1, y: fy + 19, size: 22, weight: 700, fill: '#FFF4DC' });
+vars.forEach(([v], j) => { const f = STYLE.palette.focus[v]; el('rect', { x: X1 - 150 - j * 150 - 112, y: fy, width: 112, height: 24, rx: 3, fill: f.mode === 'ink' ? f.fill : f.glow, stroke: f.mode === 'ink' ? f.edge : '#FFF6E0', 'stroke-width': 2 }); });
+
+const MX1 = 1120;
+text('חומרי אשדוד תחת שלושה אורות · השראה, לא מדידה', { x: MX1, y: TY, family: 'Frank Ruhl Libre', weight: 500, size: 34, fill: '#8C7A55' });
+const lights = [['צהריים', K.skyColors('2026-11-24T09:40:00Z'), null], ['שעת זהב', K.skyColors('2026-11-24T14:15:00Z'), null], ['לילה, ליד פנס', K.skyColors('2026-11-23T20:30:00Z'), 'sodium']];
+const mats = [['jerusalem_stone', 'אבן ירושלמית'], ['plaster', 'טיח'], ['concrete', 'בטון'], ['sand', 'חול'], ['kurkar', 'כורכר'], ['port_steel', 'פלדת נמל'], ['greenery', 'צמחייה'], ['pavers', 'אבן משתלבת']];
+lights.forEach(([he], j) => text(he, { x: MX1 - 200 - j * 130 - 55, y: TY + 40, size: 22, weight: 400, fill: '#6F7A9C', anchor: 'middle' }));
+mats.forEach(([m, he], i) => {
+  const y = TY + 52 + i * 32, base = STYLE.materials.items[m].base || STYLE.materials.items[m].ficus;
+  text(he, { x: MX1, y: y + 19, size: 22, weight: 300, fill: '#8E9BC2' });
+  lights.forEach(([, sky, lamp], j) => el('rect', { x: MX1 - 200 - j * 130 - 110, y, width: 110, height: 24, rx: 3, fill: K.shade(base, sky, { lamp }), stroke: '#FFFFFF', 'stroke-opacity': .12 }));
+  el('rect', { x: MX1 - 200 - 3 * 130 - 60, y, width: 60, height: 24, rx: 3, fill: base, stroke: '#FFFFFF', 'stroke-opacity': .12 });
+});
+text('בסיס', { x: MX1 - 200 - 3 * 130 - 30, y: TY + 40, size: 22, weight: 400, fill: '#6F7A9C', anchor: 'middle' });
+
+// ── the seven rules (centre column) ──
+const ruleLine = STYLE.rules.map(r => `${r.n} ${r.he}`).join('  ·  ');
+text('שבעת הכללים:  ' + ruleLine, { x: X1, y: 1222, size: 26, weight: 400, fill: '#C2AE86' });
+text('הכלל הראשון גובר על כולם: סגנון לעולם לא משנה מה שנמדד. ומה שמשוער — כתוב ״משוער״, ולכל גובה יש ±.', { x: X1, y: 1256, size: 22, weight: 300, fill: '#8E9BC2' });
+
+// ── footer ──
+text(`אומת מול ${ltr('PyEphem 4.2.1')}: שמש עד ${ltr('0.05°')}, ירח עד ${ltr('0.02°')}, זריחה ושקיעה עד חצי דקה · אלגוריתמים: ${ltr('NOAA / Meeus')} · גופנים: היבו, פרנק ריהל (${ltr('OFL')}) · דטרמיניסטי, זרע ${ltr('5787')}`, { x: X1, y: 1658, size: 20, weight: 300, fill: '#6F7A9C' });
+
+window.__qa = { fontsOk, sunrise: st.local.sunrise, sunset: st.local.sunset, fullMoon: K.localTime(full).hhmm, version: STYLE.version };
+document.title = 'ready';
+</script>
+</body>
+</html>

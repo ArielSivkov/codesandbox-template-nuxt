@@ -1,0 +1,11 @@
+{
+  "name": "esh27-style-kernel",
+  "version": "0.1.0",
+  "description": "Style kernel v0 for the living world of Ashdod: tokens (style.json) + real sky (sky.js). No dependencies.",
+  "type": "module",
+  "main": "sky.js",
+  "exports": { ".": "./sky.js", "./style.json": "./style.json" },
+  "scripts": { "test": "node --test", "reference": "python3 -I tools/make_reference.py", "preview": "node tools/shot.mjs" },
+  "license": "UNLICENSED",
+  "private": true
+}

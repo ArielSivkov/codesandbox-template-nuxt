@@ -1,0 +1,1656 @@
+{
+ "name": "esh27-style-kernel",
+ "title_he": "גרעין הסגנון של אשדוד החיה",
+ "version": "0.1.0",
+ "kernel": "v0",
+ "date": "2026-11-24",
+ "description_he": "אסימוני סגנון קריאים למכונה לסוכנים שחיים על חלקות אמיתיות באשדוד (world.esh27.com): צבע לפי תפקיד ושעה, מודל אור לפי גובה השמש, חומרים, קו וחריטה, טיפוגרפיה, קומפוזיציה, וכללי אמת, פרטיות וקדושה. הסגנון לקוח מהיצירה \"אורות דתוהו בכלים דתיקון\" (23.11.2026) — רק הסגנון, לא התוכן.",
+ "schema": {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://world.esh27.com/style-kernel/style.schema.json",
+  "title": "ESH27 style kernel",
+  "description": "Machine-readable style tokens for agents that live on real Ashdod parcels. Colours are uppercase #RRGGBB. Every value that is not measured carries label_he \"השראה, לא מדידה\" or an explicit ± / \"משוער\". Truth, privacy and sacred rules override every other key.",
+  "type": "object",
+  "required": [
+   "name",
+   "version",
+   "kernel",
+   "schema",
+   "place",
+   "rules",
+   "palette",
+   "light",
+   "materials",
+   "line",
+   "typography",
+   "composition",
+   "truth",
+   "privacy",
+   "sacred",
+   "digitalAssets",
+   "seed"
+  ],
+  "properties": {
+   "name": {
+    "type": "string",
+    "description": "Package name."
+   },
+   "version": {
+    "type": "string",
+    "pattern": "^\\d+\\.\\d+\\.\\d+$",
+    "description": "Semantic version of the kernel; sky.js VERSION must match."
+   },
+   "kernel": {
+    "type": "string",
+    "description": "Kernel generation, e.g. \"v0\"."
+   },
+   "schema": {
+    "type": "object",
+    "description": "This JSON Schema."
+   },
+   "place": {
+    "type": "object",
+    "description": "Default place (lat/lon WGS84, elevation m, IANA tz).",
+    "required": [
+     "lat",
+     "lon",
+     "tz"
+    ]
+   },
+   "origin": {
+    "type": "object",
+    "description": "Which artwork the style was taken from, and what was NOT taken."
+   },
+   "rules": {
+    "type": "array",
+    "description": "The 7 rules, in order of precedence (truth first).",
+    "items": {
+     "type": "object",
+     "description": "rule",
+     "required": [
+      "id",
+      "n",
+      "he",
+      "rule_he"
+     ]
+    }
+   },
+   "palette": {
+    "type": "object",
+    "description": "Colour by role. roles.<role>.{night,dawn,day,dusk} hex (null = not used); text.{onDark,onLight}; focus = the single reserved accent with its rules; maxAlphaNight = highest alpha over the night sky that stays within the brightness budget.",
+    "required": [
+     "roles",
+     "text",
+     "focus"
+    ]
+   },
+   "light": {
+    "type": "object",
+    "description": "Light model by sun altitude: keyframes.{dawn,dusk}[] with alt, 4 sky stops (zenith→horizon), sunward/antisun horizon, ambient, sunLight, shadowTint, stars; night.{moonless,moonlit}; cityGlow; streetLight; windowLight.byHourLocal[24]. sky.js LIGHT mirrors this object exactly.",
+    "required": [
+     "stopsAt",
+     "phases",
+     "night",
+     "keyframes",
+     "cityGlow",
+     "streetLight",
+     "windowLight"
+    ]
+   },
+   "geography": {
+    "type": "object",
+    "description": "Computed facts for Ashdod used by the style (sea side, sunrise/sunset azimuths)."
+   },
+   "materials": {
+    "type": "object",
+    "description": "Ashdod materials palette. Each item has label_he \"השראה, לא מדידה\" and measured:false.",
+    "required": [
+     "label_he",
+     "items"
+    ]
+   },
+   "line": {
+    "type": "object",
+    "description": "Stroke widths in u (= short side / 1080 px), alpha ranges, hatch spacing vs scale and direction rules.",
+    "required": [
+     "strokes",
+     "hatch"
+    ]
+   },
+   "typography": {
+    "type": "object",
+    "description": "Families, sizes in u, Hebrew RTL rules, gershayim/geresh code points, number formats.",
+    "required": [
+     "families",
+     "rtl",
+     "gershayim"
+    ]
+   },
+   "composition": {
+    "type": "object",
+    "description": "One focal element; brightness budget (others ≤ 35% of the focus, tested at 1080 px); clearing; calm density.",
+    "required": [
+     "focalElements",
+     "brightnessBudget"
+    ]
+   },
+   "truth": {
+    "type": "array",
+    "description": "Truth rules (style never overrides measurement; approximations labelled).",
+    "items": {
+     "type": "string"
+    }
+   },
+   "privacy": {
+    "type": "array",
+    "description": "Privacy rules.",
+    "items": {
+     "type": "string"
+    }
+   },
+   "sacred": {
+    "type": "object",
+    "description": "\"דבר קדוש לא נמכר\" — sacred text is never sold, minted or used as decoration.",
+    "required": [
+     "rule_he",
+     "rules"
+    ]
+   },
+   "digitalAssets": {
+    "type": "object",
+    "description": "Web3 / digital assets / metaverse rules: a parcel is a picture, not a right; provenance; no minting without Ariel.",
+    "required": [
+     "rules"
+    ]
+   },
+   "seed": {
+    "type": "object",
+    "description": "Determinism: PRNG, hash, base seed, key format.",
+    "required": [
+     "algorithm",
+     "hash",
+     "base"
+    ]
+   },
+   "agents": {
+    "type": "object",
+    "description": "How an agent uses the kernel, step by step."
+   },
+   "credits": {
+    "type": "object",
+    "description": "Algorithms, reference, fonts, data licences."
+   }
+  },
+  "$defs": {
+   "hex": {
+    "type": "string",
+    "pattern": "^#[0-9A-F]{6}$"
+   }
+  }
+ },
+ "files": {
+  "sky": "sky.js",
+  "readme": "README.he.md",
+  "tests": "test/sky.test.mjs",
+  "reference": "test/reference.json",
+  "referenceGenerator": "tools/make_reference.py",
+  "fonts": "fonts/fonts.css",
+  "preview": "preview/index.html",
+  "previewShot": "tools/shot.mjs"
+ },
+ "place": {
+  "name_he": "אשדוד",
+  "lat": 31.8014,
+  "lon": 34.6435,
+  "elevation_m": 10,
+  "tz": "Asia/Jerusalem",
+  "viewpoint_he": "נמל אשדוד (נקודת המבט של היצירה)",
+  "crs_world": "EPSG:2039 (רשת ישראל החדשה) — חוזה הנתונים של העולם התאום"
+ },
+ "origin": {
+  "artwork_he": "אורות דתוהו בכלים דתיקון",
+  "moment": "2026-11-23T20:30:00Z",
+  "moment_he": "ליל י״ד בכסלו תשפ״ז · 23.11.2026 · 22:30 · אשדוד",
+  "taken_he": "נלקחו רק: הפלטה, מבנה האור (קו אחד של מוקד), כללי הקו והחריטה, הטיפוגרפיה, תקציב הבהירות.",
+  "not_taken_he": "לא נלקחו: שמות, סכומים, הודעות, משימות, תאריכי יעד או כל תוכן פרטי מהיצירה."
+ },
+ "rules": [
+  {
+   "id": "truth",
+   "n": 1,
+   "he": "אמת לפני יופי",
+   "rule_he": "סגנון לעולם לא משנה גאומטריה, גובה, מיקום או צבע שנמדדו. הוא חל רק על מה שלא נמדד: מרקם, קו, טון."
+  },
+  {
+   "id": "labelled",
+   "n": 2,
+   "he": "מה שמשוער — מסומן",
+   "rule_he": "כל קירוב נושא \"משוער\" (או \"סכמטי\") וגובה נושא ±. מדוד = קו חד; משוער = רצועה רכה או קו מקווקו."
+  },
+  {
+   "id": "one-focus",
+   "n": 3,
+   "he": "קו אחד של מוקד",
+   "rule_he": "אלמנט מוקד אחד בכל סצנה, בצבע הזהב השמור. כל השאר עד 35% מבהירות המוקד."
+  },
+  {
+   "id": "calm",
+   "n": 4,
+   "he": "שקט וחריטה",
+   "rule_he": "כל השאר הוא חריטה שקטה: קווי שיער, הצללה, מיקרוגרפיה. צפיפות שקטה, שטחי מנוחה, הכול דטרמיניסטי עם זרע."
+  },
+  {
+   "id": "real-sky",
+   "n": 5,
+   "he": "שמיים אמיתיים",
+   "rule_he": "השמש, הירח, הכוכבים וצבע השמיים מחושבים לתאריך, לשעה ולמקום האמיתיים (sky.js). לא ממציאים ירח."
+  },
+  {
+   "id": "privacy",
+   "n": 6,
+   "he": "פרטיות",
+   "rule_he": "אין אנשים, פנים, לוחיות רישוי, שמות דיירים או בעלים, ואין תוכן אישי. מתמונות רחוב נכנסים רק נתונים מצרפיים (צבע, חומר)."
+  },
+  {
+   "id": "sacred",
+   "n": 7,
+   "he": "דבר קדוש לא נמכר",
+   "rule_he": "אין שמות קודש ואין פסוקים באמנות, ובשום מקרה לא בנכס שנמכר, נטבע או משמש לפרסום. מסגרת קבלית רק מופשטת ובכבוד."
+  }
+ ],
+ "palette": {
+  "note_he": "צבע לפי תפקיד. \"night/dawn/day/dusk\" הם וריאנטים לשעה; לרגע אמיתי מערבבים אותם בלי קפיצות עם roleColor(role, skyColors(date)) ב-sky.js. צבעי השמיים עצמם מגיעים מ-skyColors() — הערכים כאן הם דוגמאות לגובה שמש מייצג (לילה עם ירח, זריחה 0°, יום 30°, שקיעה 0°).",
+  "variants": {
+   "night": {
+    "he": "לילה",
+    "sunAlt": "≤ −6°",
+    "ground": "dark"
+   },
+   "dawn": {
+    "he": "שחר וזריחה",
+    "sunAlt": "−6° … +6°, בוקר",
+    "ground": "mixed",
+    "note_he": "באשדוד השמש עולה מעל העיר (מזרח): אור פנינה וורוד, הים במערב משקף שמיים קרירים."
+   },
+   "day": {
+    "he": "יום",
+    "sunAlt": "> 6°",
+    "ground": "light"
+   },
+   "dusk": {
+    "he": "שקיעה ודמדומים",
+    "sunAlt": "+6° … −6°, ערב",
+    "ground": "mixed",
+    "note_he": "באשדוד השמש שוקעת לים (מערב): אופק חם ורווי יותר, שביל נצנוץ על המים."
+   }
+  },
+  "roles": {
+   "sky_zenith": {
+    "he": "שמיים – זנית",
+    "kind": "field",
+    "night": "#08102A",
+    "dawn": "#2A4C84",
+    "day": "#2C6CC4",
+    "dusk": "#27467F",
+    "maxAlphaNight": 1
+   },
+   "sky_horizon": {
+    "he": "שמיים – אופק",
+    "kind": "field",
+    "night": "#16224A",
+    "dawn": "#E6C2A6",
+    "day": "#9EC6EE",
+    "dusk": "#E8B48A",
+    "maxAlphaNight": 1
+   },
+   "sea_surface": {
+    "he": "ים – פני המים ליד האופק",
+    "kind": "field",
+    "night": "#0C1530",
+    "dawn": "#5E6B8C",
+    "day": "#3E7FA6",
+    "dusk": "#3A4566",
+    "maxAlphaNight": 1
+   },
+   "sea_deep": {
+    "he": "ים – קדמת התמונה / עומק",
+    "kind": "field",
+    "night": "#04070F",
+    "dawn": "#26304A",
+    "day": "#1D4E78",
+    "dusk": "#1A2138",
+    "maxAlphaNight": 1
+   },
+   "land_silhouette": {
+    "he": "יבשה – צללית העיר",
+    "kind": "field",
+    "night": "#05080F",
+    "dawn": "#1E2233",
+    "day": "#CFCBC0",
+    "dusk": "#141826",
+    "note_he": "ביום העיר אינה צללית: טיח בהיר תחת אובך.",
+    "maxAlphaNight": 1
+   },
+   "ink": {
+    "he": "דיו החריטה",
+    "kind": "mark",
+    "night": "#8E9BC2",
+    "dawn": "#3A4566",
+    "day": "#2A3044",
+    "dusk": "#8E9BC2",
+    "alpha": [
+     0.05,
+     0.4
+    ],
+    "maxAlphaNight": 0.97
+   },
+   "hairline": {
+    "he": "קו שיער (פליז)",
+    "kind": "mark",
+    "night": "#C9A66B",
+    "dawn": "#A88A5A",
+    "day": "#8C7A55",
+    "dusk": "#C9A66B",
+    "alpha": [
+     0.15,
+     0.35
+    ],
+    "maxAlphaNight": 0.79
+   },
+   "region_title": {
+    "he": "כותרת אזור",
+    "kind": "text",
+    "night": "#8C7A55",
+    "dawn": "#6E5F42",
+    "day": "#6E5F42",
+    "dusk": "#8C7A55",
+    "maxAlphaNight": 1
+   },
+   "ember": {
+    "he": "גחלת – דורש תשומת לב",
+    "kind": "mark",
+    "night": "#E0703A",
+    "dawn": "#D0603A",
+    "day": "#C8562A",
+    "dusk": "#E0703A",
+    "maxAlphaNight": 1
+   },
+   "pearl": {
+    "he": "פנינה – הדגשה שקטה / ממתין לעיון",
+    "kind": "mark",
+    "night": "#E9DDB8",
+    "dawn": "#F1E6C8",
+    "day": "#FBF4E2",
+    "dusk": "#E9DDB8",
+    "maxAlphaNight": 0.44
+   },
+   "crack": {
+    "he": "סדק – כשל",
+    "kind": "mark",
+    "night": "#C8503C",
+    "dawn": "#B8483A",
+    "day": "#A8402E",
+    "dusk": "#C8503C",
+    "maxAlphaNight": 1
+   },
+   "ash": {
+    "he": "אפר – שהסתיים / ארכיון",
+    "kind": "mark",
+    "night": "#6F6A66",
+    "dawn": "#7A7470",
+    "day": "#8A857F",
+    "dusk": "#6F6A66",
+    "maxAlphaNight": 1
+   },
+   "silver": {
+    "he": "כסף – דיו שני (ענן)",
+    "kind": "mark",
+    "night": "#A9B8D4",
+    "dawn": "#7E8CA8",
+    "day": "#5E6C88",
+    "dusk": "#A9B8D4",
+    "maxAlphaNight": 0.67
+   },
+   "grid": {
+    "he": "רשת / שושנת רוחות",
+    "kind": "mark",
+    "night": "#2A3466",
+    "dawn": "#56628E",
+    "day": "#9DB0C8",
+    "dusk": "#2A3466",
+    "maxAlphaNight": 1
+   },
+   "city_light": {
+    "he": "אור עירוני (נתרן)",
+    "kind": "light",
+    "night": "#B89A6A",
+    "dawn": "#B89A6A",
+    "day": null,
+    "dusk": "#B89A6A",
+    "alpha": [
+     0,
+     0.1
+    ],
+    "maxAlphaNight": 0.94
+   },
+   "moon": {
+    "he": "הירח",
+    "kind": "truth",
+    "all": "#EEF2FA",
+    "rule_he": "מיקום, גודל (≈0.5°) ומופע אמיתיים מ-sky.js; מותר לטנן עד 85%. פטור מתקציב הבהירות."
+   },
+   "stars": {
+    "he": "כוכבים לפי טמפרטורה",
+    "kind": "truth",
+    "hot_9000K": "#C8D7FF",
+    "sun_6000K": "#FFF4E8",
+    "cool_4500K": "#FFD7AA",
+    "rule_he": "רדיוס = max(1.2, 5.2 − 0.95·V) ב-8K; V>4.2 רק כרוח רפאים α.07; בלי קווי קבוצות כוכבים אלא אם סומנו."
+   }
+  },
+  "text": {
+   "rule_he": "צבע הטקסט נבחר לפי הקרקע שמתחתיו, לא לפי השעה: Y(קרקע) < 0.18 → onDark, אחרת onLight. ניגודיות מינימלית 4.5:1 לטקסט רץ (WCAG AA).",
+   "onDark": {
+    "focus": "#FFF4DC",
+    "headline": "#F6EBD2",
+    "sub": "#C2AE86",
+    "secondary": "#8E9BC2",
+    "muted": "#6F7A9C",
+    "queue": "#7F8BB0",
+    "cartouche": "#D9C9A3"
+   },
+   "onLight": {
+    "focus": "#1A1408",
+    "headline": "#1A1408",
+    "sub": "#5A4A2E",
+    "secondary": "#4A4E63",
+    "muted": "#6E7084",
+    "queue": "#5E6680",
+    "cartouche": "#3A3020"
+   },
+   "focalOnly": [
+    "focus",
+    "headline"
+   ]
+  },
+  "focus": {
+   "he": "המוקד — \"הקַו\"",
+   "reserved": [
+    "#FFC86B",
+    "#FFF6E0",
+    "#FFFDF6"
+   ],
+   "night": {
+    "mode": "emissive",
+    "core": "#FFF6E0",
+    "glow": "#FFC86B",
+    "bead_core": "#FFFDF6",
+    "warmEnd": "#FFE2A8"
+   },
+   "dawn": {
+    "mode": "emissive",
+    "core": "#FFF6E0",
+    "glow": "#FFC86B",
+    "note_he": "להרחיק מאזור האופק שפונה לשמש."
+   },
+   "day": {
+    "mode": "ink",
+    "fill": "#E3A33A",
+    "edge": "#1A1408",
+    "note_he": "ביום הקו הוא דיו מוזהב ולא אור: הניגודיות הגבוהה ביותר בתמונה, לא הבהירות."
+   },
+   "dusk": {
+    "mode": "emissive",
+    "core": "#FFF6E0",
+    "glow": "#FFC86B",
+    "note_he": "לא לשים את הקו מעל שביל הנצנוץ של השמש בים — שני קווי אור מתחרים."
+   },
+   "chip": {
+    "fill": "#F2C66D",
+    "text": "#1A1408",
+    "highlight": "#FFE6A3",
+    "rule_he": "גלולת תשובה: בלי זוהר; רק בתוך גוש המוקד."
+   },
+   "rules_he": [
+    "אלמנט מוקד אחד בסצנה. בעולם: החלקה או הפעולה של הרגע הזה — כל השאר שקט.",
+    "צבעי המוקד שמורים: #FFC86B, #FFF6E0, #FFFDF6 — אסורים לכל אלמנט אחר (גם לשקיעה; היא מקבלת #F0A050 ו-#E0703A).",
+    "צורה: קו דק (ליבה עד 1.75u, הילה עד 40u). עד 3 \"ניצוצות\" על הקו, בבהירות יורדת (1 > 2 > 3).",
+    "בלילה המוקד הוא הבהיר ביותר; ביום — בעל הניגודיות הגבוהה ביותר. בכל מקרה כל השאר עד 35% ממנו.",
+    "המוקד הוא שכבת-על, לא גאומטריה: הוא לעולם לא מסתיר או מזיז דבר שנמדד.",
+    "מקור האור לא מצויר לעולם: הקו נכנס מעבר לשולי המסגרת ונעצר באופק."
+   ],
+   "maxAreaFraction": 0.02
+  }
+ },
+ "light": {
+  "label_he": "מודל אור לפי גובה השמש — סגנון מכויל, לא פוטומטריה. עננים/אובך שנמדדו גוברים עליו.",
+  "altitudeOf": "geometric altitude of the sun's centre, degrees (sky.js sunPosition().alt)",
+  "stopsAt": [
+   0,
+   0.45,
+   0.8,
+   1
+  ],
+  "stopsNote": "0 = zenith, 1 = the horizon. 'sunward' is the horizon colour in the sun's azimuth (±60°), 'antisun' the opposite horizon.",
+  "phases": [
+   {
+    "id": "night",
+    "he": "לילה",
+    "sunAltMax": -18
+   },
+   {
+    "id": "astronomical",
+    "he": "דמדומים אסטרונומיים",
+    "sunAltMax": -12
+   },
+   {
+    "id": "nautical",
+    "he": "דמדומים ימיים",
+    "sunAltMax": -6
+   },
+   {
+    "id": "civil",
+    "he": "דמדומים אזרחיים",
+    "sunAltMax": -0.8333
+   },
+   {
+    "id": "golden",
+    "he": "שעת זהב",
+    "sunAltMax": 6
+   },
+   {
+    "id": "day",
+    "he": "יום",
+    "sunAltMax": 90
+   }
+  ],
+  "night": {
+   "moonless": {
+    "stops": [
+     "#05091A",
+     "#070D22",
+     "#0A122B",
+     "#0E1734"
+    ],
+    "ambient": {
+     "hex": "#141B38",
+     "intensity": 0.03
+    },
+    "shadowTint": {
+     "hex": "#03050B",
+     "alpha": 0.7
+    },
+    "stars": 1
+   },
+   "moonlit": {
+    "stops": [
+     "#08102A",
+     "#0C1636",
+     "#111C40",
+     "#16224A"
+    ],
+    "ambient": {
+     "hex": "#3A4A78",
+     "intensity": 0.08
+    },
+    "shadowTint": {
+     "hex": "#05080F",
+     "alpha": 0.6
+    },
+    "stars": 0.55
+   },
+   "moonFactor": "illumination × smoothstep(−1°, 40°, moon altitude)",
+   "source_he": "צבעי הלילה של היצירה 23.11.2026 (ירח 99% בגובה 80°) = 'moonlit'; 'moonless' כהה יותר באותו גוון."
+  },
+  "keyframes": {
+   "dusk": [
+    {
+     "alt": -18,
+     "stops": [
+      "#05091A",
+      "#070D22",
+      "#0A122B",
+      "#0E1734"
+     ],
+     "sunward": "#111A38",
+     "antisun": "#0E1734",
+     "ambient": {
+      "hex": "#141B38",
+      "intensity": 0.03
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#03050B",
+      "alpha": 0.7
+     },
+     "stars": 1
+    },
+    {
+     "alt": -12,
+     "stops": [
+      "#0A1434",
+      "#101D42",
+      "#1A2850",
+      "#2A3258"
+     ],
+     "sunward": "#3A3858",
+     "antisun": "#1E2A52",
+     "ambient": {
+      "hex": "#1E2850",
+      "intensity": 0.05
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#070B18",
+      "alpha": 0.62
+     },
+     "stars": 0.8
+    },
+    {
+     "alt": -6,
+     "stops": [
+      "#13234E",
+      "#1F3566",
+      "#3A4C7E",
+      "#6A6388"
+     ],
+     "sunward": "#B0705A",
+     "antisun": "#2C3A66",
+     "ambient": {
+      "hex": "#3A4A7E",
+      "intensity": 0.12
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#141E3E",
+      "alpha": 0.5
+     },
+     "stars": 0.1
+    },
+    {
+     "alt": -3,
+     "stops": [
+      "#1C3263",
+      "#2F4C84",
+      "#6577A6",
+      "#B0848A"
+     ],
+     "sunward": "#E0703A",
+     "antisun": "#8E7A9E",
+     "ambient": {
+      "hex": "#5A5F8E",
+      "intensity": 0.2
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#26305A",
+      "alpha": 0.48
+     },
+     "stars": 0
+    },
+    {
+     "alt": 0,
+     "stops": [
+      "#27467F",
+      "#4A6EA6",
+      "#9AAACB",
+      "#E8B48A"
+     ],
+     "sunward": "#F0A050",
+     "antisun": "#A99AB8",
+     "ambient": {
+      "hex": "#7B86AE",
+      "intensity": 0.32
+     },
+     "sunLight": {
+      "hex": "#FF9A55",
+      "intensity": 0.35
+     },
+     "shadowTint": {
+      "hex": "#3A4A7A",
+      "alpha": 0.45
+     },
+     "stars": 0
+    },
+    {
+     "alt": 3,
+     "stops": [
+      "#2E5592",
+      "#577DB4",
+      "#AFC0D8",
+      "#E9CFAE"
+     ],
+     "sunward": "#F4BE7E",
+     "antisun": "#B9C4D8",
+     "ambient": {
+      "hex": "#95A3C4",
+      "intensity": 0.45
+     },
+     "sunLight": {
+      "hex": "#FFB676",
+      "intensity": 0.55
+     },
+     "shadowTint": {
+      "hex": "#43548A",
+      "alpha": 0.42
+     },
+     "stars": 0
+    },
+    {
+     "alt": 6,
+     "stops": [
+      "#2D5FA6",
+      "#5C86BE",
+      "#AFC6DE",
+      "#D8D9D6"
+     ],
+     "sunward": "#F0D6A8",
+     "antisun": "#BCCFE2",
+     "ambient": {
+      "hex": "#A9B9D6",
+      "intensity": 0.55
+     },
+     "sunLight": {
+      "hex": "#FFD0A0",
+      "intensity": 0.7
+     },
+     "shadowTint": {
+      "hex": "#4B5D8C",
+      "alpha": 0.4
+     },
+     "stars": 0
+    },
+    {
+     "alt": 15,
+     "stops": [
+      "#2C66B8",
+      "#5D8FCB",
+      "#9FC2E6",
+      "#B8D2EC"
+     ],
+     "sunward": "#E8E4D8",
+     "antisun": "#B6D0EA",
+     "ambient": {
+      "hex": "#B2C4E0",
+      "intensity": 0.75
+     },
+     "sunLight": {
+      "hex": "#FFE6CC",
+      "intensity": 0.88
+     },
+     "shadowTint": {
+      "hex": "#52648F",
+      "alpha": 0.38
+     },
+     "stars": 0
+    },
+    {
+     "alt": 30,
+     "stops": [
+      "#2C6CC4",
+      "#5A92D4",
+      "#8FBCE8",
+      "#9EC6EE"
+     ],
+     "sunward": "#DCE6EE",
+     "antisun": "#9EC6EE",
+     "ambient": {
+      "hex": "#B8CCE6",
+      "intensity": 0.92
+     },
+     "sunLight": {
+      "hex": "#FFF3E6",
+      "intensity": 1
+     },
+     "shadowTint": {
+      "hex": "#55688F",
+      "alpha": 0.36
+     },
+     "stars": 0
+    },
+    {
+     "alt": 60,
+     "stops": [
+      "#3570C0",
+      "#6A9AD0",
+      "#A6C6E4",
+      "#C4D8EA"
+     ],
+     "sunward": "#E6ECF0",
+     "antisun": "#BCD3EA",
+     "ambient": {
+      "hex": "#C0D2EA",
+      "intensity": 1
+     },
+     "sunLight": {
+      "hex": "#FFF8F0",
+      "intensity": 1
+     },
+     "shadowTint": {
+      "hex": "#5A6C92",
+      "alpha": 0.34
+     },
+     "stars": 0
+    }
+   ],
+   "dawn": [
+    {
+     "alt": -18,
+     "stops": [
+      "#05091A",
+      "#070D22",
+      "#0A122B",
+      "#0E1734"
+     ],
+     "sunward": "#101936",
+     "antisun": "#0E1734",
+     "ambient": {
+      "hex": "#141B38",
+      "intensity": 0.03
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#03050B",
+      "alpha": 0.7
+     },
+     "stars": 1
+    },
+    {
+     "alt": -12,
+     "stops": [
+      "#0A1532",
+      "#101E42",
+      "#1A2A52",
+      "#263358"
+     ],
+     "sunward": "#34385A",
+     "antisun": "#1C2850",
+     "ambient": {
+      "hex": "#1E2850",
+      "intensity": 0.05
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#070B18",
+      "alpha": 0.62
+     },
+     "stars": 0.8
+    },
+    {
+     "alt": -6,
+     "stops": [
+      "#142650",
+      "#22396A",
+      "#3F5384",
+      "#7A7090"
+     ],
+     "sunward": "#A9787A",
+     "antisun": "#33416E",
+     "ambient": {
+      "hex": "#3E4E82",
+      "intensity": 0.12
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#151F40",
+      "alpha": 0.5
+     },
+     "stars": 0.1
+    },
+    {
+     "alt": -3,
+     "stops": [
+      "#1E3666",
+      "#34528A",
+      "#6F82AE",
+      "#BB98A0"
+     ],
+     "sunward": "#E3A07A",
+     "antisun": "#8A7EA4",
+     "ambient": {
+      "hex": "#606896",
+      "intensity": 0.2
+     },
+     "sunLight": {
+      "hex": "#000000",
+      "intensity": 0
+     },
+     "shadowTint": {
+      "hex": "#28325C",
+      "alpha": 0.48
+     },
+     "stars": 0
+    },
+    {
+     "alt": 0,
+     "stops": [
+      "#2A4C84",
+      "#5074AA",
+      "#A3B3CF",
+      "#E6C2A6"
+     ],
+     "sunward": "#F2B27A",
+     "antisun": "#B2A6C0",
+     "ambient": {
+      "hex": "#828DB2",
+      "intensity": 0.32
+     },
+     "sunLight": {
+      "hex": "#FFAE7A",
+      "intensity": 0.35
+     },
+     "shadowTint": {
+      "hex": "#3C4C7C",
+      "alpha": 0.45
+     },
+     "stars": 0
+    },
+    {
+     "alt": 3,
+     "stops": [
+      "#2F5794",
+      "#5A80B6",
+      "#B2C3DA",
+      "#E3D6C2"
+     ],
+     "sunward": "#F0C89A",
+     "antisun": "#BAC6DA",
+     "ambient": {
+      "hex": "#98A6C6",
+      "intensity": 0.45
+     },
+     "sunLight": {
+      "hex": "#FFC08E",
+      "intensity": 0.55
+     },
+     "shadowTint": {
+      "hex": "#44558A",
+      "alpha": 0.42
+     },
+     "stars": 0
+    },
+    {
+     "alt": 6,
+     "stops": [
+      "#2D5FA6",
+      "#5C86BE",
+      "#B0C7DF",
+      "#D3DBE0"
+     ],
+     "sunward": "#EFDDBA",
+     "antisun": "#BCCFE2",
+     "ambient": {
+      "hex": "#AABAD7",
+      "intensity": 0.55
+     },
+     "sunLight": {
+      "hex": "#FFD6AC",
+      "intensity": 0.7
+     },
+     "shadowTint": {
+      "hex": "#4B5D8C",
+      "alpha": 0.4
+     },
+     "stars": 0
+    },
+    {
+     "alt": 15,
+     "stops": [
+      "#2C66B8",
+      "#5D8FCB",
+      "#9FC2E6",
+      "#B8D2EC"
+     ],
+     "sunward": "#E8E6DC",
+     "antisun": "#B6D0EA",
+     "ambient": {
+      "hex": "#B2C4E0",
+      "intensity": 0.75
+     },
+     "sunLight": {
+      "hex": "#FFE8D0",
+      "intensity": 0.88
+     },
+     "shadowTint": {
+      "hex": "#52648F",
+      "alpha": 0.38
+     },
+     "stars": 0
+    },
+    {
+     "alt": 30,
+     "stops": [
+      "#2C6CC4",
+      "#5A92D4",
+      "#8FBCE8",
+      "#9EC6EE"
+     ],
+     "sunward": "#DCE6EE",
+     "antisun": "#9EC6EE",
+     "ambient": {
+      "hex": "#B8CCE6",
+      "intensity": 0.92
+     },
+     "sunLight": {
+      "hex": "#FFF3E6",
+      "intensity": 1
+     },
+     "shadowTint": {
+      "hex": "#55688F",
+      "alpha": 0.36
+     },
+     "stars": 0
+    },
+    {
+     "alt": 60,
+     "stops": [
+      "#3570C0",
+      "#6A9AD0",
+      "#A6C6E4",
+      "#C4D8EA"
+     ],
+     "sunward": "#E6ECF0",
+     "antisun": "#BCD3EA",
+     "ambient": {
+      "hex": "#C0D2EA",
+      "intensity": 1
+     },
+     "sunLight": {
+      "hex": "#FFF8F0",
+      "intensity": 1
+     },
+     "shadowTint": {
+      "hex": "#5A6C92",
+      "alpha": 0.34
+     },
+     "stars": 0
+    }
+   ],
+   "source_he": "יום (30°): כיול העולם התאום מול 12 תמונות שטח ביום, 23.11.2026 13:30 (שמיים #2C6CC4, אופק #9EC6EE). דמדומים: סגנון. בשקיעה השמש יורדת לים (מערב) — חם ורווי יותר; בזריחה היא עולה מעל העיר (מזרח) — פנינה וורוד."
+  },
+  "cityGlow": {
+   "hex": "#B89A6A",
+   "alphaNight": 0.1,
+   "fadeSunAlt": [
+    -12,
+    -4
+   ],
+   "azimuthDeg": [
+    25,
+    205
+   ],
+   "label_he": "זוהר נתרן מעל העיר (יבשה: אזימוט 25°–205° דרך מזרח, משוער ±10°). השראה, לא מדידה."
+  },
+  "streetLight": {
+   "label_he": "השראה, לא מדידה — בתמונות הרחוב בלילה האור חם (Lab b* +2…+9)",
+   "onBelowSunAlt": 0,
+   "sodium": "#FFB070",
+   "ledWarm": "#FFD8AA",
+   "ledCool": "#E6EEFF",
+   "intensity": 0.35,
+   "rule_he": "פנסים דולקים כשהשמש מתחת לאופק. מיקום פנס — רק מנתונים (OSM/עירייה) או מסומן 'משוער'."
+  },
+  "windowLight": {
+   "label_he": "השראה, לא מדידה",
+   "byHourLocal": [
+    0.1,
+    0.06,
+    0.04,
+    0.03,
+    0.04,
+    0.1,
+    0.18,
+    0.15,
+    0.06,
+    0.03,
+    0.03,
+    0.03,
+    0.03,
+    0.03,
+    0.03,
+    0.03,
+    0.08,
+    0.3,
+    0.5,
+    0.62,
+    0.66,
+    0.62,
+    0.48,
+    0.25
+   ],
+   "visibility": "smoothstep(+6°, −6°, sun altitude) — by day a lit window does not read",
+   "colours": [
+    {
+     "hex": "#FFD696",
+     "w": 0.45
+    },
+    {
+     "hex": "#FFECC8",
+     "w": 0.3
+    },
+    {
+     "hex": "#FFBE78",
+     "w": 0.15
+    },
+    {
+     "hex": "#C8DCFF",
+     "w": 0.1
+    }
+   ],
+   "rule_he": "החלטה לכל חלון: seededRandom(מזהה חלון + תאריך + שעה) < הסתברות. שבת וחג אינם ממודלים ב-v0.",
+   "source_he": "גווני החלונות מהעולם התאום (30-atmo-lite); עקומת השעות – השראה כללית, לא נתון של אשדוד."
+  }
+ },
+ "geography": {
+  "label_he": "עובדות מחושבות לאשדוד (sky.js), ומה שמשוער מסומן",
+  "seaAzimuthDeg": {
+   "from": 205,
+   "to": 25,
+   "via": "west",
+   "label_he": "קו החוף ≈ 25°/205° מנקודת הנמל — משוער ±10°"
+  },
+  "sunriseAzimuthDeg": {
+   "min": 61.5,
+   "max": 117.3,
+   "he": "הזריחה תמיד מעל היבשה (מזרח)",
+   "computed": "sky.js, 2026"
+  },
+  "sunsetAzimuthDeg": {
+   "min": 242.7,
+   "max": 298.5,
+   "he": "השקיעה תמיד לתוך הים (מערב)",
+   "computed": "sky.js, 2026"
+  },
+  "noonSunAltitudeDeg": {
+   "december": 34.8,
+   "june": 81.6,
+   "he": "גובה שמש בצהריים: ~35° בחורף, ~82° בקיץ"
+  }
+ },
+ "materials": {
+  "label_he": "השראה, לא מדידה",
+  "rule_he": "צבע חומר הוא ברירת מחדל בלבד. כשיש ערך נמדד (תמונת שטח מכוילת, אורתופוטו, תיאור רשמי) — הוא גובר, ומקורו נרשם. מאירים עם shade(base, skyColors(date)).",
+  "items": {
+   "jerusalem_stone": {
+    "he": "אבן ירושלמית (אבן גיר נסורה)",
+    "base": "#D6C6A2",
+    "lit": "#E9DDC0",
+    "shade": "#A08E6B",
+    "twinMaterial": "limestone",
+    "roughness": 0.9,
+    "engraving_he": "נדבכים אופקיים כל 0.30 מ׳, חריצים אנכיים מדורגים כל 0.60 מ׳ (אבן 60×30 ס״מ, כמו בעולם התאום)",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "plaster": {
+    "he": "טיח / שפריץ בהיר",
+    "base": "#E7E2D6",
+    "lit": "#F3EFE6",
+    "shade": "#B2AC9E",
+    "twinMaterial": "plaster_light",
+    "roughness": 1,
+    "engraving_he": "נקודות (שפריץ מחוספס), לא קווים",
+    "source_he": "כיול היום של העולם התאום: \"קירות טיח לבנים\" (תמונות שטח 054–065)",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "concrete": {
+    "he": "בטון חשוף",
+    "base": "#A8A59D",
+    "lit": "#C3C0B7",
+    "shade": "#78766F",
+    "twinMaterial": "concrete",
+    "roughness": 1,
+    "engraving_he": "קווי תבנית עדינים כל ~1.2 מ׳ (משוער)",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "sand": {
+    "he": "חול / דיונות",
+    "base": "#E2CC9C",
+    "lit": "#F0E2BF",
+    "shade": "#B39A68",
+    "twinMaterial": "sand",
+    "roughness": 1,
+    "engraving_he": "אדוות רוח: הצללה מעוקלת; לא מציירים מתחת לקנה מידה 1:500",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "kurkar": {
+    "he": "כורכר (אבן חול חופית)",
+    "base": "#C4A274",
+    "lit": "#D8BC90",
+    "shade": "#8E7250",
+    "twinMaterial": "sand",
+    "roughness": 1,
+    "engraving_he": "נקבוביות: נקודות לא סדירות",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "sea": {
+    "he": "ים",
+    "day_surface": "#3E7FA6",
+    "day_nearshore": "#5FA9AE",
+    "day_deep": "#1D4E78",
+    "foam": "#EEF2F2",
+    "night_top": "#0C1530",
+    "night_floor": "#04070F",
+    "engraving_he": "הצללה אופקית בלבד; המרווח גדל עם המרחק מהאופק (ראו line.hatch)",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "port_steel": {
+    "he": "פלדת הנמל (עגורנים, מכולות)",
+    "base": "#6C757F",
+    "lit": "#9AA3AD",
+    "shade": "#434A53",
+    "rust": "#8A4B2F",
+    "containersMuted": [
+     "#9C4A3A",
+     "#3F6B8C",
+     "#7A6A4A",
+     "#5E7A4A",
+     "#8A8F96"
+    ],
+    "engraving_he": "אנכיים חדים 1px, חיזוקי X; בלי לוגו, שם חברה או שם אונייה",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "greenery": {
+    "he": "צמחייה (פיקוס, זית, תמר, וושינגטוניה)",
+    "ficus": "#4F6B3E",
+    "olive": "#7A8460",
+    "palm": "#6B7F4E",
+    "dryGrass": "#A79E6A",
+    "shade": "#2C3A26",
+    "twinModels": [
+     "tree_ficus",
+     "tree_olive",
+     "palm_date",
+     "palm_washingtonia"
+    ],
+    "engraving_he": "נקודות (סטיפלינג), לעולם לא הצללה בקווים",
+    "season_he": "ירוק בחורף-אביב, צהוב-יבש בקיץ — לפי התאריך האמיתי",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "asphalt": {
+    "he": "אספלט",
+    "base": "#5A5B5D",
+    "lit": "#7A7B7D",
+    "shade": "#36373A",
+    "twinMaterial": "asphalt",
+    "source_he": "כיול היום: \"אספלט אפור-בהיר\"",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "pavers": {
+    "he": "מדרכה – אבן משתלבת",
+    "base": "#BE9687",
+    "alt": "#A9A49B",
+    "twinMaterial": "sidewalk_pavers",
+    "source_he": "כיול היום: גוון מרצפות אדמדם ~190,150,135",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "roof_flat": {
+    "he": "גג שטוח (איטום) ודודי שמש",
+    "base": "#CFCBC2",
+    "heaterTank": "#D9D9D4",
+    "heaterPanel": "#2B3440",
+    "twinMaterial": "roof_flat",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   },
+   "glass": {
+    "he": "זכוכית",
+    "base": null,
+    "tint": "#2E3E4A",
+    "rule_he": "אין לזכוכית צבע קבוע: היא משקפת את stops של skyColors() בכיוון המשתקף, ×0.6",
+    "twinMaterial": "glass",
+    "label_he": "השראה, לא מדידה",
+    "measured": false
+   }
+  },
+  "streetPhotoStats": {
+   "label_he": "השראה מנתוני תמונות הרחוב (ממוצעי Lab מצרפיים, לא פיקסלים, לא פוטומטריה)",
+   "night": {
+    "Lmean": [
+     0.2,
+     0.4
+    ],
+    "a": [
+     1.8,
+     4.6
+    ],
+    "b": [
+     1.8,
+     9.3
+    ],
+    "he": "בגובה הרחוב הלילה חם (נתרן/לד חם); השמיים נשארים אינדיגו"
+   },
+   "day": {
+    "Lmean": [
+     0.51,
+     0.53
+    ],
+    "a": [
+     1,
+     1.4
+    ],
+    "b": [
+     -9.3,
+     -6.1
+    ],
+    "he": "ביום התמונה קרירה-כחלחלה, שמיים כחולים עמוקים"
+   },
+   "source": "twin/integration/rounds/*.json (העולם התאום)"
+  }
+ },
+ "line": {
+  "unit_he": "u = הצלע הקצרה של המסגרת / 1080 (ב-8K: u = 4 פיקסלים; ב-1080p: u = 1)",
+  "strokes": {
+   "hairline": {
+    "width_u": 0.25,
+    "min_px": 1,
+    "alpha": [
+     0.15,
+     0.35
+    ],
+    "he": "מסגרות, אופק, גבולות חלקה"
+   },
+   "engraving": {
+    "width_u": 0.25,
+    "min_px": 1,
+    "alpha": [
+     0.05,
+     0.4
+    ],
+    "he": "הצללה, מרקם, מיקרוגרפיה"
+   },
+   "contour": {
+    "width_u": 0.375,
+    "min_px": 1,
+    "alpha": [
+     0.4,
+     0.8
+    ],
+    "he": "קו מתאר של מה שנמדד"
+   },
+   "emphasis": {
+    "width_u": 0.75,
+    "min_px": 2,
+    "alpha": [
+     0.2,
+     0.5
+    ],
+    "he": "רציף, קו בסיס"
+   },
+   "focus": {
+    "width_u": 1.75,
+    "min_px": 2,
+    "he": "רק המוקד; הילה עד 40u"
+   },
+   "uncertainty": {
+    "width": "2σ מוקרן למסך, לפחות 3u",
+    "alpha": 0.05,
+    "he": "רצועה רכה מתחת לקו מדוד-בקירוב (למשל שובר גלים ±50 מ׳)"
+   }
+  },
+  "caps": "round",
+  "joins": "round",
+  "hatch": {
+   "alpha": [
+    0.05,
+    0.12
+   ],
+   "minSpacing_px": 3,
+   "maxSpacing_u": 6,
+   "jitter_he": "רעש ערכים דו-ממדי עם זרע, עד 0.3 מהמרווח",
+   "perspective_he": "בתצוגת פרספקטיבה המרווח פרופורציונלי ל-1/עומק: צפוף ליד האופק, מתרווח לכיוון הצופה. ביצירה (8K): s(y) = 3 + 0.02·(y − אופק) פיקסלים.",
+   "planScale": [
+    {
+     "scale": "1:250",
+     "hatch_m": 0.25
+    },
+    {
+     "scale": "1:500",
+     "hatch_m": 0.5
+    },
+    {
+     "scale": "1:1000",
+     "hatch_m": 1
+    },
+    {
+     "scale": "1:2500",
+     "hatch_m": 2.5
+    },
+    {
+     "scale": "1:5000",
+     "hatch_m": null,
+     "he": "טון שטוח בלבד"
+    }
+   ],
+   "rule_he": "מרווח על המסך = clamp(hatch_m × פיקסלים למטר, 3px, 6u). מתחת ל-3px → מחליפים בטון שטוח באותה שקיפות ממוצעת (מונע מואר).",
+   "directions": {
+    "water": "אופקי",
+    "shadow": "45°",
+    "stone": "אופקי (נדבכים)",
+    "sand": "אדוות מעוקלות",
+    "greenery": "נקודות",
+    "uncertain": "אין — רצועה רכה"
+   }
+  },
+  "micrography_he": "טקסט קטן לאורך נתיב יכול להיות \"קיר\" — רק עם נתונים אמיתיים וציבוריים, לעולם לא טקסט קדוש."
+ },
+ "typography": {
+  "families": {
+   "display": {
+    "family": "Frank Ruhl Libre",
+    "weights": [
+     300,
+     400,
+     500,
+     700,
+     900
+    ],
+    "licence": "OFL",
+    "he": "כותרות, אותיות, שמות אזורים"
+   },
+   "ui": {
+    "family": "Heebo",
+    "weights": [
+     100,
+     300,
+     400,
+     700,
+     800,
+     900
+    ],
+    "licence": "OFL",
+    "he": "שאלות, גלולות, שורות משנה, מיקרוגרפיה, מקרא"
+   },
+   "ceremonial": {
+    "family": "StamSefarad CLM",
+    "source": "27Devs/STAMfonts (המאגר של אריאל)",
+    "he": "כותרת יחידה בקרטוש בלבד",
+    "rule_he": "לא לטקסט רץ, לא על קרקע או רצפה, ולא לשום ציטוט קדוש בנכס שנמכר."
+   },
+   "fallback": "'Noto Sans Hebrew', 'Arial Hebrew', sans-serif",
+   "files": "fonts/fonts.css (Heebo + Frank Ruhl Libre, woff2 משתנים, עברית ולטינית, OFL)",
+   "loading_he": "טוענים כל משקל עם document.fonts.load(... \"אבגדהוזחטיכלמנסעפצקרשת0123456789\"), מוודאים document.fonts.check, ורק אז מציירים."
+  },
+  "scale_u": {
+   "headline": 75,
+   "question": 59,
+   "sub": 24,
+   "provenance": 13,
+   "caption": 16,
+   "regionTitle": 13.5,
+   "cartouche": 30,
+   "note": 5
+  },
+  "phoneMinimums_px_at_1080w": {
+   "focalGlyph": 19,
+   "headline": 33,
+   "chip": 14
+  },
+  "rtl": [
+   "כל טקסט עברי: direction=\"rtl\", lang=\"he\". ב-SVG text-anchor=\"start\" מעגן בקצה הימני.",
+   "בלי Canvas fillText לטקסט עברי — רק SVG/HTML (בידוד דו-כיווני נכון, נגיש, ניתן לבדיקה).",
+   "כותרות שמגיעות מנתונים עטופות ב-RLI…PDI (U+2067 … U+2069); מילים לטיניות בתוכן עברי ב-LRI…PDI (U+2066 … U+2069).",
+   "תאריך, שעה ומחיר נשארים ריצה אחת: 26.11 · 12:00 · ב-02.12.",
+   "מסירים אמוג׳י מטקסט שעל הבד.",
+   "מודדים רוחב בפועל בגופן הטעון (getComputedTextLength) — לא מנחשים."
+  ],
+  "gershayim": {
+   "gershayim": "״",
+   "gershayim_codepoint": "U+05F4",
+   "geresh": "׳",
+   "geresh_codepoint": "U+05F3",
+   "maqaf": "־",
+   "maqaf_codepoint": "U+05BE",
+   "never": [
+    "\"",
+    "'"
+   ],
+   "examples": [
+    "רו״ח",
+    "תשפ״ז",
+    "י״ד בכסלו",
+    "ד׳",
+    "מטכ״ל",
+    "מ׳ (מטר)"
+   ],
+   "rule_he": "ראשי תיבות ושנים עבריות בגרשיים אמיתיים; אות-מספר בגרש. לעולם לא מירכאות ASCII."
+  },
+  "numbers": {
+   "digits": "מערביות",
+   "date": "DD.MM.YYYY",
+   "time": "HH:MM (24 שעות)",
+   "percent": "98.95%",
+   "uncertainty": "18 מ׳ ±3",
+   "approx": "≈"
+  },
+  "niqqud_he": "רק כשצריך לבדל משמעות (הקַו)."
+ },
+ "composition": {
+  "focalElements": 1,
+  "maxBeadsOnFocus": 3,
+  "brightnessBudget": {
+   "othersMaxFractionOfFocus": 0.35,
+   "metric": "relative luminance Y (WCAG, linear sRGB)",
+   "test_he": "מקטינים ל-1080 פיקסלים רוחב. האחוזון ה-99 של Y מחוץ למסכת המוקד ≤ 0.35 × Y(ליבת המוקד). חמשת הרכיבים הבהירים הגדולים (Y > 0.55, שטח ≥ 40px) כולם בתוך מסכת המוקד.",
+   "dayTest_he": "ביום: אותו כלל על ניגודיות מקומית |Y − Y(רקע)| במקום Y.",
+   "exempt_he": "דיסקת הירח בגודל אמיתי וכוכבים בהירים מ-1.5 (אמת). מותר לטנן אותם, בתנאי שסדר הבהירות נשמר.",
+   "helper": "sky.js → brightnessBudget(rgba, width, height, isFocal)"
+  },
+  "clearing": {
+   "expand_u": 20,
+   "feather_u": 20,
+   "othersMultiplier": 0.3,
+   "he": "סביב גוש המוקד כל השאר מעומעם ל-30%"
+  },
+  "density": {
+   "maxInkCoverageOutsideFocus": 0.25,
+   "minQuietFieldFraction": 0.4,
+   "he": "צפיפות שקטה: לפחות 40% מהמסגרת שדה רגוע (שמיים, ים, קרקע פשוטה)."
+  },
+  "horizonFromTop": 0.618,
+  "readingDistances_he": [
+   "בטלפון במבט: המוקד ומשפט אחד",
+   "ב-4K: המבנים",
+   "ב-1:1: כל רשומה"
+  ],
+  "framing_he": "אם השמש בתוך המסגרת והיא לא המוקד — משנים מסגרת; לא מזיזים את השמש."
+ },
+ "truth": [
+  "סגנון לעולם לא משנה גאומטריה, גובה, מיקום, או צבע שנמדדו. בעימות — המדידה גוברת והסגנון נסוג.",
+  "כל קירוב מסומן \"משוער\" (ובתרשים: \"סכמטי\"), וכל גובה נושא ± (למשל \"18 מ׳ ±3\").",
+  "מדוד = קו חד; משוער = רצועה רכה ברוחב 2σ או קו מקווקו. לעולם לא מסתירים ± לטובת יופי.",
+  "שמש, ירח, כוכבים וצבע השמיים — מ-sky.js לרגע ולמקום האמיתיים; זמן תמונת המצב כתוב ביצירה.",
+  "מותר לטנן (ירח עד 85%), אסור לשנות סדר בהירות (שמש > ירח > נגה > צדק > סיריוס).",
+  "קו רקיע או צללית שאינם מנתונים — מסומנים \"סכמטי\".",
+  "בלי נתוני Google 3D Tiles ובלי תמונותיהם. גאומטריה מ-OSM/Overture — עם קרדיט ODbL: \"© OpenStreetMap contributors, ODbL\" / \"Overture Maps Foundation, ODbL\".",
+  "חומרים, חלונות דולקים ועקומות אור הם השראה, לא מדידה — ומסומנים כך. ערך נמדד גובר ומקורו נרשם.",
+  "תאריכים, שעות ומספרים ביצירה מחושבים מהנתונים, לא מוקלדים."
+ ],
+ "privacy": [
+  "אין אנשים: לא פנים, לא גוף, לא צללית מזוהה. נתוני תמונות רחוב נכנסים רק כסטטיסטיקה מצרפית (צבע, חומר), לא כפיקסלים.",
+  "אין לוחיות רישוי, אין שמות דיירים או בעלים, אין טלפונים, מיילים או מספרי בית שמקושרים לאדם.",
+  "לחלקה לעולם לא מצמידים שם של בעלים או דייר. גוש/חלקה הם מידע ציבורי ומותרים עם מקור.",
+  "אין תוכן אישי של אריאל (שמות, סכומים, הודעות, משימות, דדליינים) באמנות של העולם — רק הסגנון.",
+  "אין מיקום חי של אדם כלשהו.",
+  "תמונה שנכנסת כהשראה: מפיקים ממנה אסימונים ומוחקים אותה. מסירים EXIF ותיוג מיקום מכל נכס שיוצא."
+ ],
+ "sacred": {
+  "rule_he": "דבר קדוש לא נמכר",
+  "rules": [
+   "אין שמות קודש, אין פסוקים ואין נוסחי תפילה באמנות של העולם, ובשום מקרה לא בנכס שנמכר, נטבע (NFT/טוקן), מושכר או משמש לפרסום ולמרצ׳נדייז.",
+   "מסגרת קבלית או יהודית — רק מופשטת ובכבוד: אור, כלים, קו. לא מציירים את מקור האור. לא טקסט קדוש כמרקם או כמיקרוגרפיה.",
+   "אותיות סת״ם (StamSefarad) לא על קרקע, רצפה או כל משטח שדורכים עליו.",
+   "בתי כנסת, בתי קברות, מסגדים וכנסיות: גאומטריה מדודה בלבד, בלי שכבת \"יופי\", בלי מכניקת משחק, בלי פרסום ובלי מכירת חלקות.",
+   "כשצריך שם של ספר או מקום קדוש כתווית — כתווית בלבד, לא כקישוט, ולעולם לא בנכס שנמכר."
+  ]
+ },
+ "digitalAssets": {
+  "he": "ווב 3, נכסים דיגיטליים ומטאברס",
+  "rules": [
+   "חלקה בעולם היא תמונה של הקרקע, לא זכות בה. כל נכס דיגיטלי (טוקן, NFT, חלקה במשחק) נושא את המשפט: \"אין בנכס זה זכות כלשהי בקרקע האמיתית\".",
+   "אין נכס שמתחזה לבעלים אמיתי, לעירייה, לרשות מקרקעי ישראל או ליזם, ואין בו מיתוג שלהם.",
+   "מקור לכל נכס: גרסת הגרעין, הזרע, זמני תמונת המצב של הנתונים, מקורות ורישיונות (ODbL) — כך שאפשר לשחזר אותו אחד לאחד.",
+   "דבר קדוש לא נמכר (ראו sacred). מקומות קדושים ובתי קברות אינם הופכים לנכס.",
+   "אין מידע אישי במטא-דאטה.",
+   "תוויות האמת (\"משוער\", \"סכמטי\", ±) נשארות גלויות בנכס ובמטא-דאטה שלו.",
+   "שום דבר לא נטבע, נמכר או עולה לאתר החי בלי אישור מפורש של אריאל.",
+   "אין הבטחות רווח או ערך. הגרעין מגדיר סגנון; הוא לא מוכר ולא טובע."
+  ]
+ },
+ "seed": {
+  "algorithm": "mulberry32",
+  "hash": "FNV-1a 32-bit over Unicode code points",
+  "base": 5787,
+  "base_he": "השנה תשפ״ז",
+  "key": "<kind>:<id>|<YYYY-MM-DD>[|<HH>]",
+  "example": "window:parcel-12345/w07|2026-11-24|22",
+  "rule_he": "אותם קלטים → אותם פיקסלים. אין Math.random. כל אקראיות דרך seededRandom(key) ב-sky.js."
+ },
+ "agents": {
+  "he": "איך סוכן משתמש בגרעין",
+  "steps_he": [
+   "קורא את style.json (גרסה) ואת חוקי האמת, הפרטיות והקדושה.",
+   "skyColors(date, {lat, lon}) לרגע האמיתי ולחלקה — שמיים, אור סביבה, גוון צל, הסתברות חלון דולק.",
+   "צבע בסיס מ-materials (או ערך נמדד אם יש), ומאיר עם shade().",
+   "מצייר לפי line ו-typography; מוקד אחד בלבד.",
+   "מריץ את בדיקת תקציב הבהירות (brightnessBudget) ומתקן עד שעובר.",
+   "מסמן כל קירוב, ורושם מקור: גרסת הגרעין, זרע, זמן תמונת המצב, רישיונות."
+  ]
+ },
+ "credits": {
+  "algorithms": "NOAA Solar Calculator; J. Meeus, Astronomical Algorithms (2nd ed., 1998) ch. 11, 12, 22, 25, 40, 47, 48; Espenak & Meeus ΔT (NASA, 2006); Sæmundsson refraction (1986)",
+  "reference": "PyEphem 4.2.1 (libastro)",
+  "fonts": "Heebo, Frank Ruhl Libre (SIL OFL); StamSefarad CLM (27Devs/STAMfonts)",
+  "data": "OpenStreetMap contributors, Overture Maps Foundation (ODbL) — דרך העולם התאום"
+ }
+}
