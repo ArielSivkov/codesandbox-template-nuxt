@@ -78,32 +78,66 @@ SIM.rayPolyEntry = rayPolyEntry;
 /** שעות שמש ישירה ביום אחד (לפי לוח ישראל). o = { x, y, z, nx?, nz? (נורמל חזית החוצה; בלי = משטח אופקי פתוח),
  *  day: 'YYYY-MM-DD', near(x,z,r) → בניינים {p,n,top,sigma,minx..maxz,id}, exclude: id, step: דקות (ברירת מחדל 5), lat, lon, gamma }
  *  מחזיר { hours, lo, hi (שעות כששכנים נמוכים/גבוהים ב-σ), first, last (דקות מחצות שעון ישראל), dayHours }.
- *  מקורב: אין הצללת תבליט/אופק, עצים ומרפסות; הבניינים מנסרות עם גג שטוח; רק אריחים טעונים; רזולוציה ±step/2 לכל מעבר. */
+ *  זמני המעבר (זריחה/שקיעה, שמש עוברת מאחורי החזית, כניסה/יציאה מצל של שכן) מחושבים בחיפוש בינארי עד 0.1 ש' בתוך כל צעד –
+ *  לא נספרים בדגימות (קודם: שגיאה עד ±step/2 לכל מעבר, נמדד עד 7.5 דק' ביום).
+ *  מקורב: אין הצללת תבליט/אופק, עצים ומרפסות; הבניינים מנסרות עם גג שטוח; רק אריחים טעונים;
+ *  פער שמש בין שני שכנים, וצל קצר של שכן צר, נבדקים בפיצול הצעד עד 12 ש' (קצר מזה – לא נספר); "יום" = מרכז השמש הנראה מעל האופק. */
 SIM.sunHours = function (o) {
-  const step = o.step || 5, lat = o.lat, lon = o.lon, gam = o.gamma || 0, MAXR = 800, MAXTOP = 250;
+  const step = o.step || 5, lat = o.lat, lon = o.lon, gam = o.gamma || 0, MAXR = 800, MAXTOP = 250, TOL = 0.1 / 60;
   const [Y, M, Dd] = o.day.split('-').map(Number), mid = new Date(Date.UTC(Y, M - 1, Dd, 12));
   const off = SIM.israelOffsetMin(mid), t0 = Date.UTC(Y, M - 1, Dd) - off * 60000;
   const cand = o.near(o.x, o.z, MAXR).filter(b => b.id !== o.exclude);   // פעם אחת לכל נקודה
-  let cnt = [0, 0, 0], first = -1, last = -1, day = 0; const d = new Date();
-  for (let m = step / 2; m < 1440; m += step) {
-    d.setTime(t0 + m * 60000); const sp = SIM.sunPosition(d, lat, lon); if (sp.elevation <= 0) continue; day++;
+  const d = new Date();
+  /** מצב בדקה m: ביטים 1=יום, 2=מואר כשהשכנים ב-−σ, 4=מואר בגובה המשוער, 8=מואר כשהשכנים ב-+σ; BL[j] = הבניין שמצל בביט j */
+  let BL = [null, null, null, null], SD = null;   // SD[i] = 1/3 = הטביעה של שכן i כולה מימין/משמאל לקרן, 2 = הקרן חוצה אותה בהיטל; 0 = נמוך/רחוק מכדי להצל
+  const state = m => {
+    BL = [null, null, null, null]; SD = new Int8Array(cand.length);
+    d.setTime(t0 + m * 60000); const sp = SIM.sunPosition(d, lat, lon); if (sp.elevation <= 0) return 0;
     const v = SIM.sunVector(sp, gam), hl = Math.hypot(v.x, v.z), dx = v.x / hl, dz = v.z / hl, tanEl = v.y / hl;
-    if (o.nx !== undefined && dx * o.nx + dz * o.nz <= 0) continue;               // השמש מאחורי החזית
+    if (o.nx !== undefined && dx * o.nx + dz * o.nz <= 0) return 1;                // השמש מאחורי החזית
     const R = Math.min(MAXR, (MAXTOP - o.y) / tanEl);
-    let lo = true, mi = true, hi = true;                                            // מואר כשהשכנים ב-−σ / 0 / +σ
-    for (const b of cand) {
+    for (let i = 0; i < cand.length; i++) { const b = cand[i], s = b.sigma || 0;
       // דחייה מהירה: מלבן חוסם מול הקרן
       const cx = (b.minx + b.maxx) / 2, cz = (b.minz + b.maxz) / 2, rr = Math.hypot(b.maxx - b.minx, b.maxz - b.minz) / 2;
       const along = (cx - o.x) * dx + (cz - o.z) * dz; if (along < -rr || along > R + rr) continue;
-      if (Math.abs((cx - o.x) * dz - (cz - o.z) * dx) > rr) continue;
+      const perp = (cx - o.x) * dz - (cz - o.z) * dx;
+      if (o.y + Math.max(0, along - rr) * tanEl < b.top + s) {
+        if (Math.abs(perp) > rr) { SD[i] = perp > 0 ? 1 : 3; continue; }              // כל המעגל החוסם בצד אחד – גם הטביעה
+        let pmin = Infinity, pmax = -Infinity; for (let k = 0; k < b.n; k++) { const q = (b.p[k * 2] - o.x) * dz - (b.p[k * 2 + 1] - o.z) * dx; if (q < pmin) pmin = q; if (q > pmax) pmax = q; }
+        SD[i] = pmin > 0 ? 1 : pmax < 0 ? 3 : 2; }
+      if (Math.abs(perp) > rr) continue;
       const t = rayPolyEntry(b.p, b.n, o.x, o.z, dx, dz); if (t === Infinity) continue;
-      const yr = o.y + t * tanEl, s = b.sigma || 0;                                 // גובה הקרן בכניסה (הנמוך ביותר בתוך הטביעה)
-      if (yr < b.top + s) hi = false; if (yr < b.top) mi = false; if (yr < b.top - s) { lo = false; break; }
+      const yr = o.y + t * tanEl;                                                   // גובה הקרן בכניסה (הנמוך ביותר בתוך הטביעה)
+      if (yr < b.top + s && !BL[3]) BL[3] = b; if (yr < b.top && !BL[2]) BL[2] = b; if (yr < b.top - s) { BL[1] = b; break; }
     }
-    if (mi) { cnt[1]++; if (first < 0) first = m; last = m; } if (lo) cnt[0]++; if (hi) cnt[2]++;
+    return 1 | (BL[1] ? 0 : 2) | (BL[2] ? 0 : 4) | (BL[3] ? 0 : 8);
+  };
+  /** הזמן שבו ביט k מתחלף בין a ל-b (החלפה אחת בתוך הצעד) */
+  const edge = (a, b, sa, k) => { const on = sa & k; while (b - a > TOL) { const c = (a + b) / 2; if ((state(c) & k) === on) a = c; else b = c; } return (a + b) / 2; };
+  const dur = [0, 0, 0, 0], BITS = [1, 2, 4, 8], MINSUB = 0.2; let first = null, last = null;
+  /** קטע [a,b] מפוצל (עד 12 ש') כשייתכנו שני מעברים בתוכו: מוצל בשני הקצוות על ידי בניינים שונים (פער שמש קצר),
+   *  או מואר בשני הקצוות כשהקרן נכנסה/יצאה/חצתה בהיטל את הטביעה של שכן גבוה מספיק (צל קצר של בניין צר או של פינה) */
+  const split = (sa, ba, da, sb, bb, db) => { if (!(sa & 1) || !(sb & 1)) return false;
+    for (let j = 1; j < 4; j++) { const k = BITS[j];
+      if (!(sa & k) && !(sb & k) && ba[j] && bb[j] && ba[j] !== bb[j]) return true;
+      if ((sa & k) && (sb & k)) { for (let i = 0; i < da.length; i++) if (da[i] !== db[i] && (da[i] === 2 || db[i] === 2 || (da[i] && db[i]))) return true; } }
+    return false; };
+  const seg = (a, sa, ba, da, b, sb, bb, db) => {
+    if (b - a > MINSUB && split(sa, ba, da, sb, bb, db)) {
+      const c = (a + b) / 2, sc = state(c), bc = BL, dc = SD; seg(a, sa, ba, da, c, sc, bc, dc); seg(c, sc, bc, dc, b, sb, bb, db); return; }
+    for (let j = 0; j < 4; j++) { const k = BITS[j];
+      if ((sa & k) === (sb & k)) { if (sa & k) dur[j] += b - a; continue; }
+      const e = edge(a, b, sa, k); dur[j] += (sa & k) ? e - a : b - e;
+      if (k === 4) { if (sb & k) { if (first === null) first = e; } else last = e; } }
+    if ((sa & 4) && first === null) first = a; if ((sb & 4) && b === 1440) last = 1440;
+  };
+  let a = 0, sa = state(0), ba = BL, da = SD;
+  for (let i = 1, N = Math.ceil(1440 / step); i <= N; i++) {
+    const b = Math.min(1440, i * step), sb = state(b), bb = BL, db = SD;
+    seg(a, sa, ba, da, b, sb, bb, db); a = b; sa = sb; ba = bb; da = db;
   }
-  const h = c => c * step / 60;
-  return { hours: h(cnt[1]), lo: h(cnt[2]), hi: h(cnt[0]), first: first < 0 ? null : first - step / 2, last: last < 0 ? null : last + step / 2, dayHours: h(day) };
+  const h = m => m / 60;
+  return { hours: h(dur[2]), lo: h(dur[3]), hi: h(dur[1]), first, last, dayHours: h(dur[0]) };
 };
 /** זריחה ושקיעה (דקות מחצות שעון ישראל): השפה העליונה באופק = גובה גאומטרי של המרכז −0.833° (חצי קוטר 0.267° + שבירה תקנית 0.567°, הגדרת NOAA/USNO). חיפוש בינארי. */
 const GEO = { refraction: false };

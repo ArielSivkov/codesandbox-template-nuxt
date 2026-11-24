@@ -398,7 +398,7 @@ function sunCard(b) {
       html += `<h3>☀️ ${label} · אורך היום ${fmt(dayH, 1)} ש'</h3><table><tr><td>חזית</td><td>קומת קרקע</td><td>קומה עליונה</td></tr>${rows}</table>`;
     }
     html += `<h3>🏢 לפי קומה</h3><label>קומה <span id="sfN">1</span> מתוך ${b.floors || 1} <input type="range" id="sfR" min="1" max="${Math.max(1, b.floors || 1)}" value="1" step="1"></label><div id="sfOut"></div><div class="acts"><button class="btn" id="sCsv">⬇️ דוח הצללה (CSV, כל הקומות)</button></div>`;
-    out.innerHTML = html + `<p class="note">שעות שמש ישירה על החזית (ש'). הטווח = גובה השכנים ±σ. מקורב: בלי עצים, מרפסות ותבליט; שכנים רק מהאזור הטעון (עד 800 מ'); צעד 5 דק'. מיקום שמש: NOAA, נבדק מול NREL SPA. (${Math.round(performance.now() - t0)} מ"ש)</p>`;
+    out.innerHTML = html + `<p class="note">שעות שמש ישירה על החזית (ש'). הטווח = גובה השכנים ±σ. מקורב: בלי עצים, מרפסות ותבליט; שכנים רק מהאזור הטעון (עד 800 מ'); זמני מעבר מדויקים עד שנייה (צל קצר מ-12 ש' לא נספר). מיקום שמש: NOAA, נבדק מול NREL SPA. (${Math.round(performance.now() - t0)} מ"ש)</p>`;
     const fh = b.floors ? (b.top - b.base) / b.floors : 3;   // גובה קומה ממוצע מהגובה המשוער
     const floorRow = (k, day) => names.map(nm => { const f = fp[nm]; return SIM.sunHours({ x: f.x, z: f.z, y: b.base + (k - 0.5) * fh, nx: f.nx, nz: f.nz, day, near: W.near, exclude: b.id, lat: LAT, lon: LON, gamma: GAMMA }); });
     const showFloor = k => { $('sfN').textContent = k; const w = floorRow(k, `${Y}-12-21`), s = floorRow(k, `${Y}-06-21`);
@@ -408,7 +408,7 @@ function sunCard(b) {
       const lines = ['building_id,floor,height_m,facade,date,sun_hours,low,high,day_hours'];
       for (let k = 1; k <= Math.max(1, b.floors || 1); k++) for (const day of [`${Y}-12-21`, `${Y}-06-21`]) { const r = floorRow(k, day);
         names.forEach((nm, i) => lines.push([b.id, k, (b.base + (k - 0.5) * fh).toFixed(1), nm, day, r[i].hours.toFixed(2), r[i].lo.toFixed(2), r[i].hi.toFixed(2), r[i].dayHours.toFixed(2)].join(','))); }
-      lines.push('# מקורב: גבהים משוערים ±σ, בלי עצים/מרפסות/תבליט, צעד 5 דק\'. שמש: NOAA. נתוני מפה © תורמי OpenStreetMap (ODbL)');
+      lines.push('# מקורב: גבהים משוערים ±σ, בלי עצים/מרפסות/תבליט, מעברים עד שנייה (צל קצר מ-12 ש\' לא נספר). שמש: NOAA. נתוני מפה © תורמי OpenStreetMap (ODbL)');
       const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv' })); a.download = `shading-${b.id}.csv`; document.body.appendChild(a); a.click(); a.remove(); toast('⬇️ דוח הצללה ירד'); };
   }, 30);
 }

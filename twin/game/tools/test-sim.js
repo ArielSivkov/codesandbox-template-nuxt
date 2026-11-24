@@ -62,6 +62,23 @@ for (const c of ['../../integration/world/js/itm.js', '../../preview/world/js/it
   for (let m = 1; m < 1440; m += 2) { const sp = SIM.sunPosition(new Date(t0 + m * 60000), LAT, LON); if (sp.elevation <= 0) continue; const v = SIM.sunVector(sp, base.gamma), hl = Math.hypot(v.x, v.z);
     if (v.z / hl <= 0) continue; const t = Dw / (v.z / hl), xw = t * v.x / hl; if (Math.abs(xw) > 2000 || 1.5 + t * v.y / hl >= Hw) lit++; }
   ok(Math.abs(got.hours - lit * 2 / 60) < 0.05 && got.lo <= got.hours && got.hours <= got.hi && got.hi - got.lo > 0.1, `קיר 9±3 מ' במרחק 15 מ' דרומה, 21.12: ${got.hours.toFixed(2)} ש' (אנליטי ${(lit * 2 / 60).toFixed(2)}), טווח ${got.lo.toFixed(2)}–${got.hi.toFixed(2)}`);
+  // זמני מעבר מדויקים: עיר סינתטית (60 קופסאות, זרע קבוע) מול ספירה ישירה כל 3 ש' (ייחוס בלתי תלוי באלגוריתם; שגיאת הייחוס ≤1.5 ש' למעבר).
+  // לפני (ספירת דגימות כל 5 דק'): שגיאה עד 450 ש' (7.5 דק'); הבדיקה נכשלת על הקוד הישן.
+  { let sd = 12345; const rnd = () => (sd = (sd * 1103515245 + 12345) % 2147483648) / 2147483648, city = [];
+    for (let i = 0; i < 60; i++) { const cx = (rnd() - 0.5) * 300, cz = (rnd() - 0.5) * 300, w = 12 + rnd() * 18, d = 12 + rnd() * 18, top = 6 + rnd() * 54; if (Math.hypot(cx, cz) < 25) continue;
+      city.push({ id: 'c' + i, p: new Float32Array([cx - w / 2, cz - d / 2, cx + w / 2, cz - d / 2, cx + w / 2, cz + d / 2, cx - w / 2, cz + d / 2]), n: 4, top, sigma: 3 + rnd() * 5, minx: cx - w / 2, maxx: cx + w / 2, minz: cz - d / 2, maxz: cz + d / 2 }); }
+    const brute = (o, day) => { const [Y, M, D] = day.split('-').map(Number), off = SIM.israelOffsetMin(new Date(Date.UTC(Y, M - 1, D, 12))), t0 = Date.UTC(Y, M - 1, D) - off * 60000, dt = 0.05, c = [0, 0, 0, 0];
+      for (let m = dt / 2; m < 1440; m += dt) { const sp = SIM.sunPosition(new Date(t0 + m * 60000), LAT, LON); if (sp.elevation <= 0) continue; c[0]++;
+        const v = SIM.sunVector(sp, base.gamma), hl = Math.hypot(v.x, v.z), dx = v.x / hl, dz = v.z / hl, tn = v.y / hl; if (o.nx !== undefined && dx * o.nx + dz * o.nz <= 0) continue;
+        let yMin = Infinity, lim = [Infinity, Infinity, Infinity]; for (const b of city) { const t = SIM.rayPolyEntry(b.p, b.n, o.x, o.z, dx, dz); if (t === Infinity) continue; const yr = o.y + t * tn;
+          if (yr < b.top - b.sigma) lim[0] = 0; if (yr < b.top) lim[1] = 0; if (yr < b.top + b.sigma) lim[2] = 0; }
+        for (let j = 0; j < 3; j++) if (lim[j]) c[j + 1]++; }
+      return { dayHours: c[0] * dt / 60, hi: c[1] * dt / 60, hours: c[2] * dt / 60, lo: c[3] * dt / 60 }; };
+    const P6 = [{ x: 20, z: 0, y: 1.5, nx: -1, nz: 0 }, { x: 7.5, z: -12.99, y: 1.5 }, { x: 0, z: 20, y: 11.5, nx: 0, nz: -1 }, { x: -15, z: 0, y: 1.5 }, { x: -17.3, z: -10, y: 21.5, nx: 0.866, nz: 0.5 }, { x: 0, z: -15, y: 1.5 }];
+    let worst = 0, wOld = 0;
+    for (const day of ['2026-12-21', '2026-06-21']) for (const q of P6) { const r = brute(q, day), g = SIM.sunHours({ ...base, ...q, near: () => city, day, step: 5 });
+      for (const k of ['hours', 'lo', 'hi', 'dayHours']) worst = Math.max(worst, Math.abs(g[k] - r[k]) * 3600); }
+    ok(worst < 15, `שעות שמש בעיר סינתטית (6 נקודות × 2 ימים, 4 מדדים) מול ספירה ישירה כל 3 ש': שגיאה מרבית ${worst.toFixed(1)} ש' (סף 15 ש'; קודם עד 450 ש')`); }
   // חזיתות של קופסה: נורמלים החוצה ובכיוון הנכון
   const box = { p: new Float32Array([0, 0, 20, 0, 20, 10, 0, 10]), n: 4 }, fp = SIM.facadePoints(box);
   ok(fp['דרום'] && fp['דרום'].nz > 0.99 && fp['דרום'].z > 10 && fp['צפון'].nz < -0.99 && fp['צפון'].z < 0 && fp['מזרח'].nx > 0.99 && fp['מערב'].nx < -0.99, 'נקודות חזית: 4 כיוונים, נורמלים החוצה'); }
