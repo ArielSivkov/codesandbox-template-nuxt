@@ -44,3 +44,20 @@ test('per-frame CPU time of update() < 1 ms (real-time clock, ×3600 fast-forwar
   assert.ok(rt < 1000 && ff < 1000 && jumps < 1500);
 });
 test('dispose clears providers', () => { def.dispose(world); assert.equal(world.providers.moon, null); });
+// Observer position = the player's REAL ITM (tile frame + SAMPLE_OFFSET, host.js world.coords.toRealITM), not the tile frame.
+// Before 24.11.2026 plugin/15-sky.js used toITM (tile frame) → observer ~1.69 km SW of the player. Source of truth: integration/world/adapters/15-sky.js.
+test('observer = real ITM of the player (toRealITM), not the tile frame (offset 1507.82/757.76 m)', () => {
+  vm.runInThisContext(readFileSync(root + '../integration/world/js/itm.js', 'utf8'));
+  const ITM = globalThis.ITM, OFF = ITM.SAMPLE_OFFSET;
+  const frame = (x, z) => ({ E: 166259.2 - OFF.dE + x, N: 634922.2 - OFF.dN - z });   // HaErez street centre, tile frame
+  const real = (x, z) => { const p = frame(x, z); return { E: p.E + OFF.dE, N: p.N + OFF.dN }; };
+  const w2 = Object.assign({}, world, { providers: { gammaDeg: -0.29565 }, coords: { toITM: frame, toRealITM: real, itmToWgs84: ITM.itmToWgs84 } });
+  def.init(w2, api);
+  const o = w2.providers.sky.obs, truth = ITM.itmToWgs84(166259.2, 634922.2), wrong = ITM.itmToWgs84(166259.2 - OFF.dE, 634922.2 - OFF.dN);
+  const R = 6371008.8, d2r = Math.PI / 180, dist = (a, b) => R * Math.hypot((a.lat - b.lat) * d2r, (a.lon - b.lon) * d2r * Math.cos(a.lat * d2r));
+  const latO = o.lat != null ? o.lat : o.latDeg, lonO = o.lon != null ? o.lon : o.lonDeg, got = { lat: latO, lon: lonO };
+  const err = dist(got, truth), stale = dist(wrong, truth);
+  console.log(`# observer vs real ITM of HaErez: ${err.toFixed(3)} m (tile frame would be ${stale.toFixed(0)} m)`);
+  assert.ok(err < 0.5, `observer ${err} m from the player`); assert.ok(stale > 1600);
+  def.dispose(w2);
+});

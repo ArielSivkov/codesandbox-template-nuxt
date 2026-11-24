@@ -51,7 +51,7 @@
     const p = new THREE.Points(g, pointsMat(THREE)); p.frustumCulled = false; p.renderOrder = -0.45; return p;
   }
   function placeOf(world) {   // מיקום השחקן ב-WGS84 אם יש המרה, אחרת מרכז אשדוד
-    try { const c = world.coords, p = world.player.pos; if (c && c.toITM && c.itmToWgs84) { const itm = c.toITM(p.x, p.z), w = c.itmToWgs84(itm.E, itm.N); if (w && isFinite(w.lat)) return { lat: w.lat, lon: w.lon }; } } catch (e) { /* */ }
+    try { const c = world.coords, p = world.player.pos; if (c && c.toITM && c.itmToWgs84) { const itm = (c.toRealITM || c.toITM)(p.x, p.z), w = c.itmToWgs84(itm.E, itm.N); if (w && isFinite(w.lat)) return { lat: w.lat, lon: w.lon }; } } catch (e) { /* */ }
     return { lat: LAT, lon: LON };
   }
   const p2 = n => String(n).padStart(2, '0');

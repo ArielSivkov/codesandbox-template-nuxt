@@ -20,6 +20,10 @@ function manifest() {
       for (const w of WORLDS) pairs.push([mod + '/' + f, w + '/mods/' + mod + '/' + f]);
   }
   for (const w of WORLDS) pairs.push(['weather/weather.js', w + '/mods/weather/weather.js']);
+  // מחלקת השמיים (ירח, כוכבי לכת, 300 כוכבים, זמני היום): dist נבנה מ-sky/src (sky/tools/build.mjs --check מוודא שהוא עדכני),
+  // והתוסף sky/plugin/15-sky.js הוא המקור לשלושת עותקי adapters (עד 24.11.2026 העותק במחלקה היה ישן – צופה במסגרת האריחים, 1.69 ק"מ מהשחקן)
+  for (const w of WORLDS) pairs.push(['sky/dist/esh27-sky.js', w + '/mods/sky/esh27-sky.js']);
+  for (const a of ['integration/world/adapters', 'preview/world/adapters', 'integration/adapters']) pairs.push(['sky/plugin/15-sky.js', a + '/15-sky.js']);
   return pairs;
 }
 

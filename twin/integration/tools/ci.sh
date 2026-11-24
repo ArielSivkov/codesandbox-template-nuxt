@@ -14,6 +14,8 @@ unit() {
   run "סימולציה (שמש מול NREL SPA, רחפן, רוח)" node game/tools/test-sim.js
   run "פיזיקה קנונית (שמש מול SPA)" bash -c 'cd physics && node --test'
   run "רשת ישראל ITM" python3 game/tools/test-itm.py
+  run "שמיים: dist עדכני מול src" node sky/tools/build.mjs --check
+  run "שמיים (ירח וכוכבי לכת מול Skyfield, זמני היום, לוח עברי, תוסף)" bash -c 'cd sky && node --test test/*.test.mjs'
   run "סנכרון עותקים (0 הבדלים)" node integration/tools/sync-copies.js --check
 }
 
@@ -32,12 +34,12 @@ browser() {
 
 canary() {
   # עובד על עותק זמני של הקבצים – לא משנה את הענף
-  local T; T=$(mktemp -d); cp -r game integration preview physics aviation weather "$T"/ 2>/dev/null; cd "$T"
+  local T; T=$(mktemp -d); cp -r game integration preview physics aviation weather sky "$T"/ 2>/dev/null; cd "$T"
   local caught=0
   # בקרה: בעותק הזמני, לפני השבירה, הכול חייב לעבור (אחרת "נתפס" היה שקר – למשל קובץ חסר)
-  if ! node game/tools/test-sim.js >/dev/null 2>&1 || ! node integration/tools/sync-copies.js --check >/dev/null 2>&1; then
+  if ! node game/tools/test-sim.js >/dev/null 2>&1 || ! node integration/tools/sync-copies.js --check >/dev/null 2>&1 || ! node sky/tools/build.mjs --check >/dev/null 2>&1; then
     echo "‼ בקרה נכשלה: העותק הזמני לא עובר לפני השבירה"; cd - >/dev/null; rm -rf "$T"; FAIL=1; return; fi
-  echo "✓ בקרה: לפני השבירה test-sim ו-sync --check עוברים"
+  echo "✓ בקרה: לפני השבירה test-sim, sync --check ו-build --check של השמיים עוברים"
   # 1) שבירה פיזיקלית: שבירת אור באופק מוקטנת פי 10, מסונכרנת לכל העותקים → test-sim חייב להיכשל
   sed -i 's#-20.774 / Math.tan#-2.0774 / Math.tan#' integration/world/js/sim.js
   node integration/tools/sync-copies.js >/dev/null
@@ -45,8 +47,11 @@ canary() {
   # 2) סטיית עותק: שינוי ידני בעותק preview בלבד → sync --check חייב להיכשל
   echo "// שבירה מכוונת" >> preview/world/js/itm.js
   if node integration/tools/sync-copies.js --check >/dev/null 2>&1; then echo "‼ השער לא תפס סטיית עותק"; else echo "✓ סטיית עותק נתפסה (sync --check נכשל כמצופה)"; caught=$((caught+1)); fi
+  # 3) שמיים: שינוי ב-src בלי לבנות מחדש את dist → build.mjs --check חייב להיכשל
+  sed -i 's#export const D2R = Math.PI / 180;#export const D2R = Math.PI / 180.0001;#' sky/src/time.js
+  if node sky/tools/build.mjs --check >/dev/null 2>&1; then echo "‼ השער לא תפס dist ישן של השמיים"; else echo "✓ dist ישן של השמיים נתפס (build --check נכשל כמצופה)"; caught=$((caught+1)); fi
   cd - >/dev/null; rm -rf "$T"
-  [ $caught -eq 2 ] || FAIL=1
+  [ $caught -eq 3 ] || FAIL=1
 }
 
 case "${1:-unit}" in
