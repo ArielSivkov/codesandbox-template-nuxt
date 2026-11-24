@@ -4,6 +4,7 @@ shapely>=2.0
 pyproj>=3.6
 requests>=2.31
 scipy>=1.11        # vegetation (ndimage), merge_national (cKDTree)
+pillow>=10.0       # vegetation rasterisation (PIL.ImageDraw)
 # optional sources
 duckdb>=1.0        # Overture Maps buildings (GeoParquet on S3/Azure)
 osmium>=4.0        # Geofabrik .osm.pbf extracts (preferred in CI over Overpass)
