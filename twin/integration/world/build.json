@@ -87,5 +87,23 @@
    "GR4-low-no-tufts": "applied",
    "GR5-low-no-tufts-upd": "applied"
   }
+ },
+ "livestreet": {
+  "base": "world",
+  "added": [
+   "adapters/63-livestreet.js",
+   "adapters/63-livestreet.data.js",
+   "mods/vehicles (5 דגמים)"
+  ],
+  "patches": {
+   "BD3-hide": "already",
+   "VG1-expose": "already",
+   "FM1-pack": "already",
+   "FM2-unpack": "already",
+   "FM3-hint-range": "already",
+   "FM4-mats": "already",
+   "FM5-tex": "already",
+   "FM6-stripe": "already"
+  }
  }
 }

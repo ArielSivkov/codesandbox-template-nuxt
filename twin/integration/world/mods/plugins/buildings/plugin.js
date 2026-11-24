@@ -243,7 +243,7 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
       if (shops) flagsInf.push('חנויות בקומת הקרקע (משוער: חזית לשדרה)');
     }
     const flags = TY.facadeFlags(cls.code, seed, shops);
-    if (hint) { const hm = hint.m != null ? hint.m : hint.material; const mi = typeof hm === 'number' ? hm : MAT_NAME[String(hm || '').toLowerCase()]; if (mi != null && mi >= 0 && mi <= 3) flags.mat = mi; }
+    if (hint) { const hm = hint.m != null ? hint.m : hint.material; const mi = typeof hm === 'number' ? hm : MAT_NAME[String(hm || '').toLowerCase()]; if (mi != null && mi >= 0 && mi <= 7) flags.mat = mi; }
     const villa = cls.code === T.VILLA;
     const rs = hint ? String(hint.rs || hint.roof || '').toLowerCase() : '';
     const pitched = rs ? /gabl|hip|pyram|tile|pitch|mansard|gambrel/.test(rs) && o.wid >= 3 : villa && o.wid >= 4 && o.wid <= 22 && o.len <= 40;

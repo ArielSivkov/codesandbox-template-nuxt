@@ -142,8 +142,8 @@ function roofKit(code, floors, area, h, seed) {
 
 // ---------- אריזה לשיידר (Int16) ----------
 /* afc.z = code | floors<<4 | pil<<10 | shop<<11 | mat<<12  (≤ 14 ביטים) */
-function pack(code, floors, flags) { return (code & 15) | (Math.min(63, Math.max(0, floors | 0)) << 4) | ((flags.pil & 1) << 10) | ((flags.shop & 1) << 11) | ((flags.mat & 3) << 12); }
-function unpack(p) { return { code: p & 15, floors: (p >> 4) & 63, pil: (p >> 10) & 1, shop: (p >> 11) & 1, mat: (p >> 12) & 3 }; }
+function pack(code, floors, flags) { return (code & 15) | (Math.min(63, Math.max(0, floors | 0)) << 4) | ((flags.pil & 1) << 10) | ((flags.shop & 1) << 11) | ((flags.mat & 7) << 12); }
+function unpack(p) { return { code: p & 15, floors: (p >> 4) & 63, pil: (p >> 10) & 1, shop: (p >> 11) & 1, mat: (p >> 12) & 7 }; }
 
 // ---------- רובעים ----------
 /* אין גבולות רובעים באריחים הנוכחיים – לכן quarterOf מחזיר null עד שהצינור יוסיף שדה q (ראו pipeline/typology.py).

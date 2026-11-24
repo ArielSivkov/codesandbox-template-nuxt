@@ -50,7 +50,11 @@ vec3 eshEmit = vec3(0.0);
       wallC *= 0.97 + 0.06 * s1; }
     else if (matId < 1.5) wallC = mix(vec3(0.86, 0.80, 0.68), vec3(0.92, 0.88, 0.79), s1);
     else if (matId < 2.5) wallC = mix(vec3(0.64, 0.64, 0.62), vec3(0.74, 0.73, 0.70), s1);
-    else wallC = mix(vec3(0.40, 0.50, 0.56), vec3(0.50, 0.59, 0.65), s1);
+    else if (matId < 3.5) wallC = mix(vec3(0.40, 0.50, 0.56), vec3(0.50, 0.59, 0.65), s1);
+    else if (matId < 4.5) wallC = vec3(0.92, 0.91, 0.87) * (0.98 + 0.04 * s1);   // 4 טיח לבן מחוספס (מועדון השחמט, 061/063)
+    else if (matId < 5.5) wallC = mix(vec3(0.47, 0.45, 0.43), vec3(0.56, 0.54, 0.51), s1);   // 5 טיח אפור כהה — וילה מודרנית (062)
+    else if (matId < 6.5) wallC = mix(vec3(0.84, 0.78, 0.66), vec3(0.90, 0.85, 0.74), s1);   // 6 בלוק ישן בז' (055)
+    else wallC = mix(vec3(0.88, 0.85, 0.77), vec3(0.93, 0.90, 0.83), s1);   // 7 אבן בהירה (מגדלי הדקל) + פס חום
     float fade = (1.0 - smoothstep(uNear, uFar, vDist)) * uDetail;
     vec3 alb = wallC;
     if (vNy > 0.7) {
@@ -65,9 +69,10 @@ vec3 eshEmit = vec3(0.0);
       if (uHasTex > 0.5) {
 #endif
         vec2 tuv = vec2(u, vY);
-        float tx = matId < 0.5 ? texture2D(uTexP, tuv).g / 0.78 : (matId < 1.5 ? texture2D(uTexS, tuv / 1.2).g / 0.62 : 1.0);
+        float tx = (matId < 0.5 || (matId > 3.5 && matId < 6.5)) ? texture2D(uTexP, tuv).g / 0.78 : ((matId < 1.5 || matId > 6.5) ? texture2D(uTexS, tuv / 1.2).g / 0.62 : 1.0);
         alb *= mix(1.0, tx, 0.6 * (1.0 - smoothstep(120.0, 700.0, vDist)) + 0.08);
       }
+      if (matId > 6.5 && fract(u / 13.0) < 0.11) alb *= vec3(0.60, 0.46, 0.36);   // פס חום אנכי (מגדלי הדקל)
       ${glslParams()}
       float nb = (L < 2.0 || ww <= 0.0) ? 0.0 : max(1.0, floor(L / bay + 0.5));
       float bw = nb > 0.0 ? L / nb : 1.0;
