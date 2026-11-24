@@ -19,8 +19,8 @@
  "glintTilt_deg": 31.5,
  "windowLightProbability": 0.365,
  "render": {
-  "s2400": 0.89,
-  "s8k": 5.231,
+  "s2400": 1.334,
+  "s8k": 8.956,
   "fonts": {
    "heebo": true,
    "frank": true
@@ -32,16 +32,16 @@
   "notes": [],
   "counts": {
    "coastSegments": 7,
-   "windows": 4550,
-   "windowsLit": 1714,
-   "windowLitShare": 0.377,
+   "windows": 3030,
+   "windowsLit": 1185,
+   "windowLitShare": 0.391,
    "buildings": 120
   },
   "moonShadow": {
    "per_m": 0.16491973114255104,
    "toward_az": 348.09064212894225
   },
-  "colBottom": 960,
+  "colBottom": 976.25,
   "layout": {
    "s": 2.56,
    "EL": 34,
@@ -57,14 +57,14 @@
    608
   ],
   "focusY": 1,
-  "p99Outside": 0.0573,
+  "p99Outside": 0.0565,
   "limit": 0.35,
-  "ratio": 0.0573,
+  "ratio": 0.0565,
   "pass": true,
   "maxOutside": 0.5565,
   "pixelsOutsideOver055": 1,
-  "meanY": 0.011,
-  "quietShareY<0.02": 0.921
+  "meanY": 0.0109,
+  "quietShareY<0.02": 0.922
  },
  "data": {
   "source": {

@@ -117,14 +117,15 @@ const labels = {
     { t: `מסגרת: ${ltr('ITM')} = דגימה + ${ltr('(1507.82, 757.76)')} ${pm('0.56')} מ׳` },
     { t: `שמש, ירח ושמיים: ${ltr('sky.js')} ${STYLE.version}, נבדק מול ${ltr('PyEphem')} · לוח עברי: ${ltr('pyluach')}`, gap: 20 },
     { t: `גרעין סגנון ${STYLE.kernel} · זרע 5787 · ${ltr('night|2026-11-23|22')}`, size: 11.5, fill: STYLE.palette.roles.hairline.night, a: 0.72, w: 500, gap: 15 },
-    { t: 'השראה לסוכנים, לא מדידה. אין בלוח זה זכות כלשהי בקרקע האמיתית.', size: 10.5, a: 0.5 },
+    { t: 'גוונים, חריטה וחלונות — סגנון הגרעין: השראה, לא מדידה.', size: 10.5, a: 0.55, gap: 13 },
+    { t: 'לוח השראה לסוכנים. אין בלוח זה זכות כלשהי בקרקע האמיתית.', size: 10.5, a: 0.55 },
   ],
   callouts: [
     { id: twins.find(b => b.id !== fb.id).id, at: 'top', dx: 70, dy: -56, lines: [{ t: 'מגדלי הדקל', serif: true, size: 15, fill: kernel.roles.hairline, a: 0.75 }, { t: `${num(twins[0].h_m)} מ׳ ${pm(twins[0].sigma_m)} כל אחד · משוער מתמונות שטח (P)`, size: 11.5 }] },
     { id: midr.id, at: 'top', dx: -60, dy: -34, lines: [{ t: `מגדל המדרחוף · ${num(midr.h_m)} מ׳ ${pm(midr.sigma_m)} (R)`, size: 11.5 }, { t: `טביעת הרגל בנתונים ${Math.round(midr.area_m2)} מ״ר — לבדיקה`, size: 10.5, a: 0.55 }] },
     { id: typical.id, at: 'top', dx: -70, dy: 172, lines: [{ t: `בית טיפוסי: ${num(typical.h_m)} מ׳ ${pm(typical.sigma_m)} · ${num(typical.floors)} קומות (R)`, size: 11.5 }, { t: 'גובה מכלל אצבע — הטבעת המנוקדת היא h+σ', size: 10.5, a: 0.55 }] },
   ],
-  sea: { u: -215, v: 350, title: 'הים התיכון', note: 'קו החוף בדגימה סינתטי — סכמטי' },
+  sea: { u: -215, v: 392, title: 'הים התיכון', note: 'קו החוף בדגימה סינתטי — סכמטי' },
   section: `חתך פני הקרקע (${ltr('SRTM')}); מתחתיו — סכמטי`,
   roadNames: [{ name: 'הטיילת', at: 45 }, { name: 'שדרות משה דיין', at: 50 }],
   col: { x0: slabRight + 46, x1: W - 34, y0: 40, y1: H - 40 },
@@ -197,6 +198,10 @@ for name, box in {"towers": (2600, 1560, 4520, 3140), "sea": (300, 300, 2220, 13
     im.crop(box).save(${JSON.stringify(WORK)} + "/crop8k_" + name + ".png")
 `]);
 }
+
+// lossless re-compression (PIL optimize): same pixels, about half the bytes — the 8K master stays under ~7 MB
+const pngs = [out1, ...(r8 ? [path.join(HERE, 'night_8k.png')] : [])];
+execFileSync('python3', ['-I', '-c', 'import sys\nfrom PIL import Image\nfor p in sys.argv[1:]:\n    im = Image.open(p); im.load(); im.save(p, optimize=True)', ...pngs]);
 
 const qa = {
   plate: 'night', moment: MOMENT, local: `${lt.date_he} ${lt.hhmm}`, hebrewDate, area: AREA.id,

@@ -1,0 +1,271 @@
+{
+ "plate": "noon",
+ "moment": "2026-11-24T09:28:05.508Z",
+ "local": "24.11.2026 11:28:06",
+ "hebrewDate": "י״ד בכסלו תשפ״ז",
+ "weekday": "שלישי",
+ "area": "ashdod-tayelet-dekel-v0",
+ "sun": {
+  "alt": 37.6121,
+  "altApparent": 37.6339,
+  "az": 180,
+  "azGrid": 180.298,
+  "hourAngle": 0.0000018274693047715118
+ },
+ "gridConvergence_deg": 0.298,
+ "ephemCheck": {
+  "transit_utc": "2026/11/24 09:28:05",
+  "alt_deg": 37.61051521185067,
+  "az_deg": 180.00000500895632,
+  "ephem": "4.2.1"
+ },
+ "shadow": {
+  "per_m": 1.2969,
+  "toward_true_az": 0,
+  "toward_grid_az": 0.298,
+  "dir_uv": [
+   0.86861,
+   0.49549
+  ]
+ },
+ "noonLine": {
+  "gnomon": "w1013192689",
+  "base_uv": [
+   35.81,
+   -84.67,
+   16.75
+  ],
+  "tip_uvz": [
+   151.73,
+   -18.55,
+   13.8
+  ],
+  "on": {
+   "on": "ground",
+   "kind": "ground"
+  },
+  "length_m": 133.45,
+  "length_lo_m": 122.75,
+  "length_hi_m": 144.17,
+  "height_m": 100,
+  "sigma_m": 8,
+  "azimuth_error_deg": 7.11e-15
+ },
+ "times_local": {
+  "astronomicalDawn": "04:52",
+  "nauticalDawn": "05:21",
+  "civilDawn": "05:51",
+  "blueHourMorningStart": "05:41",
+  "blueHourMorningEnd": "06:01",
+  "sunrise": "06:17",
+  "goldenHourMorningEnd": "06:53",
+  "goldenHourEveningStart": "16:02",
+  "sunset": "16:38",
+  "blueHourEveningStart": "16:54",
+  "blueHourEveningEnd": "17:14",
+  "civilDusk": "17:04",
+  "nauticalDusk": "17:34",
+  "astronomicalDusk": "18:03",
+  "solarNoon": "11:28"
+ },
+ "dayLength_min": 621,
+ "glintTilt_deg": 50.2,
+ "tones": {
+  "paper": "#F3EFE6",
+  "ref": "#F4F4F0",
+  "gamma": {
+   "surface": 0.22,
+   "sand": 0.4,
+   "sea": 0.15,
+   "road": 0.06,
+   "section": 0.18
+  },
+  "C": {
+   "paper": "#F3EFE6",
+   "ink": "#2A3044",
+   "hairline": "#8C7A55",
+   "region": "#6E5F42",
+   "silver": "#5E6C88",
+   "grid": "#9DB0C8",
+   "pearl": "#FBF4E2",
+   "groundUrban": "#F3EFE6",
+   "groundSand": "#F2E8D4",
+   "groundGreen": "#F3EFE6",
+   "groundShadow": "#DCDCD8",
+   "mulGround": "#E7EBF0",
+   "road": "#E6E3DB",
+   "seaNear": "#D4E2DB",
+   "seaFar": "#C8D9DA",
+   "foam": "#EEF2F2",
+   "section": "#DAD4C8",
+   "focusFill": "#E3A33A",
+   "focusEdge": "#1A1408",
+   "text": {
+    "focus": "#1A1408",
+    "headline": "#1A1408",
+    "sub": "#5A4A2E",
+    "secondary": "#4A4E63",
+    "muted": "#6E7084",
+    "queue": "#5E6680",
+    "cartouche": "#3A3020"
+   }
+  }
+ },
+ "render": {
+  "s2400": 1.163,
+  "s8k": 6.835,
+  "fonts": {
+   "heebo": true,
+   "frank": true
+  },
+  "errors": [],
+  "logs": []
+ },
+ "page": {
+  "notes": [],
+  "counts": {
+   "greenDots": 11347,
+   "coastSegments": 11,
+   "walls": 240,
+   "wallsSelfShadow": 35,
+   "wallCast": 133,
+   "roofCast": 42,
+   "buildings": 120,
+   "words": 92
+  },
+  "layout": {
+   "elev": [
+    1335,
+    1143.575,
+    543,
+    144.42499999999995
+   ],
+   "dial": [
+    1930,
+    260,
+    424,
+    112
+   ],
+   "colBottom": 1127,
+   "colOverflow": false,
+   "outside": []
+  },
+  "tones": {
+   "mulGround": "#E7EBF0"
+  },
+  "sectionDatum_m": 19,
+  "ms": {
+   "scene": 563,
+   "total": 583
+  }
+ },
+ "budget": {
+  "test": "day: |Y - Y(paper)|; words exempt (see known issues: 4.5:1 text vs 35% budget)",
+  "size_tested": [
+   1080,
+   608
+  ],
+  "paperY": 0.865,
+  "focusContrast": 0.855,
+  "p99Outside": 0.2939,
+  "limit": 0.2992,
+  "ratio": 0.3437,
+  "pass": true,
+  "shareOverLimit": 0.0091,
+  "withWords": {
+   "p99Outside": 0.3697,
+   "ratio": 0.4324,
+   "pass": false
+  },
+  "maxOutside": 0.7918,
+  "largestHighContrast": [
+   {
+    "px": 141,
+    "inMask": 1
+   },
+   {
+    "px": 69,
+    "inMask": 1
+   }
+  ],
+  "componentsPass": true,
+  "meanY": 0.806,
+  "quietShare_contrast<0.08": 0.726
+ },
+ "data": {
+  "area_json": {
+   "file": "plates/data/area.json",
+   "source": {
+    "repo_branch": "twin-world",
+    "commit": "4fd64eea4456f3eca18cddff8605010817f35baf",
+    "tiles_path": "twin/integration/world/data/tiles",
+    "tiles": [
+     "163_633",
+     "163_634",
+     "164_633",
+     "164_634"
+    ],
+    "manifest": "twin/integration/world/data/cities/ashdod/manifest.json",
+    "manifest_built_at": "2026-11-22T22:00:24Z",
+    "manifest_sources": {
+     "osm": "sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+     "dem": "SRTM grid embedded in current map (DSM, 2000)"
+    },
+    "manifest_attribution": "SRTM grid embedded in current map (DSM, 2000) | sample embedded in current map (Geofabrik free extract) + SYNTHETIC coastline",
+    "manifest_sigma_m": {
+     "M_laser": 0.3,
+     "M_lidar": 0.5,
+     "M_floors": null,
+     "O_3d": 1,
+     "H_osm": 1.5,
+     "L_osm": null,
+     "V_overture": 4,
+     "S_ai": null,
+     "P_plan": null,
+     "G_gba": 8.9,
+     "F_globfp": 14.6,
+     "D_ndsm": 6.92,
+     "B_ghsl": 8,
+     "N_knn": null,
+     "R_rule": 6
+    },
+    "crs": "EPSG:2039 (sample frame: real ITM = sample + offset)"
+   },
+   "stats": {
+    "buildings": 120,
+    "cut": 11,
+    "roads": 56,
+    "sea_polys": 2,
+    "src": {
+     "P": 2,
+     "R": 118
+    },
+    "max_h_m": 100
+   }
+  },
+  "landcover_json": {
+   "file": "plates/data/landcover.json",
+   "source": {
+    "repo_branch": "twin-world",
+    "commit": "4fd64eea4456f3eca18cddff8605010817f35baf",
+    "files": [
+     "twin/integration/world/mods/vegetation/data/tiles/g/163_633.json.gz",
+     "twin/integration/world/mods/vegetation/data/tiles/g/163_634.json.gz",
+     "twin/integration/world/mods/vegetation/data/tiles/g/164_633.json.gz",
+     "twin/integration/world/mods/vegetation/data/tiles/g/164_634.json.gz"
+    ],
+    "contract": "twin/vegetation/README.txt (tiles/g: lc 100×100 uint8, row 0 = north, class | 0x80 = estimated)"
+   },
+   "counts": {
+    "0": 1490,
+    "14": 452,
+    "12e": 636,
+    "2e": 891,
+    "13e": 295,
+    "15e": 203,
+    "6e": 388
+   }
+  },
+  "note": "tiles and manifest are byte-identical at twin-world 735c5ff (checked with git diff on 24.11.2026)"
+ }
+}

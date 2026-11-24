@@ -1562,9 +1562,9 @@
    "othersMaxFractionOfFocus": 0.35,
    "metric": "relative luminance Y (WCAG, linear sRGB)",
    "test_he": "מקטינים ל-1080 פיקסלים רוחב. האחוזון ה-99 של Y מחוץ למסכת המוקד ≤ 0.35 × Y(ליבת המוקד). חמשת הרכיבים הבהירים הגדולים (Y > 0.55, שטח ≥ 40px) כולם בתוך מסכת המוקד.",
-   "dayTest_he": "ביום: אותו כלל על ניגודיות מקומית |Y − Y(רקע)| במקום Y.",
+   "dayTest_he": "ביום: אותו כלל על ניגודיות |Y − Y(נייר)| במקום Y (background באפשרויות). אותיות של טקסט ומפתחות צבע במקרא פטורות (exempt), כי קריאוּת (WCAG 4.5:1) לא נכנסת ב-35% מניגודיות המוקד; כל השאר, כולל צללים וקווים, נבדק.",
    "exempt_he": "דיסקת הירח בגודל אמיתי וכוכבים בהירים מ-1.5 (אמת). מותר לטנן אותם, בתנאי שסדר הבהירות נשמר.",
-   "helper": "sky.js → brightnessBudget(rgba, width, height, isFocal)"
+   "helper": "sky.js → brightnessBudget({data, width, height}, isFocal(x, y), {fraction, exempt(x, y), background, focusY})"
   },
   "clearing": {
    "expand_u": 20,

@@ -63,8 +63,23 @@
     ctx.strokeStyle = rgba(C.hairline, 0.22); ctx.strokeRect(R.x0, R.y0, R.x1 - R.x0, R.y1 - R.y0);
   }
 
-  // ───────── ground: terrain and sea cells (fill + same-colour stroke to hide seams)
-  for (const c of S.cells) { poly(c.pts); ctx.fillStyle = c.c; ctx.fill(); ctx.strokeStyle = c.c; ctx.lineWidth = 0.7; ctx.stroke(); }
+  // ───────── ground: terrain and sea cells (fill + same-colour stroke to hide seams).
+  // The cell colours carry approximated fields (glow occlusion, land cover — משוער), so they are shown
+  // as a soft field, not a 4 m mosaic: the crisp layer keeps the block's outline, and a copy blurred by
+  // about one cell is laid 'source-atop' over it (it never bleeds outside the block). Deterministic.
+  {
+    const g = document.createElement('canvas'); g.width = cv.width; g.height = cv.height;
+    const gc = g.getContext('2d'); gc.scale(dpr, dpr);
+    for (const c of S.cells) {
+      gc.beginPath(); gc.moveTo(c.pts[0][0], c.pts[0][1]); for (let i = 1; i < c.pts.length; i++) gc.lineTo(c.pts[i][0], c.pts[i][1]); gc.closePath();
+      gc.fillStyle = c.c; gc.fill(); gc.strokeStyle = c.c; gc.lineWidth = 0.7; gc.stroke();
+    }
+    const s = document.createElement('canvas'); s.width = cv.width; s.height = cv.height;
+    const sc = s.getContext('2d'); sc.drawImage(g, 0, 0);
+    sc.globalCompositeOperation = 'source-atop'; sc.filter = `blur(${(5 * dpr).toFixed(2)}px)`; sc.drawImage(g, 0, 0);
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(s, 0, 0); ctx.restore();
+    g.width = g.height = s.width = s.height = 0;     // free the two full-size layers (8K master)
+  }
 
   // sea engraving: horizontal hairlines, broken like wave crests (seeded)
   {
@@ -75,7 +90,7 @@
     const y0 = Math.min(...S.seaPolys.flat().map(p => p[1])), y1 = Math.max(...S.seaPolys.flat().map(p => p[1]));
     for (let y = y0 + 1; y < y1; y += 3.1 + r() * 0.6) {
       const k = (y - y0) / Math.max(1, y1 - y0);
-      ctx.strokeStyle = rgba(C.seaInk, 0.10 + 0.08 * k); ctx.lineWidth = hw(0.25 * u);
+      ctx.strokeStyle = rgba(C.seaInk, 0.12 + 0.10 * k); ctx.lineWidth = hw(0.25 * u);
       ctx.beginPath(); let x = S.block.x0 - 10;
       while (x < S.block.x1 + 10) { const L = 12 + r() * 70; const yy = y + (r() - 0.5) * 0.6; ctx.moveTo(x, yy); ctx.lineTo(x + L, yy + (r() - 0.5) * 0.3); x += L + 3 + r() * 14; }
       ctx.stroke();
@@ -86,21 +101,27 @@
   }
 
   // sand ripples (סכמטי)
-  ctx.strokeStyle = rgba(C.sandInk, 0.16); ctx.lineWidth = hw(0.25 * u);
+  ctx.strokeStyle = rgba(C.sandInk, 0.26); ctx.lineWidth = hw(0.25 * u);
   for (const p of S.ripples) { poly(p, false); ctx.stroke(); }
+  // greenery stipple (park, garden, open ground — land cover of the twin, משוער)
+  for (const [x, y, open] of S.stipple) { ctx.beginPath(); ctx.arc(x, y, open ? 0.55 : 0.75, 0, 2 * Math.PI); ctx.fillStyle = rgba(open ? C.openDot : C.greenDot, open ? 0.22 : 0.32); ctx.fill(); }
+
+  // soft long shadows toward the WNW: 45° hatch (kernel shadow direction), only on open ground
+  ctx.lineWidth = hw(0.38 * u);
+  for (const h of S.shadowHatch) { ctx.strokeStyle = rgba(C.shadowInk, h[4]); line([h[0], h[1]], [h[2], h[3]]); ctx.stroke(); }
 
   // contours every 2 m (SRTM, משוער) — every 10 m a little stronger
-  for (const c of S.contours) { ctx.strokeStyle = rgba(C.ink, c.lev % 10 === 0 ? 0.30 : 0.14); ctx.lineWidth = hw((c.lev % 10 === 0 ? 0.35 : 0.25) * u); line(c.a, c.b); ctx.stroke(); }
+  for (const c of S.contours) { ctx.strokeStyle = rgba(C.ink, c.lev % 10 === 0 ? 0.36 : 0.18); ctx.lineWidth = hw((c.lev % 10 === 0 ? 0.35 : 0.25) * u); line(c.a, c.b); ctx.stroke(); }
 
   // synthetic coastline: dashed hairline over a soft band
-  ctx.save(); ctx.strokeStyle = rgba(C.pearl, 0.07); ctx.lineWidth = 7; for (const [a, b] of S.coast) { line(a, b); ctx.stroke(); }
-  ctx.setLineDash([3, 3]); ctx.strokeStyle = rgba(C.pearl, 0.34); ctx.lineWidth = hw(0.3 * u); for (const [a, b] of S.coast) { line(a, b); ctx.stroke(); } ctx.restore();
+  ctx.save(); ctx.strokeStyle = rgba(C.pearl, 0.05); ctx.lineWidth = 9; ctx.beginPath(); for (const [a, b] of S.coast) { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); } ctx.stroke();
+  ctx.strokeStyle = rgba(C.pearl, 0.30); ctx.lineWidth = hw(0.3 * u); ctx.setLineDash([2.5, 3.5]); ctx.beginPath(); for (const [a, b] of S.coast) { ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); } ctx.stroke(); ctx.restore();
 
   // roads (OSM centre lines; widths schematic)
-  for (const r of S.roads) {
-    poly(r.pts, false); ctx.strokeStyle = rgba(C.roadEdge, 0.55); ctx.lineWidth = r.w + 1.2; ctx.stroke();
-    poly(r.pts, false); ctx.strokeStyle = C.road; ctx.lineWidth = r.w; ctx.stroke();
-  }
+  ctx.save(); ctx.lineCap = 'butt';
+  for (const r of S.roads) { poly(r.pts, false); ctx.strokeStyle = rgba(C.roadEdge, 0.35); ctx.lineWidth = r.w + 1.4; ctx.stroke(); }
+  for (const r of S.roads) { poly(r.pts, false); ctx.strokeStyle = C.road; ctx.lineWidth = r.w; ctx.stroke(); }
+  ctx.restore();
 
   // the block's front section (terrain down to sea level) — schematic strata
   {
@@ -137,28 +158,33 @@
     ctx.stroke(); ctx.restore();
   }
   const focusDrawn = [];
+  const vband = (q, color, alpha) => {           // soft band inside the wall: from h−σ (nothing) up to the nominal roof (alpha)
+    const ylo = (q[0][1] + q[1][1]) / 2, ytop = (q[2][1] + q[3][1]) / 2; if (Math.abs(ylo - ytop) < 0.5) return;
+    const g = ctx.createLinearGradient(0, ylo, 0, ytop); g.addColorStop(0, rgba(color, 0)); g.addColorStop(1, rgba(color, alpha));
+    poly(q); ctx.fillStyle = g; ctx.fill();
+  };
   for (const b of S.bldgs) {
+    const big = b.tower;
     for (const [wi, w] of b.walls.entries()) {
       poly(w.pts); ctx.fillStyle = w.c; ctx.fill(); ctx.strokeStyle = w.c; ctx.lineWidth = 0.5; ctx.stroke();
-      hatchVertical(w.pts, b.tower ? 2.6 : 3.2, C.wallInk, b.tower ? 0.16 : 0.12, `wall:${b.id}/${wi}`);
+      if (w.facing < 0.25) hatchVertical(w.pts, big ? 2.4 : 2.8, C.wallInk, big ? 0.22 : 0.16, `wall:${b.id}/${wi}`);   // walls turned from the light: shadow hatch
       if (w.lit) for (const L of w.lit) {
         poly(L.pts); ctx.fillStyle = w.litC; ctx.fill(); ctx.strokeStyle = w.litC; ctx.lineWidth = 0.4; ctx.stroke();
-        hatchVertical(L.pts, 3.6, C.litInk, 0.10, `lit:${b.id}/${wi}`);
+        hatchVertical(L.pts, 4.2, C.litInk, 0.07, `lit:${b.id}/${wi}`);
       }
-      ctx.strokeStyle = rgba(C.edge, 0.55); ctx.lineWidth = hw(0.25 * u); line(w.pts[0], w.pts[3]); ctx.stroke(); line(w.pts[1], w.pts[2]); ctx.stroke();
     }
-    // roof
+    // roof: flat tone (the measured OSM footprint at the nominal height)
     poly(b.roof); ctx.fillStyle = b.roofC; ctx.fill(); ctx.strokeStyle = b.roofC; ctx.lineWidth = 0.4; ctx.stroke();
-    hatchDiag(b.roof, 3.4, C.wallInk, 0.10);
-    // height uncertainty: a soft band from h−σ to h+σ on the visible walls, and a dotted roof at h+σ
-    for (let i = 0; i < b.bandHi.length; i++) {
-      const j = (i + 1) % b.bandHi.length; const q = [b.bandLo[i], b.bandLo[j], b.bandHi[j], b.bandHi[i]];
-      if (q[2][1] > q[1][1] - 0.5 && q[3][1] > q[0][1] - 0.5) continue;
-      poly(q); ctx.fillStyle = rgba(C.band, b.tower ? 0.07 : 0.05); ctx.fill();
-    }
-    ctx.save(); ctx.setLineDash([1.2, 2.4]); ctx.strokeStyle = rgba(C.band, b.tower ? 0.42 : 0.24); ctx.lineWidth = hw(0.25 * u); poly(b.bandHi); ctx.stroke(); ctx.restore();
-    // measured footprint (OSM) is the sharp line: the roof outline repeats it, crisp but thin
-    ctx.strokeStyle = rgba(C.edge, 0.7); ctx.lineWidth = hw(0.3 * u); poly(b.roof); ctx.stroke();
+    // edges: corners and roof outline — thin, crisp (footprint = measured)
+    ctx.strokeStyle = rgba(C.edge, big ? 0.6 : 0.42); ctx.lineWidth = hw(0.28 * u);
+    for (const w of b.walls) { line(w.pts[0], w.pts[3]); ctx.stroke(); line(w.pts[1], w.pts[2]); ctx.stroke(); }
+    poly(b.roof); ctx.stroke();
+    // height uncertainty: soft 2σ band at the top of the visible walls + dotted error bars on the corners
+    for (const w of b.walls) vband(w.band, C.band, big ? 0.14 : 0.09);
+    ctx.save(); ctx.setLineDash([1.1, 2.2]); ctx.strokeStyle = rgba(C.band, big || b.name ? 0.6 : 0.2); ctx.lineWidth = hw(0.3 * u);
+    const bars = big || b.name ? b.walls.flatMap(w => w.bars) : b.walls.slice(0, 1).flatMap(w => w.bars.slice(0, 1));   // small buildings: one error bar
+    for (const [lo, hi] of bars) { line(lo, hi); ctx.stroke(); }
+    ctx.restore();
     // the one focal line: the first light on the Dekel towers (computed terminator), gilded ink (sky.focus.mode = ink)
     if (b.tower) for (const f of S.focusRuns.filter(f => f.id === b.id)) {
       ctx.save();
@@ -204,7 +230,7 @@
     line([r.x, r.y(0)], [r.x, r.y(r.max)]); ctx.stroke();
     for (let z = 0; z <= r.max; z += 10) { line([r.x, r.y(z)], [r.x + (z % 50 ? 4 : 8), r.y(z)]); ctx.stroke(); }
     // terminator range on the ruler
-    ctx.strokeStyle = C.focusFill; ctx.globalAlpha = 0.45; ctx.lineWidth = 2;
+    ctx.strokeStyle = C.brass; ctx.globalAlpha = 0.8; ctx.lineWidth = 2;
     line([r.x - 3, r.y(r.term[0])], [r.x - 3, r.y(r.term[1])]); ctx.stroke(); ctx.globalAlpha = 1;
     // tower tops ±σ
     for (const t of r.tops) { ctx.fillStyle = rgba(C.band, 0.18); ctx.fillRect(r.x + 10, r.y(t.top + t.sigma), 6, r.y(t.top - t.sigma) - r.y(t.top + t.sigma)); ctx.strokeStyle = rgba(C.pearl, 0.6); line([r.x + 9, r.y(t.top)], [r.x + 17, r.y(t.top)]); ctx.stroke(); }

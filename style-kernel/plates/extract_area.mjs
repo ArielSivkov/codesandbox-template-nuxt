@@ -114,6 +114,9 @@ function clipLine(pts) {                      // Liang–Barsky per segment, joi
 }
 const area2 = p => { let s = 0; for (let i = 0; i < p.length; i++) { const a = p[i], b = p[(i + 1) % p.length]; s += a[0] * b[1] - b[0] * a[1]; } return s / 2; };
 
+// Privacy (kernel rule 6): twin names can carry field-photo references, e.g. 'מגדלי הדקל (משוער מתמונות 069, 071)'.
+// Keep the public name only; the source letter (P) already says the height is estimated from photos.
+const cleanName = n => String(n || '').replace(/\s*\([^)]*(?:תמונ|photo|IMG|DSC)[^)]*\)/gi, '').trim();
 const buildings = [], roads = [], sea = [];
 const CONF = ['מאומת', 'גבוה', 'בינוני', 'נמוך'];
 for (const k of keys) {
@@ -123,7 +126,7 @@ for (const k of keys) {
     const cut = clipPoly(ring);
     if (cut.length < 3 || Math.abs(area2(cut)) < 2) continue;
     const wasCut = Math.abs(Math.abs(area2(cut)) - Math.abs(area2(ring))) > 0.5;
-    buildings.push({ id: b.i, tile: k, name: b.n || '', type: b.t || '', area_m2: b.a, base_m: b.z / 10, h_m: b.h / 10, sigma_m: b.s / 10,
+    buildings.push({ id: b.i, tile: k, name: cleanName(b.n), type: b.t || '', area_m2: b.a, base_m: b.z / 10, h_m: b.h / 10, sigma_m: b.s / 10,
       floors: b.f, floors_lo: b.fl, floors_hi: b.fh, src: b.src, used: b.u, conf: CONF[b.c] ?? String(b.c), cut: wasCut,
       ring_uv: cut.map(p => [r1(p[0]), r1(p[1])]) });
   }

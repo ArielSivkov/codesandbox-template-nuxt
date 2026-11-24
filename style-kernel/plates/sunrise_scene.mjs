@@ -111,7 +111,8 @@ export function buildScene(opt) {
   const allB = [], roadsW = [], seaW = [];
   for (const k of keys) {
     const j = vt[k], [ox, oy] = j.o;
-    for (const b of j.b) allB.push({ id: b.i, name: b.n || '', ring: decRing(b.r[0], ox, oy), base: b.z / 10, h: b.h / 10, sigma: b.s / 10,
+    // privacy (kernel rule 6): drop field-photo references from twin names
+    for (const b of j.b) allB.push({ id: b.i, name: String(b.n || '').replace(/\s*\([^)]*(?:תמונ|photo|IMG|DSC)[^)]*\)/gi, '').trim(), ring: decRing(b.r[0], ox, oy), base: b.z / 10, h: b.h / 10, sigma: b.s / 10,
       src: b.src, conf: CONF[b.c] ?? String(b.c), floors: b.f, area: b.a, tile: k });
     for (const r of j.rd || []) roadsW.push({ cls: r.c, name: r.n || '', line: decRing(r.r, ox, oy) });
     for (const s of j.sea || []) seaW.push(decRing(s[0], ox, oy));
@@ -141,7 +142,12 @@ export function buildScene(opt) {
       }
     }
   }
-  for (const b of allB) fillPoly(b.ring, b.base + b.h);
+  // everything except the tall buildings (h ≥ 40 m): to separate the long soft shadows of the towers
+  const TALL = 40;
+  for (const b of allB) if (b.h < TALL) fillPoly(b.ring, b.base + b.h);
+  const HT = Float32Array.from(HR);
+  for (const b of allB) if (b.h >= TALL) fillPoly(b.ring, b.base + b.h);
+  const htAt = (x, y) => { const i = Math.floor((x - rx0) / CELL), j = Math.floor((y - ry0) / CELL); return i < 0 || j < 0 || i >= RNX || j >= RNY ? -1e9 : HT[j * RNX + i]; };
   const hAt = (x, y) => { const i = Math.floor((x - rx0) / CELL), j = Math.floor((y - ry0) / CELL); return i < 0 || j < 0 || i >= RNX || j >= RNY ? -1e9 : HR[j * RNX + i]; };
 
   // terminator: the height above which a point sees the sun's upper limb (rays at rayAlt, Earth curvature with k = 0.13)
@@ -155,20 +161,20 @@ export function buildScene(opt) {
     return best;
   }
   // horizon angle (deg) seen from (E,N,z0) toward azimuth az
-  function horizon(E, N, z0, az, dmax = 1500) {
-    const sx = Math.sin(az * D2R), sy = Math.cos(az * D2R); let best = 0;
+  function horizon(E, N, z0, az, dmax = 1500, terrainOnly = false) {
+    const sx = Math.sin(az * D2R), sy = Math.cos(az * D2R), look = terrainOnly ? htAt : hAt; let best = 0;
     for (let d = 3; d < dmax; d += d < 200 ? 3 : d < 600 ? 6 : 12) {
-      const h = hAt(E + sx * d, N + sy * d); if (h < -1e8) continue;
+      const h = look(E + sx * d, N + sy * d); if (h < -1e8) continue;
       const a = Math.atan2(h - z0 - d * d * CURV, d); if (a > best) best = a;
     }
     return best * R2D;
   }
   // share of the sunrise glow (low eastern sky around the sun) hidden from a point — a soft long shadow toward WNW.
-  // Model (משוער): glow weight exp(−(Δaz/25°)²) × exp(−elev/6°), 11 azimuths ±50°.
-  const GLOW = [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50].map(da => ({ az: sunAz + da, w: Math.exp(-((da / 25) ** 2)) }));
-  const GW = GLOW.reduce((s, g) => s + g.w, 0);
-  function glowOcc(E, N, z0) {
-    let s = 0; for (const g of GLOW) s += g.w * (1 - Math.exp(-horizon(E, N, z0 + 0.5, g.az) / 6)); return s / GW;
+  // Model (משוער): glow weight exp(−(Δaz/20°)²) × exp(−elev/5°), 41 azimuths ±40°; the glow is 70% of the dawn ambient.
+  const GLOW = []; for (let da = -40; da <= 40; da += 2) GLOW.push({ az: sunAz + da, w: Math.exp(-((da / 20) ** 2)) });
+  const GW = GLOW.reduce((s, g) => s + g.w, 0), GLOW_ELEV = 5, GLOW_SHARE = 0.7;
+  function glowOcc(E, N, z0, terrainOnly = false) {
+    let s = 0; for (const g of GLOW) s += g.w * (1 - Math.exp(-horizon(E, N, z0 + 0.5, g.az, 1500, terrainOnly) / GLOW_ELEV)); return s / GW;
   }
 
   // ---------- projection to plate pixels (parallel, camera at area.view_suggested)
@@ -217,12 +223,13 @@ export function buildScene(opt) {
   // ---------- materials and light (style.json; inspiration, not measurement)
   const M = style.materials.items, roles = style.palette.roles;
   const amb = sky.ambient, sun = sky.sunLight;
-  // ambient split: 45% of the dawn ambient comes from the low glow around the sun (משוער) — occluded by glowOcc
-  const ambientK = (occ, facing = 0.5) => (0.55 + 0.45 * (1 - occ)) * (0.8 + 0.4 * facing);
-  const lightHex = (base, { occ = 0, facing = 0.5, direct = 0 } = {}) => {
+  // ambient split: 70% of the dawn ambient comes from the low glow around the sun (משוער) — occluded by glowOcc;
+  // surfaces facing the sun's azimuth see more of it (facing 0…1)
+  const ambientK = (occ, facing = 0.5) => (1 - GLOW_SHARE * occ) * (0.7 + 0.5 * facing);
+  const lightHex = (base, { occ = 0, facing = 0.5, direct = 0, tint = 0.5 } = {}) => {
     const b = lin(base), a = lin(amb.hex), s = lin(sun.hex), ka = amb.intensity * ambientK(occ, facing), ks = sun.intensity * direct * 1.1;
     let hex = hexOf(b.map((v, i) => v * (a[i] * ka + s[i] * ks)));
-    if (direct <= 0) hex = mix(hex, sky.shadowTint.hex, sky.shadowTint.alpha * 0.5);
+    if (direct <= 0) hex = mix(hex, sky.shadowTint.hex, sky.shadowTint.alpha * tint);
     return hex;
   };
   const EXPO = opt.exposure ?? 1.0;          // one global exposure for the plate (documented in the cartouche)
@@ -236,6 +243,8 @@ export function buildScene(opt) {
   };
 
   // ---------- ground grid (4 m nodes over the area)
+  // Land cover (10 m) and the land mask (10 m, synthetic coast) are coarse: their edges are drawn as soft bands
+  // (blur ≈ 8 m for land cover, ≈ 16 m for the coast) — the kernel's way of drawing what is approximate.
   const G = 4, GU = Math.round((U1 - U0) / G), GV = Math.round((V1 - V0) / G);
   const node = [];
   for (let j = 0; j <= GV; j++) for (let i = 0; i <= GU; i++) {
@@ -243,30 +252,57 @@ export function buildScene(opt) {
     node.push({ u, v, E, N, z, land });
   }
   const nd = (i, j) => node[j * (GU + 1) + i];
+  const NC = GU * GV, landF = new Float32Array(NC), cellZ = new Float32Array(NC), cls = new Uint8Array(NC);
+  const baseLin = [new Float32Array(NC), new Float32Array(NC), new Float32Array(NC)];
+  let sandCells = 0, landCells = 0;
+  for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) {
+    const k = j * GU + i, u = U0 + (i + 0.5) * G, v = V0 + (j + 0.5) * G;
+    let lf = 0; for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const [E, N] = toEN(u + a * G / 4, v + b * G / 4); if (landAt(E, N)) lf += 0.25; }
+    landF[k] = lf;
+    const [E, N] = toEN(u, v), lc = lcAt(E, N); cls[k] = lc.cls;
+    if (lf > 0.5) { landCells++; if (lc.cls === 5 || lc.cls === 6 || lc.cls === 15) sandCells++; }
+    const q = [nd(i, j), nd(i + 1, j), nd(i + 1, j + 1), nd(i, j + 1)];
+    cellZ[k] = q.reduce((s, n) => s + n.z, 0) / 4;
+    const bl = lin(groundBase(lc.cls)); baseLin[0][k] = bl[0]; baseLin[1][k] = bl[1]; baseLin[2][k] = bl[2];
+  }
+  function blur(arr, r) {                       // separable box blur ×2 (≈ gaussian), clamped edges
+    let a = Float32Array.from(arr), t = new Float32Array(NC);
+    for (let pass = 0; pass < 2; pass++) {
+      for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) { let s = 0, n = 0; for (let d = -r; d <= r; d++) { const ii = i + d; if (ii < 0 || ii >= GU) continue; s += a[j * GU + ii]; n++; } t[j * GU + i] = s / n; }
+      for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) { let s = 0, n = 0; for (let d = -r; d <= r; d++) { const jj = j + d; if (jj < 0 || jj >= GV) continue; s += t[jj * GU + i]; n++; } a[j * GU + i] = s / n; }
+    }
+    return a;
+  }
+  const landS = blur(landF, 2), baseS = baseLin.map(ch => blur(ch, 1));
+  // glow occlusion on an 8 m lattice (bilinear to the 4 m cells)
+  const OU = Math.ceil((U1 - U0) / 8), OV = Math.ceil((V1 - V0) / 8), occL = new Float32Array((OU + 1) * (OV + 1)), occTL = new Float32Array((OU + 1) * (OV + 1));
+  for (let j = 0; j <= OV; j++) for (let i = 0; i <= OU; i++) {
+    const u = Math.min(U1, U0 + i * 8), v = Math.min(V1, V0 + j * 8), [E, N] = toEN(u, v), z = landAt(E, N) ? (zAt(E, N) ?? 0) : 0;
+    occL[j * (OU + 1) + i] = glowOcc(E, N, z); occTL[j * (OU + 1) + i] = glowOcc(E, N, z, true);
+  }
+  const lat8 = L => (u, v) => { const fx = clamp((u - U0) / 8, 0, OU - 1e-6), fy = clamp((v - V0) / 8, 0, OV - 1e-6), i = Math.floor(fx), j = Math.floor(fy), ax = fx - i, ay = fy - j, o = (a, b) => L[b * (OU + 1) + a];
+    return (1 - ay) * ((1 - ax) * o(i, j) + ax * o(i + 1, j)) + ay * ((1 - ax) * o(i, j + 1) + ax * o(i + 1, j + 1)); };
+  const occAt = lat8(occL), occTAt = lat8(occTL);
   const cells = [];
-  let litGround = 0, sandCells = 0, landCells = 0;
+  let litGround = 0;
   const seaNear = roleColor('sea_deep'), seaFar = roleColor('sea_surface');
   function roleColor(r) { return Sky.roleColor(roles[r], sky); }
   for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) {
-    const a = nd(i, j), b = nd(i + 1, j), c = nd(i + 1, j + 1), d = nd(i, j + 1);
+    const k = j * GU + i, a = nd(i, j), b = nd(i + 1, j), c = nd(i + 1, j + 1), d = nd(i, j + 1);
     const u = (a.u + c.u) / 2, v = (a.v + c.v) / 2, [E, N] = toEN(u, v);
-    const land = landAt(E, N);
-    const z = land ? (a.z + b.z + c.z + d.z) / 4 : 0;
-    const occ = glowOcc(E, N, z);
-    let col, kind;
-    if (land) {
-      const lc = lcAt(E, N); kind = lc.cls; landCells++;
-      if (kind === 5 || kind === 6 || kind === 15) sandCells++;
-      const T = terminator(E, N, 0.5), lit = z > T; if (lit) litGround++;
-      col = lightHex(groundBase(kind), { occ, facing: 0.15, direct: lit ? Math.sin(Math.max(rayAlt, 0.02) * D2R) : 0 });
-    } else {
-      kind = 14;
-      const t = clamp((v - V0) / (V1 - V0), 0, 1);
-      col = lightHex(mix(seaNear, seaFar, 0.35 + 0.65 * t), { occ: occ * 0.6, facing: 0.15 });
-      col = scaleHex(col, 2.2);             // sea role colours are already "lit" values (style.json) – undo the ambient factor partly
+    const lf = clamp((landS[k] - 0.2) / 0.6, 0, 1), z = cellZ[k], occ = occAt(u, v);
+    let landCol = null, seaCol = null;
+    if (lf > 0) {
+      const T = terminator(E, N, 0.5), lit = landF[k] > 0.5 && z > T; if (lit) litGround++;
+      landCol = lightHex(hexOf([baseS[0][k], baseS[1][k], baseS[2][k]]), { occ, facing: 0.1, tint: 0.2, direct: lit ? Math.sin(Math.max(rayAlt, 0.02) * D2R) : 0 });
     }
-    cells.push({ i, j, kind, land, occ: Math.round(occ * 1000) / 1000,
-      pts: [PP(a.u, a.v, land ? a.z : 0), PP(b.u, b.v, land ? b.z : 0), PP(c.u, c.v, land ? c.z : 0), PP(d.u, d.v, land ? d.z : 0)], c: ex(col) });
+    if (lf < 1) {
+      const t = clamp((v - V0) / (V1 - V0), 0, 1);
+      seaCol = scaleHex(lightHex(mix(seaNear, seaFar, 0.35 + 0.65 * t), { occ: occ * 0.6, facing: 0.1, tint: 0.2 }), 1.25);   // role colours are already lit values: undo part of the ambient factor
+    }
+    const col = lf >= 1 ? landCol : lf <= 0 ? seaCol : mix(seaCol, landCol, lf);
+    cells.push({ i, j, kind: lf > 0.5 ? cls[k] : 14, land: lf > 0.5, lf: Math.round(lf * 100) / 100, occ: Math.round(occ * 1000) / 1000,
+      pts: [PP(a.u, a.v, a.z), PP(b.u, b.v, b.z), PP(c.u, c.v, c.z), PP(d.u, d.v, d.z)], c: ex(col) });
   }
 
   // contours every 2 m on land (marching squares on the 4 m nodes)
@@ -284,12 +320,18 @@ export function buildScene(opt) {
     }
   }
 
-  // coastline (land/sea edge of the 4 m grid, data = synthetic coast of the sample)
+  // coastline: the 0.5 iso-line of the smoothed land fraction (the sample's coast is synthetic → drawn dashed, soft)
   const coast = [];
-  for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) {
-    const c0 = cells[j * GU + i];
-    if (i + 1 < GU && c0.land !== cells[j * GU + i + 1].land) { const u = U0 + (i + 1) * G; coast.push([PP(u, V0 + j * G, 0), PP(u, V0 + (j + 1) * G, 0)]); }
-    if (j + 1 < GV && c0.land !== cells[(j + 1) * GU + i].land) { const v = V0 + (j + 1) * G; coast.push([PP(U0 + i * G, v, 0), PP(U0 + (i + 1) * G, v, 0)]); }
+  {
+    const at = (i, j) => landS[clamp(j, 0, GV - 1) * GU + clamp(i, 0, GU - 1)];
+    for (let j = 0; j < GV - 1; j++) for (let i = 0; i < GU - 1; i++) {
+      const q = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]].map(([x, y]) => ({ x, y, f: at(x, y) })), pts = [];
+      for (let e = 0; e < 4; e++) { const A = q[e], B = q[(e + 1) % 4]; if ((A.f < 0.5) !== (B.f < 0.5)) { const t = (0.5 - A.f) / (B.f - A.f); pts.push([A.x + (B.x - A.x) * t, A.y + (B.y - A.y) * t]); } }
+      for (let k = 0; k + 1 < pts.length; k += 2) {
+        const p = pts.slice(k, k + 2).map(([x, y]) => { const uu = U0 + (x + 0.5) * G, vv = V0 + (y + 0.5) * G; return PP(uu, vv, 0); });
+        coast.push(p);
+      }
+    }
   }
 
   // sea outline in plate px (for the sea hatching clip)
@@ -302,13 +344,49 @@ export function buildScene(opt) {
   // sand ripples (engraving texture on sand cells; positions seeded — the ripples themselves are 'סכמטי')
   const ripples = [];
   const rnd = Sky.seededRandom('plate:sunrise/ripples|2026-11-24');
-  for (let n = 0; n < 5200; n++) {
+  for (let n = 0; n < 24000; n++) {
     const u = U0 + rnd() * (U1 - U0), v = V0 + rnd() * (V1 - V0), [E, N] = toEN(u, v);
     if (!landAt(E, N)) continue;
     const lc = lcAt(E, N); if (!(lc.cls === 5 || lc.cls === 6 || lc.cls === 15 || lc.cls === 7)) continue;
     const L = 3 + rnd() * 5, bend = (rnd() - 0.5) * 1.6, pts = [];
     for (let k = 0; k <= 6; k++) { const t = k / 6 - 0.5, du = t * L, dv = bend * (1 - 4 * t * t); pts.push(PP(u + du, v + dv, zUV(u + du, v + dv))); }
     ripples.push(pts);
+  }
+
+  // stipple for greenery and open ground (kernel: greenery = dots, never lines); density by class, positions seeded
+  const stipple = [];
+  {
+    const r = Sky.seededRandom('plate:sunrise/stipple|2026-11-24'), DENS = { 1: 2.2, 2: 2.6, 3: 3.4, 12: 1.6, 13: 0.9 };
+    for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) {
+      const c = cells[j * GU + i]; if (!c.land) continue;
+      const dn = DENS[c.kind]; if (!dn) continue;
+      let n = Math.floor(dn) + (r() < dn % 1 ? 1 : 0);
+      while (n-- > 0) { const uu = U0 + (i + r()) * G, vv = V0 + (j + r()) * G; const p = PP(uu, vv, zUV(uu, vv) + 0.2); p.push(c.kind === 13 ? 1 : 0); stipple.push(p); }
+    }
+  }
+
+  // long soft shadows of the tall buildings (h ≥ 40 m: the Dekel towers, and the suspicious 'tower' record) as 45° hatch
+  // on open ground (park, garden, open, sand; the sea keeps only its tone). Plan-space lines u + v = k·3 m; each 4 m cell contributes its piece
+  // with alpha ∝ (occ − occ without the tall buildings) — the share of the dawn glow that only they hide.
+  const shadowHatch = [];
+  {
+    const OPEN = new Set([2, 3, 5, 6, 7, 12, 13, 15]), SP = 3.0;   // not the sea: water is engraved horizontally only
+    for (let j = 0; j < GV; j++) for (let i = 0; i < GU; i++) {
+      const c = cells[j * GU + i]; if (!OPEN.has(c.kind)) continue;
+      const u0 = U0 + i * G, v0 = V0 + j * G, uc = u0 + G / 2, vc = v0 + G / 2;
+      const dOcc = occAt(uc, vc) - occTAt(uc, vc), a = clamp(Math.sqrt(Math.max(0, dOcc - 0.012)) * 1.35, 0, 0.42);
+      if (a < 0.02) continue;
+      const k0 = Math.ceil((u0 + v0) / SP), k1 = Math.floor((u0 + G + v0 + G) / SP);
+      for (let k = k0; k <= k1; k++) {            // segment of u + v = k·SP inside the square cell
+        const s0 = k * SP, pts = [];
+        for (const [uu, vv] of [[u0, s0 - u0], [u0 + G, s0 - u0 - G], [s0 - v0, v0], [s0 - v0 - G, v0 + G]])
+          if (uu >= u0 - 1e-9 && uu <= u0 + G + 1e-9 && vv >= v0 - 1e-9 && vv <= v0 + G + 1e-9) pts.push([uu, vv]);
+        if (pts.length < 2) continue;
+        const [p, q] = [pts[0], pts[pts.length - 1]]; if (Math.hypot(p[0] - q[0], p[1] - q[1]) < 0.3) continue;
+        const zz = c.land ? undefined : 0;
+        shadowHatch.push([...PP(p[0], p[1], zz ?? zUV(p[0], p[1]) + 0.1), ...PP(q[0], q[1], zz ?? zUV(q[0], q[1]) + 0.1), Math.round(a * 100) / 100]);
+      }
+    }
   }
 
   // roads (OSM): draped, widths schematic by class
@@ -352,17 +430,22 @@ export function buildScene(opt) {
       if (facing > 0.02 && !onEdge) {
         for (let s = 0; s < n; s++) {
           const t = s / (n - 1), u = a[0] + du * t + nU * 0.6, v = a[1] + dv * t + nV * 0.6, [E, N] = toEN(u, v);
-          const T = terminator(E, N, 0.2);
+          const T = terminator(E, N, 3.0);
           samp.push({ t, T });
           if (isTower) towerT.push(T);
         }
       }
       const pA0 = PP(a[0], a[1], b.base), pC0 = PP(c[0], c[1], b.base), pA1 = PP(a[0], a[1], top), pC1 = PP(c[0], c[1], top);
-      const shadeCol = lightHex(wallBase, { occ: 0.25, facing: Math.max(0, facing) });
-      const wall = { pts: [pA0, pC0, pC1, pA1], c: ex(shadeCol), facing: r2(facing), cut: onEdge, len: r2(L * S) };
+      const mu = (a[0] + c[0]) / 2 + nU * 1.0, mv = (a[1] + c[1]) / 2 + nV * 1.0, [mE, mN] = toEN(mu, mv);
+      const wOcc = glowOcc(mE, mN, b.base + Math.min(b.h / 3, 12));
+      const shadeCol = lightHex(wallBase, { occ: wOcc, facing: Math.max(0, facing) });
+      const lo = Math.max(b.base, top - b.sigma), hi = top + b.sigma;
+      const wall = { pts: [pA0, pC0, pC1, pA1], c: ex(shadeCol), facing: r2(facing), cut: onEdge, len: r2(L * S), occ: r2(wOcc),
+        band: [PP(a[0], a[1], lo), PP(c[0], c[1], lo), PP(c[0], c[1], top), PP(a[0], a[1], top)],
+        bars: [[PP(a[0], a[1], lo), PP(a[0], a[1], hi)], [PP(c[0], c[1], lo), PP(c[0], c[1], hi)]] };
       // lit polygon: upper part above max(T, base)
       if (samp.length && samp.some(s => s.T < top - 0.05)) {
-        const litC = lightHex(wallBase, { occ: 0.1, facing, direct: facing });
+        const litC = lightHex(wallBase, { occ: wOcc, facing, direct: facing });
         const runs = []; let cur = null;
         for (const s of samp) {
           const lo = Math.max(s.T, b.base);
@@ -405,8 +488,9 @@ export function buildScene(opt) {
   const [bE, bN] = toEN(...beachUV), bz = zAt(bE, bN) ?? 0;
   const beachHorizon = (() => { let best = -1e9; for (let d = 2; d < REACH; d += 1.5) { const h = hAt(bE + SX * d, bN + SY * d); if (h < -1e8) continue; const a = Math.atan2(h - bz - d * d * CURV, d) * R2D; if (a > best) best = a; } return best; })();
   // first direct sun (upper limb above the data horizon) at points of the waterline: u = −280 … +280 m
-  function firstSun(E, N, z0) {
-    const hz = az => { const ax = Math.sin(az * D2R), ay = Math.cos(az * D2R); let best = -1e9; for (let d = 2; d < REACH; d += 1.5) { const h = hAt(E + ax * d, N + ay * d); if (h < -1e8) continue; const a = Math.atan2(h - z0 - 1.6 - d * d * CURV, d) * R2D; if (a > best) best = a; } return best; };
+  function firstSun(E, N, z0, noTall = false) {
+    const look = noTall ? htAt : hAt;
+    const hz = az => { const ax = Math.sin(az * D2R), ay = Math.cos(az * D2R); let best = -1e9; for (let d = 2; d < REACH; d += 1.5) { const h = look(E + ax * d, N + ay * d); if (h < -1e8) continue; const a = Math.atan2(h - z0 - 1.6 - d * d * CURV, d) * R2D; if (a > best) best = a; } return best; };
     for (let s = 0; s < 3 * 3600; s += 20) {
       const t = new Date(T0.getTime() + s * 1000), p = Sky.sunPosition(t, place), h = hz(p.az);
       if (p.altApparent + p.semidiameter > h) return { local: Sky.localTime(t).hhmm, minutes: s / 60, horizon: h };
@@ -418,10 +502,13 @@ export function buildScene(opt) {
     let vv = null; for (let v = V1; v > V0; v -= 2) { const [E, N] = toEN(u, v); if (landAt(E, N)) { vv = v - 8; break; } }
     if (vv == null) continue;
     const [E, N] = toEN(u, vv), z = zAt(E, N) ?? 0, f = firstSun(E, N, z);
-    if (f) wl.push({ u, v: vv, z, ...f });
+    const f0 = firstSun(E, N, z, true), behindTall = !!(f && f0 && f.minutes - f0.minutes > 2);
+    if (f) wl.push({ u, v: vv, z, behindTall, ...f });
   }
   wl.sort((a, b) => a.minutes - b.minutes);
+  const open = wl.filter(w => !w.behindTall), tall = wl.filter(w => w.behindTall);
   const beachFirst = wl.length ? { points: wl, earliest: wl[0].local, latest: wl[wl.length - 1].local,
+    openLatest: open.length ? open[open.length - 1].local : null, tallLatest: tall.length ? tall[tall.length - 1].local : null,
     hMin: Math.min(...wl.map(w => w.horizon)), hMax: Math.max(...wl.map(w => w.horizon)), eye_m: 1.6 } : null;
   const firstSunBeach = wl[0] || null;
 
@@ -435,11 +522,11 @@ export function buildScene(opt) {
     sun: { iso: T0.toISOString(), local: lt.hhmm, localSec: `${String(lt.h).padStart(2, '0')}:${String(lt.min).padStart(2, '0')}:${String(lt.s).padStart(2, '0')}`,
       date_he: lt.date_he, dow: dows[dow], az: sunAz, alt: sp.alt, altApparent: sp.altApparent, upperLimb: rayAlt, semidiameter: sp.semidiameter,
       shadow10: 10 / Math.tan(Math.max(rayAlt, 1e-4) * D2R), civilDawn: times.local.civilDawn, goldenEnd: times.local.goldenHourMorningEnd,
-      ladder, moonSet: moonT.local.set, moonSetAz: moonAtSet ? moonAtSet.az : null, moonIllum: moonAtSet ? moonAtSet.illumination : null },
+      ladder, moonSet: moonT.local.set, moonSetMinBefore: moonT.set ? Math.round((T0 - moonT.set) / 60000) : null, moonSetAz: moonAtSet ? moonAtSet.az : null, moonIllum: moonAtSet ? moonAtSet.illumination : null },
     sky: { stops: sky.stops, sunward: sky.sunward, antisun: sky.antisun, ambient: sky.ambient, sunLight: sky.sunLight, shadowTint: sky.shadowTint,
       phase: sky.phase, focus: sky.focus, weights: sky.weights },
     heb, exposure: EXPO,
-    cells, contours, coast, seaPolys, ripples, roads, bldgs, skirt,
+    cells, contours, coast, seaPolys, ripples, stipple, shadowHatch, roads, bldgs, skirt,
     focusRuns: focusRuns.filter(r => r.pts.length >= 2),
     numbers: {
       towers: towers.map(t => ({ id: t.id, h: t.h, sigma: t.sigma, base: t.base, top: t.base + t.h, src: t.src })),

@@ -22,21 +22,22 @@ const sc = buildScene({ repo: REPO, ref: args.ref, area: AREA, style: STYLE, W, 
 
 // ───────────────────────────── one global tone map (order of brightness preserved), so the plate meets the kernel budget
 // Y' = k·Y / (1 + k·Y / m): lifts the deep shade, compresses the lit faces under the focus. k, m documented in sunrise.json.
-const TM = { k: 2.5, m: 0.17, skyDim: 0.28 };
+const TM = { k: 3.5, m: 0.17, skyDim: 0.28 };
 const tm = hex => { const l = lin(hex), y = 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2]; if (y <= 0) return hex; const y2 = TM.k * y / (1 + TM.k * y / TM.m); return hexOf(l.map(v => Math.min(1, v * y2 / y))); };
 for (const c of sc.cells) c.c = tm(c.c);
 for (const b of sc.bldgs) { b.roofC = tm(b.roofC); for (const w of b.walls) { w.c = tm(w.c); if (w.litC) w.litC = tm(w.litC); } }
 const M = STYLE.materials.items, roles = STYLE.palette.roles;
 const shadeAmb = (hex, k = 1) => { const a = lin(sc.sky.ambient.hex), b = lin(hex); return hexOf(b.map((v, i) => v * a[i] * sc.sky.ambient.intensity * k)); };
-const road = tm(mix(shadeAmb(M.asphalt.base, 0.75), sc.sky.shadowTint.hex, 0.25));
+const road = mix(tm(shadeAmb(M.asphalt.base, 0.8)), '#2E3240', 0.45);
 
 // ───────────────────────────── palette of the plate (style.json roles; the night ink for marks on a dark plate)
 const C = {
   plateTop: '#0B1431', plateBottom: '#080F26',
   hairline: roles.hairline.dawn, pearl: roles.pearl.night, moon: roles.moon.all, ink: roles.ink.night, skyInk: roles.ink.dawn,
   seaInk: roles.silver.night, seaGlint: scaleHex(sc.sky.antisun.hex, TM.skyDim * 1.3), sandInk: '#141B30',
-  road, roadEdge: '#0A0F1F', skirt: tm(shadeAmb(M.kurkar.base, 0.6)),
-  wallInk: '#10162A', litInk: '#3A2418', edge: roles.ink.night, band: roles.pearl.night,
+  road, roadEdge: '#0A0F1F', skirt: mix(tm(shadeAmb(M.kurkar.base, 0.35)), '#0E1630', 0.55),
+  greenDot: mix(M.greenery.palm, roles.silver.night, 0.35), openDot: mix(M.greenery.dryGrass, roles.silver.night, 0.4),
+  wallInk: '#10162A', shadowInk: '#04060F', litInk: '#3A2418', edge: roles.ink.night, band: roles.pearl.night,
   focusFill: sc.sky.focus.fill || '#E3A33A', focusEdge: sc.sky.focus.edge || '#1A1408',
   textDim: roles.ink.night, text: roles.pearl.night, title: roles.pearl.night, brass: roles.hairline.night, ember: roles.ember.dawn,
 };
@@ -81,21 +82,21 @@ sc.ruler = { x: rulerX, y0: rulerY0, k: sc.S * cosE, max: 130, term: [termLo, te
 // ───────────────────────────── texts (all Hebrew via SVG)
 const f1 = x => x.toFixed(1), f2 = x => x.toFixed(2), num = x => Math.round(x).toLocaleString('en-US');
 const signed = (x, d = 2) => (x < 0 ? '−' : '+') + Math.abs(x).toFixed(d);
-const LRI = '⁦', RLI = '⁧', PDI = '⁩';
+const LRI = '\u2066', RLI = '\u2067', PDI = '\u2069', ltr = x => `${LRI}${x}${PDI}`;   // bidi isolates (kernel typography)
 const T = [];
 const add = (x, y, s, o = {}) => T.push({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10, s, ...o });
 const sun = sc.sun, N = sc.numbers, L = sc.labels;
 
 // ribbon captions
-add(RB.x1 - 10, RB.y0 + 20, 'שמי המערב ברגע הזריחה · צבעי מודל הגרעין (sky.js), מעומעמים ×0.28 לתקציב הבהירות', { size: 13, fill: C.text, opacity: 0.8 });
-add(RB.x1 - 10, RB.y0 + 38, 'רצועת פנורמה: אזימוט 220°–20° דרך מערב (לא בקנה המידה של הלוח)', { size: 12, opacity: 0.7 });
+add(RB.x1 - 10, RB.y0 + 20, `שמי המערב ברגע הזריחה · צבעי מודל הגרעין (${ltr('sky.js')}), מעומעמים ${ltr('×' + TM.skyDim)} לתקציב הבהירות`, { size: 13, fill: C.text, opacity: 0.8 });
+add(RB.x1 - 10, RB.y0 + 38, `רצועת פנורמה: אזימוט ${ltr('220°–20°')} דרך מערב (לא בקנה המידה של הלוח)`, { size: 12, opacity: 0.7 });
 for (const t of sc.ribbon.ticks) if (t.major) add(t.x, RB.y1 + 19, `${t.az}°`, { size: 11, anchor: 'middle', dir: 'ltr', opacity: 0.75 });
 add(azX(270), RB.y1 + 33, 'מערב', { size: 11, anchor: 'middle', opacity: 0.6 });
 add(azX(360), RB.y1 + 33, 'צפון', { size: 11, anchor: 'middle', opacity: 0.6 });
 {
   const xa = azX(sc.sky.antisun.azimuth), xm = sun.moonSetAz != null ? azX(sun.moonSetAz) : null;
-  add(xa - 8, RB.y1 - 18, `נגד השמש ${f1(sc.sky.antisun.azimuth)}°`, { size: 12, anchor: 'end', fill: C.text, opacity: 0.8 });
-  if (xm != null) add(xm + 8, RB.y1 - 18, `כאן שקע הירח המלא ב-${sun.moonSet} (${f1(sun.moonSetAz)}°)`, { size: 12, anchor: 'start', fill: C.text, opacity: 0.8 });
+  add(xa - 8, RB.y1 - 8, `נגד השמש ${ltr(f1(sc.sky.antisun.azimuth) + '°')}`, { size: 12, anchor: 'start', fill: C.text, opacity: 0.8 });
+  if (xm != null) add(xm + 8, RB.y1 - 24, `כאן שקע הירח המלא ב-${sun.moonSet} (${ltr(f1(sun.moonSetAz) + '°')}), ${sun.moonSetMinBefore} דק׳ לפני הזריחה`, { size: 12, anchor: 'end', fill: C.text, opacity: 0.8 });
 }
 
 // in-plate labels
@@ -104,26 +105,32 @@ const tLeft = tw[0], tRight = tw[tw.length - 1];
 {
   const ax = tRight.top[0] + 30, ay = Math.min(...tw.map(t => t.top[1])) - 30;
   add(ax + 300, ay - 22, 'מגדלי הדקל', { family: 'Frank Ruhl Libre', size: 22, weight: 500, fill: C.text, leader: [[ax + 4, ay - 14], [tRight.top[0] + 2, tRight.top[1] + 4]] });
-  add(ax + 300, ay, `גובה 100 מ׳ ±8 · מקור P: משוער מתמונות שטח · קונטור OSM`, { size: 13, opacity: 0.85 });
-  add(ax + 300, ay + 17, `בסיס ${f1(N.towers[0].base)} / ${f1(N.towers[1].base)} מ׳ מעל הים (SRTM, משוער)`, { size: 13, opacity: 0.7 });
+  add(ax + 300, ay, `גובה 100 מ׳ ${ltr('±8')} · מקור P: משוער מתמונות שטח · קונטור ${ltr('OSM')}`, { size: 13, opacity: 0.85 });
+  add(ax + 300, ay + 17, `בסיס כ-${ltr(`${Math.round(N.towers[0].base)} / ${Math.round(N.towers[1].base)}`)} מ׳ מעל הים (${ltr('SRTM')}, משוער)`, { size: 13, opacity: 0.7 });
 }
 {
   // the focus label: to the right of the eastern tower, at the height of the line
-  const fr = sc.focusRuns.slice().sort((a, b) => b.pts[b.pts.length - 1][0] - a.pts[a.pts.length - 1][0])[0];
-  const p = fr.pts.reduce((m, q) => (q[0] > m[0] ? q : m), fr.pts[0]);
-  const lx = p[0] + 150, ly = p[1] + 6;
-  add(lx + 285, ly, 'קו האור הראשון', { family: 'Frank Ruhl Libre', size: 20, weight: 500, fill: C.focusFill, leader: [[lx + 4, ly - 6], [p[0] + 6, p[1]]], leaderAlpha: 0.7 });
-  add(lx + 285, ly + 18, `${Math.round(termLo)}–${Math.round(termHi)} מ׳ מעל הים · מחושב מהנתונים`, { size: 13, opacity: 0.85 });
-  add(lx + 285, ly + 34, 'מתחתיו: צל הדיונות והבניינים שבמזרח', { size: 13, opacity: 0.7 });
+  // the focus label: up and to the left of the western tower, over the quiet sand
+  const all = sc.focusRuns.flatMap(f => f.pts), p = all.reduce((m, q) => (q[0] < m[0] ? q : m), all[0]);
+  const lx = p[0] - 70, ly = p[1] - 205;
+  add(lx, ly, 'קו האור הראשון', { family: 'Frank Ruhl Libre', size: 22, weight: 500, fill: C.text, leader: [[lx - 60, ly + 42], [p[0] - 3, p[1] - 3]], leaderAlpha: 0.6 });
+  add(lx, ly + 19, `${ltr(`${Math.round(termLo)}–${Math.round(termHi)}`)} מ׳ מעל הים · מחושב מהנתונים`, { size: 13, opacity: 0.85 });
+  add(lx, ly + 35, 'מעליו השמש כבר נראית; מתחתיו צל הדיונות והבתים שבמזרח', { size: 13, opacity: 0.7 });
 }
 {
   const nd = sc.bldgs.find(b => b.name === 'מגדל המדרחוף');
-  if (nd) { const p = nd.label; add(p[0] - 14, p[1] - 10, `מגדל המדרחוף בנתונים: ${f1(nd.h)} מ׳ ±${f1(nd.sigma)} על קונטור ${f1(nd.area)} מ״ר · כלל אצבע, חשוד`, { size: 12, anchor: 'end', fill: C.ember, opacity: 0.9, leader: [[p[0] - 10, p[1] - 14], [p[0], p[1]]], leaderAlpha: 0.5 }); }
+  if (nd) { const p = nd.label; add(p[0] - 16, p[1] + 66, `״מגדל המדרחוף״ בנתונים: ${Math.round(nd.h)} מ׳ ${ltr('±' + Math.round(nd.sigma))} על קונטור של ${Math.round(nd.area)} מ״ר`, { size: 12, anchor: 'start', fill: C.ember, opacity: 0.9, leader: [[p[0] - 12, p[1] + 62], [p[0] - 2, p[1] + 50]], leaderAlpha: 0.5 });
+    add(p[0] - 16, p[1] + 82, 'גובה מכלל אצבע לפי השם — חשוד, דורש בדיקה', { size: 12, anchor: 'start', fill: C.ember, opacity: 0.75 }); }
 }
 if (L.coastAt) add(L.coastAt[0] + 8, L.coastAt[1] - 10, 'קו חוף סינתטי בנתוני הדגימה · משוער', { size: 12, anchor: 'end', opacity: 0.75 });
 add(L.seaAt[0], L.seaAt[1], 'הים התיכון', { family: 'Frank Ruhl Libre', size: 26, weight: 400, fill: C.text, opacity: 0.55, anchor: 'middle', ls: 4 });
 add(L.sandAt[0], L.sandAt[1] + 4, 'חול וחוף · כיסוי קרקע משוער', { size: 12, anchor: 'middle', opacity: 0.7 });
 add(L.skirtAt[0] + 220, L.skirtAt[1] + 6, 'חתך התבליט עד פני הים · סכמטי', { size: 12, opacity: 0.6 });
+{ // park: the land-cover layer of the twin marks it (class 2, estimated) — label at the centre of its cells beyond the towers
+  const pk = sc.cells.filter(c => c.kind === 2 && c.j * 4 + sc.area.v[0] > 120);
+  if (pk.length) { const x = pk.reduce((m, c) => m + c.pts[0][0], 0) / pk.length, y = pk.reduce((m, c) => m + c.pts[0][1], 0) / pk.length;
+    add(x + 60, y - 48, 'פארק (נקודות) · כיסוי קרקע משוער', { size: 12, anchor: 'middle', opacity: 0.7 }); }
+}
 
 // ruler labels
 const ry = z => rulerY0 - sc.S * cosE * z;
@@ -139,8 +146,8 @@ const CMP = { cx: 168, cy: 1000, r: 70 };
   sc.compass = { ...CMP, ellipse: Array.from({ length: 73 }, (_, i) => at(i * 5, CMP.r)), north: at(0, CMP.r + 16), sun: at(sun.az, CMP.r), shadow: at(sun.az + 180, CMP.r + 34), view: at(AREA.axes.v_az_deg, CMP.r) };
   const pn = at(0, CMP.r + 28), ps = at(sun.az, CMP.r + 22), ph = at(sun.az + 180, CMP.r + 48);
   add(pn[0], pn[1] + 4, 'צפון', { size: 12, anchor: 'middle', opacity: 0.8 });
-  add(ps[0] + 6, ps[1] + 14, `שמש ${f1(sun.az)}°`, { size: 12, anchor: 'middle', fill: C.text, opacity: 0.85 });
-  add(ph[0], ph[1] - 6, `צל ${f1((sun.az + 180) % 360)}°`, { size: 12, anchor: 'middle', opacity: 0.8 });
+  add(ps[0] + 6, ps[1] + 14, `שמש ${ltr(f1(sun.az) + '°')}`, { size: 12, anchor: 'middle', fill: C.text, opacity: 0.85 });
+  add(ph[0], ph[1] - 6, `צל ${ltr(f1((sun.az + 180) % 360) + '°')}`, { size: 12, anchor: 'middle', opacity: 0.8 });
   add(CMP.cx, CMP.cy + CMP.r * 0.5 + 40, 'שושנה על מישור הקרקע', { size: 11, anchor: 'middle', opacity: 0.55 });
 }
 const SB = { x0: CMP.cx - 50 * sc.S, x1: CMP.cx + 50 * sc.S, y: CMP.cy + 92 };
@@ -152,29 +159,31 @@ const CX = W - 48, CY = 1150;
 add(CX, CY, 'זריחה', { family: 'Frank Ruhl Libre', size: 44, weight: 500, fill: C.title });
 add(CX - 128, CY - 2, `${RLI}${AREA.name_he}${PDI}`, { family: 'Frank Ruhl Libre', size: 22, weight: 400, fill: C.text, opacity: 0.85 });
 add(CX, CY + 32, `יום ${sun.dow} · ${sun.date_he} · ${sun.localSec} · ${sc.heb.he}`, { size: 17, fill: C.text, weight: 500 });
-add(CX, CY + 56, `שמש: אזימוט ${f1(sun.az)}° · גובה גאומטרי ${signed(sun.alt)}° · שפה עליונה נראית ${signed(sun.upperLimb)}° (שבירת אור כלולה)`, { size: 14 });
+add(CX, CY + 56, `שמש: אזימוט ${ltr(f1(sun.az) + '°')} · גובה גאומטרי ${ltr(signed(sun.alt) + '°')} · שפה עליונה נראית ${ltr(signed(sun.upperLimb) + '°')} (שבירת אור כלולה)`, { size: 14 });
 add(CX, CY + 76, `צל של עמוד 10 מ׳ עכשיו: כ-${f1(sun.shadow10 / 1000)} ק״מ, כלומר עד האופק · אחרי 10 דק׳: ${num(sun.ladder[0].shadow10)} מ׳ · 30 דק׳: ${num(sun.ladder[2].shadow10)} מ׳ · 60 דק׳: ${num(sun.ladder[3].shadow10)} מ׳`, { size: 14 });
 {
   const fb = N.beachFirst;
-  add(CX, CY + 96, `השמש תגיע לחול בקו המים (לפי התבליט בנתונים): ${fb.earliest}–${fb.latest}, כשתעלה מעל ${f1(fb.hMin)}°–${f1(fb.hMax)}° · שעת הזהב נגמרת ב-${sun.goldenEnd}`, { size: 14 });
+  const tallNote = fb.tallLatest ? ` · מאחורי מגדלי הדקל רק ב-${fb.tallLatest}` : '';
+  add(CX, CY + 96, `השמש תגיע לחול בקו המים (לפי התבליט בנתונים): ${ltr(`${fb.earliest}–${fb.openLatest || fb.latest}`)}, כשתעלה מעל ${ltr(`${f1(fb.hMin)}°–${f1(Math.max(...fb.points.filter(p => !p.behindTall).map(p => p.horizon)))}°`)}${tallNote} · שעת הזהב נגמרת ב-${sun.goldenEnd}`, { size: 14 });
 }
-add(CX, CY + 118, 'גרעין סגנון v0 · sky.js 0.1.0 · זרע 5787 · מוקד: דיו מוזהב (sky.focus = ink)', { size: 13, fill: C.brass, opacity: 0.9 });
+add(CX, CY + 118, `גרעין סגנון v0 · ${ltr('sky.js ' + Sky.VERSION)} · זרע 5787 · מוקד: דיו מוזהב (${ltr('sky.focus = ink')})`, { size: 13, fill: C.brass, opacity: 0.9 });
 
 // sources and legend (bottom left, RTL lines anchored at their right edge)
 const SXr = 1290, SY0 = 1122;
 const srcLines = [
   ['מקורות ורישיונות', { weight: 700, fill: C.text, size: 14 }],
   [`מבנים, כבישים וקו החוף: ${LRI}© OpenStreetMap contributors, ODbL 1.0${PDI} (תמצית Geofabrik בדגימת העולם התאום)`, {}],
-  [`העולם התאום: ענף twin-world, ${LRI}${String(sc.sources.commit).slice(0, 7)}${PDI} · אריחים ${N.tilesUsed.length} (${N.tilesUsed[0]}…${N.tilesUsed[N.tilesUsed.length - 1]}) · מסגרת sample: ITM = sample + (1507.82, 757.76)`, {}],
+  [`העולם התאום: ענף ${ltr('twin-world')}, ${ltr(String(sc.sources.commit).slice(0, 7))} · ${N.tilesUsed.length} אריחים ${ltr(`${N.tilesUsed[0]} … ${N.tilesUsed[N.tilesUsed.length - 1]}`)} · מסגרת הדגימה: ${ltr('ITM = sample + (1507.82, 757.76)')}`, {}],
   ['תבליט: SRTM 2000 (DSM, כולל מבנים וצמחייה), נחלת הכלל · כיסוי קרקע: שכבת הצמחייה של העולם התאום (משוער)', {}],
-  [`גבהים: ${N.bySrc.R} מבנים בכלל אצבע (R, ±6–20 מ׳), 2 מגדלי הדקל (P, ±8 מ׳) · אור ישיר מחושב עד ${(N.reach_m / 1000).toFixed(1)} ק״מ מזרחה, מעבר לזה אופק מתמטי`, {}],
+  [`גבהים: ${N.bySrc.R} מבנים לפי כלל אצבע (מקור R) ${ltr('±6–20')} מ׳; 2 מגדלי הדקל (מקור P) ${ltr('±8')} מ׳ · אור ישיר מחושב עד ${(N.reach_m / 1000).toFixed(1)} ק״מ מזרחה; מעבר לזה אופק מתמטי`, {}],
   ['לא בנתונים ולכן לא מצוירים: עצים (רק משוערים), אנשים, רכבים · רוחב כבישים, חולות וחתך: סכמטי · חומרים וצבעים: השראה, לא מדידה', {}],
-  [`צללים רכים לכיוון ${f1((sun.az + 180) % 360)}°: חסימת זוהר הזריחה (מודל משוער) · מיפוי טונים אחיד ×${TM.k} (סדר הבהירות נשמר)`, {}],
+  [`הצללה באלכסון: הצל הרך של המגדלים לכיוון ${ltr(f1((sun.az + 180) % 360) + '°')} — זוהר הזריחה שהם מסתירים (מודל משוער) · מיפוי טונים אחיד ${ltr('×' + TM.k)} (סדר הבהירות נשמר)`, {}],
 ];
+srcLines.push(['לוח השראה לסוכנים. אין בלוח זה זכות כלשהי בקרקע האמיתית.', { opacity: 0.6 }]);   // style.json → digitalAssets (same line as night/noon)
 srcLines.forEach(([s, o], i) => add(SXr, SY0 + i * 19, s, { size: 13, opacity: 0.8, ...o }));
 // legend (small, under the compass)
 const LG = [
-  ['קו חד = קונטור מדוד (OSM)', C.edge], ['קו מנוקד ורצועה = גובה ±σ', C.band], ['פנים חמים = מעל קו האור', '#B88468'], ['זהב = המוקד היחיד', C.focusFill],
+  ['קו חד = קונטור מדוד (OSM)', C.edge], [`קו מנוקד ורצועה = גובה ${ltr('±σ')}`, C.band], ['פנים חמים = מעל קו האור', '#B88468'], ['זהב = המוקד היחיד', C.focusFill],
 ];
 sc.legend = LG.map(([s, c], i) => ({ x: 280, y: 1196 + i * 21, c }));
 LG.forEach(([s, c], i) => add(268, 1200 + i * 21, s, { size: 13, opacity: 0.85 }));
@@ -260,11 +269,12 @@ const rec = {
   sky_model: sc.sky,
   area: { id: AREA.id, file: 'plates/AREA.json', name_he: AREA.name_he, center_sample: AREA.center_sample, center_itm: AREA.center_itm, center_wgs84: AREA.center_wgs84, u_range_m: AREA.u_range_m, v_range_m: AREA.v_range_m, axes: AREA.axes },
   view: { camera_az_deg: AREA.view_suggested.camera_az_deg, elevation_deg: sc.elevDeg, projection: 'parallel (axonometric)', px_per_m: sc.S },
-  data: { ...sc.sources, tiles_loaded: N.tilesUsed, why_beyond_area_he: 'אריחים מזרחה לאזור (עד 2.4 ק״מ) נטענים רק כדי לחשב מה חוסם את האור הראשון.' },
+  data: { ...sc.sources, tiles_loaded: N.tilesUsed,
+    files_read: [sc.sources.manifest, ...N.tilesUsed.flatMap(k => [`twin/integration/world/data/tiles/v/${k}.json.gz`, `twin/integration/world/data/tiles/t/${k}.bin.gz`, `twin/integration/world/mods/vegetation/data/tiles/g/${k}.json.gz`])], why_beyond_area_he: 'אריחים מזרחה לאזור (עד 2.4 ק״מ) נטענים רק כדי לחשב מה חוסם את האור הראשון.' },
   computed: { tower_first_light_m_asl: [termLo, termHi], tower_terminator_samples: term, towers: N.towers, beach_first_sun: N.beachFirst, buildings_in_area: N.buildingsInArea, by_src: N.bySrc, lit_ground_cells: N.litGroundCells, land_cells: N.landCells, sand_cells: N.sandCells },
   approximations_he: [
     'אור ישיר: קרן מהשפה העליונה של השמש (+0.05°), חסימה מפני השטח (SRTM DSM) ומגגות (בסיס + גובה) ברשת 2 מ׳, עד 2.4 ק״מ מזרחה; עקמומיות כדור הארץ עם k = 0.13. הרי השפלה רחוק יותר אינם בנתונים — בפועל השמש נראית כמה דקות מאוחר יותר (משוער).',
-    'צללים רכים: חלק זוהר הזריחה (±50° סביב השמש, דועך ב-6° גובה) שמוסתר מכל נקודה — מודל משוער, לא פוטומטריה.',
+    'צללים רכים: זוהר הזריחה הוא 70% מאור הסביבה (משוער); משקלו exp(−(Δאזימוט/20°)²)·exp(−גובה/5°) ב-41 כיוונים ±40° סביב השמש. כל נקודה מאבדת את החלק שהתבליט והבניינים מסתירים (טון). ההצללה באלכסון מסמנת רק את החלק שמסתירים הבניינים בני 40 מ׳ ומעלה — מודל משוער, לא פוטומטריה.',
     'גבהים: R (כלל אצבע) ±6–20 מ׳; מגדלי הדקל P ±8 מ׳. כל גג מצויר בגובה הנומינלי, עם רצועה ±σ וקו מנוקד ב-+σ.',
     'קו החוף בדגימה סינתטי. כיסוי קרקע (חול/חוף) משכבת הצמחייה, מסומן משוער. רוחב כבישים לפי סוג — סכמטי. החתך הקדמי — סכמטי.',
     'צבעים: חומרים מ-style.json (השראה, לא מדידה), מוארים במודל האור של הגרעין ברגע הזריחה (+1 שנ׳), ואחר כך מיפוי טונים אחיד אחד לכל הלוח.',

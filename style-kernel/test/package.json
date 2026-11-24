@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "type": "module",
+  "main": "sky.test.mjs",
+  "description": "Lets `node --test style-kernel/test/` (a directory) resolve on Node 22; `cd style-kernel && node --test` also works."
+}

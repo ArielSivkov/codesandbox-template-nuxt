@@ -176,16 +176,55 @@
    "166_633",
    "166_634"
   ],
+  "files_read": [
+   "twin/integration/world/data/cities/ashdod/manifest.json",
+   "twin/integration/world/data/tiles/v/163_632.json.gz",
+   "twin/integration/world/data/tiles/t/163_632.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/163_632.json.gz",
+   "twin/integration/world/data/tiles/v/163_633.json.gz",
+   "twin/integration/world/data/tiles/t/163_633.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/163_633.json.gz",
+   "twin/integration/world/data/tiles/v/163_634.json.gz",
+   "twin/integration/world/data/tiles/t/163_634.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/163_634.json.gz",
+   "twin/integration/world/data/tiles/v/164_632.json.gz",
+   "twin/integration/world/data/tiles/t/164_632.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/164_632.json.gz",
+   "twin/integration/world/data/tiles/v/164_633.json.gz",
+   "twin/integration/world/data/tiles/t/164_633.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/164_633.json.gz",
+   "twin/integration/world/data/tiles/v/164_634.json.gz",
+   "twin/integration/world/data/tiles/t/164_634.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/164_634.json.gz",
+   "twin/integration/world/data/tiles/v/165_632.json.gz",
+   "twin/integration/world/data/tiles/t/165_632.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/165_632.json.gz",
+   "twin/integration/world/data/tiles/v/165_633.json.gz",
+   "twin/integration/world/data/tiles/t/165_633.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/165_633.json.gz",
+   "twin/integration/world/data/tiles/v/165_634.json.gz",
+   "twin/integration/world/data/tiles/t/165_634.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/165_634.json.gz",
+   "twin/integration/world/data/tiles/v/166_632.json.gz",
+   "twin/integration/world/data/tiles/t/166_632.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/166_632.json.gz",
+   "twin/integration/world/data/tiles/v/166_633.json.gz",
+   "twin/integration/world/data/tiles/t/166_633.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/166_633.json.gz",
+   "twin/integration/world/data/tiles/v/166_634.json.gz",
+   "twin/integration/world/data/tiles/t/166_634.bin.gz",
+   "twin/integration/world/mods/vegetation/data/tiles/g/166_634.json.gz"
+  ],
   "why_beyond_area_he": "אריחים מזרחה לאזור (עד 2.4 ק״מ) נטענים רק כדי לחשב מה חוסם את האור הראשון."
  },
  "computed": {
   "tower_first_light_m_asl": [
-   35.751805256466696,
-   47.925442622920045
+   35.7520068820122,
+   47.92564207722084
   ],
   "tower_terminator_samples": {
-   "min": 35.751805256466696,
-   "max": 120.29981125826379
+   "min": 35.7520068820122,
+   "max": 120.27261740912954
   },
   "towers": [
    {
@@ -211,6 +250,7 @@
      "u": -40,
      "v": 338,
      "z": 4.349051454457692,
+     "behindTall": false,
      "local": "06:37",
      "minutes": 20.333333333333332,
      "horizon": 3.552611612229864
@@ -219,6 +259,7 @@
      "u": 120,
      "v": 360,
      "z": 2.094808426802219,
+     "behindTall": false,
      "local": "06:38",
      "minutes": 20.666666666666668,
      "horizon": 3.5911951287444115
@@ -227,6 +268,7 @@
      "u": 200,
      "v": 372,
      "z": 2.434989005528479,
+     "behindTall": false,
      "local": "06:39",
      "minutes": 21.666666666666668,
      "horizon": 3.7916954816389485
@@ -235,6 +277,7 @@
      "u": -120,
      "v": 318,
      "z": 4.4765061493047655,
+     "behindTall": false,
      "local": "06:39",
      "minutes": 22,
      "horizon": 3.8501107984831324
@@ -243,6 +286,7 @@
      "u": -280,
      "v": 326,
      "z": 3.218324971746832,
+     "behindTall": false,
      "local": "06:39",
      "minutes": 22.333333333333332,
      "horizon": 3.9251292005172402
@@ -251,6 +295,7 @@
      "u": -200,
      "v": 318,
      "z": 2.321827261171626,
+     "behindTall": false,
      "local": "06:44",
      "minutes": 27,
      "horizon": 4.735615556053622
@@ -259,6 +304,7 @@
      "u": 280,
      "v": 396,
      "z": 3.1838887925335224,
+     "behindTall": false,
      "local": "06:44",
      "minutes": 27,
      "horizon": 4.723780999014322
@@ -267,6 +313,7 @@
      "u": 40,
      "v": 348,
      "z": 3.422463533405617,
+     "behindTall": true,
      "local": "07:23",
      "minutes": 65.66666666666667,
      "horizon": 5.886999030864668
@@ -274,6 +321,8 @@
    ],
    "earliest": "06:37",
    "latest": "07:23",
+   "openLatest": "06:44",
+   "tallLatest": "07:23",
    "hMin": 3.552611612229864,
    "hMax": 5.886999030864668,
    "eye_m": 1.6
@@ -284,18 +333,18 @@
    "P": 2
   },
   "lit_ground_cells": 0,
-  "land_cells": 23846,
-  "sand_cells": 3641
+  "land_cells": 23829,
+  "sand_cells": 3624
  },
  "approximations_he": [
   "אור ישיר: קרן מהשפה העליונה של השמש (+0.05°), חסימה מפני השטח (SRTM DSM) ומגגות (בסיס + גובה) ברשת 2 מ׳, עד 2.4 ק״מ מזרחה; עקמומיות כדור הארץ עם k = 0.13. הרי השפלה רחוק יותר אינם בנתונים — בפועל השמש נראית כמה דקות מאוחר יותר (משוער).",
-  "צללים רכים: חלק זוהר הזריחה (±50° סביב השמש, דועך ב-6° גובה) שמוסתר מכל נקודה — מודל משוער, לא פוטומטריה.",
+  "צללים רכים: זוהר הזריחה הוא 70% מאור הסביבה (משוער); משקלו exp(−(Δאזימוט/20°)²)·exp(−גובה/5°) ב-41 כיוונים ±40° סביב השמש. כל נקודה מאבדת את החלק שהתבליט והבניינים מסתירים (טון). ההצללה באלכסון מסמנת רק את החלק שמסתירים הבניינים בני 40 מ׳ ומעלה — מודל משוער, לא פוטומטריה.",
   "גבהים: R (כלל אצבע) ±6–20 מ׳; מגדלי הדקל P ±8 מ׳. כל גג מצויר בגובה הנומינלי, עם רצועה ±σ וקו מנוקד ב-+σ.",
   "קו החוף בדגימה סינתטי. כיסוי קרקע (חול/חוף) משכבת הצמחייה, מסומן משוער. רוחב כבישים לפי סוג — סכמטי. החתך הקדמי — סכמטי.",
   "צבעים: חומרים מ-style.json (השראה, לא מדידה), מוארים במודל האור של הגרעין ברגע הזריחה (+1 שנ׳), ואחר כך מיפוי טונים אחיד אחד לכל הלוח."
  ],
  "tone_map": {
-  "k": 2.5,
+  "k": 3.5,
   "m": 0.17,
   "skyDim": 0.28
  },
@@ -311,26 +360,26 @@
     608
    ],
    "plain": {
-    "p99Outside": 0.13186813186813187,
+    "p99Outside": 0.13015873015873017,
     "focusY": 0.42830767412393245,
     "limit": 0.14990768594337633,
-    "ratio": 0.30788178647010495,
+    "ratio": 0.30389072627512215,
     "pass": true,
-    "pixelsOutside": 656159
+    "pixelsOutside": 656160
    },
    "measured": {
-    "p99Outside": 0.13186813186813187,
-    "focusY": 0.23375420856123888,
-    "limit": 0.0818139729964336,
-    "ratio": 0.5641315836826317,
+    "p99Outside": 0.13015873015873017,
+    "focusY": 0.2638291878400865,
+    "limit": 0.09234021574403027,
+    "ratio": 0.49334469481679427,
     "pass": false,
-    "pixelsOutside": 656159
+    "pixelsOutside": 656160
    },
-   "quietFieldFraction": 0.801989216868953
+   "quietFieldFraction": 0.7905136758659741
   },
   "render": {
    "plate_2400": {
-    "seconds": 0.644,
+    "seconds": 1.013,
     "fonts": {
      "400 13px Heebo": true,
      "700 13px Heebo": true,
@@ -339,19 +388,35 @@
     },
     "qa": {
      "overflow": [],
-     "texts": 49,
-     "focusRuns": 9,
+     "texts": 52,
+     "focusRuns": 2,
      "dpr": 1
     },
     "errors": null,
     "logs": []
    },
-   "master_8k": null
+   "master_8k": {
+    "seconds": 3.5,
+    "fonts": {
+     "400 13px Heebo": true,
+     "700 13px Heebo": true,
+     "500 30px \"Frank Ruhl Libre\"": true,
+     "400 16px \"Frank Ruhl Libre\"": true
+    },
+    "qa": {
+     "overflow": [],
+     "texts": 52,
+     "focusRuns": 2,
+     "dpr": 3.200000047683716
+    },
+    "errors": null,
+    "logs": []
+   }
   }
  },
  "files": {
   "plate": "plates/sunrise.png",
-  "master": null,
+  "master": "plates/sunrise_8k.png",
   "renderer": "plates/render_sunrise.mjs",
   "helpers": [
    "plates/sunrise_scene.mjs",

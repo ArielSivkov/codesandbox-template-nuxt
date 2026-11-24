@@ -90,7 +90,7 @@ export async function draw(P, SKY) {
     sc.fillStyle = g; sc.fill();
     // water engraving: horizontal lines, spacing grows toward the viewer
     reset(sc); sc.globalCompositeOperation = 'source-atop';
-    sc.strokeStyle = rgba(C.silver, 0.11); sc.lineWidth = lw(0.25);
+    sc.strokeStyle = rgba(C.silver, 0.085); sc.lineWidth = lw(0.25);
     const yTop = pj(0, V1, 0)[1], yBot = pj(0, V0, 0)[1];
     for (let y = yTop, k = 0; y < yBot; k++) {
       const rnd = R('sea-line:' + k), x0 = rnd() * 40;
@@ -247,9 +247,13 @@ export async function draw(P, SKY) {
     const run = [r[start]]; for (let k = start, c = 0; vis.includes(k) && c < n; k = (k + 1) % n, c++) run.push(r[(k + 1) % n]);
     focus.pts = run.map(([u, v]) => pj(u, v, b.z0 + 0.2));
     const path = () => { ctx.beginPath(); focus.pts.forEach((pt, i) => (i ? ctx.lineTo(...pt) : ctx.moveTo(...pt))); };
-    ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.globalCompositeOperation = 'screen';
-    for (const [wu, a] of [[40, 0.035], [26, 0.05], [14, 0.08], [7, 0.14], [3.5, 0.26]]) { path(); ctx.strokeStyle = rgba(C.focusGlow, a); ctx.lineWidth = wu * U; ctx.stroke(); }
-    ctx.restore();
+    // halo: the line drawn wide into its own layer and blurred (no stepped bands), screened onto the plate
+    for (const [wu, blurU, a] of [[12, 18, 0.6], [4, 5, 0.55]]) {
+      const [fo, fc] = off(); fc.lineCap = 'round'; fc.lineJoin = 'round';
+      fc.beginPath(); focus.pts.forEach((pt, i) => (i ? fc.lineTo(...pt) : fc.moveTo(...pt))); fc.strokeStyle = C.focusGlow; fc.lineWidth = wu * U; fc.stroke();
+      ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = a;
+      ctx.filter = `blur(${(blurU * U * DPR).toFixed(1)}px)`; ctx.drawImage(fo, 0, 0); ctx.restore();
+    }
     path(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = C.focusCore; ctx.lineWidth = lw(1.75, 2); ctx.stroke();
     // one bead at the corner nearest the viewer
     const near = run.reduce((m, pt) => (pt[1] < m[1] ? pt : m), [0, 1e9]); const bp = pj(near[0], near[1], b.z0 + 0.2);
@@ -288,7 +292,8 @@ export async function draw(P, SKY) {
       ctx.strokeStyle = rgba('#03050D', 0.35); ctx.lineWidth = lw(0.25); ctx.stroke();
       // windows: floors from the data (f), columns every 3.4 m — SCHEMATIC; lit by the kernel's probability for 22:30
       const f = Math.max(1, b.floors | 0), fh = (b.h_m - 1.2) / f, ncol = Math.floor((w.L - 0.8) / 3.4);
-      if (ncol >= 1 && fh > 2.2) {
+      const winPx = 1.2 * s * Math.abs(w.nv);                                             // on-screen width of one window
+      if (ncol >= 1 && fh > 2.2 && winPx >= 1.1) {
         for (let fl = 0; fl < f; fl++) for (let c = 0; c < ncol; c++) {
           const t0 = (c + 0.5) * w.L / ncol, half = 0.6, za = b.z0 + fl * fh + 0.95, zb = za + Math.min(1.45, fh - 1.1);
           const at = t => [w.a[0] + (w.q[0] - w.a[0]) * t / w.L, w.a[1] + (w.q[1] - w.a[1]) * t / w.L];
@@ -296,7 +301,7 @@ export async function draw(P, SKY) {
           const lit = R(`window:${b.id}/w${w.k}/f${fl}/u${Math.floor(c / 2)}|2026-11-23|22`)() < p;
           const pts = [pj(pa[0], pa[1], za), pj(pb[0], pb[1], za), pj(pb[0], pb[1], zb), pj(pa[0], pa[1], zb)];
           winN++;
-          if (lit) { litN++; winPts.push(pts); }
+          if (lit) { litN++; pts.k = Math.min(1, winPx / 3); winPts.push(pts); }
           else { ctx.beginPath(); pts.forEach((pt, i) => (i ? ctx.lineTo(...pt) : ctx.moveTo(...pt))); ctx.fillStyle = rgba('#03050E', 0.55 * (0.35 + w.lam / lamMax)); ctx.fill(); }
         }
       }
@@ -304,8 +309,8 @@ export async function draw(P, SKY) {
       // lit windows of this face (drawn after the clip so the glow may breathe)
       for (const pts of winPts.splice(0)) {
         const cx = (pts[0][0] + pts[2][0]) / 2, cy = (pts[0][1] + pts[2][1]) / 2;
-        const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, 4.2 * U); g.addColorStop(0, rgba(C.windowGlow, 0.16)); g.addColorStop(1, rgba(C.windowGlow, 0));
-        ctx.fillStyle = g; ctx.fillRect(cx - 4.2 * U, cy - 4.2 * U, 8.4 * U, 8.4 * U);
+        const gr = 4.2 * U * pts.k, g = ctx.createRadialGradient(cx, cy, 0, cx, cy, gr); g.addColorStop(0, rgba(C.windowGlow, 0.16 * pts.k)); g.addColorStop(1, rgba(C.windowGlow, 0));
+        ctx.fillStyle = g; ctx.fillRect(cx - gr, cy - gr, 2 * gr, 2 * gr);
         ctx.beginPath(); pts.forEach((pt, i) => (i ? ctx.lineTo(...pt) : ctx.moveTo(...pt))); ctx.fillStyle = rgba(C.window, 0.92); ctx.fill();
       }
     }
