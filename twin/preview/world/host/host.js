@@ -508,7 +508,7 @@ function onWorldReady() {
   const G = world.G27, W = G.W;
   world.coords.origin = { E: W.OX, N: W.OY }; world.coords.toScene = W.toScene; world.coords.toITM = W.toITM;
   // מסגרת הדגימה ≠ ITM אמיתי: אמיתי = דגימה + היסט (groundtruth/ashdod_reference.json). toITM נשאר במסגרת הדגימה (תאימות לאחור).
-  const OFF = window.ITM ? window.ITM.SAMPLE_OFFSET : { dE: 1524.6, dN: 753.6 }; world.coords.sampleOffset = OFF;
+  const OFF = window.ITM ? window.ITM.SAMPLE_OFFSET : { dE: 1507.82, dN: 757.76 }; world.coords.sampleOffset = OFF;
   world.coords.toRealITM = (x, z) => { const p = W.toITM(x, z); return { E: p.E + OFF.dE, N: p.N + OFF.dN }; };
   world.coords.fromRealITM = (E, N) => W.toScene(E - OFF.dE, N - OFF.dN);
   if (window.ITM) { world.coords.itmToWgs84 = window.ITM.itmToWgs84; world.coords.wgs84ToItm = window.ITM.wgs84ToItm; }   // הלמרט 7 פרמטרים + TM, ≤0.5 מ"מ מול PROJ
@@ -534,7 +534,7 @@ function onWorldReady() {
   const ws = setInterval(() => { if (G.S.started) { clearInterval(ws); if (!world.stats.startMs) onStarted(qs.get('view') === 'eye' ? 'dev' : qs.get('mode') || (qs.get('view') === 'char' ? 'walk' : LS.get('mode', 'walk'))); } }, 50);
 }
 // ---------------------------------------------------------------- השכונה שלי: רחוב הארז, אשדוד (מסגרת האריחים של גדוד 5!)
-// אמצע מקטע הרחוב (164765.1,634196.2)→(164737.0,634132.0). ITM אמיתי = מסגרת הדגימה + (1524.6 מז׳, 753.6 צפ׳) – לא מערבבים.
+// אמצע מקטע הרחוב (164765.1,634196.2)→(164737.0,634132.0). ITM אמיתי = מסגרת הדגימה + (1507.82 מז׳, 757.76 צפ׳) – לא מערבבים.
 const HOME = { E: 164751, N: 634164, side: 5.5, yaw: Math.atan2(164737.0 - 164765.1, -(634132.0 - 634196.2)), r: 500, name: 'רחוב הארז' };
 world.home = HOME;
 function placeAt(E, N, yaw, sidewalk) {

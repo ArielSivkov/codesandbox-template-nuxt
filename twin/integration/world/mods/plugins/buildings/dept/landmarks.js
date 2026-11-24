@@ -1,14 +1,14 @@
 /* ESH27 · מחלקת הבניינים — landmarks.js
    ציוני דרך באשדוד: רק עובדות עם מקור. גובה/קומות 'data' = מצוטט; צורה/מידה 'proc' = הנחה חזותית מסומנת.
    מזהי OSM מתייחסים לאריחי הדגימה (twin/pipeline/sample-out-ashdod = b6/map/data), כפי שהותאמו ב-twin/groundtruth.
-   קואורדינטות: ITM של אריחי הדגימה = ITM אמיתי − (1524.6, 753.6) (היסט הגאורפרנס, groundtruth/README.txt). */
+   קואורדינטות: ITM של אריחי הדגימה = ITM אמיתי − (1507.82, 757.76) (היסט הגאורפרנס, groundtruth/README.txt). */
 (function (root, factory) {
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
   else { root.ESHBuildings = root.ESHBuildings || {}; root.ESHBuildings.landmarks = api; }
 })(typeof self !== 'undefined' ? self : this, function () {
 'use strict';
-const GEOREF = { dx: 1524.6, dy: 753.6 };   // twin/groundtruth/ashdod_reference.json → georef_offset_itm_m
+const GEOREF = { dx: 1507.82, dy: 757.76 };   // twin/groundtruth/ashdod_reference.json → georef_offset_itm_m
 
 // על בניין קיים באריח (לפי מזהה OSM): תיקון גובה + תווית + צורה מיוחדת אופציונלית
 const ON_TILE = [
@@ -45,10 +45,24 @@ const STANDALONE = [
 ];
 STANDALONE.forEach(s => { s.itm = toSample(s.itm_real); });
 
+
+/* מגדלים לפי נקודה (ג'מיני, twin_ashdod_towers_geoint_v1, 23.11.2026): אין מזהה OSM, הגובה = קומות מאתר היזם × ~3.4 (משוער).
+   מוחל על הבניין הגבוה ביותר באריח שמרכזו ברדיוס r מהנקודה, ורק אם אין לו גובה מנתונים. K ודמרי לא כאן – נשארו לפי המקורות למעלה. */
+const BY_POINT = [
+  { key: 'yahad-d', he: 'מגדלי יחד – רובע ד׳', floors: 34, h: 115, itm_real: [166364.8, 634233.4], r: 30, conf: 'estimated', src: ['https://www.yad2.co.il/yad1/project/1529'] },
+  { key: 'aqua-park', he: 'AQUA PARK – עמרם אברהם', floors: 29, h: 100, itm_real: [167576.3, 635957.1], r: 35, conf: 'estimated', src: ['https://amramltd.co.il/portfolio/aqwa-park-%D7%90%D7%A9%D7%93%D7%95%D7%93-%D7%A6%D7%A4%D7%95%D7%9F/'] },
+  { key: 'sarfati', he: 'צרפתי TOWERS', floors: 23, h: 80, itm_real: [167643.2, 636089.8], r: 35, conf: 'estimated', src: ['https://www.yad2.co.il/yad1/project/18032'] },
+  { key: 'seaport', he: 'מרכז עסקים סי פורט', floors: 12, h: 46, itm_real: [167361.6, 635642.2], r: 30, conf: 'estimated', src: ['https://www.zira1.com/buildings/5dcac0397db4310294f3f905'] },
+  { key: 'we-lev', he: 'We לב אשדוד', floors: 25, h: 86, itm_real: [166912.0, 633820.3], r: 35, conf: 'estimated', src: ['https://www.s-sarfati.co.il/blog/lev-ashdod-residential-commercial-hub/'] },
+  { key: 'yahad-maar', he: 'יחד במע"ר', floors: 25, h: 85, itm_real: [165951.8, 633115.6], r: 30, conf: 'estimated', src: ['https://y-hb.co.il/maar/'] },
+  { key: 'the-lux', he: 'THE LUX – גבאי', floors: 14, h: 50, itm_real: [165838.1, 634923.7], r: 30, conf: 'estimated', src: ['https://gabaygroup.com/projects/the-lux/'] },
+];
+BY_POINT.forEach(s => { s.itm = toSample(s.itm_real); });
+
 const byId = new Map(ON_TILE.map(l => [l.id, l]));
 function landmarkOf(id) { return byId.get(String(id).startsWith('w') || String(id).startsWith('r') ? String(id) : 'w' + id) || null; }
 /* גובה יעד לציון דרך: h מצוטט, אחרת קומות × 3.3 (מסומן proc), אחרת null */
 function targetHeight(l) { if (!l) return null; if (l.h) return { h: l.h, basis: 'data' }; if (l.floors) return { h: l.floors * 3.3 + 1, basis: 'proc' }; return null; }
 
-return { GEOREF, ON_TILE, STANDALONE, landmarkOf, targetHeight, toSample };
+return { GEOREF, ON_TILE, STANDALONE, BY_POINT, landmarkOf, targetHeight, toSample };
 });

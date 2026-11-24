@@ -168,9 +168,9 @@ function decodeBuildings(t, v) {
     let minx = 1e9, maxx = -1e9, minz = 1e9, maxz = -1e9, per = 0, cx = 0, cz = 0;
     for (let i = 0; i < n; i++) { const x = p[i * 2], z = p[i * 2 + 1]; minx = Math.min(minx, x); maxx = Math.max(maxx, x); minz = Math.min(minz, z); maxz = Math.max(maxz, z); cx += x; cz += z;
       const j = (i + 1) % n; per += Math.hypot(p[j * 2] - x, p[j * 2 + 1] - z); }
-    const base = b.z / 10, h = Math.max(3, b.h / 10);
+    const _ov = window.YZ_BOVR && window.YZ_BOVR[b.i], base = b.z / 10, h = _ov && _ov.h ? _ov.h : Math.max(3, b.h / 10);
     const ind = /industrial|warehouse|manufacture|cowshed/.test(b.t) || (b.a > 2500 && b.f <= 3);
-    out.push({ id: b.i, name: b.n || '', type: b.t || '', area: b.a, base, h, top: base + h, sigma: b.s / 10, floors: b.f, fl: b.fl, fh: b.fh, src: b.src, conf: b.c,
+    out.push({ id: b.i, name: b.n || '', type: b.t || '', area: b.a, base, h, top: base + h, sigma: b.s / 10, floors: _ov && _ov.f ? _ov.f : b.f, ty: _ov ? _ov.ty : undefined, ovr: _ov ? _ov.note : undefined, fl: b.fl, fh: b.fh, src: b.src, conf: b.c,
       p, n, minx, maxx, minz, maxz, cx: cx / n, cz: cz / n, per, ind, tile: t.key });
   }
   return out;
@@ -592,6 +592,13 @@ function buildTile(job) {
   const [tx, ty] = job.key.split('_').map(Number);
   const t = { key: job.key, tx, ty, grp: new T.Group(), cx: (tx + 0.5) * TILE - W.OX, cz: -((ty + 0.5) * TILE - W.OY) };
   const ter = decodeTerrain(job.tb, job.v); t.hgt = ter.h; t.wild = wildMask(job.tb);
+  // גבעת יונה: ה-DEM הגס (GLO-90) חותך את הפסגה ב-34.8 מ'. תבליט משוער של ג'מיני (49 מ' בפסגת מפ"י, 53 בתל המגדלור) – רק מעלה, לא מוריד, ולא נוגע בים.
+  { const MB = window.ESHMapiBridge, off = window.ITM && ITM.SAMPLE_OFFSET; if (MB && off && job.v && job.v.o) {
+    const ox = job.v.o[0], oy = job.v.o[1], E0 = ox + off.dE, N0 = oy + off.dN;
+    if (E0 + TILE > 165950 && E0 < 167300 && N0 + TILE > 635250 && N0 < 636350) {
+      let n = 0; for (let r = 0; r < NT; r++) for (let k = 0; k < NT; k++) { const i = r * NT + k; if (t.hgt[i] <= SEA_Y + 0.01) continue;
+        const z = MB.fuseCoarseDemWithMapiPeaks(E0 + k * STEP, N0 + TILE - r * STEP, t.hgt[i]); if (z > t.hgt[i]) { t.hgt[i] = z; n++; } }
+      t.gyFix = n; } } }
   W.tiles.set(t.key, t);
   t.terrain = terrainMesh(t); t.grp.add(t.terrain);
   t.blds = decodeBuildings(t, job.v); for (const b of t.blds) indexAdd(b);

@@ -592,6 +592,13 @@ function buildTile(job) {
   const [tx, ty] = job.key.split('_').map(Number);
   const t = { key: job.key, tx, ty, grp: new T.Group(), cx: (tx + 0.5) * TILE - W.OX, cz: -((ty + 0.5) * TILE - W.OY) };
   const ter = decodeTerrain(job.tb, job.v); t.hgt = ter.h; t.wild = wildMask(job.tb);
+  // גבעת יונה: ה-DEM הגס (GLO-90) חותך את הפסגה ב-34.8 מ'. תבליט משוער של ג'מיני (49 מ' בפסגת מפ"י, 53 בתל המגדלור) – רק מעלה, לא מוריד, ולא נוגע בים.
+  { const MB = window.ESHMapiBridge, off = window.ITM && ITM.SAMPLE_OFFSET; if (MB && off && job.v && job.v.o) {
+    const ox = job.v.o[0], oy = job.v.o[1], E0 = ox + off.dE, N0 = oy + off.dN;
+    if (E0 + TILE > 165950 && E0 < 167300 && N0 + TILE > 635250 && N0 < 636350) {
+      let n = 0; for (let r = 0; r < NT; r++) for (let k = 0; k < NT; k++) { const i = r * NT + k; if (t.hgt[i] <= SEA_Y + 0.01) continue;
+        const z = MB.fuseCoarseDemWithMapiPeaks(E0 + k * STEP, N0 + TILE - r * STEP, t.hgt[i]); if (z > t.hgt[i]) { t.hgt[i] = z; n++; } }
+      t.gyFix = n; } } }
   W.tiles.set(t.key, t);
   t.terrain = terrainMesh(t); t.grp.add(t.terrain);
   t.blds = decodeBuildings(t, job.v); for (const b of t.blds) indexAdd(b);

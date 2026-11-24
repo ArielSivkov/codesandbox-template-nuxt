@@ -219,6 +219,14 @@ vec3 yzPal(float pc) { vec3 c = uYzPal[7]; for (int i = 7; i >= 0; i--) { if (pc
     if (hTy != null && hTy >= 0 && hTy <= 10) cls = { code: hTy, he: TY.T_HE[hTy], basis: 'data', why: 'רמז ממחלקת הנתונים האמיתיים' + (hint.src ? ' (' + hint.src + ')' : '') };
     else if (cls.code !== T.VILLA && resid && b.area >= 40 && ((floors <= 2 && b.area < 400) || (b.area < 150 && floors <= 3))) { cls = { code: T.VILLA, he: TY.T_HE[T.VILLA], basis: 'shape', why: floors + ' קומות, ' + Math.round(b.area) + ' מ"ר (כלל: ≤2 קומות או טביעה קטנה)' }; }
     let lm = LM.landmarkOf(b.id), tgt = LM.targetHeight(lm);
+    if (!lm && !D && LM.BY_POINT && !(hint && (+hint.h > 0 || +hint.height_m > 0 || +hint.floors > 0))) {   // מגדלים לפי נקודה (משוער)
+      const W27 = window.W27; if (W27 && W27.toScene) {
+        for (const pt of LM.BY_POINT) { if (!pt._sc) pt._sc = W27.toScene(pt.itm[0], pt.itm[1]);
+          if (Math.hypot(b.cx - pt._sc.x, b.cz - pt._sc.z) > pt.r) continue;
+          if (pt._b && pt._b !== b && (pt._b.area || 0) >= (b.area || 0)) continue;   // רק הטביעה הגדולה ברדיוס
+          pt._b = b; lm = { id: b.id, he: pt.he, floors: pt.floors, h: pt.h, conf: pt.conf, src: pt.src, note: 'גובה משוער מקומות (ג׳מיני)' }; tgt = { h: pt.h, basis: 'proc' }; break; }
+      }
+    }
     if (D) { lm = { id: b.id, he: D.he, floors: S.dekel.floors, h: S.dekel.h, conf: D.osm ? 'candidate' : 'estimated', src: S.dekel.sources.map(s => s.url), note: D.note }; tgt = { h: S.dekel.h, basis: 'data' }; }
     if (lm && tgt) {
       const hintH = hint && (+hint.h > 0 || +hint.height_m > 0 || +hint.floors > 0);

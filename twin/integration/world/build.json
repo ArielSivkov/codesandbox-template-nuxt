@@ -68,5 +68,24 @@
   "RT-nan-bld": "applied",
   "PB2-win-warm": "applied",
   "PB3-win-dim": "applied"
+ },
+ "day_update": {
+  "built_at": "2026-11-24 00:44:52",
+  "base": "world_git4",
+  "added": [
+   "adapters/61-beauty.js",
+   "adapters/62-beautyday.js",
+   "mods/plugins/ground",
+   "mods/plugins/_common"
+  ],
+  "patches": {
+   "BD1-bovr": "applied",
+   "BD2-bovr-fl": "applied",
+   "GR1-asphalt-lighter": "applied",
+   "GR2-patch-grey": "applied",
+   "GR3-trees-default-off": "applied",
+   "GR4-low-no-tufts": "applied",
+   "GR5-low-no-tufts-upd": "applied"
+  }
  }
 }
