@@ -1,0 +1,178 @@
+{
+  "product": "עולם 27 – העולם התאום ולוח היזם",
+  "semver": "0.4.6",
+  "next_rc": "0.5.0-rc.1",
+  "build_number": 30,
+  "rc_build_number": 31,
+  "commit": "520659e",
+  "branch_head_commit": "520659e",
+  "branch": "twin-world",
+  "hud_branch_commit": "3b3f4dab",
+  "released_at": "2026-11-25T06:18:00+02:00",
+  "environment": "production-ready",
+  "sanhedrin_freeze_until": "2026-11-30",
+  "protected_hud_files_untouched": [
+    "57-ariel-car.js",
+    "53-materials-hd.js",
+    "js/flora.js",
+    "61-beauty.js",
+    "world.js"
+  ],
+  "budgets": {
+    "scene_max_triangles": 250000,
+    "scene_max_draw_calls": 120,
+    "vehicle_max_triangles": 6000,
+    "character_max_triangles": 15000,
+    "lab_prop_max_triangles": 20000,
+    "texture_max_px": 1024,
+    "js_heap_max_mb": 65,
+    "css_backdrop_filter_allowed": false,
+    "building_extrusion_datum": "AGL",
+    "stage1_max_sigma_pos_m": 2.0,
+    "stage1_max_sigma_floors": 1.0,
+    "stage1_max_sigma_ground_m": 2.0,
+    "stage1_min_independent_sources": 2
+  },
+  "candidates": [
+    {
+      "rc_version": "0.4.6-rc.1",
+      "rc_build": 29,
+      "date_ist": "2026-11-24 12:35",
+      "queue_tasks": [
+        2,
+        6,
+        7
+      ],
+      "summary": "חבילת אימות קומות, גבהי AGL, רשת קרקע חשופה (DTM ברזולוציית 25 מ', σ=0.64 מ' במקום SRTM DSM σ=3.77 מ') וסטיות תקן (±σ) לשכונת הפיילוט סביב רחוב הארז (קומיט 434ca11): 31 רשומות מאומתות (51 מבנים פיזיים) העוברות שער סנהדרין #7 (n>=2, σ<=1.0), כולל פיצול תלת-נפחי לבית קנדה (4 קומות מקורי + 12 מדורג + 21 מגדל מזרחי מתב\"ע 603-0207761), התכנסות מגדלי הדקל ל-29 קומות (תב\"ע 603-1218759), הכרעת רוגוזין 27 ל-24 קומות מרשות המיסים, והחזקת מקבצי n=1 בבידוד שקוף."
+    },
+    {
+      "rc_version": "0.4.5-rc.1",
+      "rc_build": 28,
+      "date_ist": "2026-11-24 06:40",
+      "queue_tasks": [
+        5
+      ],
+      "summary": "דף מדידת 60 שניות ל-Redmi Note 14, חיבורי מנוע photomatch וגשר טקסטורות KTX2."
+    },
+    {
+      "rc_version": "0.4.4-rc.2",
+      "rc_build": 27,
+      "date_ist": "2026-11-24 06:36",
+      "queue_tasks": [
+        2,
+        7
+      ],
+      "summary": "חיבור קלט קומות OSM (W1), תיקון פערי צוות שחור C1/N5 ופיצול פודיום מגדל דמרי (N10)."
+    },
+    {
+      "rc_version": "0.4.1-rc.2",
+      "rc_build": 26,
+      "date_ist": "2026-11-24 06:22",
+      "queue_tasks": [
+        2,
+        6
+      ],
+      "summary": "תיקון מיקומי K1–K2 (51.98 מ'), הפרדת מגדל דמרי מיוניטרייד (29.60 מ'), הכרעת גבהי AGL רשמיים ל-17 מגדלי אשדוד והסרת backdrop-filter מתג הגרסה."
+    },
+    {
+      "rc_version": "0.4.2-rc.1",
+      "rc_build": 25,
+      "date_ist": "2026-11-23 23:31",
+      "queue_tasks": [
+        6
+      ],
+      "summary": "אופטימיזציית 60 FPS ויחס הזהב (φ=1.618) לטלפון אנכי."
+    }
+  ],
+  "history": [
+    {
+      "version": "0.4.6",
+      "build": 30,
+      "commit": "520659e",
+      "time_ist": "2026-11-25 06:18",
+      "owner": "Gemini + Antigravity + Claude",
+      "summary": "איחוד שחרור ייצור v0.4.6 (Build #30) על בסיס 520659e: שכונת הפיילוט ברחוב הארז (31 רשומות מבנים n>=2 ו-DTM קרקע חשופה 25 מ' עם σ=0.51 מ'), 17 מגדלי אשדוד ב-AGL מדויק (K1-K2 ב-51.98 מ' ודמרי 141.52 מ'), מצמצם קריאות ציור ל-<=98 (מתוך 225 ב-520659e), תיקוני אבטחה C1/C2/H1/H3/N5 ובאג 35-camera, סורק השטח scan.esh27.com v3.0.0 בקובץ Worker עצמאי, ולוח היזם v3.5.1."
+    },
+    {
+      "version": "0.4.0",
+      "build": 24,
+      "commit": "35de539",
+      "time_ist": "2026-11-23 23:20",
+      "owner": "Claude + Gemini",
+      "summary": "היסט מפ\"י 1507.82/757.76 מ', תבליט גבעת יונה (48.9 מ' במקום 34.8 מ'), רכב אאודי A1 מהודק ל-FPV, 7 מגדלים ואתר 3 העגורנים במגדלי הדקל."
+    },
+    {
+      "version": "0.3.2",
+      "build": 23,
+      "commit": "dryden-2135",
+      "time_ist": "2026-11-23 21:35",
+      "owner": "Claude",
+      "summary": "משבי רוח פיזיקליים במודל דריידן (MIL-F-8785C) בסינתזה ספקטרלית 64 מספרי גל."
+    },
+    {
+      "version": "0.3.0",
+      "build": 22,
+      "commit": "01efd83",
+      "time_ist": "2026-11-23 20:05",
+      "owner": "Claude",
+      "summary": "הרחבה ארצית מגוש דן עד אשדוד (national-v1): 1,532 אריחים חדשים ו-248,769 בניינים."
+    },
+    {
+      "version": "0.2.6",
+      "build": 21,
+      "commit": "f7451e0",
+      "time_ist": "2026-11-23 20:00",
+      "owner": "Claude",
+      "summary": "שילוב 4 עצמי רחוב ממודלי הענן לאחר בדיקה."
+    },
+    {
+      "version": "0.2.5",
+      "build": 20,
+      "commit": "b3aee06",
+      "time_ist": "2026-11-23 18:45",
+      "owner": "Claude",
+      "summary": "פרגולה ומגדלי מים בגבעת יונה."
+    },
+    {
+      "version": "0.2.4",
+      "build": 19,
+      "commit": "2ec6f6f",
+      "time_ist": "2026-11-23 18:20",
+      "owner": "Claude",
+      "summary": "שילוב מגדלור אשדוד בגבעת יונה והפעלת תור הענן esh27-vision."
+    },
+    {
+      "version": "0.2.3",
+      "build": 18,
+      "commit": "63d97e1",
+      "time_ist": "2026-11-23 17:50",
+      "owner": "Claude",
+      "summary": "תיקון מסך אפור ומעבר לברירת מחדל גוף ראשון (FPV)."
+    },
+    {
+      "version": "0.2.2",
+      "build": 17,
+      "commit": "de9d78f",
+      "time_ist": "2026-11-23 17:30",
+      "owner": "Claude",
+      "summary": "עדכון מגדלי הדקל ל-30 קומות במקום 8 קומות."
+    },
+    {
+      "version": "0.2.1",
+      "build": 16,
+      "commit": "8c458eb",
+      "time_ist": "2026-11-23 17:15",
+      "owner": "Claude",
+      "summary": "גוף מעוגל ראשוני לרכב הסיור."
+    },
+    {
+      "version": "0.2.0",
+      "build": 15,
+      "commit": "0dcb1c0",
+      "time_ist": "2026-11-23 16:45",
+      "owner": "Claude + Gemini",
+      "summary": "איחוד הגרסה המלאה לקישור הרגיל והכנסת רכב הסיור של אריאל."
+    }
+  ],
+  "previous_live_commit": "35de539"
+}
