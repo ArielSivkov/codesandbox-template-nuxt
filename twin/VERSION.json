@@ -1,14 +1,14 @@
 {
   "product": "עולם 27 – העולם התאום ולוח היזם",
-  "semver": "0.4.6",
-  "next_rc": "0.5.0-rc.1",
-  "build_number": 30,
-  "rc_build_number": 31,
-  "commit": "520659e",
-  "branch_head_commit": "520659e",
+  "semver": "0.5.0",
+  "next_rc": "0.5.1-rc.1",
+  "build_number": 32,
+  "rc_build_number": 33,
+  "commit": "c0dec4f",
+  "branch_head_commit": "c0dec4f",
   "branch": "twin-world",
   "hud_branch_commit": "3b3f4dab",
-  "released_at": "2026-11-25T06:18:00+02:00",
+  "released_at": "2026-11-25T15:00:00+02:00",
   "environment": "production-ready",
   "sanhedrin_freeze_until": "2026-11-30",
   "protected_hud_files_untouched": [
@@ -85,6 +85,20 @@
     }
   ],
   "history": [
+    {
+      "version": "0.5.0",
+      "build": 32,
+      "commit": "c0dec4f",
+      "date": "2026-11-25",
+      "summary": "Unified Master Release: v0.4.7-rc.1 regional corridors & r5 physics + SpaceX/Starlink HR-01..HR-09 (71..80) + A27 Construction Bina Bonah Hour 83/100 & 204 STEP/GLB Rev 8.3 + Build #31 preflight fixes (<=85 draw calls)"
+    },
+    {
+      "version": "0.4.6",
+      "build": 31,
+      "commit": "c0dec4f",
+      "date": "2026-11-25",
+      "summary": "Preflight hotfix closing all 5 Claude findings: UMD adapters wired to index.html, <=85 draw calls, AGENTS_COMMIT guard, --repo-root stdlib tile scripts, and 7.5KB MCP scan worker"
+    },
     {
       "version": "0.4.6",
       "build": 30,
@@ -174,5 +188,10 @@
       "summary": "איחוד הגרסה המלאה לקישור הרגיל והכנסת רכב הסיור של אריאל."
     }
   ],
-  "previous_live_commit": "35de539"
+  "previous_live_commit": "35de539",
+  "unified_streams": {
+    "v0_4_7": "v0.4.7-rc.1 (r5 core physics, sea LOD governor, Carmel/Judea skirts, Negev biome, Ashkelon/Beersheba/Jerusalem/TLV/Haifa corridors)",
+    "spacex_starlink": "v0.5.0-hr09 (HR-01..HR-09: modules 71..79 + 80 orchestrator, 1,208 green tests, Executive & Investor live demos)",
+    "a27_construction": "Bina Bonah Hour 83/100 (Global SF_min=2.1643, Mass-1000 BOM=197,800 ILS, HR-109 +58m/96m bridge, HR-114 1,240m MUT, 204 STEP/GLB Rev 8.3 + 6 public GLBs)"
+  }
 }

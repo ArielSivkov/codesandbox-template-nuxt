@@ -1,0 +1,84 @@
+{
+  "package_name": "twin_south_ashkelon_beersheba_v1",
+  "version": "1.0.1-v047",
+  "date_il": "2026-11-23",
+  "backlogs_completed": [
+    {
+      "id": 102,
+      "name_he": "אשקלון והסביבה + רצף חיבור אשדוד–אשקלון",
+      "feature_count": 15,
+      "corridor_hw4_tiles": 27,
+      "corridor_rail_tiles": 17
+    },
+    {
+      "id": 105,
+      "name_he": "באר שבע ופני השטח המדבריים של הנגב",
+      "feature_count": 13,
+      "wadi_corridor_tiles": 8,
+      "biome_module": "biome/negev_desert_biome.js",
+      "look_profile": "biome/look_negev.json"
+    }
+  ],
+  "geodetic_verification": {
+    "crs_wgs84": "EPSG:4326",
+    "crs_israel_tm": "EPSG:2039",
+    "official_mapi_ashdod_sample_offset_m": {
+      "dE": 1507.82,
+      "dN": 757.76
+    },
+    "inter_module_drift_m": 0.0
+  },
+  "licensing": {
+    "osm_credit": "© OpenStreetMap contributors (ODbL 1.0)",
+    "osm_license_url": "https://www.openstreetmap.org/copyright",
+    "neutral_infrastructure_pins_enforced": true,
+    "kedushat_hashem_checked": true
+  },
+  "files": [
+    {
+      "path": "SOUTH_MAPPING_REPORT_HE.md",
+      "size_bytes": 20065,
+      "sha256": "351f15fa6219e437d87f600b7bb45d951e319d1b80a468340a14c47b8d8acd4d"
+    },
+    {
+      "path": "data/ashkelon_backlog102.geojson",
+      "size_bytes": 36249,
+      "sha256": "377d07b9d1d1aa75694e4046c29bbdbe252b4994560b7334df7bec5256a77aba"
+    },
+    {
+      "path": "data/beersheba_negev_backlog105.geojson",
+      "size_bytes": 31897,
+      "sha256": "5189b0ba3684b6ad466150217a2f458524fb2069206b2a3d27afb0fda94bb710"
+    },
+    {
+      "path": "data/corridor_ashdod_ashkelon_backlog102.geojson",
+      "size_bytes": 7534,
+      "sha256": "820c715cda8c72a15400a71ba464a9a74dd0ee9ba135a2a7c93f2309c7e3533c"
+    },
+    {
+      "path": "data/south_tiles_index_national_v1.json",
+      "size_bytes": 44248,
+      "sha256": "698e2595285189499672cd2b77bca18fdf1c2d1a7041504b169d502afd51042c"
+    },
+    {
+      "path": "biome/look_negev.json",
+      "size_bytes": 5067,
+      "sha256": "fa10c92f7bca53c91f0b487b1692c01157176ae43fc5db2a3ab082fb34994a44"
+    },
+    {
+      "path": "biome/negev_desert_biome.js",
+      "size_bytes": 14952,
+      "sha256": "1db98f49e422845bfc43333fd9d759116f3ef8bfa22973c953c85b2f73d38104"
+    },
+    {
+      "path": "tools/itm_wgs84_converter.js",
+      "size_bytes": 5866,
+      "sha256": "bd88c0b495c8c72e536320192d7fe9338ee0dd2fdea2bcdd31109cd06e138307"
+    },
+    {
+      "path": "tests/validate_south_package.py",
+      "size_bytes": 1661,
+      "sha256": "ee5319f798c7c5641f756bcf5cd9bd85c640b3bbc4396e6195d436bef25e4549"
+    }
+  ]
+}

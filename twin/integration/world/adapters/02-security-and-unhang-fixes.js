@@ -156,3 +156,28 @@
     installLoadingWatchdog
   };
 });
+
+// Auto-register with YZW runtime in browser index.html
+(function () {
+  if (typeof window === 'undefined' || !window.YZW_SecUnhang) return;
+  var secApi = window.YZW_SecUnhang;
+  var watchdogRef = null;
+  var ADAPTER_02 = {
+    id: '02-security-and-unhang-fixes',
+    order: 2,
+    init: function () {
+      if (window.location) {
+        window.__yzwSanitizedParams = secApi.sanitizeRuntimeParams(window.location.search, window.location);
+      }
+      if (typeof document !== 'undefined') {
+        watchdogRef = secApi.installLoadingWatchdog(document, 8000);
+      }
+    },
+    dispose: function () {
+      watchdogRef = null;
+    }
+  };
+  if (window.YZW && typeof window.YZW.register === 'function') {
+    window.YZW.register(ADAPTER_02);
+  }
+})();

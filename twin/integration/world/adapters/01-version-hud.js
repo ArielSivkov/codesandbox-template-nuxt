@@ -3,20 +3,20 @@
 
   var DEFAULT_VERSION_INFO = {
     product: 'עולם 27',
-    semver: '0.4.6',
-    build_number: 24,
-    commit: '35de539',
+    semver: '0.5.0',
+    build_number: 32,
+    commit: 'c0dec4f',
     branch: 'twin-world',
-    released_at: '2026-11-23 23:20',
-    environment: 'staging',
+    released_at: '2026-11-25 15:00',
+    environment: 'production',
     budgets: {
       scene_max_triangles: 250000,
       scene_max_draw_calls: 120
     },
     highlights: [
-      'היסט מפ"י רשמי 1507.82/757.76 מ\' אוחד במנוע',
-      'תבליט גבעת יונה עלה ל-48.9 מ\' (במקום 34.8 מ\')',
-      'רכב אאודי A1 מהודק ל-FPV + אתר 3 עגורנים במגדלי הדקל'
+      'איחוד מלא: v0.4.7 + מרתון SpaceX/Starlink (HR-01..09) + A27 בינה בונה שעה 83',
+      '1,584 לווייני Starlink LEO, כיפת RF, נחיתת G-FOLD (1.24 ס"מ) ורשת חירום 12 צמתים',
+      'גשר HR-109 (+58 מ׳ / שלוחת 96 מ׳), מנהרת MUT 1,240 מ׳ ו-204 מכלולי STEP/GLB ב-<=85 DC'
     ]
   };
 

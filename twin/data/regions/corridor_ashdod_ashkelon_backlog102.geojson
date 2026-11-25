@@ -1,0 +1,301 @@
+{
+  "type": "FeatureCollection",
+  "name": "corridor_ashdod_ashkelon_and_nahal_beersheba",
+  "metadata": {
+    "schema": "esh27.twin_corridors/1.0",
+    "backlogs": [
+      102,
+      105
+    ],
+    "crs_primary": "EPSG:4326 (WGS84)",
+    "crs_metric": "EPSG:2039 (Israel 1993 / ITM)",
+    "unified_world_sample_offsets": {
+      "realdata_v2": {
+        "dE_m": -1507.85,
+        "dN_m": -757.75
+      },
+      "legacy_v1": {"dE_m": -1524.6, "dN_m": -753.6}
+    },
+    "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+    "osm_license_url": "https://www.openstreetmap.org/copyright"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "COR-HW4-ASHDOD-ASHKELON",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.7,
+            31.827222
+          ],
+          [
+            34.6815,
+            31.796766
+          ],
+          [
+            34.666951,
+            31.777514
+          ],
+          [
+            34.658,
+            31.7625
+          ],
+          [
+            34.6465,
+            31.739779
+          ],
+          [
+            34.627,
+            31.7095
+          ],
+          [
+            34.6145,
+            31.6938
+          ],
+          [
+            34.6065,
+            31.676794
+          ],
+          [
+            34.599,
+            31.6645
+          ]
+        ]
+      },
+      "properties": {
+        "id": "COR-HW4-ASHDOD-ASHKELON",
+        "backlog_id": 102,
+        "name_he": "ציר כביש 4 – רצף אשדוד (מחלף אשדוד / עד הלום) עד אשקלון",
+        "corridor_type": "national_highway",
+        "crs_secondary": "EPSG:2039",
+        "itm_polyline_m": [
+          [
+            171700.11,
+            637270.48
+          ],
+          [
+            169932.41,
+            633901.59
+          ],
+          [
+            168544.02,
+            631773.52
+          ],
+          [
+            167687.79,
+            630112.89
+          ],
+          [
+            166585.38,
+            627598.98
+          ],
+          [
+            164719.72,
+            624251.09
+          ],
+          [
+            163525.39,
+            622516.53
+          ],
+          [
+            162756.57,
+            620634.95
+          ],
+          [
+            162037.81,
+            619275.65
+          ]
+        ],
+        "national_v1_tiles_ordered": [
+          "171_637",
+          "171_636",
+          "171_635",
+          "170_635",
+          "170_634",
+          "169_633",
+          "169_632",
+          "168_632",
+          "168_631",
+          "168_630",
+          "167_630",
+          "167_629",
+          "167_628",
+          "166_628",
+          "166_627",
+          "166_626",
+          "165_626",
+          "165_625",
+          "165_624",
+          "164_624",
+          "164_623",
+          "163_623",
+          "163_622",
+          "163_621",
+          "162_621",
+          "162_620",
+          "162_619"
+        ],
+        "tile_count": 27,
+        "provenance": "verified_public",
+        "source_title": "כביש 4 ומחלף עד הלום – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%A3_%D7%A2%D7%93_%D7%94%D7%9C%D7%95%D7%9D",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "COR-RAIL-ASHDOD-ASHKELON",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.665833,
+            31.773889
+          ],
+          [
+            34.6442,
+            31.741
+          ],
+          [
+            34.6248,
+            31.7085
+          ],
+          [
+            34.604658,
+            31.676794
+          ]
+        ]
+      },
+      "properties": {
+        "id": "COR-RAIL-ASHDOD-ASHKELON",
+        "backlog_id": 102,
+        "name_he": "מסילת החוף / מסילת לוד–אשקלון (מקטע אשדוד עד הלום – אשקלון, מחושמל 25kV)",
+        "corridor_type": "electrified_railway",
+        "crs_secondary": "EPSG:2039",
+        "itm_polyline_m": [
+          [
+            168436.13,
+            631372.08
+          ],
+          [
+            166368.12,
+            627735.49
+          ],
+          [
+            164510.58,
+            624141.31
+          ],
+          [
+            162581.9,
+            620635.91
+          ]
+        ],
+        "national_v1_tiles_ordered": [
+          "168_631",
+          "168_630",
+          "167_630",
+          "167_629",
+          "167_628",
+          "166_628",
+          "166_627",
+          "165_626",
+          "165_625",
+          "164_625",
+          "164_624",
+          "164_623",
+          "163_623",
+          "163_622",
+          "163_621",
+          "162_621",
+          "162_620"
+        ],
+        "tile_count": 17,
+        "provenance": "verified_public",
+        "source_title": "מסילת החוף ותחנת הרכבת אשקלון – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A1%D7%99%D7%9C%D7%AA_%D7%94%D7%97%D7%95%D7%A3",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%A8%D7%9B%D7%91%D7%AA_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "COR-WADI-BEERSHEBA",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.841,
+            31.2335
+          ],
+          [
+            34.808333,
+            31.235556
+          ],
+          [
+            34.807111,
+            31.236056
+          ],
+          [
+            34.789,
+            31.2375
+          ],
+          [
+            34.768,
+            31.2345
+          ]
+        ]
+      },
+      "properties": {
+        "id": "COR-WADI-BEERSHEBA",
+        "backlog_id": 105,
+        "name_he": "ערוץ נחל באר שבע (ואדי מדברי ופארק נחל באר שבע)",
+        "corridor_type": "desert_wadi_channel",
+        "crs_secondary": "EPSG:2039",
+        "itm_polyline_m": [
+          [
+            184830.55,
+            571384.68
+          ],
+          [
+            181719.09,
+            571623.34
+          ],
+          [
+            181602.87,
+            571679.2
+          ],
+          [
+            179878.03,
+            571845.65
+          ],
+          [
+            177876.06,
+            571520.73
+          ]
+        ],
+        "national_v1_tiles_ordered": [
+          "184_571",
+          "183_571",
+          "182_571",
+          "181_571",
+          "180_571",
+          "179_571",
+          "178_571",
+          "177_571"
+        ],
+        "tile_count": 8,
+        "provenance": "verified_public",
+        "source_title": "נחל באר שבע ופארק נחל באר שבע – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%A4%D7%90%D7%A8%D7%A7_%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "package_name": "twin_jerusalem_tlv_haifa_v1.zip",
+  "version": "1.0.1-v047",
+  "board_date": "2026-11-23",
+  "backlogs_completed": [
+    103,
+    104,
+    106
+  ],
+  "crs": {
+    "geographic": "WGS84 (EPSG:4326)",
+    "projected": "Israel 1993 / Israeli Transverse Mercator (ITM EPSG:2039)",
+    "epsg_url": "https://epsg.io/2039"
+  },
+  "corridor_continuity": {
+    "south_package_junction": "Ad Halom Interchange (Ashdod) — [168, 630] ITM 1km tile",
+    "highway_4_ashdod_to_dan_1km_tiles": 50,
+    "highway_20_ayalon_holot_to_glilot_1km_tiles": 28
+  },
+  "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+  "qa_verification": {
+    "zero_nan_verified": true,
+    "kedushat_hashem_verified": true,
+    "nodejs_foundation_skirts_self_test": "PASS",
+    "western_wall_mapi_benchmark_itm": {
+      "easting_m": 222303.615,
+      "northing_m": 631557.918,
+      "elev_asl_m": 725.0
+    },
+    "total_geojson_features": 51,
+    "height_source_counts": {
+      "verified_public": 42,
+      "estimated": 9
+    }
+  },
+  "files": [
+    {
+      "filename": "JERUSALEM_TLV_HAIFA_REPORT_HE.md",
+      "size_bytes": 25244,
+      "sha256": "b8af89de9e5273dd5886c4bd278589a59dd01d940a5e726cdf9ff21e92a31d5f"
+    },
+    {
+      "filename": "backlog_103_jerusalem_100km.geojson",
+      "size_bytes": 52513,
+      "sha256": "f8b1bb9ddb1da3346cd565d47eb9844c25099f8dd9545cdbfa2b5abf113639cd"
+    },
+    {
+      "filename": "backlog_104_tlv_ashdod_corridor.geojson",
+      "size_bytes": 49150,
+      "sha256": "3867be7114f4a5b979361a2d38356bbb4cd379108c0dd27434cdb13bfb222bd1"
+    },
+    {
+      "filename": "backlog_106_haifa_carmel_bay.geojson",
+      "size_bytes": 36276,
+      "sha256": "b6681059de6102eb89c59fcfc4e36b758eff48e0bb26abcc76392d3369d16b55"
+    },
+    {
+      "filename": "jerusalem_horizon_profile.json",
+      "size_bytes": 186998,
+      "sha256": "50e7c6e502b7ce4dde3b8942abd3536b18397ec676aee297ee472d6d674d7abb"
+    },
+    {
+      "filename": "jerusalem_horizon_zmanim.py",
+      "size_bytes": 32608,
+      "sha256": "e9b4acfcaac19d4e8e612f89835adf56dc1af4b92cfb2bdd95d2e82922c8959f"
+    },
+    {
+      "filename": "carmel_judea_terrain_skirts.js",
+      "size_bytes": 18148,
+      "sha256": "17c5c2f08cd72319c4990b33dbd852287576fac51854e4cf289b3db828112f7e"
+    }
+  ]
+}

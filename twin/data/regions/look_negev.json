@@ -1,0 +1,136 @@
+{
+  "schema": "esh27.look_profile/1.0",
+  "profile_id": "negev_desert_v1",
+  "backlog_id": 105,
+  "region_he": "בקעת באר שבע וצפון הנגב",
+  "elevation_band_m_asl": {
+    "min": 255.0,
+    "mean_beersheba": 291.0,
+    "max": 325.0,
+    "provenance": "verified_public",
+    "source_url": "https://he.wikipedia.org/wiki/%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2"
+  },
+  "license_attribution": {
+    "osm": "© OpenStreetMap contributors (ODbL 1.0)",
+    "osm_license_url": "https://www.openstreetmap.org/copyright",
+    "code_license": "MIT (ESH27 Twin World)"
+  },
+  "materials": {
+    "loess_soil": {
+      "label_he": "אדמת לס צפון-נגבית (טין, קוורץ וקלציט)",
+      "srgb_hex": "#D4BA8E",
+      "crust_dry_hex": "#DFC9A3",
+      "compacted_track_hex": "#C2A679",
+      "albedo_broadband": 0.35,
+      "roughness": 0.88,
+      "metalness": 0.0,
+      "normal_micro_scale": 0.42,
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9C%D7%A1"
+    },
+    "pale_limestone": {
+      "label_he": "אבן גיר וקירטון מדברי בהיר",
+      "srgb_hex": "#E8DFCC",
+      "weathered_patina_hex": "#D6CBB4",
+      "brutalist_concrete_beersheba_hex": "#CFC8BA",
+      "albedo_broadband": 0.43,
+      "roughness": 0.79,
+      "metalness": 0.0,
+      "source_url": "https://he.wikipedia.org/wiki/%D7%92%D7%90%D7%95%D7%9C%D7%95%D7%92%D7%99%D7%94_%D7%A9%D7%9C_%D7%99%D7%A9%D7%A8%D7%90%D7%9C"
+    },
+    "dry_wadi_bed": {
+      "label_he": "ערוץ ואדי יבש – חלוקי נחל, חצץ וסחף לס",
+      "thalweg_pebble_hex": "#B8A280",
+      "silt_bar_hex": "#CBB58D",
+      "bank_cut_loess_hex": "#C5A87A",
+      "albedo_broadband": 0.31,
+      "roughness": 0.92,
+      "pebble_scatter_density_per_m2": 6.5,
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2"
+    }
+  },
+  "atmosphere_and_haze": {
+    "preset_mode": "desert_dust_light",
+    "horizon_dust_tint_day_hex": "#E6D5B8",
+    "horizon_dust_tint_golden_hex": "#E5B582",
+    "sky_zenith_day_hex": "#3C78B8",
+    "sky_zenith_night_hex": "#0B1326",
+    "mie_turbidity_day": 3.8,
+    "mie_directional_g": 0.76,
+    "exponential_fog_beta_day": 0.000145,
+    "exponential_fog_beta_night": 0.000065,
+    "visibility_range_km": {
+      "clear_winter": 18.0,
+      "typical_dry_day": 11.5,
+      "light_loess_breeze": 7.5
+    },
+    "height_fog_base_m_asl": 260.0,
+    "height_fog_falloff_m": 180.0,
+    "source_url": "https://he.wikipedia.org/wiki/%D7%94%D7%A0%D7%92%D7%91"
+  },
+  "radiative_diurnal_cycle": {
+    "solar_albedo_mean": 0.36,
+    "midday_exposure_ev_offset": -0.35,
+    "ground_bounce_warm_intensity": 0.42,
+    "ground_bounce_tint_hex": "#DEC396",
+    "diurnal_temperature_model_c": {
+      "summer_peak_day_c": 36.5,
+      "summer_pre_dawn_c": 20.5,
+      "winter_peak_day_c": 18.5,
+      "winter_pre_dawn_c": 6.5,
+      "radiative_cooling_rate_c_per_hr_post_sunset": 2.1
+    },
+    "night_post_processing": {
+      "uBloomStr": 0.40,
+      "lit_window_fraction": 0.06,
+      "color_temp_shift_kelvin_night": 4300
+    },
+    "source_url": "https://he.wikipedia.org/wiki/%D7%94%D7%A0%D7%92%D7%91"
+  },
+  "sparse_flora": [
+    {
+      "species_id": "vachellia_tortilis_raddiana",
+      "name_he": "שיטה סלילנית",
+      "scientific_name": "Vachellia tortilis subsp. raddiana",
+      "habitat": "wadi_thalweg_and_alluvial_fans",
+      "canopy_shape": "flat_umbrella_sparse",
+      "foliage_hex": "#6E7F4F",
+      "bark_hex": "#5C4B3B",
+      "height_range_m": [4.0, 8.5],
+      "crown_radius_m": [2.8, 5.6],
+      "max_wadi_distance_m": 65.0,
+      "density_per_hectare_wadi": 4.2,
+      "density_per_hectare_plain": 0.15,
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A9%D7%99%D7%98%D7%94_%D7%A1%D7%9C%D7%99%D7%9C%D7%A0%D7%99%D7%AA"
+    },
+    {
+      "species_id": "tamarix_nilotica",
+      "name_he": "אשל היאור / אשל מרובע",
+      "scientific_name": "Tamarix nilotica / Tamarix aphylla",
+      "habitat": "nahal_banks_and_saline_loess_depressions",
+      "canopy_shape": "feathery_irregular_clump",
+      "foliage_hex": "#778870",
+      "bark_hex": "#665544",
+      "height_range_m": [3.5, 7.5],
+      "crown_radius_m": [2.0, 4.2],
+      "max_wadi_distance_m": 90.0,
+      "density_per_hectare_wadi": 6.5,
+      "density_per_hectare_plain": 0.25,
+      "source_url": "https://he.wikipedia.org/wiki/%D7%90%D7%A9%D7%9C_%D7%94%D7%99%D7%90%D7%95%D7%A8"
+    },
+    {
+      "species_id": "retama_raetam",
+      "name_he": "רותם המדבר",
+      "scientific_name": "Retama raetam",
+      "habitat": "loess_slopes_and_wadi_margins",
+      "canopy_shape": "broom_shrub_leafless",
+      "foliage_hex": "#839165",
+      "bark_hex": "#7A7258",
+      "height_range_m": [1.2, 2.8],
+      "crown_radius_m": [0.9, 1.9],
+      "max_wadi_distance_m": 250.0,
+      "density_per_hectare_wadi": 14.0,
+      "density_per_hectare_plain": 3.2,
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A8%D7%95%D7%AA%D7%9D_%D7%94%D7%9E%D7%93%D7%91%D7%A8"
+    }
+  ]
+}

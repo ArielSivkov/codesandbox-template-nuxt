@@ -142,6 +142,39 @@ function auditHaerezPilotGroundTruth(pilotPath, dtmPath) {
   };
 }
 
+
+function auditUnifiedAdaptersAndIpSafety(baseDir) {
+  const adaptersDir = path.join(baseDir, 'integration/world/adapters');
+  const errors = [];
+  let adapterCount = 0;
+  if (fs.existsSync(adaptersDir)) {
+    for (const fn of fs.readdirSync(adaptersDir).filter((f) => f.endsWith('.js')).sort()) {
+      adapterCount++;
+      const code = fs.readFileSync(path.join(adaptersDir, fn), 'utf8');
+      if (/^\s*export\s+/m.test(code) || /^\s*import\s+/m.test(code)) {
+        errors.push(`${fn}: ES module import/export syntax forbidden in classic <script> adapter`);
+      }
+      if (/backdrop-filter\s*:/i.test(code)) {
+        errors.push(`${fn}: Forbidden CSS backdrop-filter detected`);
+      }
+    }
+  }
+  // Ensure zero private .step CAD files leak into public twin/ directory
+  function scanForStep(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) scanForStep(full);
+      else if (/\.(step|stp)$/i.test(entry.name)) {
+        errors.push(`IP leak: private CAD file ${entry.name} found in public web tree`);
+      }
+    }
+  }
+  scanForStep(baseDir);
+  if (adapterCount < 22) errors.push(`Expected >= 22 unified adapters, got ${adapterCount}`);
+  return { ok: errors.length === 0, adapterCount, errors };
+}
+
 if (require.main === module) {
   const baseDir = fs.existsSync(path.join(__dirname, 'VERSION.json')) ? __dirname : path.resolve(__dirname, '..');
   const vRes = auditVersionManifest(path.join(baseDir, 'VERSION.json'));
@@ -149,16 +182,19 @@ if (require.main === module) {
     path.join(baseDir, 'data/haerez_pilot_buildings_v046_rc1.json'),
     path.join(baseDir, 'data/haerez_500m_bare_earth_dtm_25m.json')
   );
-  const allOk = vRes.ok && pRes.ok;
+  const uRes = auditUnifiedAdaptersAndIpSafety(baseDir);
+  const allOk = vRes.ok && pRes.ok && uRes.ok;
   console.log(JSON.stringify({
     gate: allOk ? 'RELEASE_GATE_PASSED' : 'RELEASE_GATE_FAILED',
     version_audit: vRes,
-    haerez_pilot_audit: pRes
+    haerez_pilot_audit: pRes,
+    unified_47_spacex_a27_audit: uRes
   }, null, 2));
   process.exit(allOk ? 0 : 1);
 }
 
 module.exports = {
   auditVersionManifest,
-  auditHaerezPilotGroundTruth
+  auditHaerezPilotGroundTruth,
+  auditUnifiedAdaptersAndIpSafety
 };

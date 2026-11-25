@@ -1,37 +1,70 @@
 /**
- * ESH27 Twin World · Adapter 81 & 15 Drift Corrections (Marathon hr06 Fixes)
- * Version: 0.4.6 (Build #30)
- *
- * 1. Fixes 81-lido-railing.js ITM anchor from (166420, 636150) [1,210.4m NE inland near Givat Yona!]
- *    to verified Lido Beach Promenade seawall edge (165695.0, 635150.0) in EPSG:2039.
- * 2. Unifies SCENE_DRAW_CALL_BUDGET = 120 across 15-sea-lod-governor.js and studio-release-gate.js
- *    (eliminating the 150 vs 120 contradiction).
+ * ESH27 Twin World · Adapter 81 & 15 Drift Corrections (Build #31) — Classic Browser <script> + UMD
  */
-export const LIDO_RAILING_ANCHOR_ITM = Object.freeze({
-  itmE: 165695.0,
-  itmN: 635150.0,
-  elevationM: 3.1,
-  azimuthDeg: 9.2,
-  lengthM: 180.0,
-  previousBuggyItm: [166420.0, 636150.0],
-  correctedDriftMeters: 1235.2
-});
-
-export const UNIFIED_STUDIO_BUDGETS = Object.freeze({
-  SCENE_DRAW_CALL_BUDGET: 120,
-  SCENE_TRIANGLE_BUDGET: 250000,
-  MOBILE_VRAM_BUDGET_MB: 40.0,
-  CSS_BACKDROP_FILTER_BUDGET: 0
-});
-
-export function patchLidoRailingAndGovernor(registry = {}) {
-  if (registry.lidoRailing) {
-    registry.lidoRailing.itmE = LIDO_RAILING_ANCHOR_ITM.itmE;
-    registry.lidoRailing.itmN = LIDO_RAILING_ANCHOR_ITM.itmN;
-    registry.lidoRailing.elevationM = LIDO_RAILING_ANCHOR_ITM.elevationM;
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === 'object' && module && module.exports) {
+    module.exports = api;
   }
-  if (registry.seaLodGovernor) {
-    registry.seaLodGovernor.SCENE_DRAW_CALL_BUDGET = UNIFIED_STUDIO_BUDGETS.SCENE_DRAW_CALL_BUDGET;
+  if (root) {
+    root.YZW_LidoFix = api;
+    if (root.YZW && typeof root.YZW.register === 'function') {
+      root.YZW.register(api.ADAPTER_SPEC);
+    }
   }
-  return UNIFIED_STUDIO_BUDGETS;
-}
+})(typeof window !== 'undefined' ? window : globalThis, function () {
+  'use strict';
+
+  var LIDO_RAILING_ANCHOR_ITM = Object.freeze({
+    itmE: 165695.0,
+    itmN: 635150.0,
+    elevationM: 3.1,
+    azimuthDeg: 9.2,
+    lengthM: 180.0
+  });
+
+  var UNIFIED_STUDIO_BUDGETS = Object.freeze({
+    SCENE_DRAW_CALL_BUDGET: 98,
+    STUDIO_RELEASE_GATE_CAP: 120,
+    SCENE_TRIANGLE_BUDGET: 250000,
+    MOBILE_VRAM_BUDGET_MB: 40.0,
+    CSS_BACKDROP_FILTER_BUDGET: 0
+  });
+
+  function patchLidoRailingAndGovernor(registry) {
+    registry = registry || {};
+    if (registry.lidoRailing) {
+      registry.lidoRailing.itmE = LIDO_RAILING_ANCHOR_ITM.itmE;
+      registry.lidoRailing.itmN = LIDO_RAILING_ANCHOR_ITM.itmN;
+      registry.lidoRailing.elevationM = LIDO_RAILING_ANCHOR_ITM.elevationM;
+    }
+    if (registry.seaLodGovernor) {
+      registry.seaLodGovernor.SCENE_DRAW_CALL_BUDGET = UNIFIED_STUDIO_BUDGETS.STUDIO_RELEASE_GATE_CAP;
+    }
+    return UNIFIED_STUDIO_BUDGETS;
+  }
+
+  var ADAPTER_SPEC = {
+    id: '81-lido-railing-itm-fix',
+    order: 82,
+    init: function (world) {
+      if (!world) return;
+      patchLidoRailingAndGovernor(world);
+      if (world.scene && typeof world.scene.traverse === 'function') {
+        world.scene.traverse(function (n) {
+          if (n && /lido[-_]?railing/i.test(String(n.name || '')) && typeof world.placeITM === 'function') {
+            world.placeITM(n, LIDO_RAILING_ANCHOR_ITM.itmE, LIDO_RAILING_ANCHOR_ITM.itmN, LIDO_RAILING_ANCHOR_ITM.elevationM);
+          }
+        });
+      }
+    },
+    dispose: function () {}
+  };
+
+  return {
+    LIDO_RAILING_ANCHOR_ITM: LIDO_RAILING_ANCHOR_ITM,
+    UNIFIED_STUDIO_BUDGETS: UNIFIED_STUDIO_BUDGETS,
+    ADAPTER_SPEC: ADAPTER_SPEC,
+    patchLidoRailingAndGovernor: patchLidoRailingAndGovernor
+  };
+});

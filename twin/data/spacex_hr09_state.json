@@ -1,0 +1,174 @@
+{
+  "project": "ESH27 Twin World & Game — SpaceX / Starlink-Grade Engineering Sprint (06:00–18:00)",
+  "created_at": "2026-11-25T06:01:00+02:00",
+  "drive_folder_id": "13A1TiHDNsDw5nZTgVupR9qvYBxJXZaTG",
+  "roadmap_doc_id": "1PBbVDdO4Ka1C7eI15rHg-hBKEv8dofpGNgHi7dQbiFA",
+  "twin_board_doc_id": "1o86b41j87Xg4vY8BFFzMicOPmkpzNYBRfrY3m0-HD3w",
+  "next_hour_to_execute": "HR-10",
+  "completed_hours": [
+    "HR-01",
+    "HR-02",
+    "HR-03",
+    "HR-04",
+    "HR-05",
+    "HR-06",
+    "HR-07",
+    "HR-08",
+    "HR-09"
+  ],
+  "cumulative_verified_tests": 1208,
+  "iron_rules": [
+    "First-principles physics only: every equation (SGP4, Friis/ITU-R, ES-EKF, 6-DOF, convex guidance, floating-origin, EO/IR Planck, LiDAR ToF & Mesh Laplacian/M/M/1) must be verified numerically in Python and Node.js with unit tests before delivery.",
+    "60 FPS mobile budget (Redmi Note 14): <= 108 Draw Calls, zero CSS backdrop-filter over WebGL, proper GPU dispose(), no NaN/Infinity.",
+    "Respect Sanhedrin locks: never overwrite world.esh27.com live DNS without Ariel's explicit approval, never modify locked twin-hud files in place (deliver clean drop-in adapters and standalone runnable HTML demos in Drive), zero personal neighbor data or unapproved keys."
+  ],
+  "hourly_rungs": [
+    {
+      "id": "HR-01",
+      "window": "06:00",
+      "module": "71-starlink-leo-shell.js",
+      "title": "מסלולי לווייני LEO (SGP4/J2) בזמן אמת מעל אשדוד והגלובוס (550 ק\"מ, הזזת דופלר ומעברי דמדומים)"
+    },
+    {
+      "id": "HR-02",
+      "window": "07:00",
+      "module": "72-rf-link-budget.js",
+      "title": "תקציב ערוץ RF (Ku/Ka Phased-Array) וכיפת חסימות תלת-ממדית (LOS Obstruction Dome) בין בנייני אשדוד"
+    },
+    {
+      "id": "HR-03",
+      "window": "08:00",
+      "module": "73-gnss-leo-ekf.js",
+      "title": "היתוך ניווט ES-EKF (GPS L1/L5 + דופלר LEO + IMU) וסינון החזרי Multipath בקניון העירוני של אשדוד"
+    },
+    {
+      "id": "HR-04",
+      "window": "09:00",
+      "module": "74-uav-6dof-aerospace.js",
+      "title": "מנוע טיסה אווירונאוטי 6-DOF מלא בקווטרניונים, גזירת רוח במורד מגדלים וטלמטריית הספק היברידי"
+    },
+    {
+      "id": "HR-05",
+      "window": "10:00",
+      "module": "75-gfold-precision-landing.js",
+      "title": "אופטימיזציית מסלול קמורה (סגנון G-FOLD של SpaceX) להנחתה מדויקת על גגות ואסדות בנמל אשדוד תחת משבי רוח"
+    },
+    {
+      "id": "HR-06",
+      "window": "11:00",
+      "module": "76-mission-control-hud.js",
+      "title": "ממשק Mission Control בסגנון Dragon/Starship (וקטורי ב-60 FPS ללא blur, נאב-בול, מפל SNR וקופסה שחורה FDR)"
+    },
+    {
+      "id": "HR-07",
+      "window": "12:00",
+      "module": "77-floating-origin-lod.js",
+      "title": "זום רציף מהחלל לאבן השפה (550 ק\"מ עד 1 ס\"מ ברחוב הארז) עם Floating-Origin 64-bit ועומק לוגריתמי ללא רעידות"
+    },
+    {
+      "id": "HR-08",
+      "window": "13:00",
+      "module": "78-eoir-lidar-gimbal.js",
+      "title": "סימולטור מטע\"ד אופטי-תרמי (EO/IR Gimbal) וסורק LiDAR סינתטי עם חישוב GSD והשוואת שלד מול היתר"
+    },
+    {
+      "id": "HR-09",
+      "window": "14:00",
+      "module": "79-starlink-mesh-resilience.js",
+      "title": "סימולציית רשת חירום היברידית (Starlink + ממסרי רחפנים + מוקדי Edge-AI סולאריים) בשרידות הפסקת חשמל/סיבים"
+    },
+    {
+      "id": "HR-10",
+      "window": "15:00",
+      "module": "80-utm-4d-corridors.js",
+      "title": "ניהול מרחב אווירי 4D ומניעת התנגשויות (ORCA / CBF) ל-50 רחפנים, מנופים ורובוטי בנייה במקביל ב-60 FPS"
+    },
+    {
+      "id": "HR-11",
+      "window": "16:00",
+      "module": "81-engine-gpu-governor.js",
+      "title": "שער ביצועי קצה וזיכרון GPU (<=98 קריאות ציור, <=38MB VRAM ב-KTX2, אפס דליפות זיכרון ב-100 טעינות אריחים)"
+    },
+    {
+      "id": "HR-12",
+      "window": "17:00",
+      "module": "82-aerospace-fault-injection.js",
+      "title": "חליפת הזרקת תקלות וצוות אדום אווירונאוטי (שיבוש GPS, אובדן מנוע, משב 18 מ'/שנ' ודעיכת גשם ב-Ku-Band)"
+    },
+    {
+      "id": "HR-13",
+      "window": "18:00",
+      "module": "twin_spacex_starlink_showcase_v1.html",
+      "title": "איחוד וחתימה: דמו תלת-ממדי חי מאוחד (Earth-to-Orbit Ashdod Twin) עם מצב תצוגת מנהלים אוטומטי בן 90 שניות"
+    }
+  ],
+  "last_updated_ist": "2026-11-25T14:33:00+02:00",
+  "current_version": "v0.5.0-hr09",
+  "latest_metrics": {
+    "shell_1_sats": 1584,
+    "orbital_altitude_km": 550.0,
+    "orbital_inclination_deg": 53.0,
+    "ku_band_center_ghz": 11.7,
+    "fspl_550km_db": 168.62,
+    "obstruction_dome_sectors": 468,
+    "ekf_state_dimension": 15,
+    "chi2_1dof_99pct_gate": 6.634897,
+    "urban_canyon_naive_gps_rmse_m": 14.86,
+    "urban_canyon_es_ekf_leo_rmse_m": 0.79,
+    "multipath_error_reduction_pct": 94.68,
+    "uav_6dof_so3_wind_rmse_m": 0.76,
+    "uav_6dof_naive_pid_rmse_m": 17.64,
+    "uav_6dof_wind_error_reduction_pct": 95.67,
+    "da38cc_zone_c_pa12cf_temp_c": 69.2,
+    "da38cc_hybrid_endurance_hours": 3.63,
+    "gfold_touchdown_err_cm": 1.24,
+    "gfold_uncompensated_miss_m": 2.92,
+    "gfold_dispersion_reduction_pct": 99.58,
+    "gfold_min_cone_margin_m": 0.446,
+    "fdr_ring_buffer_capacity_frames": 600,
+    "fdr_channels_per_frame": 16,
+    "fdr_crc32_poly_hex": "0xEDB88320",
+    "shannon_eff_18_4db_bps_hz": 6.133,
+    "shannon_cap_240mhz_mbps": 1471.9,
+    "scale_dive_range_m": [0.01, 550000.0],
+    "dynamic_scale_ratio": 55000000.0,
+    "naive_ecef_f32_jitter_cm": 27.57,
+    "naive_epsg2039_f32_jitter_cm": 2.29,
+    "floating_origin_64bit_jitter_nm": 23.20,
+    "two_float_gpu_jitter_nm": 26.33,
+    "jitter_reduction_pct": 99.9999904,
+    "std_z_1500m_resolution_m": 26.82,
+    "log_z_1500m_resolution_mm": 1.442,
+    "log_z_1cm_resolution_um": 0.970,
+    "rayleigh_mie_rk4_gci_12": 2.7998e-06,
+    "eo_4k_gsd_mm_px": 3.437,
+    "eo_airy_disk_mm": 1.604,
+    "lwir_gsd_cm_px": 4.53,
+    "gimbal_residual_los_urad": 44.38,
+    "planck_curing_concrete_radiance_w_m2_sr": 66.594,
+    "planck_ambient_radiance_w_m2_sr": 46.373,
+    "planck_asme_gci_12": 3.1883e-12,
+    "lidar_range_1sigma_cm": 1.346,
+    "lidar_points_per_scan": 640,
+    "permit_compliant_pct": 95.78,
+    "permit_compliant_rmse_cm": 0.86,
+    "permit_warning_count": 11,
+    "permit_violation_count": 16,
+    "max_permit_deviation_cm": 38.38,
+    "boq_concrete_completion_pct": 84.6,
+    "mesh_nodes_total": 12,
+    "mesh_fiedler_lambda2_blackout": 4.0000,
+    "mesh_fiedler_lambda2_extreme": 2.0000,
+    "mesh_haerez4_nominal_latency_ms": 7.60,
+    "mesh_haerez4_blackout_latency_ms": 27.40,
+    "mesh_haerez4_extreme_uav_relay_latency_ms": 28.59,
+    "mesh_hard_latency_gate_ms": 45.0,
+    "solar_lifepo4_72h_min_soc_pct": 70.49,
+    "solar_lifepo4_dark_autonomy_hours": 34.38,
+    "solar_microgrid_rk4_gci_12": 1.2289e-10,
+    "executive_demo_draw_calls": 25,
+    "investor_demo_draw_calls": 23,
+    "mobile_draw_call_budget_max": 108,
+    "backdrop_filter_count": 0
+  }
+}

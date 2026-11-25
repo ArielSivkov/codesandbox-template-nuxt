@@ -1,0 +1,481 @@
+{
+  "schema": "esh27.step_3d_product_tree.v1",
+  "generated_at_utc": "2026-11-25T03:50:27Z",
+  "crs": "EPSG:2039 (Israel Transverse Mercator)",
+  "twin_world_origin": {
+    "E": 166263.8,
+    "N": 634919.8,
+    "site": "HaErez 4, Ashdod"
+  },
+  "ip_firewall_policy": "STEP AP214 files retain PRIVATE_CORE parts for Google Drive vault only; GLB files strip PRIVATE_CORE parts for public Twin-World engine.",
+  "inventions": [
+    {
+      "part_id": "HR-109-ASM",
+      "code": "HR-109",
+      "name_he": "גשר-אור 27 (שם זמני) - גשר מיתרים UHPC וסיבי פחמן",
+      "name_en": "Gesher-Or 27 UHPC CFRP Cable-Stayed Bridge",
+      "material": "Assembly",
+      "ip_tier": "PUBLIC_SHELL",
+      "total_mass_kg": 979020.0,
+      "total_cost_ils_cots": 8140000,
+      "total_cost_ils_mass": 5485000,
+      "triangle_count": 180,
+      "itm_anchor": {
+        "E": 166410.0,
+        "N": 635210.0,
+        "site": "ציר נחל לכיש / כניסה צפונית אשדוד"
+      },
+      "kpis": {
+        "schedule_months": "11 חודשים במקום 48 (-77%)",
+        "flutter_limit": "82.4 m/s (296.6 km/h)",
+        "cable_weight_delta": "-79.6% לעומת פלדה (2,800 MPa CFRP)",
+        "contractor_gross_margin": "60.4%"
+      },
+      "children": [
+        {
+          "part_id": "HR-109-PYL-01",
+          "code": "HR-109-PYL-01",
+          "name_he": "צמד פילוני H מבטון UHPC >= 175 MPa (טיפוס רובוטי 6.5 מ'/יום)",
+          "name_en": "UHPC 175MPa Twin H-Pylons",
+          "material": "UHPC 175 MPa + Basalt Rebar",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 420000.0,
+          "total_cost_ils_cots": 2850000,
+          "total_cost_ils_mass": 1920000,
+          "triangle_count": 72
+        },
+        {
+          "part_id": "HR-109-DCK-02",
+          "code": "HR-109-DCK-02",
+          "name_he": "מיסעת קורה אווירודינמית טרומית (מקטעי 180 טון)",
+          "name_en": "Aerodynamic Precast Box-Girder Deck",
+          "material": "Post-Tensioned UHPC Box Girder",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 540000.0,
+          "total_cost_ils_cots": 3400000,
+          "total_cost_ils_mass": 2350000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "HR-109-CBL-03",
+          "code": "HR-109-CBL-03",
+          "name_he": "מערך מיתרי CFRP 2,800 MPa (עמידות 2,000,000 מחזורי התעייפות)",
+          "name_en": "CFRP 2800MPa Stay-Cable Array",
+          "material": "Pultruded T700S CFRP Strands",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 18400.0,
+          "total_cost_ils_cots": 1650000,
+          "total_cost_ils_mass": 1120000,
+          "triangle_count": 48
+        },
+        {
+          "part_id": "HR-109-ANC-99",
+          "code": "HR-109-ANC-99",
+          "name_he": "ליבת עיגון טריז קרמי וחיישן FBG פנימי (חסוי D&A)",
+          "name_en": "Proprietary Ceramic Wedge Anchor + FBG Core",
+          "material": "Si3N4 Ceramic + 30CrMoV9 Sleeve",
+          "ip_tier": "PRIVATE_CORE",
+          "total_mass_kg": 620.0,
+          "total_cost_ils_cots": 240000,
+          "total_cost_ils_mass": 95000,
+          "triangle_count": 48
+        }
+      ],
+      "step_vault_file": "step_private_vault_ap214/HR-109-ASM.step",
+      "step_size_bytes": 67750,
+      "glb_public_file": "glb_public_twin_world/HR-109-ASM_public_shell.glb",
+      "glb_public_bytes": 14356,
+      "public_shell_triangles": 132
+    },
+    {
+      "part_id": "HR-086-ASM",
+      "code": "HR-86 / H76",
+      "name_he": "מגדל בינה בונה 30 קומות + מפעל-שמיים מטפס (Sky-Factory)",
+      "name_en": "Bina Bonah 30F Net-Zero Tower and Sky-Factory",
+      "material": "Assembly",
+      "ip_tier": "PUBLIC_SHELL",
+      "total_mass_kg": 5789450.0,
+      "total_cost_ils_cots": 29380000,
+      "total_cost_ils_mass": 19740000,
+      "triangle_count": 84,
+      "itm_anchor": {
+        "E": 166520.0,
+        "N": 634680.0,
+        "site": "מתחם פינוי-בינוי הנביאים 16-24 אשדוד"
+      },
+      "kpis": {
+        "floor_cycle": "48 שעות לקומה (+108.0 מ', 180 יח\"ד וממ\"דים)",
+        "skeleton_cost": "1,120 ש\"ח/מ\"ר (-60.7%)",
+        "energy_water": "1,700 kWp BIPV + 4,800 kWh LFP + 145 m3/d MBR-UF",
+        "laser_accuracy": "+/-0.077 מ\"מ לאורך 108 מ'"
+      },
+      "children": [
+        {
+          "part_id": "HR-086-COR-01",
+          "code": "HR-086-COR-01",
+          "name_he": "גרעין ממ\"דים מונוליטי ביציקה רציפה (180 ממ\"דים)",
+          "name_en": "Monolithic Slipform MAMAD Structural Core",
+          "material": "C50/60 Low-Carbon Concrete",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 4800000.0,
+          "total_cost_ils_cots": 14200000,
+          "total_cost_ils_mass": 9800000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "HR-086-BIPV-02",
+          "code": "HR-086-BIPV-02",
+          "name_he": "מעטפת חזיתות סולארית 1,700 kWp BIPV ומרפסות טרומיות",
+          "name_en": "1700kWp BIPV Curtain Facade and Modules",
+          "material": "Bifacial BIPV Glass + Anodized Alu",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 920000.0,
+          "total_cost_ils_cots": 11500000,
+          "total_cost_ils_mass": 7900000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "HR-086-SKY-03",
+          "code": "HR-086-SKY-03",
+          "name_he": "חופת מפעל-שמיים אוטונומי מטפס (גשר עגורן כפול)",
+          "name_en": "Self-Climbing Robotic Sky-Factory Canopy",
+          "material": "S460 High-Tensile Steel Truss",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 68000.0,
+          "total_cost_ils_cots": 3200000,
+          "total_cost_ils_mass": 1850000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "HR-086-JCK-99",
+          "code": "HR-086-JCK-99",
+          "name_he": "מפעיל טיפוס הידרו-סינכרוני + נעילת לייזר 520nm (חסוי)",
+          "name_en": "Closed-Loop Climbing Jack + 520nm Laser Lock",
+          "material": "42CrMo4 Alloy + Optical Lock",
+          "ip_tier": "PRIVATE_CORE",
+          "total_mass_kg": 1450.0,
+          "total_cost_ils_cots": 480000,
+          "total_cost_ils_mass": 190000,
+          "triangle_count": 48
+        }
+      ],
+      "step_vault_file": "step_private_vault_ap214/HR-086-ASM.step",
+      "step_size_bytes": 32786,
+      "glb_public_file": "glb_public_twin_world/HR-086-ASM_public_shell.glb",
+      "glb_public_bytes": 6848,
+      "public_shell_triangles": 36
+    },
+    {
+      "part_id": "E27-BOT-ASM",
+      "code": "E27-01..10",
+      "name_he": "רובוט בינה בונה דו-זרועי 68 ס\"מ + פוד לייזר AR (22.08 גרם)",
+      "name_en": "Bina Bonah 68cm Bimanual Construction Robot",
+      "material": "Assembly",
+      "ip_tier": "PUBLIC_SHELL",
+      "total_mass_kg": 107.322,
+      "total_cost_ils_cots": 581000,
+      "total_cost_ils_mass": 210950,
+      "triangle_count": 168,
+      "itm_anchor": {
+        "E": 166263.8,
+        "N": 634919.8,
+        "site": "רחוב הארז 4 אשדוד - אתר פיילוט פנים ושלד"
+      },
+      "kpis": {
+        "chassis_width": "680 מ\"מ (עובר בכל דלת פנים תקנית 70-80 ס\"מ)",
+        "bom_dual_track": "210,950 ש\"ח סדרתי (Mass-1000) | 581,000 ש\"ח Batch-1",
+        "sensor_pod": "22.080 גרם IP69K לייזר ירוק 520nm",
+        "tether": "160 מ' כבל הזנה ורשת מחוזק קוולאר (אפס זמן השבתת סוללה)"
+      },
+      "children": [
+        {
+          "part_id": "BL-01-CHS",
+          "code": "BL-01-CHS",
+          "name_he": "שלדת Mecanum ברוחב 680 מ\"מ עם מייצבים הידראוליים",
+          "name_en": "680mm Omnidirectional Mecanum Base",
+          "material": "Al 7075-T6 + Polyurethane Rollers",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 64.0,
+          "total_cost_ils_cots": 148000,
+          "total_cost_ils_mass": 52000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "BL-04-ARM",
+          "code": "BL-04-ARM",
+          "name_he": "גזע וצמד זרועות קרבון T700S/Epoxy 7-DOF לעבודות גמר ושלד",
+          "name_en": "T700S Carbon Bimanual 7-DOF Arms and Torso",
+          "material": "Toray T700S CFRP + Al 6061-T6",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 38.5,
+          "total_cost_ils_cots": 265000,
+          "total_cost_ils_mass": 96400,
+          "triangle_count": 36
+        },
+        {
+          "part_id": "BL-09-POD",
+          "code": "BL-09-POD",
+          "name_he": "פוד הקרנת לייזר AR וסריקת עומק IP69K (22.080 גרם)",
+          "name_en": "22.08g IP69K 520nm Laser AR Projection Pod",
+          "material": "PA12-CF + Sapphire Window",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 0.022,
+          "total_cost_ils_cots": 42000,
+          "total_cost_ils_mass": 14550,
+          "triangle_count": 56
+        },
+        {
+          "part_id": "BL-04-HD-99",
+          "code": "BL-04-HD-99",
+          "name_he": "תמסורת גל-מעוות 30CrMoV9 בניטרידציה (פרופיל שן חסוי D&A)",
+          "name_en": "30CrMoV9 Nitrided Harmonic Flexspline Core",
+          "material": "30CrMoV9 Plasma-Nitrided Steel",
+          "ip_tier": "PRIVATE_CORE",
+          "total_mass_kg": 4.8,
+          "total_cost_ils_cots": 126000,
+          "total_cost_ils_mass": 48000,
+          "triangle_count": 64
+        }
+      ],
+      "step_vault_file": "step_private_vault_ap214/E27-BOT-ASM.step",
+      "step_size_bytes": 62294,
+      "glb_public_file": "glb_public_twin_world/E27-BOT-ASM_public_shell.glb",
+      "glb_public_bytes": 12296,
+      "public_shell_triangles": 104
+    },
+    {
+      "part_id": "HR-114-ASM",
+      "code": "HR-114 / MUT",
+      "name_he": "תחתית-אור 27 (שם זמני) - מנהרת תשתיות ולוגיסטיקה עירונית ללא חפירה",
+      "name_en": "Tachtit-Or 27 Trenchless Multi-Utility Tunnel",
+      "material": "Assembly",
+      "ip_tier": "PUBLIC_SHELL",
+      "total_mass_kg": 306088.0,
+      "total_cost_ils_cots": 291000,
+      "total_cost_ils_mass": 172600,
+      "triangle_count": 104,
+      "itm_anchor": {
+        "E": 166074.0,
+        "N": 634956.0,
+        "site": "ציר רוגוזין / מגדלי הדקל אשדוד"
+      },
+      "kpis": {
+        "advance_rate": "18.5 מ'/יום דחיקה רובוטית ללא פתיחת כבישים (+/-4.5 מ\"מ)",
+        "cost_per_meter": "6,400 ש\"ח/מ' (-65.4% לעומת חפירה פתוחה)",
+        "traffic_relief": "מוריד 85% ממשאיות החלוקה מהרחוב (קפסולות 35-50 קמ\"ש)",
+        "waste_avac": "שאיבת אשפה פנאומטית AVAC ב-75 קמ\"ש + הפרדת אש REI 240"
+      },
+      "children": [
+        {
+          "part_id": "HR-114-LNR-01",
+          "code": "HR-114-LNR-01",
+          "name_he": "טבעות דיפון UHPC מלבניות בדחיקה תת-קרקעית (REI 240)",
+          "name_en": "Precast UHPC Jacking Tunnel Segments",
+          "material": "UHPC 150 MPa + Polypropylene Microfibers",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 290000.0,
+          "total_cost_ils_cots": 118000,
+          "total_cost_ils_mass": 84000,
+          "triangle_count": 24
+        },
+        {
+          "part_id": "HR-114-LOG-02",
+          "code": "HR-114-LOG-02",
+          "name_he": "מסלול 3 נתיבי קפסולות משטחים אוטונומיות (35-50 קמ\"ש)",
+          "name_en": "Autonomous Electric Pallet Capsule Lane",
+          "material": "LFP Pod + Inductive Guide Slot",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 1850.0,
+          "total_cost_ils_cots": 42000,
+          "total_cost_ils_mass": 24000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "HR-114-AVC-03",
+          "code": "HR-114-AVC-03",
+          "name_he": "צינור שאיבת אשפה פנאומטי AVAC + תא מים ומתח גבוה מופרד",
+          "name_en": "AVAC 75kmh Pneumatic Waste and Utility Duct",
+          "material": "Basalt-Lined Steel Pipe DN900",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 14200.0,
+          "total_cost_ils_cots": 36000,
+          "total_cost_ils_mass": 23600,
+          "triangle_count": 56
+        },
+        {
+          "part_id": "HR-114-FOG-99",
+          "code": "HR-114-FOG-99",
+          "name_he": "יחידת ניווט ג'ירו סיב-אופטי FOG ולייזר לדחיקה (+/-4.5 מ\"מ חסוי)",
+          "name_en": "Fiber-Optic Gyroscope Micro-Tunneling Guidance Head",
+          "material": "Mu-Metal Shielded FOG + Laser Target",
+          "ip_tier": "PRIVATE_CORE",
+          "total_mass_kg": 38.0,
+          "total_cost_ils_cots": 95000,
+          "total_cost_ils_mass": 41000,
+          "triangle_count": 12
+        }
+      ],
+      "step_vault_file": "step_private_vault_ap214/HR-114-ASM.step",
+      "step_size_bytes": 39715,
+      "glb_public_file": "glb_public_twin_world/HR-114-ASM_public_shell.glb",
+      "glb_public_bytes": 11324,
+      "public_shell_triangles": 92
+    },
+    {
+      "part_id": "HR-125-ASM",
+      "code": "HR-125 + D&A 38cc",
+      "name_he": "מגדל-אור 27 (שם זמני) - תורן CFRP וקן רחפן היברידי D&A 38cc",
+      "name_en": "Migdal-Or 27 CFRP Mast and ORB-GLIDER 38cc Nest",
+      "material": "Assembly",
+      "ip_tier": "PUBLIC_SHELL",
+      "total_mass_kg": 19931.25,
+      "total_cost_ils_cots": 746200,
+      "total_cost_ils_mass": 438850,
+      "triangle_count": 192,
+      "itm_anchor": {
+        "E": 166617.1,
+        "N": 635832.2,
+        "site": "גבעת יונה אשדוד (+53 מ' תצפית קו חוף ונמל)"
+      },
+      "kpis": {
+        "erection_time": "9 ימי הקמה במקום 180 (-80% מסה עצמית)",
+        "radar_horizon": "אופק מכ\"ם ותצפית 66.8 ק\"מ מגובה התורן",
+        "hybrid_engine": "מנוע D&A 38cc מודפס PA12-CF + ציפוי נחושת 1.5 מ\"מ (1,800W רציף, 1.45 ק\"ג)",
+        "prototype_cap": "~650 ש\"ח חומרי גלם לאב-טיפוס מנוע"
+      },
+      "children": [
+        {
+          "part_id": "HR-125-MST-01",
+          "code": "HR-125-MST-01",
+          "name_he": "עמוד תורן מודולרי מסיבי פחמן ובסיס UHPC",
+          "name_en": "Modular CFRP Lattice Spine and Base",
+          "material": "Filament-Wound CFRP + UHPC Plinth",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 19500.0,
+          "total_cost_ils_cots": 620000,
+          "total_cost_ils_mass": 380000,
+          "triangle_count": 48
+        },
+        {
+          "part_id": "HR-125-NST-02",
+          "code": "HR-125-NST-02",
+          "name_he": "קן נחיתה וטעינה אינדוקטיבית אוטונומית בגובה הרקיע",
+          "name_en": "Elevated Inductive Drone Landing Pad",
+          "material": "Al 6061-T6 + Weatherproof Radome",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 420.0,
+          "total_cost_ils_cots": 88000,
+          "total_cost_ils_mass": 44000,
+          "triangle_count": 64
+        },
+        {
+          "part_id": "DA-ORB-03",
+          "code": "DA-ORB-03",
+          "name_he": "כלי טיס ORB-GLIDER לסיור עירוני, מיפוי תאום ואבטחה",
+          "name_en": "D&A ORB-GLIDER Long-Endurance Airframe",
+          "material": "CFRP Spar + Kevlar Honeycomb Skin",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 9.8,
+          "total_cost_ils_cots": 34000,
+          "total_cost_ils_mass": 14200,
+          "triangle_count": 24
+        },
+        {
+          "part_id": "DA-38CC-99",
+          "code": "DA-38CC-99",
+          "name_he": "ליבת מנוע היברידי 38cc מודפס PA12-CF + אלקטרופורמינג נחושת 1.5 מ\"מ (חסוי D&A)",
+          "name_en": "D&A 38cc PA12-CF Copper-Electroformed Hybrid Powerplant",
+          "material": "PA12-CF + 1.5mm Electroformed Cu + Ceramic Coating",
+          "ip_tier": "PRIVATE_CORE",
+          "total_mass_kg": 1.45,
+          "total_cost_ils_cots": 4200,
+          "total_cost_ils_mass": 650,
+          "triangle_count": 56
+        }
+      ],
+      "step_vault_file": "step_private_vault_ap214/HR-125-ASM.step",
+      "step_size_bytes": 70914,
+      "glb_public_file": "glb_public_twin_world/HR-125-ASM_public_shell.glb",
+      "glb_public_bytes": 14732,
+      "public_shell_triangles": 136
+    },
+    {
+      "part_id": "HR-124-ASM",
+      "code": "HR-124",
+      "name_he": "מים-אור 27 (שם זמני) - מתקן התפלה ומיקרו-גריד עירוני מודולרי",
+      "name_en": "Mayim-Or 27 Autonomous SWRO-ERD and Solar Canopy",
+      "material": "Assembly",
+      "ip_tier": "PUBLIC_SHELL",
+      "total_mass_kg": 21385.0,
+      "total_cost_ils_cots": 1275000,
+      "total_cost_ils_mass": 783000,
+      "triangle_count": 256,
+      "itm_anchor": {
+        "E": 165890.0,
+        "N": 635120.0,
+        "site": "רצועת חוף לידו / מרינה אשדוד"
+      },
+      "kpis": {
+        "specific_energy": "1.92 kWh/m3 (נצילות החזר לחץ איזובארי 98.2%)",
+        "net_water_cost": "0.95 ש\"ח/מ\"ק נטו לאחר מינרליזציית תמלחת ZLD",
+        "agri_solar": "חופת דו-פאנל בגובה 4.5 מ' (LER = 1.52)",
+        "turbidity": "<= 0.14 NTU ניטור רציף אוטונומי"
+      },
+      "children": [
+        {
+          "part_id": "HR-124-SKD-01",
+          "code": "HR-124-SKD-01",
+          "name_he": "שלדת מכולה ימית מוגנת קורוזיה ומערך כלי לחץ SWRO",
+          "name_en": "Duplex Marine Skid and SWRO Pressure Vessels",
+          "material": "Super-Duplex 2507 + FRP Vessels",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 16400.0,
+          "total_cost_ils_cots": 890000,
+          "total_cost_ils_mass": 560000,
+          "triangle_count": 180
+        },
+        {
+          "part_id": "HR-124-PV-02",
+          "code": "HR-124-PV-02",
+          "name_he": "חופה סולארית דו-צדדית בגובה 4.5 מ' להצללה וייצור עצמי",
+          "name_en": "4.5m Bifacial Solar Microgrid Canopy",
+          "material": "N-Type TOPCon Bifacial Glass + Galv Frame",
+          "ip_tier": "PUBLIC_SHELL",
+          "total_mass_kg": 4800.0,
+          "total_cost_ils_cots": 210000,
+          "total_cost_ils_mass": 145000,
+          "triangle_count": 12
+        },
+        {
+          "part_id": "HR-124-ERD-99",
+          "code": "HR-124-ERD-99",
+          "name_he": "רוטור החזר אנרגיה איזובארי קרמי 98.2% + תא ZLD (חסוי)",
+          "name_en": "98.2pct Alumina Ceramic Isobaric ERD Rotor",
+          "material": "99.5% Sintered Alumina Ceramic",
+          "ip_tier": "PRIVATE_CORE",
+          "total_mass_kg": 185.0,
+          "total_cost_ils_cots": 175000,
+          "total_cost_ils_mass": 78000,
+          "triangle_count": 64
+        }
+      ],
+      "step_vault_file": "step_private_vault_ap214/HR-124-ASM.step",
+      "step_size_bytes": 92705,
+      "glb_public_file": "glb_public_twin_world/HR-124-ASM_public_shell.glb",
+      "glb_public_bytes": 17952,
+      "public_shell_triangles": 192
+    }
+  ],
+  "total_public_triangles_all_6_inventions": 692,
+  "mobile_60fps_budget_pass": true,
+  "rev": "8.3-hour83",
+  "updated_at_utc": "2026-11-25T12:30:00Z",
+  "a27_hour83_sync": {
+    "hour": "83/100",
+    "total_step_glb_assemblies": 204,
+    "serial_mass_1000_bom_ils": 197800,
+    "core_unit_serial_bom_ils": 53850,
+    "global_sf_min": 2.1643,
+    "private_step_exposed_in_web_bundle": false
+  }
+}

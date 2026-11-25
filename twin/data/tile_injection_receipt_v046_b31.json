@@ -1,0 +1,10 @@
+{
+  "task": "apply_haerez_pilot_to_tiles_and_scorecard",
+  "version": "0.4.6",
+  "build": 31,
+  "files_scanned": 0,
+  "files_modified": 0,
+  "buildings_patched": 0,
+  "buildings_dtm_upgraded": 0,
+  "dtm_sigma_m": 0.51
+}

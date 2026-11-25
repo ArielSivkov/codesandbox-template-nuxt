@@ -1,0 +1,1099 @@
+{
+  "type": "FeatureCollection",
+  "name": "backlog_106_haifa_carmel_bay",
+  "crs_metadata": {
+    "geojson_coordinates": "EPSG:4326 (WGS84 [lon, lat, elev_m])",
+    "projected_twin_grid": "EPSG:2039 (Israel 1993 / Israeli Transverse Mercator [easting_m, northing_m])",
+    "epsg_source_url": "https://epsg.io/2039",
+    "slope_skirts_module": "carmel_judea_terrain_skirts.js"
+  },
+  "attribution": {
+    "osm": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+    "license_guidelines": "https://osmfoundation.org/wiki/Licence/Attribution_Guidelines",
+    "security_policy": "מעטפת חיצונית ציבורית בלבד (Exterior Envelope Only)."
+  },
+  "data_gaps": [
+    {
+      "gap_id": "GAP-106-STEPPED-BUILDINGS-CARMEL",
+      "region": "מורדות הדר, חליסה, נווה שאנן, אחוזה ונשר",
+      "severity": "medium",
+      "description_he": "בנייני מגורים מדורגים על מדרונות הכרמל (הנכנסים מקומת הגג ברחוב העליון ויורדים 4–8 קומות למורד הוואדי) מיוצגים ב-OSM כפוליגון יחיד ללא פיצול מפלסים; מודול carmel_judea_terrain_skirts.js פותר את תופעת הריחוף ומייצר התראת קיר תמך כאשר הפרש המדרון חורג מ-9.0 מ'.",
+      "reference_url": "https://www.openstreetmap.org/copyright"
+    },
+    {
+      "gap_id": "GAP-106-BAYPORT-RECLAIMED-POLYGONS",
+      "region": "נמל המפרץ (שטחי ים מיובשים מצפון לשפך הקישון)",
+      "severity": "low",
+      "description_he": "חלק ממפות הרקע הישנות אינן כוללות במלואן את הרציפים המיובשים החדשים של נמל המפרץ (SIPG, נפתח בספטמבר 2021); בקובץ זה קואורדינטות הרציף מעודכנות.",
+      "reference_url": "https://en.wikipedia.org/wiki/Port_of_Haifa"
+    }
+  ],
+  "features": [
+    {
+      "type": "Feature",
+      "id": "haifa_carmel_steep_elevation_profile",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.0239,
+            32.823058,
+            0.0
+          ],
+          [
+            35.00448,
+            32.820118,
+            2.0
+          ],
+          [
+            35.00275,
+            32.816278,
+            8.0
+          ],
+          [
+            34.99056,
+            32.82,
+            22.0
+          ],
+          [
+            34.98694,
+            32.81444,
+            155.0
+          ],
+          [
+            34.99806,
+            32.80778,
+            120.0
+          ],
+          [
+            34.9869,
+            32.8056,
+            275.0
+          ],
+          [
+            35.02167,
+            32.7775,
+            220.0
+          ],
+          [
+            35.01806,
+            32.7625,
+            495.0
+          ],
+          [
+            35.05,
+            32.733,
+            525.4
+          ]
+        ]
+      },
+      "properties": {
+        "id": "haifa_carmel_steep_elevation_profile",
+        "backlog_id": 106,
+        "name_he": "חתך הגבהים התלול של חיפה: מפרץ ונמל חיפה (0 מ') ← הדר ← מרכז הכרמל ← אוניברסיטת חיפה (495 מ' + מגדל אשכול 597 מ')",
+        "name_en": "Haifa Steep Elevation Transect: Port & Bay (0 m) to University of Haifa Crest",
+        "category": "topographic_cross_section",
+        "wgs84": {
+          "start_lon": 35.0239,
+          "start_lat": 32.823058,
+          "end_lon": 35.05,
+          "end_lat": 32.733
+        },
+        "itm_epsg2039": {
+          "start_easting_m": 202550.353,
+          "start_northing_m": 747606.184,
+          "end_easting_m": 204979.801,
+          "end_northing_m": 737614.696,
+          "computed_polyline_length_km": 17.21,
+          "continuous_1km_tiles_count": 22,
+          "continuous_1km_tiles": [
+            [
+              202,
+              747
+            ],
+            [
+              201,
+              747
+            ],
+            [
+              200,
+              747
+            ],
+            [
+              200,
+              746
+            ],
+            [
+              199,
+              747
+            ],
+            [
+              199,
+              746
+            ],
+            [
+              200,
+              745
+            ],
+            [
+              199,
+              745
+            ],
+            [
+              199,
+              744
+            ],
+            [
+              200,
+              744
+            ],
+            [
+              200,
+              743
+            ],
+            [
+              201,
+              743
+            ],
+            [
+              201,
+              742
+            ],
+            [
+              202,
+              742
+            ],
+            [
+              202,
+              741
+            ],
+            [
+              201,
+              740
+            ],
+            [
+              202,
+              740
+            ],
+            [
+              202,
+              739
+            ],
+            [
+              203,
+              739
+            ],
+            [
+              203,
+              738
+            ],
+            [
+              204,
+              738
+            ],
+            [
+              204,
+              737
+            ]
+          ],
+          "waypoints": [
+            {
+              "seq": 1,
+              "label_he": "מפרץ חיפה — פני הים (0 מ')",
+              "lat": 32.823058,
+              "lon": 35.0239,
+              "easting_m": 202550.353,
+              "northing_m": 747606.184,
+              "tile_1km": [
+                202,
+                747
+              ],
+              "ground_elev_m": 0.0
+            },
+            {
+              "seq": 2,
+              "label_he": "נמל חיפה — רציף הנמל (2 מ')",
+              "lat": 32.820118,
+              "lon": 35.00448,
+              "easting_m": 200731.235,
+              "northing_m": 747283.402,
+              "tile_1km": [
+                200,
+                747
+              ],
+              "ground_elev_m": 2.0
+            },
+            {
+              "seq": 3,
+              "label_he": "העיר התחתית — קריית הממשלה ומגדל המפרש (~8 מ')",
+              "lat": 32.816278,
+              "lon": 35.00275,
+              "easting_m": 200568.419,
+              "northing_m": 746857.842,
+              "tile_1km": [
+                200,
+                746
+              ],
+              "ground_elev_m": 8.0
+            },
+            {
+              "seq": 4,
+              "label_he": "המושבה הגרמנית — שדרות בן-גוריון (~22 מ')",
+              "lat": 32.82,
+              "lon": 34.99056,
+              "easting_m": 199427.687,
+              "northing_m": 747272.866,
+              "tile_1km": [
+                199,
+                747
+              ],
+              "ground_elev_m": 22.0
+            },
+            {
+              "seq": 5,
+              "label_he": "הגנים הבהאיים — מפלס מקדש הבאב באמצע המדרון (~155 מ')",
+              "lat": 32.81444,
+              "lon": 34.98694,
+              "easting_m": 199087.428,
+              "northing_m": 746656.938,
+              "tile_1km": [
+                199,
+                746
+              ],
+              "ground_elev_m": 155.0
+            },
+            {
+              "seq": 6,
+              "label_he": "הדר הכרמל — מדרגת הביניים העירונית (~63–194 מ')",
+              "lat": 32.80778,
+              "lon": 34.99806,
+              "easting_m": 200127.372,
+              "northing_m": 745916.238,
+              "tile_1km": [
+                200,
+                745
+              ],
+              "ground_elev_m": 120.0
+            },
+            {
+              "seq": 7,
+              "label_he": "מרכז הכרמל וטיילת לואי (~237–300 מ')",
+              "lat": 32.8056,
+              "lon": 34.9869,
+              "easting_m": 199081.665,
+              "northing_m": 745676.565,
+              "tile_1km": [
+                199,
+                745
+              ],
+              "ground_elev_m": 275.0
+            },
+            {
+              "seq": 8,
+              "label_he": "קמפוס הטכניון — נווה שאנן / מורדות צפון-מזרח הכרמל (~180–260 מ')",
+              "lat": 32.7775,
+              "lon": 35.02167,
+              "easting_m": 202332.805,
+              "northing_m": 742554.047,
+              "tile_1km": [
+                202,
+                742
+              ],
+              "ground_elev_m": 220.0
+            },
+            {
+              "seq": 9,
+              "label_he": "אוניברסיטת חיפה ובסיס מגדל אשכול ברכס הכרמל (~475–495 מ' קרקע; קצה המגדל 597 מ')",
+              "lat": 32.7625,
+              "lon": 35.01806,
+              "easting_m": 201991.662,
+              "northing_m": 740891.107,
+              "tile_1km": [
+                201,
+                740
+              ],
+              "ground_elev_m": 495.0
+            },
+            {
+              "seq": 10,
+              "label_he": "פסגת רכס הר הכרמל — רום גאוגרפי מרבי (525.4–546 מ')",
+              "lat": 32.733,
+              "lon": 35.05,
+              "easting_m": 204979.801,
+              "northing_m": 737614.696,
+              "tile_1km": [
+                204,
+                737
+              ],
+              "ground_elev_m": 525.4
+            }
+          ]
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Mount_Carmel",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "חתך טופוגרפי הממחיש שיפועי קרקע של 15%–35% לאורך מורדות הכרמל: עלייה של כמעט 500 מ' בקרקע (וכ-600 מ' כולל מגדל אשכול) במרחק אווירי של כ-6.5 ק\"מ בלבד מקו המים, המחייבת שימוש במודול חצאיות היסוד (carmel_judea_terrain_skirts.js).",
+        "max_ground_elev_m": 525.4,
+        "max_structure_asl_m": 597.0
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_carmelit_funicular_line",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.0005,
+            32.8152,
+            12.0
+          ],
+          [
+            34.9985,
+            32.8123,
+            63.0
+          ],
+          [
+            34.9963,
+            32.8105,
+            70.0
+          ],
+          [
+            34.9942,
+            32.8079,
+            118.0
+          ],
+          [
+            34.9908,
+            32.8058,
+            194.0
+          ],
+          [
+            34.9866,
+            32.8041,
+            237.0
+          ]
+        ]
+      },
+      "properties": {
+        "id": "haifa_carmelit_funicular_line",
+        "backlog_id": 106,
+        "name_he": "תוואי הכרמלית (פוניקולר תת-קרקעי: העיר התחתית ← הדר ← מרכז הכרמל)",
+        "name_en": "Carmelit Underground Funicular Transit Line",
+        "category": "slope_transit_funicular",
+        "wgs84": {
+          "start_lon": 35.0005,
+          "start_lat": 32.8152,
+          "end_lon": 34.9866,
+          "end_lat": 32.8041
+        },
+        "itm_epsg2039": {
+          "start_easting_m": 200357.481,
+          "start_northing_m": 746738.693,
+          "end_easting_m": 199053.225,
+          "end_northing_m": 745510.269,
+          "computed_polyline_length_km": 1.84,
+          "continuous_1km_tiles_count": 3,
+          "continuous_1km_tiles": [
+            [
+              200,
+              746
+            ],
+            [
+              199,
+              746
+            ],
+            [
+              199,
+              745
+            ]
+          ],
+          "waypoints": [
+            {
+              "seq": 1,
+              "label_he": "תחנת העיר התחתית (כיכר פריז — 12 מ')",
+              "lat": 32.8152,
+              "lon": 35.0005,
+              "easting_m": 200357.481,
+              "northing_m": 746738.693,
+              "tile_1km": [
+                200,
+                746
+              ],
+              "ground_elev_m": 12.0
+            },
+            {
+              "seq": 2,
+              "label_he": "תחנת הדר – עירייה (63 מ')",
+              "lat": 32.8123,
+              "lon": 34.9985,
+              "easting_m": 200169.557,
+              "northing_m": 746417.438,
+              "tile_1km": [
+                200,
+                746
+              ],
+              "ground_elev_m": 63.0
+            },
+            {
+              "seq": 3,
+              "label_he": "תחנת הנביאים (70 מ')",
+              "lat": 32.8105,
+              "lon": 34.9963,
+              "easting_m": 199963.129,
+              "northing_m": 746218.217,
+              "tile_1km": [
+                199,
+                746
+              ],
+              "ground_elev_m": 70.0
+            },
+            {
+              "seq": 4,
+              "label_he": "תחנת מצדה (118 מ')",
+              "lat": 32.8079,
+              "lon": 34.9942,
+              "easting_m": 199765.883,
+              "northing_m": 745930.259,
+              "tile_1km": [
+                199,
+                745
+              ],
+              "ground_elev_m": 118.0
+            },
+            {
+              "seq": 5,
+              "label_he": "תחנת גולומב (194 מ')",
+              "lat": 32.8058,
+              "lon": 34.9908,
+              "easting_m": 199446.98,
+              "northing_m": 745698.001,
+              "tile_1km": [
+                199,
+                745
+              ],
+              "ground_elev_m": 194.0
+            },
+            {
+              "seq": 6,
+              "label_he": "תחנת מרכז הכרמל / גן האם (237 מ'; רום מערכת מרבי 268 מ')",
+              "lat": 32.8041,
+              "lon": 34.9866,
+              "easting_m": 199053.225,
+              "northing_m": 745510.269,
+              "tile_1km": [
+                199,
+                745
+              ],
+              "ground_elev_m": 237.0
+            }
+          ]
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Carmelit",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "הכרמלית (נפתחה ב-1959 וחודשה ב-2018): קו פוניקולר תת-קרקעי באורך 1.8 ק\"מ הכולל 6 תחנות ומטפס מרום 12 מ' בעיר התחתית עד 237 מ' בתחנת מרכז הכרמל (הפרש גבהים כולל במערכת עד 274 מ').",
+        "tunnel_length_km": 1.8,
+        "stations_count": 6,
+        "max_system_elev_m": 268.0
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_rakavlit_cable_car_line",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            35.03313,
+            32.79323,
+            8.0
+          ],
+          [
+            35.02167,
+            32.7775,
+            225.0
+          ],
+          [
+            35.0185,
+            32.7628,
+            468.0
+          ]
+        ]
+      },
+      "properties": {
+        "id": "haifa_rakavlit_cable_car_line",
+        "backlog_id": 106,
+        "name_he": "תוואי הרכבלית: מרכזית המפרץ ← קמפוס הטכניון ← אוניברסיטת חיפה",
+        "name_en": "Rakavlit Public Transit Gondola Line",
+        "category": "aerial_cable_transit",
+        "wgs84": {
+          "start_lon": 35.03313,
+          "start_lat": 32.79323,
+          "end_lon": 35.0185,
+          "end_lat": 32.7628
+        },
+        "itm_epsg2039": {
+          "start_easting_m": 203409.298,
+          "start_northing_m": 744296.742,
+          "end_easting_m": 202032.95,
+          "end_northing_m": 740924.305,
+          "computed_polyline_length_km": 3.71,
+          "continuous_1km_tiles_count": 6,
+          "continuous_1km_tiles": [
+            [
+              203,
+              744
+            ],
+            [
+              203,
+              743
+            ],
+            [
+              202,
+              743
+            ],
+            [
+              202,
+              742
+            ],
+            [
+              202,
+              741
+            ],
+            [
+              202,
+              740
+            ]
+          ],
+          "waypoints": [
+            {
+              "seq": 1,
+              "label_he": "תחנת מרכזית המפרץ — למרגלות הכרמל (~8 מ')",
+              "lat": 32.79323,
+              "lon": 35.03313,
+              "easting_m": 203409.298,
+              "northing_m": 744296.742,
+              "tile_1km": [
+                203,
+                744
+              ],
+              "ground_elev_m": 8.0
+            },
+            {
+              "seq": 2,
+              "label_he": "תחנת הטכניון המרכזית (~225 מ')",
+              "lat": 32.7775,
+              "lon": 35.02167,
+              "easting_m": 202332.805,
+              "northing_m": 742554.047,
+              "tile_1km": [
+                202,
+                742
+              ],
+              "ground_elev_m": 225.0
+            },
+            {
+              "seq": 3,
+              "label_he": "תחנת אוניברסיטת חיפה — רכס הכרמל (~468 מ', טיפוס כולל 460 מ')",
+              "lat": 32.7628,
+              "lon": 35.0185,
+              "easting_m": 202032.95,
+              "northing_m": 740924.305,
+              "tile_1km": [
+                202,
+                740
+              ],
+              "ground_elev_m": 468.0
+            }
+          ]
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Rakavlit",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "הרכבלית (נפתחה באפריל 2022): מערכת רכבל תחבורה ציבורית באורך 4.4 ק\"מ המטפסת הפרש גובה של 460 מ' ממרכזית המפרץ דרך הטכניון לאוניברסיטת חיפה ב-19 דקות (148 קרוניות).",
+        "line_length_km": 4.4,
+        "elevation_gain_m": 460.0,
+        "cabins_count": 148
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_eshkol_tower_univ",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.01806,
+          32.7625,
+          495.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_eshkol_tower_univ",
+        "backlog_id": 106,
+        "name_he": "מגדל אשכול ואוניברסיטת חיפה",
+        "name_en": "Eshkol Tower, University of Haifa",
+        "category": "skyscraper_on_ridge",
+        "wgs84": {
+          "lon": 35.01806,
+          "lat": 32.7625,
+          "ground_elev_m": 495.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 201991.662,
+          "northing_m": 740891.107,
+          "tile_1km": [
+            201,
+            740
+          ],
+          "ground_elev_m": 495.0,
+          "top_asl_m": 597.0
+        },
+        "height_m": 102.0,
+        "floors": 30,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/University_of_Haifa",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל אשכול בקמפוס אוניברסיטת חיפה על קו הרכס של הכרמל (רעיון אדריכלי: אוסקר נימאייר, תכנון: שלמה גלעד): בן 30 קומות ובגובה מבני של 102 מ' מעל במת הקמפוס (~495 מ' מעל פני הים), כך שראשו מתנשא לרום של כ-597 מ' (~600 מ') מעל פני הים — מנקודות התצפית הגבוהות בצפון.",
+        "height_verification_url": "https://haipo.co.il/en/item/35834",
+        "secondary_verification_url": "https://haipo.co.il/en/item/520764",
+        "top_asl_verified_m": 597.0,
+        "requires_foundation_skirt": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_sail_tower",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.00275,
+          32.816278,
+          8.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_sail_tower",
+        "backlog_id": 106,
+        "name_he": "מגדל המפרש (בניין הטיל — קריית הממשלה חיפה)",
+        "name_en": "Sail Tower (HaMifras)",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 35.00275,
+          "lat": 32.816278,
+          "ground_elev_m": 8.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 200568.419,
+          "northing_m": 746857.842,
+          "tile_1km": [
+            200,
+            746
+          ],
+          "ground_elev_m": 8.0,
+          "top_asl_m": 145.0
+        },
+        "height_m": 137.0,
+        "floors": 29,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Sail_Tower",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל קריית הממשלה ע\"ש יצחק רבין בעיר התחתית בחיפה (הושלם בפברואר 2002): גובה אדריכלי כולל התרנים העליונים 137 מ' (גובה גג הבטון העליון 95 מ'), 29 קומות עיליות ו-3 תת-קרקעיות.",
+        "roof_height_m": 95.0,
+        "spire_architectural_height_m": 137.0,
+        "underground_floors": 3
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_bahai_gardens",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.98694,
+          32.81444,
+          155.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_bahai_gardens",
+        "backlog_id": 106,
+        "name_he": "הגנים הבהאיים ומקדש הבאב",
+        "name_en": "Bahá'í Gardens and Terraces",
+        "category": "terraced_unesco_landmark",
+        "wgs84": {
+          "lon": 34.98694,
+          "lat": 32.81444,
+          "ground_elev_m": 155.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 199087.428,
+          "northing_m": 746656.938,
+          "tile_1km": [
+            199,
+            746
+          ],
+          "ground_elev_m": 155.0,
+          "top_asl_m": 195.0
+        },
+        "height_m": 40.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Terraces_(Bah%C3%A1%CA%BC%C3%AD)",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "הגנים התלויים במורדות הצפוניים של הר הכרמל (נפתחו ביוני 2001, אתר מורשת עולמית של אונסק\"ו מ-2008, אדריכל פריבורז שהבא): 19 טרסות מדורגות ולמעלה מ-1,500 מדרגות לאורך כ-1 ק\"מ מרום ~60 מ' מעל המושבה הגרמנית ועד ~285 מ' בטיילת לואי, ובליבן כיפת מקדש הבאב בגובה ~40 מ'.",
+        "terraces_count": 19,
+        "slope_span_elev_m": [
+          60.0,
+          285.0
+        ],
+        "area_m2": 200000,
+        "requires_foundation_skirt": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_german_colony",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.99056,
+          32.82,
+          22.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_german_colony",
+        "backlog_id": 106,
+        "name_he": "המושבה הגרמנית",
+        "name_en": "German Colony, Haifa",
+        "category": "historic_district",
+        "wgs84": {
+          "lon": 34.99056,
+          "lat": 32.82,
+          "ground_elev_m": 22.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 199427.687,
+          "northing_m": 747272.866,
+          "tile_1km": [
+            199,
+            747
+          ],
+          "ground_elev_m": 22.0,
+          "top_asl_m": 33.0
+        },
+        "height_m": 11.0,
+        "floors": 3,
+        "height_source": "estimated",
+        "source_url": "https://en.wikipedia.org/wiki/German_Colony,_Haifa",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "הרובע ההיסטורי שהוקם ב-1868 לאורך ציר שדרות בן-גוריון למרגלות הכרמל (רום ~10–45 מ' מעל פני הים), המקשר בקו ראייה סימטרי בין נמל חיפה לטרסות הגנים הבהאיים.",
+        "requires_foundation_skirt": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_hadar_hacarmel",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.99806,
+          32.80778,
+          120.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_hadar_hacarmel",
+        "backlog_id": 106,
+        "name_he": "הדר הכרמל",
+        "name_en": "Hadar HaCarmel",
+        "category": "urban_slope_tier",
+        "wgs84": {
+          "lon": 34.99806,
+          "lat": 32.80778,
+          "ground_elev_m": 120.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 200127.372,
+          "northing_m": 745916.238,
+          "tile_1km": [
+            200,
+            745
+          ],
+          "ground_elev_m": 120.0,
+          "top_asl_m": 136.0
+        },
+        "height_m": 16.0,
+        "floors": 5,
+        "height_source": "estimated",
+        "source_url": "https://en.wikipedia.org/wiki/Hadar_HaCarmel",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מדרגת הביניים ההיסטורית של חיפה במורדות הכרמל (רום ~60–195 מ' מעל פני הים), הכוללת את בניין הטכניון ההיסטורי מ-1912 (מדעטק), אדריכלות באוהאוס ושיפועי רחובות תלולים המחייבים חצאיות יסוד במודל התלת-ממדי.",
+        "tier_elevation_range_m": [
+          60.0,
+          195.0
+        ],
+        "requires_foundation_skirt": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_merkaz_hacarmel",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.9869,
+          32.8056,
+          275.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_merkaz_hacarmel",
+        "backlog_id": 106,
+        "name_he": "מרכז הכרמל וטיילת לואי",
+        "name_en": "Merkaz HaCarmel",
+        "category": "ridge_crest_district",
+        "wgs84": {
+          "lon": 34.9869,
+          "lat": 32.8056,
+          "ground_elev_m": 275.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 199081.665,
+          "northing_m": 745676.565,
+          "tile_1km": [
+            199,
+            745
+          ],
+          "ground_elev_m": 275.0,
+          "top_asl_m": 300.0
+        },
+        "height_m": 25.0,
+        "floors": 8,
+        "height_source": "estimated",
+        "source_url": "https://en.wikipedia.org/wiki/Merkaz_HaCarmel",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "רובע הרכס העליון של חיפה (רום ~237–300 מ' מעל פני הים, שטח ~680 דונם), הכולל את גן האם, תחנת הקצה העליונה של הכרמלית וטיילת לואי באורך 400 מ' הצופה על מפרץ חיפה והגליל.",
+        "louis_promenade_length_m": 400.0,
+        "requires_foundation_skirt": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_technion_campus",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.02167,
+          32.7775,
+          220.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_technion_campus",
+        "backlog_id": 106,
+        "name_he": "קמפוס הטכניון (קריית הטכניון — נווה שאנן)",
+        "name_en": "Technion – Israel Institute of Technology",
+        "category": "academic_campus_on_slope",
+        "wgs84": {
+          "lon": 35.02167,
+          "lat": 32.7775,
+          "ground_elev_m": 220.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 202332.805,
+          "northing_m": 742554.047,
+          "tile_1km": [
+            202,
+            742
+          ],
+          "ground_elev_m": 220.0,
+          "top_asl_m": 248.0
+        },
+        "height_m": 28.0,
+        "floors": 8,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Technion_%E2%80%93_Israel_Institute_of_Technology",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "קמפוס הטכניון במורדות הצפון-מזרחיים של הכרמל (נוסד ב-1912, שטח 1,325 דונם עם מעל 300 מבנים מדורגים ברום ~180–260 מ' מעל פני הים, כולל מונומנט האובליסק בגובה 28 מ').",
+        "campus_area_dunams": 1325,
+        "obelisk_height_m": 28.0,
+        "requires_foundation_skirt": true
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_port_historic",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.00448,
+          32.820118,
+          2.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_port_historic",
+        "backlog_id": 106,
+        "name_he": "נמל חיפה",
+        "name_en": "Port of Haifa",
+        "category": "seaport",
+        "wgs84": {
+          "lon": 35.00448,
+          "lat": 32.820118,
+          "ground_elev_m": 2.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 200731.235,
+          "northing_m": 747283.402,
+          "tile_1km": [
+            200,
+            747
+          ],
+          "ground_elev_m": 2.0,
+          "top_asl_m": 2.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Port_of_Haifa",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "נמל המים העמוקים ההיסטורי של חיפה (קוד ILHFA, נפתח באוקטובר 1933 ברום 0–3 מ' מעל פני הים; עומק תעלה 11–12.2 מ' ורציף הכרמל בעומק 15.2 מ' ואורך 700 מ', היקף מטענים כ-29.53 מיליון טון).",
+        "un_locode": "ILHFA",
+        "carmel_wharf_draft_m": 15.2
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_bayport_terminal",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.028,
+          32.828,
+          3.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_bayport_terminal",
+        "backlog_id": 106,
+        "name_he": "נמל המפרץ (SIPG Bayport)",
+        "name_en": "Haifa Bayport Container Terminal",
+        "category": "automated_seaport",
+        "wgs84": {
+          "lon": 35.028,
+          "lat": 32.828,
+          "ground_elev_m": 3.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 202935.195,
+          "northing_m": 748153.618,
+          "tile_1km": [
+            202,
+            748
+          ],
+          "ground_elev_m": 3.0,
+          "top_asl_m": 3.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Port_of_Haifa",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "נמל המכולות האוטומטי החדש שהוקם על שטח ים מיובש מצפון-מזרח לשפך הקישון (נחנך ב-1 בספטמבר 2021 ומופעל על ידי SIPG): מותאם לאוניות ענק של 15,000+ TEU בקיבולת התחלתית של 800,000 TEU (+700,000 TEU בהרחבה).",
+        "operator_url": "https://www.sipgbayport.com/",
+        "inaugurated": "2021-09-01"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_kishon_mouth",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.033,
+          32.817,
+          0.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_kishon_mouth",
+        "backlog_id": 106,
+        "name_he": "שפך נחל הקישון ומעגן הקישון",
+        "name_en": "Kishon River Mouth",
+        "category": "estuary_and_harbor",
+        "wgs84": {
+          "lon": 35.033,
+          "lat": 32.817,
+          "ground_elev_m": 0.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 203401.394,
+          "northing_m": 746932.916,
+          "tile_1km": [
+            203,
+            746
+          ],
+          "ground_elev_m": 0.0,
+          "top_asl_m": 0.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Kishon_River",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מוצא נחל הקישון (אורך 70 ק\"מ ואגן ניקוז של 1,100 קמ\"ר מהגלבוע והעמק) אל מפרץ חיפה ברום 0 מ' מעל פני הים, בתווך שבין נמל חיפה המערבי לנמל המפרץ החדש.",
+        "river_length_km": 70.0,
+        "basin_area_km2": 1100.0
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "haifa_bay_waterfront",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          35.0239,
+          32.823058,
+          0.0
+        ]
+      },
+      "properties": {
+        "id": "haifa_bay_waterfront",
+        "backlog_id": 106,
+        "name_he": "מפרץ חיפה",
+        "name_en": "Haifa Bay",
+        "category": "coastal_bay",
+        "wgs84": {
+          "lon": 35.0239,
+          "lat": 32.823058,
+          "ground_elev_m": 0.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 202550.353,
+          "northing_m": 747606.184,
+          "tile_1km": [
+            202,
+            747
+          ],
+          "ground_elev_m": 0.0,
+          "top_asl_m": 0.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Haifa_Bay",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "המפרץ הטבעי הגדול בחוף הישראלי של הים התיכון בין רכס הכרמל בדרום לעכו בצפון (רום 0 מ' מעל פני הים), הכולל את אזור התעשייה והמפרץ ולבניות הבז\"ן ההיסטוריות בגובה 76 מ'.",
+        "historic_cooling_towers_height_m": 76.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,907 @@
+{
+  "type": "FeatureCollection",
+  "name": "ashkelon_and_coast_backlog102",
+  "metadata": {
+    "backlog_id": 102,
+    "title_he": "אשקלון והסביבה + עוגני חיבור לאשדוד",
+    "crs_primary": "EPSG:4326",
+    "crs_itm": "EPSG:2039",
+    "unified_world_sample_offsets": {
+      "realdata_v2": {
+        "dE_m": -1507.85,
+        "dN_m": -757.75
+      },
+      "legacy_v1": {"dE_m": -1524.6, "dN_m": -753.6}
+    },
+    "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+    "osm_license_url": "https://www.openstreetmap.org/copyright",
+    "generated_at_utc": "2026-11-23T03:00:24Z"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "AKL-LM-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.555972,
+          31.68209
+        ]
+      },
+      "properties": {
+        "id": "AKL-LM-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "מרינה אשקלון",
+        "name_en": "Ashkelon Marina",
+        "category": "marina_coastal",
+        "wgs84_lat": 31.68209,
+        "wgs84_lon": 34.555972,
+        "itm_epsg2039": {
+          "easting_m": 157968.656,
+          "northing_m": 621249.564
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            156460.806,
+            620491.814
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            156444.056,
+            620495.964
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "157_621",
+          "tile_e_km": 157,
+          "tile_n_km": 621,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 2.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 2,
+        "height_agl_m": 9.5,
+        "provenance": "estimated",
+        "estimation_rule": "מבנה מנהלה, מגדלור ושוברי גלים במעגנה (~650 כלי שיט, שטח 200 דונם); גובה מבני חוף לפי כלל 2×3.0+3.5 מ' מגדלור מעגנה",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "מעגנה בינלאומית שנפתחה ב-1995 (200 דונם, כ-650 מקומות עגינה) ומתחם מרינה מול על רצועת החוף.",
+        "source_title": "מרינה אשקלון – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A8%D7%99%D7%A0%D7%94_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-TW-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.5576,
+          31.6834
+        ]
+      },
+      "properties": {
+        "id": "AKL-TW-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "מגדלי מרינה אשקלון (פרויקט דמרי על הים)",
+        "name_en": "Marina Ashkelon Dimri Towers",
+        "category": "residential_highrise",
+        "wgs84_lat": 31.6834,
+        "wgs84_lon": 34.5576,
+        "itm_epsg2039": {
+          "easting_m": 158123.887,
+          "northing_m": 621393.908
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            156616.037,
+            620636.158
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            156599.287,
+            620640.308
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "158_621",
+          "tile_e_km": 158,
+          "tile_n_km": 621,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 18.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 24,
+        "height_agl_m": 73.0,
+        "provenance": "estimated",
+        "estimation_rule": "מספר קומות מתועד במקור ציבורי (3 מגדלים בני 24 קומות); גובה במטרים לפי כלל national-v1: 24×3.0 + 1.0 = 73.0 מ'",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "שלושה מגדלי מגורים בני 24 קומות בעורף מרינה אשקלון (קואורדינטת מתחם עורף המרינה משוערת ברמת מתחם).",
+        "source_title": "י.ח. דמרי – פרויקט מרינה אשקלון (3 מגדלים בני 24 קומות)",
+        "source_url": "https://www.dimri.co.il/",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A8%D7%99%D7%A0%D7%94_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-LM-02",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.549722,
+          31.661667
+        ]
+      },
+      "properties": {
+        "id": "AKL-LM-02",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "גן לאומי תל אשקלון",
+        "name_en": "Tel Ashkelon National Park",
+        "category": "national_park_archaeology",
+        "wgs84_lat": 31.661667,
+        "wgs84_lon": 34.549722,
+        "itm_epsg2039": {
+          "easting_m": 157362.434,
+          "northing_m": 618988.485
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            155854.584,
+            618230.735
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            155837.834,
+            618234.885
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "157_618",
+          "tile_e_km": 157,
+          "tile_n_km": 618,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 24.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 1,
+        "height_agl_m": 12.0,
+        "provenance": "estimated",
+        "estimation_rule": "רכס כורכר חופי, סוללת העפר הכנענית ושער הקשת הקדום (~12 מ' גובה סוללה/שער משוחזר)",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "גן לאומי על רכס הכורכר בדרום-מערב אשקלון הכולל את השער הכנעני הקדום, הבזיליקה הרומית ובארות המים.",
+        "source_title": "גן לאומי תל אשקלון – רשות הטבע והגנים",
+        "source_url": "https://www.parks.org.il/reserve-park/%D7%92%D7%9F-%D7%9C%D7%90%D7%95%D7%9E%D7%99-%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F/",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%92%D7%9F_%D7%9C%D7%90%D7%95%D7%9E%D7%99_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-LM-03",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.554881,
+          31.675844
+        ]
+      },
+      "properties": {
+        "id": "AKL-LM-03",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "חוף דלילה וטיילת החוף",
+        "name_en": "Delilah Beach Ashkelon",
+        "category": "beach_promenade",
+        "wgs84_lat": 31.675844,
+        "wgs84_lon": 34.554881,
+        "itm_epsg2039": {
+          "easting_m": 157861.083,
+          "northing_m": 620557.587
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            156353.233,
+            619799.837
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            156336.483,
+            619803.987
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "157_620",
+          "tile_e_km": 157,
+          "tile_n_km": 620,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 3.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 1,
+        "height_agl_m": 4.5,
+        "provenance": "estimated",
+        "estimation_rule": "סוכת הצלה ומתקני חוף מוכרז (גובה חד-קומתי ~4.5 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "חוף הרחצה המרכזי מדרום למרינה אשקלון המחובר לטיילת ולמוקדי הפנאי (סי-פארק).",
+        "source_title": "אשקלון – מדריך למטייל בוויקימסע (קואורדינטות חוף דלילה)",
+        "source_url": "https://he.wikivoyage.org/wiki/%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "secondary_source_url": "https://ashkelon.muni.gov.il/%D7%94%D7%A2%D7%99%D7%A8%D7%99%D7%99%D7%94/%D7%99%D7%97%D7%99%D7%93%D7%95%D7%AA-%D7%94%D7%A8%D7%A9%D7%95%D7%AA/%D7%90%D7%92%D7%A3-%D7%A9%D7%99%D7%A4%D7%95%D7%A8-%D7%A4%D7%A0%D7%99-%D7%94%D7%A2%D7%99%D7%A8/%D7%9E%D7%97%D7%9C%D7%A7%D7%AA-%D7%97%D7%95%D7%A4%D7%99%D7%9D",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-LM-04",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.559383,
+          31.684282
+        ]
+      },
+      "properties": {
+        "id": "AKL-LM-04",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "חוף בר כוכבא ומצוק הכורכר",
+        "name_en": "Bar Kochba Beach Ashkelon",
+        "category": "beach_promenade",
+        "wgs84_lat": 31.684282,
+        "wgs84_lon": 34.559383,
+        "itm_epsg2039": {
+          "easting_m": 158293.53,
+          "northing_m": 621490.709
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            156785.68,
+            620732.959
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            156768.93,
+            620737.109
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "158_621",
+          "tile_e_km": 158,
+          "tile_n_km": 621,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 4.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 1,
+        "height_agl_m": 4.5,
+        "provenance": "estimated",
+        "estimation_rule": "תחנת הצלה וטיילת מצוק חופי (גובה סוכת הצלה ~4.5 מ'; גובה מצוק הכורכר מעל החוף ~18–25 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "חוף רחצה מוכרז בצפון רצועת החוף של אשקלון למרגלות טיילת ברנע, בפיתוח ושיקום הגנת מצוקים עירוני.",
+        "source_title": "שיקום חוף בר כוכבא – עיריית אשקלון",
+        "source_url": "https://ashkelon.muni.gov.il/%D7%97%D7%93%D7%A9-%D7%95%D7%9E%D7%A2%D7%A0%D7%99%D7%99%D7%9F-%D7%91%D7%A2%D7%99%D7%A8/%D7%A9%D7%99%D7%A7%D7%95%D7%9D-%D7%97%D7%95%D7%A3-%D7%91%D7%A8-%D7%9B%D7%95%D7%9B%D7%91%D7%90-%D7%A0%D7%9E%D7%A9%D7%9A-%D7%91%D7%99%D7%AA%D7%A8-%D7%A9%D7%90%D7%AA",
+        "secondary_source_url": "https://he.wikivoyage.org/wiki/%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-LM-05",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.560556,
+          31.6625
+        ]
+      },
+      "properties": {
+        "id": "AKL-LM-05",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "המרכז הרפואי האוניברסיטאי ברזילי",
+        "name_en": "Barzilai University Medical Center",
+        "category": "medical_center",
+        "wgs84_lat": 31.6625,
+        "wgs84_lon": 34.560556,
+        "itm_epsg2039": {
+          "easting_m": 158390.502,
+          "northing_m": 619074.741
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            156882.652,
+            618316.991
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            156865.902,
+            618321.141
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "158_619",
+          "tile_e_km": 158,
+          "tile_n_km": 619,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 34.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 6,
+        "height_agl_m": 25.0,
+        "provenance": "estimated",
+        "estimation_rule": "אגף אשפוז וכירורגיה ממוגן רב-קומתי (4 קומות אשפוז עיליות + קומת כניסה וקומה טכנית ≈ 25.0 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "בית החולים המרכזי באשקלון (רחוב ההסתדרות 2, נוסד 1961, כולל האגף הממוגן שנחנך ב-2018).",
+        "source_title": "מרכז רפואי ברזילי – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A8%D7%9B%D7%96_%D7%A8%D7%A4%D7%95%D7%90%D7%99_%D7%91%D7%A8%D7%96%D7%99%D7%9C%D7%99",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-LM-06",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.566944,
+          31.676667
+        ]
+      },
+      "properties": {
+        "id": "AKL-LM-06",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "שכונת אפרידר ומגדל השעון (כיכר צפניה)",
+        "name_en": "Afridar Neighborhood & Clock Tower",
+        "category": "heritage_neighborhood_landmark",
+        "wgs84_lat": 31.676667,
+        "wgs84_lon": 34.566944,
+        "itm_epsg2039": {
+          "easting_m": 159005.525,
+          "northing_m": 620642.1
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            157497.675,
+            619884.35
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            157480.925,
+            619888.5
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "159_620",
+          "tile_e_km": 159,
+          "tile_n_km": 620,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 36.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 4,
+        "height_agl_m": 16.0,
+        "provenance": "estimated",
+        "estimation_rule": "אומדן אדריכלי למגדל השעון בכיכר צפניה (~16 מ'); גובה ממוצע עירוני אשקלון 36 מ' מעל פני הים מאומת בוויקיפדיה",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "שכונת הגנים ההיסטורית אפרידר (נוסדה 1952) שבמרכזה כיכר צפניה ומגדל השעון הסמלי.",
+        "source_title": "שכונת אפרידר – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%A9%D7%9B%D7%95%D7%A0%D7%AA_%D7%90%D7%A4%D7%A8%D7%99%D7%93%D7%A8",
+        "secondary_source_url": "https://tiulim.education.gov.il/ale/articles-stock/africa/",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-NB-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.572806,
+          31.689534
+        ]
+      },
+      "properties": {
+        "id": "AKL-NB-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "שכונת ברנע (מרכז השכונה וברנע ב'/ג')",
+        "name_en": "Barnea Neighborhood Ashkelon",
+        "category": "neighborhood_anchor",
+        "wgs84_lat": 31.689534,
+        "wgs84_lon": 34.572806,
+        "itm_epsg2039": {
+          "easting_m": 159569.662,
+          "northing_m": 622065.633
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            158061.812,
+            621307.883
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            158045.062,
+            621312.033
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "159_622",
+          "tile_e_km": 159,
+          "tile_n_km": 622,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 35.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 9,
+        "height_agl_m": 28.0,
+        "provenance": "estimated",
+        "estimation_rule": "בנייה מרקמית מעורבת בצפון אשקלון (צמודי קרקע לצד בנייני 9–18 קומות; ממוצע ייצוגי 9×3.0+1.0=28.0 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "שכונת הצפון הגדולה של אשקלון המשתרעת מקו החוף ועד היציאה הצפונית ומחברת לעיר היין.",
+        "source_title": "שכונת ברנע – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%A9%D7%9B%D7%95%D7%A0%D7%AA_%D7%91%D7%A8%D7%A0%D7%A2",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-TW-02",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.5705,
+          31.6912
+        ]
+      },
+      "properties": {
+        "id": "AKL-TW-02",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "מגדל רחוב אשתאול 1 (המבנה הגבוה המתועד באשקלון ב-SKYDB)",
+        "name_en": "1 Eshtaol Street High-Rise Ashkelon",
+        "category": "residential_highrise",
+        "wgs84_lat": 31.6912,
+        "wgs84_lon": 34.5705,
+        "itm_epsg2039": {
+          "easting_m": 159352.095,
+          "northing_m": 622251.637
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            157844.245,
+            621493.887
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            157827.495,
+            621498.037
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "159_622",
+          "tile_e_km": 159,
+          "tile_n_km": 622,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 34.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 20,
+        "height_agl_m": 67.0,
+        "provenance": "verified_public",
+        "estimation_rule": null,
+        "neutral_geographic_pin_only": false,
+        "notes_he": "גובה מתועד של 67.0 מ' (220 רגל) במאגר גורדי השחקים SKYDB באזור צפון אשקלון/ברנע (קואורדינטה משוערת לרחוב אשתאול).",
+        "source_title": "Tallest buildings in Ashkelon – SKYDB (1 Eshtaol Street, 67 m)",
+        "source_url": "https://www.skydb.net/overview/896375674/ashkelon/",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-NB-02",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.5915,
+          31.6938
+        ]
+      },
+      "properties": {
+        "id": "AKL-NB-02",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון",
+        "name_he": "רובע עיר היין – מגדלי מגורים מאוכלסים ובבנייה (תמ\"ל/1006)",
+        "name_en": "Ir HaYayin (Wine City) District & Towers",
+        "category": "new_district_highrise",
+        "wgs84_lat": 31.6938,
+        "wgs84_lon": 34.5915,
+        "itm_epsg2039": {
+          "easting_m": 161344.77,
+          "northing_m": 622528.559
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            159836.92,
+            621770.809
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            159820.17,
+            621774.959
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "161_622",
+          "tile_e_km": 161,
+          "tile_n_km": 622,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 42.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 18,
+        "height_agl_m": 55.0,
+        "provenance": "estimated",
+        "estimation_rule": "פרויקטים מתועדים בני 15–18 קומות (נחמיאס: 17 קומות מעל קומת מסחר = 18 קומות -> 18×3.0+1.0=55.0 מ'; וכן תוכנית מגדל 30 קומות מעל 2 קומות מסחר ~97 מ' סמוך לתחנת הרכבת)",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "רובע הדגל הצפון-מזרחי של אשקלון (~11,000 יח\"ד ופארק היי-טק) המחבר בין ברנע לכביש 4 ותחנת הרכבת אשקלון.",
+        "source_title": "30 קומות באשקלון: מגדל עם 150 דירות בדרך לעיר היין (מרכז הנדל\"ן)",
+        "source_url": "https://www.nadlancenter.co.il/article/14910",
+        "secondary_source_url": "https://www.nahmias-group.co.il/project/%D7%A9%D7%9B%D7%95%D7%A0%D7%AA-%D7%A2%D7%99%D7%A8-%D7%94%D7%99%D7%99%D7%9F-%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F/",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-INF-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.516111,
+          31.6275
+        ]
+      },
+      "properties": {
+        "id": "AKL-INF-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון – דרום (ציון ניטרלי)",
+        "name_he": "תחנת הכוח רוטנברג (ציון גיאוגרפי ניטרלי בלבד)",
+        "name_en": "Rutenberg Power Station (Neutral Pin Only)",
+        "category": "national_infrastructure_neutral_pin",
+        "wgs84_lat": 31.6275,
+        "wgs84_lon": 34.516111,
+        "itm_epsg2039": {
+          "easting_m": 154150.801,
+          "northing_m": 615219.467
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            152642.951,
+            614461.717
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            152626.201,
+            614465.867
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "154_615",
+          "tile_e_km": 154,
+          "tile_n_km": 615,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 12.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": null,
+        "height_agl_m": 0.0,
+        "provenance": "verified_public",
+        "estimation_rule": "ציון מיקום גיאוגרפי ניטרלי בלבד ללא מידול מבני או תשתיתי פנימי בהתאם לכללי הביטחון של גדוד 5",
+        "neutral_geographic_pin_only": true,
+        "notes_he": "נקודת ייחוס גיאוגרפית ניטרלית בלבד בקצה הדרומי של גזרת חוף אשקלון (ללא גיאומטריה תפעולית).",
+        "source_title": "תחנת הכוח רוטנברג – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%9B%D7%95%D7%97_%D7%A8%D7%95%D7%98%D7%A0%D7%91%D7%A8%D7%92",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-INF-02",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.526736,
+          31.63695
+        ]
+      },
+      "properties": {
+        "id": "AKL-INF-02",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון – דרום (ציון ניטרלי)",
+        "name_he": "מתקן התפלה אשקלון (ציון גיאוגרפי ניטרלי בלבד)",
+        "name_en": "Ashkelon Desalination Plant (Neutral Pin Only)",
+        "category": "national_infrastructure_neutral_pin",
+        "wgs84_lat": 31.63695,
+        "wgs84_lon": 34.526736,
+        "itm_epsg2039": {
+          "easting_m": 155165.374,
+          "northing_m": 616261.032
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            153657.524,
+            615503.282
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            153640.774,
+            615507.432
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "155_616",
+          "tile_e_km": 155,
+          "tile_n_km": 616,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 15.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": null,
+        "height_agl_m": 0.0,
+        "provenance": "verified_public",
+        "estimation_rule": "ציון מיקום גיאוגרפי ניטרלי בלבד ללא מידול מבני או תשתיתי פנימי בהתאם לכללי הביטחון של גדוד 5",
+        "neutral_geographic_pin_only": true,
+        "notes_he": "נקודת ייחוס גיאוגרפית ניטרלית בלבד באזור התעשייה הדרומי אשקלון (ללא גיאומטריה תפעולית).",
+        "source_title": "מתקן התפלה אשקלון – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%94%D7%AA%D7%A4%D7%9C%D7%94_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-COR-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.630366,
+          31.739779
+        ]
+      },
+      "properties": {
+        "id": "AKL-COR-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "מסדרון חוף אשדוד–אשקלון",
+        "name_he": "שמורת טבע חולות ניצנים ודיונות החוף",
+        "name_en": "Nitzanim Sand Dunes Nature Reserve",
+        "category": "nature_reserve_dunes",
+        "wgs84_lat": 31.739779,
+        "wgs84_lon": 34.630366,
+        "itm_epsg2039": {
+          "easting_m": 165056.482,
+          "northing_m": 627606.921
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            163548.632,
+            626849.171
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            163531.882,
+            626853.321
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "165_627",
+          "tile_e_km": 165,
+          "tile_n_km": 627,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 22.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 0,
+        "height_agl_m": 0.0,
+        "provenance": "verified_public",
+        "estimation_rule": "שטח טבעי פתוח של דיונות חול מיוצבות ונודדות, רכסי כורכר ובריכות מי תהום (גובה טופוגרפי 5–35 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "שמורת החולות המרכזית בין אשדוד לאשקלון (הוכרזה ב-2005, כ-7,700 דונם מוכרזים מתוך כ-20,000–30,000 דונם מרחב חולות).",
+        "source_title": "שמורת טבע חולות ניצנים – רשות הטבע והגנים",
+        "source_url": "https://www.parks.org.il/reserve-park/%D7%A9%D7%9E%D7%95%D7%A8%D7%AA-%D7%98%D7%91%D7%A2-%D7%97%D7%95%D7%9C%D7%95%D7%AA-%D7%A0%D7%99%D7%A6%D7%A0%D7%99%D7%9D/",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%97%D7%95%D7%9C%D7%95%D7%AA_%D7%A0%D7%99%D7%A6%D7%A0%D7%99%D7%9D",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "AKL-TR-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.604658,
+          31.676794
+        ]
+      },
+      "properties": {
+        "id": "AKL-TR-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשקלון – מסדרון מזרחי",
+        "name_he": "תחנת הרכבת אשקלון (מפגש מסילת לוד–אשקלון ומסילת אשקלון–באר שבע)",
+        "name_en": "Ashkelon Railway Station",
+        "category": "rail_transit_hub",
+        "wgs84_lat": 31.676794,
+        "wgs84_lon": 34.604658,
+        "itm_epsg2039": {
+          "easting_m": 162581.904,
+          "northing_m": 620635.906
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            161074.054,
+            619878.156
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            161057.304,
+            619882.306
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "162_620",
+          "tile_e_km": 162,
+          "tile_n_km": 620,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 46.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 2,
+        "height_agl_m": 11.0,
+        "provenance": "estimated",
+        "estimation_rule": "אולם נוסעים, גג רציפים ועמודי חשמול 25kV עיליים (~11.0 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "תחנת הרכבת המזרחית של אשקלון סמוך לצומת אבא הלל סילבר וכביש 4,4 רציפים ומתחם תחזוקה חשמלי.",
+        "source_title": "תחנת הרכבת אשקלון – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%A8%D7%9B%D7%91%D7%AA_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "ASH-TR-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.665833,
+          31.773889
+        ]
+      },
+      "properties": {
+        "id": "ASH-TR-01",
+        "backlog_id": 102,
+        "city_or_zone_he": "אשדוד – עוגן חיבור צפוני",
+        "name_he": "מחלף עד הלום ותחנת הרכבת אשדוד – עד הלום",
+        "name_en": "Ad Halom Interchange & Ashdod Railway Station",
+        "category": "corridor_northern_anchor",
+        "wgs84_lat": 31.773889,
+        "wgs84_lon": 34.665833,
+        "itm_epsg2039": {
+          "easting_m": 168436.125,
+          "northing_m": 631372.08
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            166928.275,
+            630614.33
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            166911.525,
+            630618.48
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "168_631",
+          "tile_e_km": 168,
+          "tile_n_km": 631,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 28.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 2,
+        "height_agl_m": 11.0,
+        "provenance": "estimated",
+        "estimation_rule": "גשר מחלף עד הלום ואולם תחנת הרכבת אשדוד (~11.0 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "נקודת העוגן הדרומית של אריחי אשדוד הקיימים שממנה יוצא רצף החיבור הדרומי לאשקלון.",
+        "source_title": "תחנת הרכבת אשדוד – עד הלום – מטרופול – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%A8%D7%9B%D7%91%D7%AA_%D7%90%D7%A9%D7%93%D7%95%D7%93_%E2%80%93_%D7%A2%D7%93_%D7%94%D7%9C%D7%95%D7%9D_%E2%80%93_%D7%9E%D7%98%D7%A8%D7%95%D7%A4%D7%95%D7%9C",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%97%D7%9C%D7%A3_%D7%A2%D7%93_%D7%94%D7%9C%D7%95%D7%9D",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    }
+  ]
+}

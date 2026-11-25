@@ -1,0 +1,4540 @@
+{
+  "schema_version": "1.0.0",
+  "module": "zmanim.esh27.com / twin.physics.horizon",
+  "backlog_id": 103,
+  "generated_for_board_date": "2026-11-23",
+  "crs": {
+    "geographic": "EPSG:4326 (WGS84)",
+    "projected": "EPSG:2039 (Israel 1993 / ITM)"
+  },
+  "physics_constants": {
+    "standard_sea_level_zenith_deg": 90.833333,
+    "atmospheric_refraction_arcmin": 34.0,
+    "solar_semidiameter_arcmin": 16.0,
+    "terrestrial_refraction_coeff_k": 0.13,
+    "horizon_refraction_uncertainty_deg": 0.2,
+    "methodology_sources": [
+      "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html",
+      "https://www.chabad.org/library/article_cdo/aid/3209349/jewish/About-Our-Zmanim-Calculations.htm",
+      "https://epsg.io/2039"
+    ]
+  },
+  "observer_profiles": {
+    "temple_mount_plateau": {
+      "site_key": "temple_mount_plateau",
+      "name_he": "הר הבית (מפלס הרחבה)",
+      "name_en": "Temple Mount Plateau",
+      "wgs84": {
+        "lat": 31.77806,
+        "lon": 35.23583,
+        "elev_asl_m": 740.0
+      },
+      "itm_epsg2039": {
+        "easting_m": 222429.552,
+        "northing_m": 631708.756,
+        "elev_asl_m": 740.0
+      },
+      "source_url": "https://en.wikipedia.org/wiki/Temple_Mount",
+      "unobstructed_geometric_dip_deg": 0.8732,
+      "eastern_sunrise_sector_60_120_deg": {
+        "min_horizon_angle_deg": 2.262,
+        "mean_horizon_angle_deg": 4.9397,
+        "max_horizon_angle_deg": 6.3297,
+        "due_east_90_deg_angle": 6.1812,
+        "due_east_governing_ridge_he": "פסגת הר הזיתים (א-טור)"
+      },
+      "western_sunset_sector_240_300_deg": {
+        "min_horizon_angle_deg": 1.5322,
+        "mean_horizon_angle_deg": 2.1001,
+        "max_horizon_angle_deg": 2.3673,
+        "due_west_270_deg_angle": 2.3617,
+        "due_west_governing_ridge_he": "ממילא / ימק\"א"
+      },
+      "azimuth_profile": [
+        {
+          "azimuth_deg": 0,
+          "horizon_angle_deg": 0.6129,
+          "effective_solar_zenith_deg": 90.2205,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 16.76,
+          "ridge_effective_elev_m": 938.5,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 5,
+          "horizon_angle_deg": 0.618,
+          "effective_solar_zenith_deg": 90.2153,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 19.1,
+          "ridge_effective_elev_m": 970.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 10,
+          "horizon_angle_deg": 1.4672,
+          "effective_solar_zenith_deg": 89.3661,
+          "governing_ridge_he": "גבעת המבתר / צפון הר הצופים",
+          "ridge_distance_km": 2.94,
+          "ridge_effective_elev_m": 815.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 15,
+          "horizon_angle_deg": 1.8808,
+          "effective_solar_zenith_deg": 88.9526,
+          "governing_ridge_he": "גבעת המבתר / צפון הר הצופים",
+          "ridge_distance_km": 2.43,
+          "ridge_effective_elev_m": 820.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 20,
+          "horizon_angle_deg": 2.2791,
+          "effective_solar_zenith_deg": 88.5542,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 2.08,
+          "ridge_effective_elev_m": 823.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 25,
+          "horizon_angle_deg": 2.6595,
+          "effective_solar_zenith_deg": 88.1738,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 1.84,
+          "ridge_effective_elev_m": 825.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 30,
+          "horizon_angle_deg": 2.9896,
+          "effective_solar_zenith_deg": 87.8438,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 1.61,
+          "ridge_effective_elev_m": 824.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 35,
+          "horizon_angle_deg": 3.2867,
+          "effective_solar_zenith_deg": 87.5466,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 1.43,
+          "ridge_effective_elev_m": 822.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 40,
+          "horizon_angle_deg": 3.5585,
+          "effective_solar_zenith_deg": 87.2748,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.29,
+          "ridge_effective_elev_m": 820.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 45,
+          "horizon_angle_deg": 3.803,
+          "effective_solar_zenith_deg": 87.0303,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.19,
+          "ridge_effective_elev_m": 819.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 50,
+          "horizon_angle_deg": 4.0218,
+          "effective_solar_zenith_deg": 86.8115,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.11,
+          "ridge_effective_elev_m": 818.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 55,
+          "horizon_angle_deg": 4.4686,
+          "effective_solar_zenith_deg": 86.3647,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.02,
+          "ridge_effective_elev_m": 819.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 60,
+          "horizon_angle_deg": 4.8809,
+          "effective_solar_zenith_deg": 85.9524,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 0.95,
+          "ridge_effective_elev_m": 820.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 65,
+          "horizon_angle_deg": 5.2557,
+          "effective_solar_zenith_deg": 85.5776,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 0.89,
+          "ridge_effective_elev_m": 822.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 70,
+          "horizon_angle_deg": 5.5902,
+          "effective_solar_zenith_deg": 85.2431,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.85,
+          "ridge_effective_elev_m": 823.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 75,
+          "horizon_angle_deg": 5.8821,
+          "effective_solar_zenith_deg": 84.9513,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.81,
+          "ridge_effective_elev_m": 823.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 80,
+          "horizon_angle_deg": 6.1292,
+          "effective_solar_zenith_deg": 84.7042,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.79,
+          "ridge_effective_elev_m": 824.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 85,
+          "horizon_angle_deg": 6.3297,
+          "effective_solar_zenith_deg": 84.5036,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.77,
+          "ridge_effective_elev_m": 825.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 90,
+          "horizon_angle_deg": 6.1812,
+          "effective_solar_zenith_deg": 84.6521,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.76,
+          "ridge_effective_elev_m": 822.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 95,
+          "horizon_angle_deg": 5.6215,
+          "effective_solar_zenith_deg": 85.2119,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.77,
+          "ridge_effective_elev_m": 815.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 100,
+          "horizon_angle_deg": 5.018,
+          "effective_solar_zenith_deg": 85.8153,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.78,
+          "ridge_effective_elev_m": 808.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 105,
+          "horizon_angle_deg": 4.3753,
+          "effective_solar_zenith_deg": 86.458,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.8,
+          "ridge_effective_elev_m": 801.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 110,
+          "horizon_angle_deg": 3.6982,
+          "effective_solar_zenith_deg": 87.1351,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.83,
+          "ridge_effective_elev_m": 793.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 115,
+          "horizon_angle_deg": 2.992,
+          "effective_solar_zenith_deg": 87.8414,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 0.86,
+          "ridge_effective_elev_m": 785.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 120,
+          "horizon_angle_deg": 2.262,
+          "effective_solar_zenith_deg": 88.5714,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 0.9,
+          "ridge_effective_elev_m": 775.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 125,
+          "horizon_angle_deg": 1.5139,
+          "effective_solar_zenith_deg": 89.3194,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 0.96,
+          "ridge_effective_elev_m": 765.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 130,
+          "horizon_angle_deg": 0.7538,
+          "effective_solar_zenith_deg": 90.0796,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.03,
+          "ridge_effective_elev_m": 753.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 135,
+          "horizon_angle_deg": 0.4287,
+          "effective_solar_zenith_deg": 90.4046,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.1,
+          "ridge_effective_elev_m": 748.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 140,
+          "horizon_angle_deg": 0.5473,
+          "effective_solar_zenith_deg": 90.286,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.17,
+          "ridge_effective_elev_m": 751.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 145,
+          "horizon_angle_deg": 0.6616,
+          "effective_solar_zenith_deg": 90.1717,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.25,
+          "ridge_effective_elev_m": 754.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 150,
+          "horizon_angle_deg": 0.7707,
+          "effective_solar_zenith_deg": 90.0626,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.35,
+          "ridge_effective_elev_m": 758.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 155,
+          "horizon_angle_deg": 0.8738,
+          "effective_solar_zenith_deg": 89.9595,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.49,
+          "ridge_effective_elev_m": 762.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 160,
+          "horizon_angle_deg": 0.97,
+          "effective_solar_zenith_deg": 89.8633,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.67,
+          "ridge_effective_elev_m": 768.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 165,
+          "horizon_angle_deg": 1.0586,
+          "effective_solar_zenith_deg": 89.7748,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 1.92,
+          "ridge_effective_elev_m": 775.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 170,
+          "horizon_angle_deg": 1.1385,
+          "effective_solar_zenith_deg": 89.6948,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.28,
+          "ridge_effective_elev_m": 785.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 175,
+          "horizon_angle_deg": 1.1611,
+          "effective_solar_zenith_deg": 89.6722,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.73,
+          "ridge_effective_elev_m": 795.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 180,
+          "horizon_angle_deg": 1.0699,
+          "effective_solar_zenith_deg": 89.7635,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 3.14,
+          "ridge_effective_elev_m": 799.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 185,
+          "horizon_angle_deg": 0.9697,
+          "effective_solar_zenith_deg": 89.8636,
+          "governing_ridge_he": "רכס רמת רחל / צור באהר",
+          "ridge_distance_km": 3.73,
+          "ridge_effective_elev_m": 804.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 190,
+          "horizon_angle_deg": -0.8145,
+          "effective_solar_zenith_deg": 91.6478,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 104.1,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 195,
+          "horizon_angle_deg": -0.8145,
+          "effective_solar_zenith_deg": 91.6478,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 104.1,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 200,
+          "horizon_angle_deg": -0.8145,
+          "effective_solar_zenith_deg": 91.6478,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 104.1,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 205,
+          "horizon_angle_deg": -0.8145,
+          "effective_solar_zenith_deg": 91.6478,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 104.1,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 210,
+          "horizon_angle_deg": 0.5724,
+          "effective_solar_zenith_deg": 90.261,
+          "governing_ridge_he": "פסגת הרי יהודה (חלחול)",
+          "ridge_distance_km": 23.84,
+          "ridge_effective_elev_m": 1017.0,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 215,
+          "horizon_angle_deg": 0.8676,
+          "effective_solar_zenith_deg": 89.9657,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.95,
+          "ridge_effective_elev_m": 785.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 220,
+          "horizon_angle_deg": 1.0188,
+          "effective_solar_zenith_deg": 89.8146,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.65,
+          "ridge_effective_elev_m": 787.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 225,
+          "horizon_angle_deg": 1.1617,
+          "effective_solar_zenith_deg": 89.6716,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.42,
+          "ridge_effective_elev_m": 789.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 230,
+          "horizon_angle_deg": 1.2956,
+          "effective_solar_zenith_deg": 89.5377,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 2.24,
+          "ridge_effective_elev_m": 791.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 235,
+          "horizon_angle_deg": 1.4194,
+          "effective_solar_zenith_deg": 89.414,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 2.1,
+          "ridge_effective_elev_m": 792.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 240,
+          "horizon_angle_deg": 1.5322,
+          "effective_solar_zenith_deg": 89.3012,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 2.0,
+          "ridge_effective_elev_m": 793.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 245,
+          "horizon_angle_deg": 1.6331,
+          "effective_solar_zenith_deg": 89.2002,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.91,
+          "ridge_effective_elev_m": 794.8,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 250,
+          "horizon_angle_deg": 1.8094,
+          "effective_solar_zenith_deg": 89.024,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.71,
+          "ridge_effective_elev_m": 794.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 255,
+          "horizon_angle_deg": 1.9863,
+          "effective_solar_zenith_deg": 88.847,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.53,
+          "ridge_effective_elev_m": 793.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 260,
+          "horizon_angle_deg": 2.1479,
+          "effective_solar_zenith_deg": 88.6854,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.4,
+          "ridge_effective_elev_m": 792.8,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 265,
+          "horizon_angle_deg": 2.293,
+          "effective_solar_zenith_deg": 88.5404,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.3,
+          "ridge_effective_elev_m": 792.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 270,
+          "horizon_angle_deg": 2.3617,
+          "effective_solar_zenith_deg": 88.4716,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.27,
+          "ridge_effective_elev_m": 792.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 275,
+          "horizon_angle_deg": 2.3673,
+          "effective_solar_zenith_deg": 88.4661,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.3,
+          "ridge_effective_elev_m": 794.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 280,
+          "horizon_angle_deg": 2.3548,
+          "effective_solar_zenith_deg": 88.4786,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.34,
+          "ridge_effective_elev_m": 795.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 285,
+          "horizon_angle_deg": 2.3243,
+          "effective_solar_zenith_deg": 88.509,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.39,
+          "ridge_effective_elev_m": 796.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 290,
+          "horizon_angle_deg": 2.276,
+          "effective_solar_zenith_deg": 88.5573,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.46,
+          "ridge_effective_elev_m": 798.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 295,
+          "horizon_angle_deg": 2.2103,
+          "effective_solar_zenith_deg": 88.623,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.55,
+          "ridge_effective_elev_m": 800.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 300,
+          "horizon_angle_deg": 2.0047,
+          "effective_solar_zenith_deg": 88.8286,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.8,
+          "ridge_effective_elev_m": 803.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 305,
+          "horizon_angle_deg": 1.7805,
+          "effective_solar_zenith_deg": 89.0528,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 2.18,
+          "ridge_effective_elev_m": 808.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 310,
+          "horizon_angle_deg": 1.5418,
+          "effective_solar_zenith_deg": 89.2915,
+          "governing_ridge_he": "שנלר / רוממה מזרח",
+          "ridge_distance_km": 2.78,
+          "ridge_effective_elev_m": 815.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 315,
+          "horizon_angle_deg": 1.0476,
+          "effective_solar_zenith_deg": 89.7857,
+          "governing_ridge_he": "נבי סמואל (צפון-מערב ירושלים)",
+          "ridge_distance_km": 6.73,
+          "ridge_effective_elev_m": 866.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 320,
+          "horizon_angle_deg": 0.996,
+          "effective_solar_zenith_deg": 89.8373,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.1,
+          "ridge_effective_elev_m": 885.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 325,
+          "horizon_angle_deg": 0.9532,
+          "effective_solar_zenith_deg": 89.8801,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.52,
+          "ridge_effective_elev_m": 886.7,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 330,
+          "horizon_angle_deg": 0.9025,
+          "effective_solar_zenith_deg": 89.9309,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.06,
+          "ridge_effective_elev_m": 888.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 335,
+          "horizon_angle_deg": 0.844,
+          "effective_solar_zenith_deg": 89.9894,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.75,
+          "ridge_effective_elev_m": 890.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 340,
+          "horizon_angle_deg": 0.778,
+          "effective_solar_zenith_deg": 90.0554,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 10.65,
+          "ridge_effective_elev_m": 892.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 345,
+          "horizon_angle_deg": 0.7046,
+          "effective_solar_zenith_deg": 90.1287,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 11.83,
+          "ridge_effective_elev_m": 895.0,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 350,
+          "horizon_angle_deg": 0.624,
+          "effective_solar_zenith_deg": 90.2094,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 13.41,
+          "ridge_effective_elev_m": 898.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 355,
+          "horizon_angle_deg": 0.6002,
+          "effective_solar_zenith_deg": 90.2332,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 15.04,
+          "ridge_effective_elev_m": 912.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        }
+      ]
+    },
+    "western_wall_plaza": {
+      "site_key": "western_wall_plaza",
+      "name_he": "רחבת הכותל המערבי",
+      "name_en": "Western Wall Plaza",
+      "wgs84": {
+        "lat": 31.7767,
+        "lon": 35.2345,
+        "elev_asl_m": 725.0
+      },
+      "itm_epsg2039": {
+        "easting_m": 222303.615,
+        "northing_m": 631557.918,
+        "elev_asl_m": 725.0
+      },
+      "source_url": "https://en.wikipedia.org/wiki/Western_Wall",
+      "unobstructed_geometric_dip_deg": 0.8643,
+      "eastern_sunrise_sector_60_120_deg": {
+        "min_horizon_angle_deg": 1.4496,
+        "mean_horizon_angle_deg": 4.4975,
+        "max_horizon_angle_deg": 6.2141,
+        "due_east_90_deg_angle": 5.2302,
+        "due_east_governing_ridge_he": "פסגת הר הזיתים (א-טור)"
+      },
+      "western_sunset_sector_240_300_deg": {
+        "min_horizon_angle_deg": 2.1057,
+        "mean_horizon_angle_deg": 2.8832,
+        "max_horizon_angle_deg": 3.3557,
+        "due_west_270_deg_angle": 3.2225,
+        "due_west_governing_ridge_he": "ממילא / ימק\"א"
+      },
+      "azimuth_profile": [
+        {
+          "azimuth_deg": 0,
+          "horizon_angle_deg": 0.6567,
+          "effective_solar_zenith_deg": 90.1766,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 16.74,
+          "ridge_effective_elev_m": 936.0,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 5,
+          "horizon_angle_deg": 0.6565,
+          "effective_solar_zenith_deg": 90.1768,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 19.07,
+          "ridge_effective_elev_m": 968.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 10,
+          "horizon_angle_deg": 0.647,
+          "effective_solar_zenith_deg": 90.1863,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 22.36,
+          "ridge_effective_elev_m": 1011.7,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 15,
+          "horizon_angle_deg": 1.9295,
+          "effective_solar_zenith_deg": 88.9038,
+          "governing_ridge_he": "גבעת המבתר / צפון הר הצופים",
+          "ridge_distance_km": 2.77,
+          "ridge_effective_elev_m": 818.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 20,
+          "horizon_angle_deg": 2.3363,
+          "effective_solar_zenith_deg": 88.497,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 2.37,
+          "ridge_effective_elev_m": 822.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 25,
+          "horizon_angle_deg": 2.7246,
+          "effective_solar_zenith_deg": 88.1087,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 2.09,
+          "ridge_effective_elev_m": 824.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 30,
+          "horizon_angle_deg": 3.0747,
+          "effective_solar_zenith_deg": 87.7586,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 1.85,
+          "ridge_effective_elev_m": 824.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 35,
+          "horizon_angle_deg": 3.3827,
+          "effective_solar_zenith_deg": 87.4506,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 1.64,
+          "ridge_effective_elev_m": 822.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 40,
+          "horizon_angle_deg": 3.6647,
+          "effective_solar_zenith_deg": 87.1687,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.49,
+          "ridge_effective_elev_m": 820.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 45,
+          "horizon_angle_deg": 3.9184,
+          "effective_solar_zenith_deg": 86.9149,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.37,
+          "ridge_effective_elev_m": 818.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 50,
+          "horizon_angle_deg": 4.2286,
+          "effective_solar_zenith_deg": 86.6047,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.26,
+          "ridge_effective_elev_m": 818.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 55,
+          "horizon_angle_deg": 4.6939,
+          "effective_solar_zenith_deg": 86.1394,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.16,
+          "ridge_effective_elev_m": 820.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 60,
+          "horizon_angle_deg": 5.1229,
+          "effective_solar_zenith_deg": 85.7104,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.08,
+          "ridge_effective_elev_m": 821.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 65,
+          "horizon_angle_deg": 5.5125,
+          "effective_solar_zenith_deg": 85.3208,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.02,
+          "ridge_effective_elev_m": 823.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 70,
+          "horizon_angle_deg": 5.8599,
+          "effective_solar_zenith_deg": 84.9735,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.97,
+          "ridge_effective_elev_m": 824.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 75,
+          "horizon_angle_deg": 6.1625,
+          "effective_solar_zenith_deg": 84.6709,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.93,
+          "ridge_effective_elev_m": 825.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 80,
+          "horizon_angle_deg": 6.2141,
+          "effective_solar_zenith_deg": 84.6192,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.9,
+          "ridge_effective_elev_m": 823.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 85,
+          "horizon_angle_deg": 5.7443,
+          "effective_solar_zenith_deg": 85.089,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.9,
+          "ridge_effective_elev_m": 815.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 90,
+          "horizon_angle_deg": 5.2302,
+          "effective_solar_zenith_deg": 85.6031,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.9,
+          "ridge_effective_elev_m": 807.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 95,
+          "horizon_angle_deg": 4.6756,
+          "effective_solar_zenith_deg": 86.1577,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.9,
+          "ridge_effective_elev_m": 798.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 100,
+          "horizon_angle_deg": 4.0845,
+          "effective_solar_zenith_deg": 86.7488,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 0.92,
+          "ridge_effective_elev_m": 790.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 105,
+          "horizon_angle_deg": 3.4615,
+          "effective_solar_zenith_deg": 87.3718,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 0.94,
+          "ridge_effective_elev_m": 781.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 110,
+          "horizon_angle_deg": 2.8113,
+          "effective_solar_zenith_deg": 88.022,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 0.97,
+          "ridge_effective_elev_m": 772.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 115,
+          "horizon_angle_deg": 2.139,
+          "effective_solar_zenith_deg": 88.6944,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.01,
+          "ridge_effective_elev_m": 762.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 120,
+          "horizon_angle_deg": 1.4496,
+          "effective_solar_zenith_deg": 89.3837,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.06,
+          "ridge_effective_elev_m": 751.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 125,
+          "horizon_angle_deg": 1.2126,
+          "effective_solar_zenith_deg": 89.6208,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.1,
+          "ridge_effective_elev_m": 748.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 130,
+          "horizon_angle_deg": 1.2996,
+          "effective_solar_zenith_deg": 89.5338,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.15,
+          "ridge_effective_elev_m": 751.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 135,
+          "horizon_angle_deg": 1.3766,
+          "effective_solar_zenith_deg": 89.4567,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.2,
+          "ridge_effective_elev_m": 753.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 140,
+          "horizon_angle_deg": 1.443,
+          "effective_solar_zenith_deg": 89.3903,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.27,
+          "ridge_effective_elev_m": 757.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 145,
+          "horizon_angle_deg": 1.4984,
+          "effective_solar_zenith_deg": 89.3349,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.36,
+          "ridge_effective_elev_m": 760.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 150,
+          "horizon_angle_deg": 1.5422,
+          "effective_solar_zenith_deg": 89.2911,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.47,
+          "ridge_effective_elev_m": 764.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 155,
+          "horizon_angle_deg": 1.5741,
+          "effective_solar_zenith_deg": 89.2592,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.62,
+          "ridge_effective_elev_m": 769.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 160,
+          "horizon_angle_deg": 1.5938,
+          "effective_solar_zenith_deg": 89.2395,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 1.82,
+          "ridge_effective_elev_m": 775.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 165,
+          "horizon_angle_deg": 1.6011,
+          "effective_solar_zenith_deg": 89.2323,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.09,
+          "ridge_effective_elev_m": 783.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 170,
+          "horizon_angle_deg": 1.5956,
+          "effective_solar_zenith_deg": 89.2377,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.48,
+          "ridge_effective_elev_m": 794.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 175,
+          "horizon_angle_deg": 1.4782,
+          "effective_solar_zenith_deg": 89.3552,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.79,
+          "ridge_effective_elev_m": 797.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 180,
+          "horizon_angle_deg": 1.3457,
+          "effective_solar_zenith_deg": 89.4876,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 3.21,
+          "ridge_effective_elev_m": 801.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 185,
+          "horizon_angle_deg": 1.2022,
+          "effective_solar_zenith_deg": 89.6311,
+          "governing_ridge_he": "רכס רמת רחל / צור באהר",
+          "ridge_distance_km": 3.81,
+          "ridge_effective_elev_m": 805.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 190,
+          "horizon_angle_deg": -0.8062,
+          "effective_solar_zenith_deg": 91.6395,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 103.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 195,
+          "horizon_angle_deg": -0.8062,
+          "effective_solar_zenith_deg": 91.6395,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 103.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 200,
+          "horizon_angle_deg": -0.8062,
+          "effective_solar_zenith_deg": 91.6395,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 103.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 205,
+          "horizon_angle_deg": -0.8062,
+          "effective_solar_zenith_deg": 91.6395,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 103.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 210,
+          "horizon_angle_deg": 0.6186,
+          "effective_solar_zenith_deg": 90.2148,
+          "governing_ridge_he": "פסגת הרי יהודה (חלחול)",
+          "ridge_distance_km": 23.45,
+          "ridge_effective_elev_m": 1015.7,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 215,
+          "horizon_angle_deg": 1.2573,
+          "effective_solar_zenith_deg": 89.576,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.73,
+          "ridge_effective_elev_m": 785.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 220,
+          "horizon_angle_deg": 1.4524,
+          "effective_solar_zenith_deg": 89.381,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.45,
+          "ridge_effective_elev_m": 787.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 225,
+          "horizon_angle_deg": 1.636,
+          "effective_solar_zenith_deg": 89.1973,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.24,
+          "ridge_effective_elev_m": 789.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 230,
+          "horizon_angle_deg": 1.8069,
+          "effective_solar_zenith_deg": 89.0264,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 2.08,
+          "ridge_effective_elev_m": 790.8,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 235,
+          "horizon_angle_deg": 1.9639,
+          "effective_solar_zenith_deg": 88.8694,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.95,
+          "ridge_effective_elev_m": 792.1,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 240,
+          "horizon_angle_deg": 2.1057,
+          "effective_solar_zenith_deg": 88.7276,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.85,
+          "ridge_effective_elev_m": 793.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 245,
+          "horizon_angle_deg": 2.2313,
+          "effective_solar_zenith_deg": 88.602,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.77,
+          "ridge_effective_elev_m": 794.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 250,
+          "horizon_angle_deg": 2.3836,
+          "effective_solar_zenith_deg": 88.4498,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.67,
+          "ridge_effective_elev_m": 794.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 255,
+          "horizon_angle_deg": 2.6252,
+          "effective_solar_zenith_deg": 88.2081,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.5,
+          "ridge_effective_elev_m": 794.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 260,
+          "horizon_angle_deg": 2.8467,
+          "effective_solar_zenith_deg": 87.9866,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.37,
+          "ridge_effective_elev_m": 793.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 265,
+          "horizon_angle_deg": 3.0463,
+          "effective_solar_zenith_deg": 87.7871,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.27,
+          "ridge_effective_elev_m": 792.8,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 270,
+          "horizon_angle_deg": 3.2225,
+          "effective_solar_zenith_deg": 87.6108,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.19,
+          "ridge_effective_elev_m": 792.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 275,
+          "horizon_angle_deg": 3.3557,
+          "effective_solar_zenith_deg": 87.4776,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.14,
+          "ridge_effective_elev_m": 792.1,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 280,
+          "horizon_angle_deg": 3.3146,
+          "effective_solar_zenith_deg": 87.5187,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.18,
+          "ridge_effective_elev_m": 793.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 285,
+          "horizon_angle_deg": 3.2482,
+          "effective_solar_zenith_deg": 87.5851,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.22,
+          "ridge_effective_elev_m": 794.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 290,
+          "horizon_angle_deg": 3.157,
+          "effective_solar_zenith_deg": 87.6763,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.28,
+          "ridge_effective_elev_m": 795.9,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 295,
+          "horizon_angle_deg": 3.0418,
+          "effective_solar_zenith_deg": 87.7916,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.36,
+          "ridge_effective_elev_m": 797.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 300,
+          "horizon_angle_deg": 2.9032,
+          "effective_solar_zenith_deg": 87.9301,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.46,
+          "ridge_effective_elev_m": 799.1,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 305,
+          "horizon_angle_deg": 2.6159,
+          "effective_solar_zenith_deg": 88.2174,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.68,
+          "ridge_effective_elev_m": 802.1,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 310,
+          "horizon_angle_deg": 2.1982,
+          "effective_solar_zenith_deg": 88.6352,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 2.15,
+          "ridge_effective_elev_m": 807.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 315,
+          "horizon_angle_deg": 1.7619,
+          "effective_solar_zenith_deg": 89.0715,
+          "governing_ridge_he": "שנלר / רוממה מזרח",
+          "ridge_distance_km": 2.99,
+          "ridge_effective_elev_m": 817.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 320,
+          "horizon_angle_deg": 1.1135,
+          "effective_solar_zenith_deg": 89.7199,
+          "governing_ridge_he": "נבי סמואל (צפון-מערב ירושלים)",
+          "ridge_distance_km": 7.88,
+          "ridge_effective_elev_m": 882.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 325,
+          "horizon_angle_deg": 1.0608,
+          "effective_solar_zenith_deg": 89.7726,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.45,
+          "ridge_effective_elev_m": 886.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 330,
+          "horizon_angle_deg": 1.0036,
+          "effective_solar_zenith_deg": 89.8297,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.99,
+          "ridge_effective_elev_m": 887.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 335,
+          "horizon_angle_deg": 0.938,
+          "effective_solar_zenith_deg": 89.8954,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.67,
+          "ridge_effective_elev_m": 889.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 340,
+          "horizon_angle_deg": 0.8641,
+          "effective_solar_zenith_deg": 89.9692,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 10.56,
+          "ridge_effective_elev_m": 891.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 345,
+          "horizon_angle_deg": 0.7823,
+          "effective_solar_zenith_deg": 90.0511,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 11.73,
+          "ridge_effective_elev_m": 894.6,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 350,
+          "horizon_angle_deg": 0.6925,
+          "effective_solar_zenith_deg": 90.1408,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 13.3,
+          "ridge_effective_elev_m": 897.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 355,
+          "horizon_angle_deg": 0.649,
+          "effective_solar_zenith_deg": 90.1843,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 15.02,
+          "ridge_effective_elev_m": 910.5,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        }
+      ]
+    },
+    "old_city_upper_quarter": {
+      "site_key": "old_city_upper_quarter",
+      "name_he": "העיר העתיקה (מפלס גגות מרכזי)",
+      "name_en": "Old City Central Elevation",
+      "wgs84": {
+        "lat": 31.7769,
+        "lon": 35.231,
+        "elev_asl_m": 760.0
+      },
+      "itm_epsg2039": {
+        "easting_m": 221972.08,
+        "northing_m": 631580.009,
+        "elev_asl_m": 760.0
+      },
+      "source_url": "https://en.wikipedia.org/wiki/Jerusalem",
+      "unobstructed_geometric_dip_deg": 0.885,
+      "eastern_sunrise_sector_60_120_deg": {
+        "min_horizon_angle_deg": 0.003,
+        "mean_horizon_angle_deg": 1.7003,
+        "max_horizon_angle_deg": 2.9937,
+        "due_east_90_deg_angle": 2.3015,
+        "due_east_governing_ridge_he": "פסגת הר הזיתים (א-טור)"
+      },
+      "western_sunset_sector_240_300_deg": {
+        "min_horizon_angle_deg": 1.3354,
+        "mean_horizon_angle_deg": 1.962,
+        "max_horizon_angle_deg": 2.2651,
+        "due_west_270_deg_angle": 2.1745,
+        "due_west_governing_ridge_he": "ממילא / ימק\"א"
+      },
+      "azimuth_profile": [
+        {
+          "azimuth_deg": 0,
+          "horizon_angle_deg": 0.5335,
+          "effective_solar_zenith_deg": 90.2998,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 16.27,
+          "ridge_effective_elev_m": 929.6,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 5,
+          "horizon_angle_deg": 0.5489,
+          "effective_solar_zenith_deg": 90.2844,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 18.53,
+          "ridge_effective_elev_m": 961.0,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 10,
+          "horizon_angle_deg": 0.5559,
+          "effective_solar_zenith_deg": 90.2774,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 21.73,
+          "ridge_effective_elev_m": 1003.1,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 15,
+          "horizon_angle_deg": -0.8254,
+          "effective_solar_zenith_deg": 91.6588,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 105.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 20,
+          "horizon_angle_deg": 1.0982,
+          "effective_solar_zenith_deg": 89.7352,
+          "governing_ridge_he": "גבעת המבתר / צפון הר הצופים",
+          "ridge_distance_km": 2.97,
+          "ridge_effective_elev_m": 817.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 25,
+          "horizon_angle_deg": 1.3212,
+          "effective_solar_zenith_deg": 89.5121,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 2.62,
+          "ridge_effective_elev_m": 820.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 30,
+          "horizon_angle_deg": 1.5337,
+          "effective_solar_zenith_deg": 89.2996,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 2.36,
+          "ridge_effective_elev_m": 823.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 35,
+          "horizon_angle_deg": 1.7342,
+          "effective_solar_zenith_deg": 89.0991,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 2.16,
+          "ridge_effective_elev_m": 825.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 40,
+          "horizon_angle_deg": 1.858,
+          "effective_solar_zenith_deg": 88.9753,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 1.96,
+          "ridge_effective_elev_m": 824.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 45,
+          "horizon_angle_deg": 1.9558,
+          "effective_solar_zenith_deg": 88.8775,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.81,
+          "ridge_effective_elev_m": 821.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 50,
+          "horizon_angle_deg": 2.0385,
+          "effective_solar_zenith_deg": 88.7948,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.68,
+          "ridge_effective_elev_m": 820.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 55,
+          "horizon_angle_deg": 2.1056,
+          "effective_solar_zenith_deg": 88.7277,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.59,
+          "ridge_effective_elev_m": 818.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 60,
+          "horizon_angle_deg": 2.2584,
+          "effective_solar_zenith_deg": 88.575,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.5,
+          "ridge_effective_elev_m": 819.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 65,
+          "horizon_angle_deg": 2.4721,
+          "effective_solar_zenith_deg": 88.3613,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 1.41,
+          "ridge_effective_elev_m": 820.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 70,
+          "horizon_angle_deg": 2.6668,
+          "effective_solar_zenith_deg": 88.1665,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.34,
+          "ridge_effective_elev_m": 822.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 75,
+          "horizon_angle_deg": 2.8411,
+          "effective_solar_zenith_deg": 87.9922,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.29,
+          "ridge_effective_elev_m": 824.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 80,
+          "horizon_angle_deg": 2.9937,
+          "effective_solar_zenith_deg": 87.8396,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.25,
+          "ridge_effective_elev_m": 825.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 85,
+          "horizon_angle_deg": 2.8204,
+          "effective_solar_zenith_deg": 88.0129,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.23,
+          "ridge_effective_elev_m": 820.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 90,
+          "horizon_angle_deg": 2.3015,
+          "effective_solar_zenith_deg": 88.5319,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.23,
+          "ridge_effective_elev_m": 809.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 95,
+          "horizon_angle_deg": 1.7645,
+          "effective_solar_zenith_deg": 89.0688,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.24,
+          "ridge_effective_elev_m": 798.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 100,
+          "horizon_angle_deg": 1.2138,
+          "effective_solar_zenith_deg": 89.6195,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 1.25,
+          "ridge_effective_elev_m": 786.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 105,
+          "horizon_angle_deg": 0.6535,
+          "effective_solar_zenith_deg": 90.1798,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.28,
+          "ridge_effective_elev_m": 774.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 110,
+          "horizon_angle_deg": 0.0881,
+          "effective_solar_zenith_deg": 90.7452,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.32,
+          "ridge_effective_elev_m": 762.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 115,
+          "horizon_angle_deg": 0.003,
+          "effective_solar_zenith_deg": 90.8303,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 54.17,
+          "ridge_effective_elev_m": 963.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 120,
+          "horizon_angle_deg": 0.0266,
+          "effective_solar_zenith_deg": 90.8067,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 56.53,
+          "ridge_effective_elev_m": 1004.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 125,
+          "horizon_angle_deg": 0.0457,
+          "effective_solar_zenith_deg": 90.7876,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 59.57,
+          "ridge_effective_elev_m": 1049.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 130,
+          "horizon_angle_deg": 0.0593,
+          "effective_solar_zenith_deg": 90.774,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 63.47,
+          "ridge_effective_elev_m": 1100.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 135,
+          "horizon_angle_deg": 0.0622,
+          "effective_solar_zenith_deg": 90.7712,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 68.26,
+          "ridge_effective_elev_m": 1152.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 140,
+          "horizon_angle_deg": 0.1418,
+          "effective_solar_zenith_deg": 90.6915,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.67,
+          "ridge_effective_elev_m": 764.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 145,
+          "horizon_angle_deg": 0.2825,
+          "effective_solar_zenith_deg": 90.5508,
+          "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+          "ridge_distance_km": 1.79,
+          "ridge_effective_elev_m": 769.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 150,
+          "horizon_angle_deg": 0.4209,
+          "effective_solar_zenith_deg": 90.4125,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 1.94,
+          "ridge_effective_elev_m": 774.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 155,
+          "horizon_angle_deg": 0.5557,
+          "effective_solar_zenith_deg": 90.2776,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.13,
+          "ridge_effective_elev_m": 781.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 160,
+          "horizon_angle_deg": 0.6861,
+          "effective_solar_zenith_deg": 90.1473,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.4,
+          "ridge_effective_elev_m": 789.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 165,
+          "horizon_angle_deg": 0.7554,
+          "effective_solar_zenith_deg": 90.0779,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.69,
+          "ridge_effective_elev_m": 795.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 170,
+          "horizon_angle_deg": 0.7345,
+          "effective_solar_zenith_deg": 90.0989,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.96,
+          "ridge_effective_elev_m": 798.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 175,
+          "horizon_angle_deg": 0.7075,
+          "effective_solar_zenith_deg": 90.1258,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 3.32,
+          "ridge_effective_elev_m": 801.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 180,
+          "horizon_angle_deg": 0.6745,
+          "effective_solar_zenith_deg": 90.1588,
+          "governing_ridge_he": "רכס רמת רחל / צור באהר",
+          "ridge_distance_km": 3.82,
+          "ridge_effective_elev_m": 805.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 185,
+          "horizon_angle_deg": -0.8254,
+          "effective_solar_zenith_deg": 91.6588,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 105.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 190,
+          "horizon_angle_deg": -0.8254,
+          "effective_solar_zenith_deg": 91.6588,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 105.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 195,
+          "horizon_angle_deg": -0.8254,
+          "effective_solar_zenith_deg": 91.6588,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 105.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 200,
+          "horizon_angle_deg": -0.8254,
+          "effective_solar_zenith_deg": 91.6588,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 105.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 205,
+          "horizon_angle_deg": -0.8254,
+          "effective_solar_zenith_deg": 91.6588,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 105.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 210,
+          "horizon_angle_deg": 0.5943,
+          "effective_solar_zenith_deg": 90.239,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.47,
+          "ridge_effective_elev_m": 786.1,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 215,
+          "horizon_angle_deg": 0.7358,
+          "effective_solar_zenith_deg": 90.0975,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 2.17,
+          "ridge_effective_elev_m": 788.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 220,
+          "horizon_angle_deg": 0.8713,
+          "effective_solar_zenith_deg": 89.962,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 1.95,
+          "ridge_effective_elev_m": 789.9,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 225,
+          "horizon_angle_deg": 0.9999,
+          "effective_solar_zenith_deg": 89.8334,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.78,
+          "ridge_effective_elev_m": 791.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 230,
+          "horizon_angle_deg": 1.1207,
+          "effective_solar_zenith_deg": 89.7126,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.65,
+          "ridge_effective_elev_m": 792.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 235,
+          "horizon_angle_deg": 1.2328,
+          "effective_solar_zenith_deg": 89.6005,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.55,
+          "ridge_effective_elev_m": 793.6,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 240,
+          "horizon_angle_deg": 1.3354,
+          "effective_solar_zenith_deg": 89.4979,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.47,
+          "ridge_effective_elev_m": 794.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 245,
+          "horizon_angle_deg": 1.465,
+          "effective_solar_zenith_deg": 89.3684,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.35,
+          "ridge_effective_elev_m": 794.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 250,
+          "horizon_angle_deg": 1.6344,
+          "effective_solar_zenith_deg": 89.199,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 1.19,
+          "ridge_effective_elev_m": 794.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 255,
+          "horizon_angle_deg": 1.7911,
+          "effective_solar_zenith_deg": 89.0422,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 1.07,
+          "ridge_effective_elev_m": 793.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 260,
+          "horizon_angle_deg": 1.9341,
+          "effective_solar_zenith_deg": 88.8993,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.97,
+          "ridge_effective_elev_m": 793.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 265,
+          "horizon_angle_deg": 2.0622,
+          "effective_solar_zenith_deg": 88.7712,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.9,
+          "ridge_effective_elev_m": 792.6,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 270,
+          "horizon_angle_deg": 2.1745,
+          "effective_solar_zenith_deg": 88.6589,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.85,
+          "ridge_effective_elev_m": 792.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 275,
+          "horizon_angle_deg": 2.2651,
+          "effective_solar_zenith_deg": 88.5682,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.81,
+          "ridge_effective_elev_m": 792.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 280,
+          "horizon_angle_deg": 2.2557,
+          "effective_solar_zenith_deg": 88.5776,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.83,
+          "ridge_effective_elev_m": 792.9,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 285,
+          "horizon_angle_deg": 2.2291,
+          "effective_solar_zenith_deg": 88.6043,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.87,
+          "ridge_effective_elev_m": 793.8,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 290,
+          "horizon_angle_deg": 2.1854,
+          "effective_solar_zenith_deg": 88.6479,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.91,
+          "ridge_effective_elev_m": 794.7,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 295,
+          "horizon_angle_deg": 2.1251,
+          "effective_solar_zenith_deg": 88.7082,
+          "governing_ridge_he": "ממילא / ימק\"א",
+          "ridge_distance_km": 0.96,
+          "ridge_effective_elev_m": 795.8,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 300,
+          "horizon_angle_deg": 2.0485,
+          "effective_solar_zenith_deg": 88.7848,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.03,
+          "ridge_effective_elev_m": 797.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 305,
+          "horizon_angle_deg": 1.9562,
+          "effective_solar_zenith_deg": 88.8771,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.12,
+          "ridge_effective_elev_m": 798.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 310,
+          "horizon_angle_deg": 1.8372,
+          "effective_solar_zenith_deg": 88.9961,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.25,
+          "ridge_effective_elev_m": 800.2,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 315,
+          "horizon_angle_deg": 1.5052,
+          "effective_solar_zenith_deg": 89.3281,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.74,
+          "ridge_effective_elev_m": 806.0,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 320,
+          "horizon_angle_deg": 0.8995,
+          "effective_solar_zenith_deg": 89.9338,
+          "governing_ridge_he": "נבי סמואל (צפון-מערב ירושלים)",
+          "ridge_distance_km": 6.95,
+          "ridge_effective_elev_m": 872.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 325,
+          "horizon_angle_deg": 0.8609,
+          "effective_solar_zenith_deg": 89.9724,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.07,
+          "ridge_effective_elev_m": 885.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 330,
+          "horizon_angle_deg": 0.8159,
+          "effective_solar_zenith_deg": 90.0175,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.59,
+          "ridge_effective_elev_m": 887.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 335,
+          "horizon_angle_deg": 0.7638,
+          "effective_solar_zenith_deg": 90.0695,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.25,
+          "ridge_effective_elev_m": 889.1,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 340,
+          "horizon_angle_deg": 0.7049,
+          "effective_solar_zenith_deg": 90.1284,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 10.1,
+          "ridge_effective_elev_m": 891.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 345,
+          "horizon_angle_deg": 0.6393,
+          "effective_solar_zenith_deg": 90.1941,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 11.21,
+          "ridge_effective_elev_m": 893.7,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 350,
+          "horizon_angle_deg": 0.567,
+          "effective_solar_zenith_deg": 90.2664,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 12.71,
+          "ridge_effective_elev_m": 896.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 355,
+          "horizon_angle_deg": 0.5113,
+          "effective_solar_zenith_deg": 90.322,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 14.59,
+          "ridge_effective_elev_m": 904.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        }
+      ]
+    },
+    "mount_of_olives_crest": {
+      "site_key": "mount_of_olives_crest",
+      "name_he": "פסגת הר הזיתים",
+      "name_en": "Mount of Olives Summit",
+      "wgs84": {
+        "lat": 31.77833,
+        "lon": 35.24389,
+        "elev_asl_m": 826.0
+      },
+      "itm_epsg2039": {
+        "easting_m": 223192.994,
+        "northing_m": 631738.944,
+        "elev_asl_m": 826.0
+      },
+      "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives",
+      "unobstructed_geometric_dip_deg": 0.9226,
+      "eastern_sunrise_sector_60_120_deg": {
+        "min_horizon_angle_deg": -0.2052,
+        "mean_horizon_angle_deg": -0.0823,
+        "max_horizon_angle_deg": 0.0424,
+        "due_east_90_deg_angle": -0.2052,
+        "due_east_governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)"
+      },
+      "western_sunset_sector_240_300_deg": {
+        "min_horizon_angle_deg": -0.7054,
+        "mean_horizon_angle_deg": -0.0564,
+        "max_horizon_angle_deg": 0.0991,
+        "due_west_270_deg_angle": 0.004,
+        "due_west_governing_ridge_he": "פסגת הר הרצל"
+      },
+      "azimuth_profile": [
+        {
+          "azimuth_deg": 0,
+          "horizon_angle_deg": 0.3411,
+          "effective_solar_zenith_deg": 90.4922,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 17.77,
+          "ridge_effective_elev_m": 953.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 5,
+          "horizon_angle_deg": 0.3785,
+          "effective_solar_zenith_deg": 90.4549,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 20.25,
+          "ridge_effective_elev_m": 987.7,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 10,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 15,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 20,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 25,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 30,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 35,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 40,
+          "horizon_angle_deg": -0.0453,
+          "effective_solar_zenith_deg": 90.8787,
+          "governing_ridge_he": "הרי גלעד הצפוניים (עג'לון)",
+          "ridge_distance_km": 73.48,
+          "ridge_effective_elev_m": 1136.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 45,
+          "horizon_angle_deg": -0.0047,
+          "effective_solar_zenith_deg": 90.838,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 66.07,
+          "ridge_effective_elev_m": 1118.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 50,
+          "horizon_angle_deg": 0.0271,
+          "effective_solar_zenith_deg": 90.8062,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 60.43,
+          "ridge_effective_elev_m": 1104.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 55,
+          "horizon_angle_deg": 0.0519,
+          "effective_solar_zenith_deg": 90.7814,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 56.08,
+          "ridge_effective_elev_m": 1091.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 60,
+          "horizon_angle_deg": 0.0424,
+          "effective_solar_zenith_deg": 90.7909,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 53.58,
+          "ridge_effective_elev_m": 1061.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 65,
+          "horizon_angle_deg": 0.0244,
+          "effective_solar_zenith_deg": 90.8089,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 51.8,
+          "ridge_effective_elev_m": 1031.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 70,
+          "horizon_angle_deg": 0.0028,
+          "effective_solar_zenith_deg": 90.8305,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 50.51,
+          "ridge_effective_elev_m": 1002.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 75,
+          "horizon_angle_deg": -0.0272,
+          "effective_solar_zenith_deg": 90.8605,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 49.43,
+          "ridge_effective_elev_m": 969.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 80,
+          "horizon_angle_deg": -0.0842,
+          "effective_solar_zenith_deg": 90.9175,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 47.77,
+          "ridge_effective_elev_m": 911.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 85,
+          "horizon_angle_deg": -0.1438,
+          "effective_solar_zenith_deg": 90.9771,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 46.57,
+          "ridge_effective_elev_m": 857.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 90,
+          "horizon_angle_deg": -0.2052,
+          "effective_solar_zenith_deg": 91.0386,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 45.76,
+          "ridge_effective_elev_m": 805.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 95,
+          "horizon_angle_deg": -0.197,
+          "effective_solar_zenith_deg": 91.0304,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 46.18,
+          "ridge_effective_elev_m": 812.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 100,
+          "horizon_angle_deg": -0.1606,
+          "effective_solar_zenith_deg": 90.9939,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 47.36,
+          "ridge_effective_elev_m": 846.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 105,
+          "horizon_angle_deg": -0.1261,
+          "effective_solar_zenith_deg": 90.9594,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 48.98,
+          "ridge_effective_elev_m": 882.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 110,
+          "horizon_angle_deg": -0.0941,
+          "effective_solar_zenith_deg": 90.9274,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 51.11,
+          "ridge_effective_elev_m": 920.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 115,
+          "horizon_angle_deg": -0.064,
+          "effective_solar_zenith_deg": 90.8973,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 52.85,
+          "ridge_effective_elev_m": 957.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 120,
+          "horizon_angle_deg": -0.0371,
+          "effective_solar_zenith_deg": 90.8704,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 55.14,
+          "ridge_effective_elev_m": 997.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 125,
+          "horizon_angle_deg": -0.0142,
+          "effective_solar_zenith_deg": 90.8475,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 58.11,
+          "ridge_effective_elev_m": 1042.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 130,
+          "horizon_angle_deg": 0.0038,
+          "effective_solar_zenith_deg": 90.8295,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 61.91,
+          "ridge_effective_elev_m": 1091.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 135,
+          "horizon_angle_deg": 0.0157,
+          "effective_solar_zenith_deg": 90.8176,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 66.79,
+          "ridge_effective_elev_m": 1148.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 140,
+          "horizon_angle_deg": -0.0078,
+          "effective_solar_zenith_deg": 90.8412,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 71.54,
+          "ridge_effective_elev_m": 1165.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 145,
+          "horizon_angle_deg": -0.0393,
+          "effective_solar_zenith_deg": 90.8726,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 77.61,
+          "ridge_effective_elev_m": 1184.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 150,
+          "horizon_angle_deg": -0.0799,
+          "effective_solar_zenith_deg": 90.9132,
+          "governing_ridge_he": "דרום רמת מואב / הרי אדום צפון",
+          "ridge_distance_km": 85.52,
+          "ridge_effective_elev_m": 1206.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 155,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 160,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 165,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 170,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 175,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 180,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 185,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 190,
+          "horizon_angle_deg": -0.6686,
+          "effective_solar_zenith_deg": 91.5019,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 2.69,
+          "ridge_effective_elev_m": 795.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 195,
+          "horizon_angle_deg": -0.4032,
+          "effective_solar_zenith_deg": 91.2365,
+          "governing_ridge_he": "רכס ארמון הנציב",
+          "ridge_distance_km": 3.58,
+          "ridge_effective_elev_m": 801.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 200,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 205,
+          "horizon_angle_deg": -0.8605,
+          "effective_solar_zenith_deg": 91.6939,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.0,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 210,
+          "horizon_angle_deg": 0.2545,
+          "effective_solar_zenith_deg": 90.5789,
+          "governing_ridge_he": "פסגת הרי יהודה (חלחול)",
+          "ridge_distance_km": 28.3,
+          "ridge_effective_elev_m": 1006.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 215,
+          "horizon_angle_deg": 0.4014,
+          "effective_solar_zenith_deg": 90.4319,
+          "governing_ridge_he": "רכס גוש עציון",
+          "ridge_distance_km": 18.5,
+          "ridge_effective_elev_m": 979.0,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 220,
+          "horizon_angle_deg": 0.4472,
+          "effective_solar_zenith_deg": 90.3862,
+          "governing_ridge_he": "רכס גוש עציון",
+          "ridge_distance_km": 14.15,
+          "ridge_effective_elev_m": 950.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 225,
+          "horizon_angle_deg": 0.4813,
+          "effective_solar_zenith_deg": 90.352,
+          "governing_ridge_he": "הר גילה (מדרום לירושלים)",
+          "ridge_distance_km": 11.66,
+          "ridge_effective_elev_m": 933.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 230,
+          "horizon_angle_deg": 0.5082,
+          "effective_solar_zenith_deg": 90.3251,
+          "governing_ridge_he": "הר גילה (מדרום לירושלים)",
+          "ridge_distance_km": 9.97,
+          "ridge_effective_elev_m": 921.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 235,
+          "horizon_angle_deg": -0.7048,
+          "effective_solar_zenith_deg": 91.5382,
+          "governing_ridge_he": "תלפיות / בקעה",
+          "ridge_distance_km": 3.02,
+          "ridge_effective_elev_m": 789.5,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 240,
+          "horizon_angle_deg": -0.7054,
+          "effective_solar_zenith_deg": 91.5388,
+          "governing_ridge_he": "טלביה / רחביה",
+          "ridge_distance_km": 2.87,
+          "ridge_effective_elev_m": 791.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 245,
+          "horizon_angle_deg": 0.0869,
+          "effective_solar_zenith_deg": 90.7464,
+          "governing_ridge_he": "רכס הר גילה / מבוא ביתר",
+          "ridge_distance_km": 11.12,
+          "ridge_effective_elev_m": 851.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 250,
+          "horizon_angle_deg": 0.0712,
+          "effective_solar_zenith_deg": 90.7622,
+          "governing_ridge_he": "הר אורה / רכס עמינדב",
+          "ridge_distance_km": 9.74,
+          "ridge_effective_elev_m": 844.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 255,
+          "horizon_angle_deg": 0.0215,
+          "effective_solar_zenith_deg": 90.8119,
+          "governing_ridge_he": "קריית יובל / הדסה",
+          "ridge_distance_km": 8.15,
+          "ridge_effective_elev_m": 833.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 260,
+          "horizon_angle_deg": 0.0218,
+          "effective_solar_zenith_deg": 90.8115,
+          "governing_ridge_he": "קריית יובל / הדסה",
+          "ridge_distance_km": 6.89,
+          "ridge_effective_elev_m": 831.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 265,
+          "horizon_angle_deg": 0.0509,
+          "effective_solar_zenith_deg": 90.7824,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 6.06,
+          "ridge_effective_elev_m": 833.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 270,
+          "horizon_angle_deg": 0.004,
+          "effective_solar_zenith_deg": 90.8294,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 5.46,
+          "ridge_effective_elev_m": 828.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 275,
+          "horizon_angle_deg": -0.0485,
+          "effective_solar_zenith_deg": 90.8819,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 5.0,
+          "ridge_effective_elev_m": 823.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 280,
+          "horizon_angle_deg": -0.1012,
+          "effective_solar_zenith_deg": 90.9346,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 4.64,
+          "ridge_effective_elev_m": 819.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 285,
+          "horizon_angle_deg": -0.1536,
+          "effective_solar_zenith_deg": 90.9869,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 4.36,
+          "ridge_effective_elev_m": 815.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 290,
+          "horizon_angle_deg": -0.0862,
+          "effective_solar_zenith_deg": 90.9195,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 4.58,
+          "ridge_effective_elev_m": 820.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 295,
+          "horizon_angle_deg": 0.0068,
+          "effective_solar_zenith_deg": 90.8265,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 4.98,
+          "ridge_effective_elev_m": 828.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 300,
+          "horizon_angle_deg": 0.0991,
+          "effective_solar_zenith_deg": 90.7342,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 5.5,
+          "ridge_effective_elev_m": 837.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 305,
+          "horizon_angle_deg": 0.1898,
+          "effective_solar_zenith_deg": 90.6435,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 6.19,
+          "ridge_effective_elev_m": 849.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 310,
+          "horizon_angle_deg": 0.2779,
+          "effective_solar_zenith_deg": 90.5555,
+          "governing_ridge_he": "נבי סמואל (צפון-מערב ירושלים)",
+          "ridge_distance_km": 7.14,
+          "ridge_effective_elev_m": 864.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 315,
+          "horizon_angle_deg": 0.362,
+          "effective_solar_zenith_deg": 90.4714,
+          "governing_ridge_he": "נבי סמואל (צפון-מערב ירושלים)",
+          "ridge_distance_km": 8.51,
+          "ridge_effective_elev_m": 884.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 320,
+          "horizon_angle_deg": 0.3551,
+          "effective_solar_zenith_deg": 90.4782,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.88,
+          "ridge_effective_elev_m": 886.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 325,
+          "horizon_angle_deg": 0.3438,
+          "effective_solar_zenith_deg": 90.4896,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.34,
+          "ridge_effective_elev_m": 888.0,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 330,
+          "horizon_angle_deg": 0.329,
+          "effective_solar_zenith_deg": 90.5043,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.94,
+          "ridge_effective_elev_m": 889.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 335,
+          "horizon_angle_deg": 0.3108,
+          "effective_solar_zenith_deg": 90.5225,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 10.7,
+          "ridge_effective_elev_m": 891.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 340,
+          "horizon_angle_deg": 0.289,
+          "effective_solar_zenith_deg": 90.5443,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 11.68,
+          "ridge_effective_elev_m": 894.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 345,
+          "horizon_angle_deg": 0.2635,
+          "effective_solar_zenith_deg": 90.5698,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 12.98,
+          "ridge_effective_elev_m": 897.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 350,
+          "horizon_angle_deg": 0.2506,
+          "effective_solar_zenith_deg": 90.5828,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 14.55,
+          "ridge_effective_elev_m": 904.1,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 355,
+          "horizon_angle_deg": 0.2981,
+          "effective_solar_zenith_deg": 90.5353,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 15.94,
+          "ridge_effective_elev_m": 926.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        }
+      ]
+    },
+    "mount_herzl_summit": {
+      "site_key": "mount_herzl_summit",
+      "name_he": "פסגת הר הרצל (קו הרכס המערבי)",
+      "name_en": "Mount Herzl Summit",
+      "wgs84": {
+        "lat": 31.77389,
+        "lon": 35.18056,
+        "elev_asl_m": 834.0
+      },
+      "itm_epsg2039": {
+        "easting_m": 217194.211,
+        "northing_m": 631246.186,
+        "elev_asl_m": 834.0
+      },
+      "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl",
+      "unobstructed_geometric_dip_deg": 0.927,
+      "eastern_sunrise_sector_60_120_deg": {
+        "min_horizon_angle_deg": -0.2413,
+        "mean_horizon_angle_deg": -0.1089,
+        "max_horizon_angle_deg": -0.0019,
+        "due_east_90_deg_angle": -0.2413,
+        "due_east_governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)"
+      },
+      "western_sunset_sector_240_300_deg": {
+        "min_horizon_angle_deg": -0.8647,
+        "mean_horizon_angle_deg": -0.8647,
+        "max_horizon_angle_deg": -0.8647,
+        "due_west_270_deg_angle": -0.8647,
+        "due_west_governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ"
+      },
+      "azimuth_profile": [
+        {
+          "azimuth_deg": 0,
+          "horizon_angle_deg": 0.4185,
+          "effective_solar_zenith_deg": 90.4148,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 6.59,
+          "ridge_effective_elev_m": 885.1,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 5,
+          "horizon_angle_deg": 0.3382,
+          "effective_solar_zenith_deg": 90.4952,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.41,
+          "ridge_effective_elev_m": 888.5,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 10,
+          "horizon_angle_deg": 0.2491,
+          "effective_solar_zenith_deg": 90.5843,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 11.74,
+          "ridge_effective_elev_m": 894.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 15,
+          "horizon_angle_deg": 0.2331,
+          "effective_solar_zenith_deg": 90.6002,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 16.46,
+          "ridge_effective_elev_m": 919.5,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 20,
+          "horizon_angle_deg": 0.3051,
+          "effective_solar_zenith_deg": 90.5282,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 21.29,
+          "ridge_effective_elev_m": 978.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 25,
+          "horizon_angle_deg": -0.0309,
+          "effective_solar_zenith_deg": 90.8642,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 3.22,
+          "ridge_effective_elev_m": 833.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 30,
+          "horizon_angle_deg": -0.1248,
+          "effective_solar_zenith_deg": 90.9582,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 2.98,
+          "ridge_effective_elev_m": 828.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 35,
+          "horizon_angle_deg": -0.2181,
+          "effective_solar_zenith_deg": 91.0514,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 2.8,
+          "ridge_effective_elev_m": 823.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 40,
+          "horizon_angle_deg": -0.1094,
+          "effective_solar_zenith_deg": 90.9427,
+          "governing_ridge_he": "הרי גלעד הצפוניים (עג'לון)",
+          "ridge_distance_km": 83.4,
+          "ridge_effective_elev_m": 1149.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 45,
+          "horizon_angle_deg": -0.0676,
+          "effective_solar_zenith_deg": 90.9009,
+          "governing_ridge_he": "הרי גלעד הצפוניים (עג'לון)",
+          "ridge_distance_km": 74.99,
+          "ridge_effective_elev_m": 1129.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 50,
+          "horizon_angle_deg": -0.0355,
+          "effective_solar_zenith_deg": 90.8688,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 68.6,
+          "ridge_effective_elev_m": 1112.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 55,
+          "horizon_angle_deg": -0.0108,
+          "effective_solar_zenith_deg": 90.8441,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 63.65,
+          "ridge_effective_elev_m": 1098.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 60,
+          "horizon_angle_deg": -0.0019,
+          "effective_solar_zenith_deg": 90.8352,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 60.15,
+          "ridge_effective_elev_m": 1079.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 65,
+          "horizon_angle_deg": -0.0197,
+          "effective_solar_zenith_deg": 90.853,
+          "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+          "ridge_distance_km": 58.15,
+          "ridge_effective_elev_m": 1044.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 70,
+          "horizon_angle_deg": -0.0412,
+          "effective_solar_zenith_deg": 90.8745,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 56.7,
+          "ridge_effective_elev_m": 1012.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 75,
+          "horizon_angle_deg": -0.066,
+          "effective_solar_zenith_deg": 90.8993,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 55.73,
+          "ridge_effective_elev_m": 981.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 80,
+          "horizon_angle_deg": -0.1207,
+          "effective_solar_zenith_deg": 90.9541,
+          "governing_ridge_he": "רמת עמון המערבית",
+          "ridge_distance_km": 53.95,
+          "ridge_effective_elev_m": 919.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 85,
+          "horizon_angle_deg": -0.1032,
+          "effective_solar_zenith_deg": 90.9366,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 6.03,
+          "ridge_effective_elev_m": 825.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 90,
+          "horizon_angle_deg": -0.2413,
+          "effective_solar_zenith_deg": 91.0746,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 51.68,
+          "ridge_effective_elev_m": 798.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 95,
+          "horizon_angle_deg": -0.219,
+          "effective_solar_zenith_deg": 91.0523,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 52.36,
+          "ridge_effective_elev_m": 821.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 100,
+          "horizon_angle_deg": -0.1832,
+          "effective_solar_zenith_deg": 91.0166,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 53.69,
+          "ridge_effective_elev_m": 859.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 105,
+          "horizon_angle_deg": -0.1497,
+          "effective_solar_zenith_deg": 90.983,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 55.53,
+          "ridge_effective_elev_m": 899.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 110,
+          "horizon_angle_deg": -0.1181,
+          "effective_solar_zenith_deg": 90.9514,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 57.42,
+          "ridge_effective_elev_m": 940.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 115,
+          "horizon_angle_deg": -0.0888,
+          "effective_solar_zenith_deg": 90.9221,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 59.37,
+          "ridge_effective_elev_m": 982.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 120,
+          "horizon_angle_deg": -0.0631,
+          "effective_solar_zenith_deg": 90.8964,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 61.95,
+          "ridge_effective_elev_m": 1027.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 125,
+          "horizon_angle_deg": -0.0416,
+          "effective_solar_zenith_deg": 90.875,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 65.28,
+          "ridge_effective_elev_m": 1077.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 130,
+          "horizon_angle_deg": -0.0255,
+          "effective_solar_zenith_deg": 90.8588,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 69.55,
+          "ridge_effective_elev_m": 1133.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 135,
+          "horizon_angle_deg": -0.0359,
+          "effective_solar_zenith_deg": 90.8692,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 73.98,
+          "ridge_effective_elev_m": 1161.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 140,
+          "horizon_angle_deg": -0.0603,
+          "effective_solar_zenith_deg": 90.8936,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 79.21,
+          "ridge_effective_elev_m": 1179.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 145,
+          "horizon_angle_deg": -0.0925,
+          "effective_solar_zenith_deg": 90.9259,
+          "governing_ridge_he": "דרום רמת מואב / הרי אדום צפון",
+          "ridge_distance_km": 85.94,
+          "ridge_effective_elev_m": 1199.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 150,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 155,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 160,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 165,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 170,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 175,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 180,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 185,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 190,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 195,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 200,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 205,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 210,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 215,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 220,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 225,
+          "horizon_angle_deg": 0.1422,
+          "effective_solar_zenith_deg": 90.6911,
+          "governing_ridge_he": "הר אורה / רכס עמינדב",
+          "ridge_distance_km": 5.38,
+          "ridge_effective_elev_m": 849.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 230,
+          "horizon_angle_deg": 0.1145,
+          "effective_solar_zenith_deg": 90.7188,
+          "governing_ridge_he": "הר אורה / רכס עמינדב",
+          "ridge_distance_km": 3.73,
+          "ridge_effective_elev_m": 842.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 235,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 240,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 245,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 250,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 255,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 260,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 265,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 270,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 275,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 280,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 285,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 290,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 295,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 300,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 305,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 310,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 315,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 320,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 325,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 330,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 335,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 340,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 345,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 350,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 355,
+          "horizon_angle_deg": -0.8647,
+          "effective_solar_zenith_deg": 91.698,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 110.5,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        }
+      ]
+    },
+    "knesset_givat_ram": {
+      "site_key": "knesset_givat_ram",
+      "name_he": "משכן הכנסת (גבעת רם)",
+      "name_en": "Knesset Building (Givat Ram)",
+      "wgs84": {
+        "lat": 31.7767,
+        "lon": 35.2053,
+        "elev_asl_m": 805.0
+      },
+      "itm_epsg2039": {
+        "easting_m": 219537.716,
+        "northing_m": 631557.524,
+        "elev_asl_m": 805.0
+      },
+      "source_url": "https://en.wikipedia.org/wiki/Knesset_building",
+      "unobstructed_geometric_dip_deg": 0.9108,
+      "eastern_sunrise_sector_60_120_deg": {
+        "min_horizon_angle_deg": -0.1817,
+        "mean_horizon_angle_deg": 0.0663,
+        "max_horizon_angle_deg": 0.2865,
+        "due_east_90_deg_angle": 0.0181,
+        "due_east_governing_ridge_he": "פסגת הר הזיתים (א-טור)"
+      },
+      "western_sunset_sector_240_300_deg": {
+        "min_horizon_angle_deg": 0.3323,
+        "mean_horizon_angle_deg": 0.6173,
+        "max_horizon_angle_deg": 0.7377,
+        "due_west_270_deg_angle": 0.7213,
+        "due_west_governing_ridge_he": "פסגת הר הרצל"
+      },
+      "azimuth_profile": [
+        {
+          "azimuth_deg": 0,
+          "horizon_angle_deg": 0.387,
+          "effective_solar_zenith_deg": 90.4463,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 11.99,
+          "ridge_effective_elev_m": 895.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 5,
+          "horizon_angle_deg": 0.3383,
+          "effective_solar_zenith_deg": 90.4951,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 14.79,
+          "ridge_effective_elev_m": 907.2,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 10,
+          "horizon_angle_deg": 0.3809,
+          "effective_solar_zenith_deg": 90.4524,
+          "governing_ridge_he": "רכס רמאללה / אל-בירה",
+          "ridge_distance_km": 17.34,
+          "ridge_effective_elev_m": 940.8,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 15,
+          "horizon_angle_deg": 0.4152,
+          "effective_solar_zenith_deg": 90.4181,
+          "governing_ridge_he": "בעל חצור (הרי בנימין צפון)",
+          "ridge_distance_km": 21.14,
+          "ridge_effective_elev_m": 988.7,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 20,
+          "horizon_angle_deg": 0.2898,
+          "effective_solar_zenith_deg": 90.5435,
+          "governing_ridge_he": "שנלר / רוממה מזרח",
+          "ridge_distance_km": 2.12,
+          "ridge_effective_elev_m": 816.1,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 25,
+          "horizon_angle_deg": 0.2375,
+          "effective_solar_zenith_deg": 90.5959,
+          "governing_ridge_he": "שנלר / רוממה מזרח",
+          "ridge_distance_km": 2.0,
+          "ridge_effective_elev_m": 813.6,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 30,
+          "horizon_angle_deg": 0.1831,
+          "effective_solar_zenith_deg": 90.6502,
+          "governing_ridge_he": "שנלר / רוממה מזרח",
+          "ridge_distance_km": 1.9,
+          "ridge_effective_elev_m": 811.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 35,
+          "horizon_angle_deg": 0.1273,
+          "effective_solar_zenith_deg": 90.7061,
+          "governing_ridge_he": "שנלר / רוממה מזרח",
+          "ridge_distance_km": 1.83,
+          "ridge_effective_elev_m": 809.3,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 40,
+          "horizon_angle_deg": 0.0703,
+          "effective_solar_zenith_deg": 90.7631,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.77,
+          "ridge_effective_elev_m": 807.4,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 45,
+          "horizon_angle_deg": 0.0127,
+          "effective_solar_zenith_deg": 90.8207,
+          "governing_ridge_he": "מוסררה / מגרש הרוסים",
+          "ridge_distance_km": 1.73,
+          "ridge_effective_elev_m": 805.6,
+          "source_url": "https://en.wikipedia.org/wiki/Jerusalem"
+        },
+        {
+          "azimuth_deg": 50,
+          "horizon_angle_deg": 0.1361,
+          "effective_solar_zenith_deg": 90.6972,
+          "governing_ridge_he": "גבעת המבתר / צפון הר הצופים",
+          "ridge_distance_km": 4.49,
+          "ridge_effective_elev_m": 817.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 55,
+          "horizon_angle_deg": 0.187,
+          "effective_solar_zenith_deg": 90.6463,
+          "governing_ridge_he": "גבעת המבתר / צפון הר הצופים",
+          "ridge_distance_km": 4.3,
+          "ridge_effective_elev_m": 820.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 60,
+          "horizon_angle_deg": 0.2363,
+          "effective_solar_zenith_deg": 90.5971,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 4.17,
+          "ridge_effective_elev_m": 823.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 65,
+          "horizon_angle_deg": 0.2757,
+          "effective_solar_zenith_deg": 90.5576,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 4.06,
+          "ridge_effective_elev_m": 825.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 70,
+          "horizon_angle_deg": 0.2367,
+          "effective_solar_zenith_deg": 90.5966,
+          "governing_ridge_he": "הר הצופים",
+          "ridge_distance_km": 3.95,
+          "ridge_effective_elev_m": 822.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 75,
+          "horizon_angle_deg": 0.1956,
+          "effective_solar_zenith_deg": 90.6377,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 3.86,
+          "ridge_effective_elev_m": 819.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 80,
+          "horizon_angle_deg": 0.2201,
+          "effective_solar_zenith_deg": 90.6132,
+          "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+          "ridge_distance_km": 3.77,
+          "ridge_effective_elev_m": 820.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 85,
+          "horizon_angle_deg": 0.2865,
+          "effective_solar_zenith_deg": 90.5468,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 3.69,
+          "ridge_effective_elev_m": 824.4,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 90,
+          "horizon_angle_deg": 0.0181,
+          "effective_solar_zenith_deg": 90.8152,
+          "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+          "ridge_distance_km": 3.66,
+          "ridge_effective_elev_m": 807.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 95,
+          "horizon_angle_deg": -0.1817,
+          "effective_solar_zenith_deg": 91.015,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 49.93,
+          "ridge_effective_elev_m": 816.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 100,
+          "horizon_angle_deg": -0.1464,
+          "effective_solar_zenith_deg": 90.9797,
+          "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+          "ridge_distance_km": 51.2,
+          "ridge_effective_elev_m": 853.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 105,
+          "horizon_angle_deg": -0.1134,
+          "effective_solar_zenith_deg": 90.9467,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 52.95,
+          "ridge_effective_elev_m": 891.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 110,
+          "horizon_angle_deg": -0.0827,
+          "effective_solar_zenith_deg": 90.916,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 54.96,
+          "ridge_effective_elev_m": 931.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 115,
+          "horizon_angle_deg": -0.0539,
+          "effective_solar_zenith_deg": 90.8873,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 56.83,
+          "ridge_effective_elev_m": 972.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 120,
+          "horizon_angle_deg": -0.0288,
+          "effective_solar_zenith_deg": 90.8621,
+          "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+          "ridge_distance_km": 59.29,
+          "ridge_effective_elev_m": 1015.3,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 125,
+          "horizon_angle_deg": -0.008,
+          "effective_solar_zenith_deg": 90.8414,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 62.48,
+          "ridge_effective_elev_m": 1062.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 130,
+          "horizon_angle_deg": 0.0074,
+          "effective_solar_zenith_deg": 90.8259,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 66.57,
+          "ridge_effective_elev_m": 1116.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 135,
+          "horizon_angle_deg": 0.0044,
+          "effective_solar_zenith_deg": 90.829,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 71.21,
+          "ridge_effective_elev_m": 1156.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 140,
+          "horizon_angle_deg": -0.0212,
+          "effective_solar_zenith_deg": 90.8546,
+          "governing_ridge_he": "רמת מואב המרכזית (כרכ)",
+          "ridge_distance_km": 76.24,
+          "ridge_effective_elev_m": 1173.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Nebo"
+        },
+        {
+          "azimuth_deg": 145,
+          "horizon_angle_deg": -0.0239,
+          "effective_solar_zenith_deg": 90.8572,
+          "governing_ridge_he": "רכס רמת רחל / צור באהר",
+          "ridge_distance_km": 4.42,
+          "ridge_effective_elev_m": 804.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 150,
+          "horizon_angle_deg": 0.0149,
+          "effective_solar_zenith_deg": 90.8184,
+          "governing_ridge_he": "רכס רמת רחל / צור באהר",
+          "ridge_distance_km": 4.63,
+          "ridge_effective_elev_m": 807.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_of_Olives"
+        },
+        {
+          "azimuth_deg": 155,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 160,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 165,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 170,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 175,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 180,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 185,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 190,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 195,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 200,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 205,
+          "horizon_angle_deg": 0.5447,
+          "effective_solar_zenith_deg": 90.2886,
+          "governing_ridge_he": "רכס גוש עציון",
+          "ridge_distance_km": 16.21,
+          "ridge_effective_elev_m": 977.1,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 210,
+          "horizon_angle_deg": 0.7701,
+          "effective_solar_zenith_deg": 90.0632,
+          "governing_ridge_he": "הר גילה (מדרום לירושלים)",
+          "ridge_distance_km": 8.99,
+          "ridge_effective_elev_m": 931.4,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 215,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 220,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 225,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 230,
+          "horizon_angle_deg": -0.8495,
+          "effective_solar_zenith_deg": 91.6828,
+          "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+          "ridge_distance_km": 108.6,
+          "ridge_effective_elev_m": 0.0,
+          "source_url": "https://kosherjava.com/zmanim/docs/api/com/kosherjava/zmanim/AstronomicalCalendar.html"
+        },
+        {
+          "azimuth_deg": 235,
+          "horizon_angle_deg": 0.308,
+          "effective_solar_zenith_deg": 90.5253,
+          "governing_ridge_he": "רכס הר גילה / מבוא ביתר",
+          "ridge_distance_km": 7.8,
+          "ridge_effective_elev_m": 851.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 240,
+          "horizon_angle_deg": 0.3323,
+          "effective_solar_zenith_deg": 90.5011,
+          "governing_ridge_he": "הר אורה / רכס עמינדב",
+          "ridge_distance_km": 6.38,
+          "ridge_effective_elev_m": 844.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 245,
+          "horizon_angle_deg": 0.337,
+          "effective_solar_zenith_deg": 90.4963,
+          "governing_ridge_he": "קריית יובל / הדסה",
+          "ridge_distance_km": 4.8,
+          "ridge_effective_elev_m": 834.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 250,
+          "horizon_angle_deg": 0.4056,
+          "effective_solar_zenith_deg": 90.4278,
+          "governing_ridge_he": "קריית יובל / הדסה",
+          "ridge_distance_km": 3.58,
+          "ridge_effective_elev_m": 831.2,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 255,
+          "horizon_angle_deg": 0.5251,
+          "effective_solar_zenith_deg": 90.3083,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 2.95,
+          "ridge_effective_elev_m": 832.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 260,
+          "horizon_angle_deg": 0.6397,
+          "effective_solar_zenith_deg": 90.1936,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 2.52,
+          "ridge_effective_elev_m": 833.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 265,
+          "horizon_angle_deg": 0.7044,
+          "effective_solar_zenith_deg": 90.1289,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 2.22,
+          "ridge_effective_elev_m": 832.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 270,
+          "horizon_angle_deg": 0.7213,
+          "effective_solar_zenith_deg": 90.112,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 2.0,
+          "ridge_effective_elev_m": 830.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 275,
+          "horizon_angle_deg": 0.7324,
+          "effective_solar_zenith_deg": 90.1009,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 1.83,
+          "ridge_effective_elev_m": 828.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 280,
+          "horizon_angle_deg": 0.7377,
+          "effective_solar_zenith_deg": 90.0956,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 1.7,
+          "ridge_effective_elev_m": 827.1,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 285,
+          "horizon_angle_deg": 0.7373,
+          "effective_solar_zenith_deg": 90.096,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 1.6,
+          "ridge_effective_elev_m": 825.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 290,
+          "horizon_angle_deg": 0.7311,
+          "effective_solar_zenith_deg": 90.1022,
+          "governing_ridge_he": "פסגת הר הרצל",
+          "ridge_distance_km": 1.52,
+          "ridge_effective_elev_m": 824.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 295,
+          "horizon_angle_deg": 0.7192,
+          "effective_solar_zenith_deg": 90.1141,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.46,
+          "ridge_effective_elev_m": 823.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 300,
+          "horizon_angle_deg": 0.7018,
+          "effective_solar_zenith_deg": 90.1316,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.41,
+          "ridge_effective_elev_m": 822.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 305,
+          "horizon_angle_deg": 0.6789,
+          "effective_solar_zenith_deg": 90.1544,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.38,
+          "ridge_effective_elev_m": 821.5,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 310,
+          "horizon_angle_deg": 0.6508,
+          "effective_solar_zenith_deg": 90.1826,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.36,
+          "ridge_effective_elev_m": 820.6,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 315,
+          "horizon_angle_deg": 0.6176,
+          "effective_solar_zenith_deg": 90.2157,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.35,
+          "ridge_effective_elev_m": 819.7,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 320,
+          "horizon_angle_deg": 0.5796,
+          "effective_solar_zenith_deg": 90.2537,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.35,
+          "ridge_effective_elev_m": 818.8,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 325,
+          "horizon_angle_deg": 0.5372,
+          "effective_solar_zenith_deg": 90.2961,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.36,
+          "ridge_effective_elev_m": 817.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 330,
+          "horizon_angle_deg": 0.4906,
+          "effective_solar_zenith_deg": 90.3428,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.38,
+          "ridge_effective_elev_m": 816.9,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 335,
+          "horizon_angle_deg": 0.4401,
+          "effective_solar_zenith_deg": 90.3932,
+          "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+          "ridge_distance_km": 1.41,
+          "ridge_effective_elev_m": 816.0,
+          "source_url": "https://en.wikipedia.org/wiki/Mount_Herzl"
+        },
+        {
+          "azimuth_deg": 340,
+          "horizon_angle_deg": 0.6535,
+          "effective_solar_zenith_deg": 90.1798,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 6.76,
+          "ridge_effective_elev_m": 885.3,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 345,
+          "horizon_angle_deg": 0.5957,
+          "effective_solar_zenith_deg": 90.2376,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 7.51,
+          "ridge_effective_elev_m": 886.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 350,
+          "horizon_angle_deg": 0.5322,
+          "effective_solar_zenith_deg": 90.3011,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 8.52,
+          "ridge_effective_elev_m": 889.1,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        },
+        {
+          "azimuth_deg": 355,
+          "horizon_angle_deg": 0.4628,
+          "effective_solar_zenith_deg": 90.3705,
+          "governing_ridge_he": "נבי סמואל",
+          "ridge_distance_km": 9.92,
+          "ridge_effective_elev_m": 891.9,
+          "source_url": "https://en.wikipedia.org/wiki/Judaean_Mountains"
+        }
+      ]
+    }
+  },
+  "zmanim_benchmarks": [
+    {
+      "site_key": "temple_mount_plateau",
+      "name_he": "הר הבית (מפלס הרחבה)",
+      "elev_asl_m": 740.0,
+      "dates": [
+        {
+          "date": "2026-11-23",
+          "label_he": "היום בתור העבודה (23.11.2026 — חורף/כסלו)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:14:08",
+            "unobstructed_elevation_dip_local": "06:09:40",
+            "topographic_visible_local": "06:29:12",
+            "solar_azimuth_deg": 115.56,
+            "horizon_angle_deg": 2.91,
+            "effective_zenith_deg": 87.924,
+            "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+            "delta_visible_minus_planar_sec": 903.8
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:36:24",
+            "unobstructed_elevation_dip_local": "16:40:53",
+            "topographic_visible_local": "16:27:56",
+            "solar_azimuth_deg": 245.21,
+            "horizon_angle_deg": 1.641,
+            "effective_zenith_deg": 89.193,
+            "governing_ridge_he": "טלביה / רחביה",
+            "delta_visible_minus_planar_sec": -507.8
+          }
+        },
+        {
+          "date": "2026-03-20",
+          "label_he": "שוויון האביב (20.03.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "05:43:06",
+            "unobstructed_elevation_dip_local": "05:39:00",
+            "topographic_visible_local": "06:10:27",
+            "solar_azimuth_deg": 93.3,
+            "horizon_angle_deg": 5.812,
+            "effective_zenith_deg": 85.021,
+            "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+            "delta_visible_minus_planar_sec": 1640.3
+          },
+          "sunset": {
+            "planar_sea_level_local": "17:50:24",
+            "unobstructed_elevation_dip_local": "17:54:31",
+            "topographic_visible_local": "17:39:21",
+            "solar_azimuth_deg": 269.08,
+            "horizon_angle_deg": 2.349,
+            "effective_zenith_deg": 88.484,
+            "governing_ridge_he": "ממילא / ימק\"א",
+            "delta_visible_minus_planar_sec": -663.5
+          }
+        },
+        {
+          "date": "2026-06-21",
+          "label_he": "היפוך הקיץ (21.06.2026)",
+          "timezone": "IDT (UTC+3)",
+          "sunrise": {
+            "planar_sea_level_local": "05:34:01",
+            "unobstructed_elevation_dip_local": "05:29:20",
+            "topographic_visible_local": "06:01:44",
+            "solar_azimuth_deg": 65.08,
+            "horizon_angle_deg": 5.261,
+            "effective_zenith_deg": 85.572,
+            "governing_ridge_he": "אוגוסטה ויקטוריה — רכס הר הזיתים",
+            "delta_visible_minus_planar_sec": 1662.9
+          },
+          "sunset": {
+            "planar_sea_level_local": "19:47:41",
+            "unobstructed_elevation_dip_local": "19:52:22",
+            "topographic_visible_local": "19:36:22",
+            "solar_azimuth_deg": 297.0,
+            "horizon_angle_deg": 2.128,
+            "effective_zenith_deg": 88.705,
+            "governing_ridge_he": "מוסררה / מגרש הרוסים",
+            "delta_visible_minus_planar_sec": -678.9
+          }
+        },
+        {
+          "date": "2026-12-21",
+          "label_he": "היפוך החורף (21.12.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:34:51",
+            "unobstructed_elevation_dip_local": "06:30:15",
+            "topographic_visible_local": "06:47:42",
+            "solar_azimuth_deg": 119.02,
+            "horizon_angle_deg": 2.406,
+            "effective_zenith_deg": 88.428,
+            "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+            "delta_visible_minus_planar_sec": 770.7
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:39:17",
+            "unobstructed_elevation_dip_local": "16:43:54",
+            "topographic_visible_local": "16:30:58",
+            "solar_azimuth_deg": 241.59,
+            "horizon_angle_deg": 1.564,
+            "effective_zenith_deg": 89.269,
+            "governing_ridge_he": "טלביה / רחביה",
+            "delta_visible_minus_planar_sec": -499.7
+          }
+        }
+      ]
+    },
+    {
+      "site_key": "western_wall_plaza",
+      "name_he": "רחבת הכותל המערבי",
+      "elev_asl_m": 725.0,
+      "dates": [
+        {
+          "date": "2026-11-23",
+          "label_he": "היום בתור העבודה (23.11.2026 — חורף/כסלו)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:14:08",
+            "unobstructed_elevation_dip_local": "06:09:42",
+            "topographic_visible_local": "06:25:10",
+            "solar_azimuth_deg": 115.02,
+            "horizon_angle_deg": 2.136,
+            "effective_zenith_deg": 88.697,
+            "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+            "delta_visible_minus_planar_sec": 662.0
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:36:25",
+            "unobstructed_elevation_dip_local": "16:40:51",
+            "topographic_visible_local": "16:24:55",
+            "solar_azimuth_deg": 244.81,
+            "horizon_angle_deg": 2.227,
+            "effective_zenith_deg": 88.607,
+            "governing_ridge_he": "טלביה / רחביה",
+            "delta_visible_minus_planar_sec": -690.3
+          }
+        },
+        {
+          "date": "2026-03-20",
+          "label_he": "שוויון האביב (20.03.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "05:43:07",
+            "unobstructed_elevation_dip_local": "05:39:03",
+            "topographic_visible_local": "06:06:17",
+            "solar_azimuth_deg": 92.74,
+            "horizon_angle_deg": 4.926,
+            "effective_zenith_deg": 85.908,
+            "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+            "delta_visible_minus_planar_sec": 1389.9
+          },
+          "sunset": {
+            "planar_sea_level_local": "17:50:25",
+            "unobstructed_elevation_dip_local": "17:54:29",
+            "topographic_visible_local": "17:35:29",
+            "solar_azimuth_deg": 268.57,
+            "horizon_angle_deg": 3.172,
+            "effective_zenith_deg": 87.661,
+            "governing_ridge_he": "ממילא / ימק\"א",
+            "delta_visible_minus_planar_sec": -896.0
+          }
+        },
+        {
+          "date": "2026-06-21",
+          "label_he": "היפוך הקיץ (21.06.2026)",
+          "timezone": "IDT (UTC+3)",
+          "sunrise": {
+            "planar_sea_level_local": "05:34:02",
+            "unobstructed_elevation_dip_local": "05:29:23",
+            "topographic_visible_local": "06:03:08",
+            "solar_azimuth_deg": 65.26,
+            "horizon_angle_deg": 5.53,
+            "effective_zenith_deg": 85.303,
+            "governing_ridge_he": "פסגת הר הזיתים (א-טור)",
+            "delta_visible_minus_planar_sec": 1746.6
+          },
+          "sunset": {
+            "planar_sea_level_local": "19:47:41",
+            "unobstructed_elevation_dip_local": "19:52:19",
+            "topographic_visible_local": "19:31:46",
+            "solar_azimuth_deg": 296.41,
+            "horizon_angle_deg": 3.003,
+            "effective_zenith_deg": 87.831,
+            "governing_ridge_he": "מוסררה / מגרש הרוסים",
+            "delta_visible_minus_planar_sec": -955.4
+          }
+        },
+        {
+          "date": "2026-12-21",
+          "label_he": "היפוך החורף (21.12.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:34:52",
+            "unobstructed_elevation_dip_local": "06:30:18",
+            "topographic_visible_local": "06:43:42",
+            "solar_azimuth_deg": 118.48,
+            "horizon_angle_deg": 1.659,
+            "effective_zenith_deg": 89.174,
+            "governing_ridge_he": "הר המשחה / דרום הר הזיתים",
+            "delta_visible_minus_planar_sec": 530.2
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:39:18",
+            "unobstructed_elevation_dip_local": "16:43:52",
+            "topographic_visible_local": "16:27:55",
+            "solar_azimuth_deg": 241.18,
+            "horizon_angle_deg": 2.135,
+            "effective_zenith_deg": 88.698,
+            "governing_ridge_he": "טלביה / רחביה",
+            "delta_visible_minus_planar_sec": -683.4
+          }
+        }
+      ]
+    },
+    {
+      "site_key": "mount_of_olives_crest",
+      "name_he": "פסגת הר הזיתים",
+      "elev_asl_m": 826.0,
+      "dates": [
+        {
+          "date": "2026-11-23",
+          "label_he": "היום בתור העבודה (23.11.2026 — חורף/כסלו)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:14:06",
+            "unobstructed_elevation_dip_local": "06:09:23",
+            "topographic_visible_local": "06:13:44",
+            "solar_azimuth_deg": 113.52,
+            "horizon_angle_deg": -0.073,
+            "effective_zenith_deg": 90.906,
+            "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+            "delta_visible_minus_planar_sec": -22.5
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:36:22",
+            "unobstructed_elevation_dip_local": "16:41:06",
+            "topographic_visible_local": "16:35:57",
+            "solar_azimuth_deg": 246.27,
+            "horizon_angle_deg": 0.083,
+            "effective_zenith_deg": 90.75,
+            "governing_ridge_he": "רכס הר גילה / מבוא ביתר",
+            "delta_visible_minus_planar_sec": -25.6
+          }
+        },
+        {
+          "date": "2026-03-20",
+          "label_he": "שוויון האביב (20.03.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "05:43:05",
+            "unobstructed_elevation_dip_local": "05:38:44",
+            "topographic_visible_local": "05:42:08",
+            "solar_azimuth_deg": 89.57,
+            "horizon_angle_deg": -0.2,
+            "effective_zenith_deg": 91.033,
+            "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+            "delta_visible_minus_planar_sec": -56.4
+          },
+          "sunset": {
+            "planar_sea_level_local": "17:50:22",
+            "unobstructed_elevation_dip_local": "17:54:43",
+            "topographic_visible_local": "17:50:23",
+            "solar_azimuth_deg": 270.54,
+            "horizon_angle_deg": -0.002,
+            "effective_zenith_deg": 90.835,
+            "governing_ridge_he": "פסגת הר הרצל",
+            "delta_visible_minus_planar_sec": 0.5
+          }
+        },
+        {
+          "date": "2026-06-21",
+          "label_he": "היפוך הקיץ (21.06.2026)",
+          "timezone": "IDT (UTC+3)",
+          "sunrise": {
+            "planar_sea_level_local": "05:33:59",
+            "unobstructed_elevation_dip_local": "05:29:02",
+            "topographic_visible_local": "05:34:11",
+            "solar_azimuth_deg": 61.54,
+            "horizon_angle_deg": 0.037,
+            "effective_zenith_deg": 90.796,
+            "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+            "delta_visible_minus_planar_sec": 11.8
+          },
+          "sunset": {
+            "planar_sea_level_local": "19:47:39",
+            "unobstructed_elevation_dip_local": "19:52:36",
+            "topographic_visible_local": "19:47:16",
+            "solar_azimuth_deg": 298.44,
+            "horizon_angle_deg": 0.07,
+            "effective_zenith_deg": 90.763,
+            "governing_ridge_he": "רכס הכניסה לעיר / גשר המיתרים",
+            "delta_visible_minus_planar_sec": -22.6
+          }
+        },
+        {
+          "date": "2026-12-21",
+          "label_he": "היפוך החורף (21.12.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:34:50",
+            "unobstructed_elevation_dip_local": "06:29:57",
+            "topographic_visible_local": "06:34:33",
+            "solar_azimuth_deg": 117.28,
+            "horizon_angle_deg": -0.052,
+            "effective_zenith_deg": 90.885,
+            "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+            "delta_visible_minus_planar_sec": -16.4
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:39:15",
+            "unobstructed_elevation_dip_local": "16:44:08",
+            "topographic_visible_local": "16:40:36",
+            "solar_azimuth_deg": 242.86,
+            "horizon_angle_deg": -0.253,
+            "effective_zenith_deg": 91.086,
+            "governing_ridge_he": "רכס הר גילה / מבוא ביתר",
+            "delta_visible_minus_planar_sec": 80.3
+          }
+        }
+      ]
+    },
+    {
+      "site_key": "mount_herzl_summit",
+      "name_he": "פסגת הר הרצל (קו הרכס המערבי)",
+      "elev_asl_m": 834.0,
+      "dates": [
+        {
+          "date": "2026-11-23",
+          "label_he": "היום בתור העבודה (23.11.2026 — חורף/כסלו)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:14:21",
+            "unobstructed_elevation_dip_local": "06:09:36",
+            "topographic_visible_local": "06:13:51",
+            "solar_azimuth_deg": 113.5,
+            "horizon_angle_deg": -0.098,
+            "effective_zenith_deg": 90.931,
+            "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+            "delta_visible_minus_planar_sec": -30.1
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:36:38",
+            "unobstructed_elevation_dip_local": "16:41:23",
+            "topographic_visible_local": "16:41:04",
+            "solar_azimuth_deg": 246.9,
+            "horizon_angle_deg": -0.865,
+            "effective_zenith_deg": 91.698,
+            "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+            "delta_visible_minus_planar_sec": 265.9
+          }
+        },
+        {
+          "date": "2026-03-20",
+          "label_he": "שוויון האביב (20.03.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "05:43:20",
+            "unobstructed_elevation_dip_local": "05:38:58",
+            "topographic_visible_local": "05:42:15",
+            "solar_azimuth_deg": 89.55,
+            "horizon_angle_deg": -0.229,
+            "effective_zenith_deg": 91.062,
+            "governing_ridge_he": "הר נבו / הרי העברים (מול ירושלים)",
+            "delta_visible_minus_planar_sec": -64.6
+          },
+          "sunset": {
+            "planar_sea_level_local": "17:50:38",
+            "unobstructed_elevation_dip_local": "17:54:59",
+            "topographic_visible_local": "17:54:42",
+            "solar_azimuth_deg": 271.08,
+            "horizon_angle_deg": -0.865,
+            "effective_zenith_deg": 91.698,
+            "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+            "delta_visible_minus_planar_sec": 244.3
+          }
+        },
+        {
+          "date": "2026-06-21",
+          "label_he": "היפוך הקיץ (21.06.2026)",
+          "timezone": "IDT (UTC+3)",
+          "sunrise": {
+            "planar_sea_level_local": "05:34:15",
+            "unobstructed_elevation_dip_local": "05:29:16",
+            "topographic_visible_local": "05:34:13",
+            "solar_azimuth_deg": 61.51,
+            "horizon_angle_deg": -0.007,
+            "effective_zenith_deg": 90.841,
+            "governing_ridge_he": "רכס גלעד / סלט (מזרח בקעת הירדן)",
+            "delta_visible_minus_planar_sec": -2.3
+          },
+          "sunset": {
+            "planar_sea_level_local": "19:47:53",
+            "unobstructed_elevation_dip_local": "19:52:52",
+            "topographic_visible_local": "19:52:32",
+            "solar_azimuth_deg": 299.11,
+            "horizon_angle_deg": -0.865,
+            "effective_zenith_deg": 91.698,
+            "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+            "delta_visible_minus_planar_sec": 278.6
+          }
+        },
+        {
+          "date": "2026-12-21",
+          "label_he": "היפוך החורף (21.12.2026)",
+          "timezone": "IST (UTC+2)",
+          "sunrise": {
+            "planar_sea_level_local": "06:35:04",
+            "unobstructed_elevation_dip_local": "06:30:10",
+            "topographic_visible_local": "06:34:40",
+            "solar_azimuth_deg": 117.26,
+            "horizon_angle_deg": -0.077,
+            "effective_zenith_deg": 90.911,
+            "governing_ridge_he": "רמת מואב הצפונית (מזרח ים המלח)",
+            "delta_visible_minus_planar_sec": -24.5
+          },
+          "sunset": {
+            "planar_sea_level_local": "16:39:31",
+            "unobstructed_elevation_dip_local": "16:44:25",
+            "topographic_visible_local": "16:44:05",
+            "solar_azimuth_deg": 243.27,
+            "horizon_angle_deg": -0.865,
+            "effective_zenith_deg": 91.698,
+            "governing_ridge_he": "אופק מרוחק מעבר לקימור כדור הארץ",
+            "delta_visible_minus_planar_sec": 274.1
+          }
+        }
+      ]
+    }
+  ]
+}

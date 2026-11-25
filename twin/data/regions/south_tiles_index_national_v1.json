@@ -1,0 +1,1836 @@
+{
+  "schema": "esh27.national_v1.south_tiles_index/1.0",
+  "compatible_branch": "national-v1",
+  "crs": "EPSG:2039",
+  "tile_size_m": 1000,
+  "terrain_mesh_samples": "41x41",
+  "unified_world_sample_offsets": {
+    "realdata_v2": {
+      "dE_m": -1507.85,
+      "dN_m": -757.75
+    },
+    "legacy_v1": {"dE_m": -1524.6, "dN_m": -753.6}
+  },
+  "total_tiles": 53,
+  "corridor_continuity_verified": true,
+  "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+  "osm_license_url": "https://www.openstreetmap.org/copyright",
+  "tiles": [
+    {
+      "tile_id": "177_571",
+      "tile_e_km": 177,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        177000,
+        571000,
+        178000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.758827,
+        31.229772,
+        34.769281,
+        31.238827
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        175492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "178_571",
+      "tile_e_km": 178,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        178000,
+        571000,
+        179000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.769322,
+        31.229808,
+        34.779778,
+        31.238862
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        176492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "179_571",
+      "tile_e_km": 179,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        179000,
+        571000,
+        180000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.779818,
+        31.229843,
+        34.790274,
+        31.238896
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        177492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "180_571",
+      "tile_e_km": 180,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        180000,
+        571000,
+        181000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.790314,
+        31.229877,
+        34.800771,
+        31.23893
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        178492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "181_571",
+      "tile_e_km": 181,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        181000,
+        571000,
+        182000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.800809,
+        31.229911,
+        34.811267,
+        31.238962
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        179492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor",
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [
+        "BSV-LM-06"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "182_571",
+      "tile_e_km": 182,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        182000,
+        571000,
+        183000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.811305,
+        31.229943,
+        34.821764,
+        31.238994
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        180492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "183_571",
+      "tile_e_km": 183,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        183000,
+        571000,
+        184000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.8218,
+        31.229975,
+        34.832261,
+        31.239025
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        181492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "184_571",
+      "tile_e_km": 184,
+      "tile_n_km": 571,
+      "itm_bbox_m": [
+        184000,
+        571000,
+        185000,
+        572000
+      ],
+      "wgs84_bbox": [
+        34.832296,
+        31.230006,
+        34.842757,
+        31.239055
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        182492.15,
+        570242.25
+      ],
+      "zones": [
+        "beersheba_wadi_corridor"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        295.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "177_572",
+      "tile_e_km": 177,
+      "tile_n_km": 572,
+      "itm_bbox_m": [
+        177000,
+        572000,
+        178000,
+        573000
+      ],
+      "wgs84_bbox": [
+        34.758785,
+        31.238791,
+        34.76924,
+        31.247846
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        175492.15,
+        571242.25
+      ],
+      "zones": [
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        320.0
+      ],
+      "landmark_ids": [
+        "BSV-TW-01"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%92%D7%95%D7%A8%D7%93%D7%99_%D7%94%D7%A9%D7%97%D7%A7%D7%99%D7%9D_%D7%94%D7%92%D7%91%D7%95%D7%94%D7%99%D7%9D_%D7%91%D7%99%D7%A9%D7%A8%D7%90%D7%9C",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "179_572",
+      "tile_e_km": 179,
+      "tile_n_km": 572,
+      "itm_bbox_m": [
+        179000,
+        572000,
+        180000,
+        573000
+      ],
+      "wgs84_bbox": [
+        34.779778,
+        31.238862,
+        34.790235,
+        31.247915
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        177492.15,
+        571242.25
+      ],
+      "zones": [
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        320.0
+      ],
+      "landmark_ids": [
+        "BSV-LM-04",
+        "BSV-LM-05"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%98%D7%95%D7%A8%D7%A7%D7%99%D7%AA_%D7%91%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "180_572",
+      "tile_e_km": 180,
+      "tile_n_km": 572,
+      "itm_bbox_m": [
+        180000,
+        572000,
+        181000,
+        573000
+      ],
+      "wgs84_bbox": [
+        34.790274,
+        31.238896,
+        34.800732,
+        31.247949
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        178492.15,
+        571242.25
+      ],
+      "zones": [
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        320.0
+      ],
+      "landmark_ids": [
+        "BSV-TW-02",
+        "BSV-TW-04",
+        "BSV-TR-01"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A7%D7%A0%D7%99%D7%95%D7%9F_%D7%A2%D7%96%D7%A8%D7%99%D7%90%D7%9C%D7%99_%D7%94%D7%A0%D7%92%D7%91",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "180_573",
+      "tile_e_km": 180,
+      "tile_n_km": 573,
+      "itm_bbox_m": [
+        180000,
+        573000,
+        181000,
+        574000
+      ],
+      "wgs84_bbox": [
+        34.790235,
+        31.247915,
+        34.800694,
+        31.256967
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        178492.15,
+        572242.25
+      ],
+      "zones": [
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        320.0
+      ],
+      "landmark_ids": [
+        "BSV-LM-08",
+        "BSV-TW-03"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%91%D7%A0%D7%99%D7%99%D7%9F_%D7%A2%D7%99%D7%A8%D7%99%D7%99%D7%AA_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "181_574",
+      "tile_e_km": 181,
+      "tile_n_km": 574,
+      "itm_bbox_m": [
+        181000,
+        574000,
+        182000,
+        575000
+      ],
+      "wgs84_bbox": [
+        34.800694,
+        31.256967,
+        34.811155,
+        31.266019
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        179492.15,
+        573242.25
+      ],
+      "zones": [
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        320.0
+      ],
+      "landmark_ids": [
+        "BSV-LM-01",
+        "BSV-LM-02",
+        "BSV-LM-03"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%94%D7%9E%D7%A8%D7%9B%D7%96_%D7%94%D7%A8%D7%A4%D7%95%D7%90%D7%99_%D7%94%D7%90%D7%95%D7%A0%D7%99%D7%91%D7%A8%D7%A1%D7%99%D7%98%D7%90%D7%99_%D7%A1%D7%95%D7%A8%D7%95%D7%A7%D7%94",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "182_575",
+      "tile_e_km": 182,
+      "tile_n_km": 575,
+      "itm_bbox_m": [
+        182000,
+        575000,
+        183000,
+        576000
+      ],
+      "wgs84_bbox": [
+        34.811155,
+        31.266019,
+        34.821619,
+        31.27507
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        180492.15,
+        574242.25
+      ],
+      "zones": [
+        "beersheba_cluster_b105"
+      ],
+      "biome": "negev_desert_v1",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        258.0,
+        320.0
+      ],
+      "landmark_ids": [
+        "BSV-LM-07"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%90%D7%A0%D7%93%D7%A8%D7%98%D7%AA_%D7%97%D7%98%D7%99%D7%91%D7%AA_%D7%94%D7%A0%D7%92%D7%91",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "154_615",
+      "tile_e_km": 154,
+      "tile_n_km": 615,
+      "itm_bbox_m": [
+        154000,
+        615000,
+        155000,
+        616000
+      ],
+      "wgs84_bbox": [
+        34.514536,
+        31.625512,
+        34.52501,
+        31.634587
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        152492.15,
+        614242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-INF-01"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%9B%D7%95%D7%97_%D7%A8%D7%95%D7%98%D7%A0%D7%91%D7%A8%D7%92",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "155_616",
+      "tile_e_km": 155,
+      "tile_n_km": 616,
+      "itm_bbox_m": [
+        155000,
+        616000,
+        156000,
+        617000
+      ],
+      "wgs84_bbox": [
+        34.52501,
+        31.634587,
+        34.535486,
+        31.64366
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        153492.15,
+        615242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-INF-02"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%AA%D7%A7%D7%9F_%D7%94%D7%AA%D7%A4%D7%9C%D7%94_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "157_618",
+      "tile_e_km": 157,
+      "tile_n_km": 618,
+      "itm_bbox_m": [
+        157000,
+        618000,
+        158000,
+        619000
+      ],
+      "wgs84_bbox": [
+        34.545964,
+        31.652733,
+        34.556443,
+        31.661805
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        155492.15,
+        617242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-LM-02"
+      ],
+      "source_url": "https://www.parks.org.il/reserve-park/%D7%92%D7%9F-%D7%9C%D7%90%D7%95%D7%9E%D7%99-%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F/",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "158_619",
+      "tile_e_km": 158,
+      "tile_n_km": 619,
+      "itm_bbox_m": [
+        158000,
+        619000,
+        159000,
+        620000
+      ],
+      "wgs84_bbox": [
+        34.556443,
+        31.661805,
+        34.566925,
+        31.670876
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        156492.15,
+        618242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-LM-05"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A8%D7%9B%D7%96_%D7%A8%D7%A4%D7%95%D7%90%D7%99_%D7%91%D7%A8%D7%96%D7%99%D7%9C%D7%99",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "162_619",
+      "tile_e_km": 162,
+      "tile_n_km": 619,
+      "itm_bbox_m": [
+        162000,
+        619000,
+        163000,
+        620000
+      ],
+      "wgs84_bbox": [
+        34.598617,
+        31.662012,
+        34.609104,
+        31.67108
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        160492.15,
+        618242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "157_620",
+      "tile_e_km": 157,
+      "tile_n_km": 620,
+      "itm_bbox_m": [
+        157000,
+        620000,
+        158000,
+        621000
+      ],
+      "wgs84_bbox": [
+        34.545836,
+        31.670769,
+        34.556318,
+        31.679841
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        155492.15,
+        619242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-LM-03"
+      ],
+      "source_url": "https://he.wikivoyage.org/wiki/%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "159_620",
+      "tile_e_km": 159,
+      "tile_n_km": 620,
+      "itm_bbox_m": [
+        159000,
+        620000,
+        160000,
+        621000
+      ],
+      "wgs84_bbox": [
+        34.566925,
+        31.670876,
+        34.577409,
+        31.679947
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        157492.15,
+        619242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-LM-06"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A9%D7%9B%D7%95%D7%A0%D7%AA_%D7%90%D7%A4%D7%A8%D7%99%D7%93%D7%A8",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "162_620",
+      "tile_e_km": 162,
+      "tile_n_km": 620,
+      "itm_bbox_m": [
+        162000,
+        620000,
+        163000,
+        621000
+      ],
+      "wgs84_bbox": [
+        34.598559,
+        31.67103,
+        34.609046,
+        31.680098
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        160492.15,
+        619242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail",
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-TR-01"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "157_621",
+      "tile_e_km": 157,
+      "tile_n_km": 621,
+      "itm_bbox_m": [
+        157000,
+        621000,
+        158000,
+        622000
+      ],
+      "wgs84_bbox": [
+        34.545773,
+        31.679787,
+        34.556256,
+        31.688859
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        155492.15,
+        620242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-LM-01"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A8%D7%99%D7%A0%D7%94_%D7%90%D7%A9%D7%A7%D7%9C%D7%95%D7%9F",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "158_621",
+      "tile_e_km": 158,
+      "tile_n_km": 621,
+      "itm_bbox_m": [
+        158000,
+        621000,
+        159000,
+        622000
+      ],
+      "wgs84_bbox": [
+        34.556318,
+        31.679841,
+        34.566802,
+        31.688912
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        156492.15,
+        620242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-TW-01",
+        "AKL-LM-04"
+      ],
+      "source_url": "https://www.dimri.co.il/",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "162_621",
+      "tile_e_km": 162,
+      "tile_n_km": 621,
+      "itm_bbox_m": [
+        162000,
+        621000,
+        163000,
+        622000
+      ],
+      "wgs84_bbox": [
+        34.5985,
+        31.680048,
+        34.608988,
+        31.689116
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        160492.15,
+        620242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "163_621",
+      "tile_e_km": 163,
+      "tile_n_km": 621,
+      "itm_bbox_m": [
+        163000,
+        621000,
+        164000,
+        622000
+      ],
+      "wgs84_bbox": [
+        34.609046,
+        31.680098,
+        34.619535,
+        31.689165
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        161492.15,
+        620242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "159_622",
+      "tile_e_km": 159,
+      "tile_n_km": 622,
+      "itm_bbox_m": [
+        159000,
+        622000,
+        160000,
+        623000
+      ],
+      "wgs84_bbox": [
+        34.566802,
+        31.688912,
+        34.577288,
+        31.697983
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        157492.15,
+        621242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-NB-01",
+        "AKL-TW-02"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%A9%D7%9B%D7%95%D7%A0%D7%AA_%D7%91%D7%A8%D7%A0%D7%A2",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "161_622",
+      "tile_e_km": 161,
+      "tile_n_km": 622,
+      "itm_bbox_m": [
+        161000,
+        622000,
+        162000,
+        623000
+      ],
+      "wgs84_bbox": [
+        34.587895,
+        31.689016,
+        34.598383,
+        31.698084
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        159492.15,
+        621242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-NB-02"
+      ],
+      "source_url": "https://www.nadlancenter.co.il/article/14910",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "163_622",
+      "tile_e_km": 163,
+      "tile_n_km": 622,
+      "itm_bbox_m": [
+        163000,
+        622000,
+        164000,
+        623000
+      ],
+      "wgs84_bbox": [
+        34.608988,
+        31.689116,
+        34.619479,
+        31.698183
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        161492.15,
+        621242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "163_623",
+      "tile_e_km": 163,
+      "tile_n_km": 623,
+      "itm_bbox_m": [
+        163000,
+        623000,
+        164000,
+        624000
+      ],
+      "wgs84_bbox": [
+        34.608931,
+        31.698134,
+        34.619422,
+        31.707201
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        161492.15,
+        622242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "164_623",
+      "tile_e_km": 164,
+      "tile_n_km": 623,
+      "itm_bbox_m": [
+        164000,
+        623000,
+        165000,
+        624000
+      ],
+      "wgs84_bbox": [
+        34.619479,
+        31.698183,
+        34.629971,
+        31.707249
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        162492.15,
+        622242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "164_624",
+      "tile_e_km": 164,
+      "tile_n_km": 624,
+      "itm_bbox_m": [
+        164000,
+        624000,
+        165000,
+        625000
+      ],
+      "wgs84_bbox": [
+        34.619422,
+        31.707201,
+        34.629915,
+        31.716267
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        162492.15,
+        623242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "165_624",
+      "tile_e_km": 165,
+      "tile_n_km": 624,
+      "itm_bbox_m": [
+        165000,
+        624000,
+        166000,
+        625000
+      ],
+      "wgs84_bbox": [
+        34.629971,
+        31.707249,
+        34.640465,
+        31.716314
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        163492.15,
+        623242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "164_625",
+      "tile_e_km": 164,
+      "tile_n_km": 625,
+      "itm_bbox_m": [
+        164000,
+        625000,
+        165000,
+        626000
+      ],
+      "wgs84_bbox": [
+        34.619365,
+        31.716219,
+        34.629859,
+        31.725285
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        162492.15,
+        624242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9E%D7%A1%D7%99%D7%9C%D7%AA_%D7%94%D7%97%D7%95%D7%A3",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "165_625",
+      "tile_e_km": 165,
+      "tile_n_km": 625,
+      "itm_bbox_m": [
+        165000,
+        625000,
+        166000,
+        626000
+      ],
+      "wgs84_bbox": [
+        34.629915,
+        31.716267,
+        34.64041,
+        31.725332
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        163492.15,
+        624242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "165_626",
+      "tile_e_km": 165,
+      "tile_n_km": 626,
+      "itm_bbox_m": [
+        165000,
+        626000,
+        166000,
+        627000
+      ],
+      "wgs84_bbox": [
+        34.629859,
+        31.725285,
+        34.640356,
+        31.73435
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        163492.15,
+        625242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "166_626",
+      "tile_e_km": 166,
+      "tile_n_km": 626,
+      "itm_bbox_m": [
+        166000,
+        626000,
+        167000,
+        627000
+      ],
+      "wgs84_bbox": [
+        34.64041,
+        31.725332,
+        34.650907,
+        31.734396
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        164492.15,
+        625242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "165_627",
+      "tile_e_km": 165,
+      "tile_n_km": 627,
+      "itm_bbox_m": [
+        165000,
+        627000,
+        166000,
+        628000
+      ],
+      "wgs84_bbox": [
+        34.629804,
+        31.734303,
+        34.640301,
+        31.743368
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        163492.15,
+        626242.25
+      ],
+      "zones": [
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_mediterranean_kurkar",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        0.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "AKL-COR-01"
+      ],
+      "source_url": "https://www.parks.org.il/reserve-park/%D7%A9%D7%9E%D7%95%D7%A8%D7%AA-%D7%98%D7%91%D7%A2-%D7%97%D7%95%D7%9C%D7%95%D7%AA-%D7%A0%D7%99%D7%A6%D7%A0%D7%99%D7%9D/",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "166_627",
+      "tile_e_km": 166,
+      "tile_n_km": 627,
+      "itm_bbox_m": [
+        166000,
+        627000,
+        167000,
+        628000
+      ],
+      "wgs84_bbox": [
+        34.640356,
+        31.73435,
+        34.650854,
+        31.743415
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        164492.15,
+        626242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "166_628",
+      "tile_e_km": 166,
+      "tile_n_km": 628,
+      "itm_bbox_m": [
+        166000,
+        628000,
+        167000,
+        629000
+      ],
+      "wgs84_bbox": [
+        34.640301,
+        31.743368,
+        34.6508,
+        31.752433
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        164492.15,
+        627242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "167_628",
+      "tile_e_km": 167,
+      "tile_n_km": 628,
+      "itm_bbox_m": [
+        167000,
+        628000,
+        168000,
+        629000
+      ],
+      "wgs84_bbox": [
+        34.650854,
+        31.743415,
+        34.661354,
+        31.752478
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        165492.15,
+        627242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "167_629",
+      "tile_e_km": 167,
+      "tile_n_km": 629,
+      "itm_bbox_m": [
+        167000,
+        629000,
+        168000,
+        630000
+      ],
+      "wgs84_bbox": [
+        34.6508,
+        31.752433,
+        34.661301,
+        31.761496
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        165492.15,
+        628242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "167_630",
+      "tile_e_km": 167,
+      "tile_n_km": 630,
+      "itm_bbox_m": [
+        167000,
+        630000,
+        168000,
+        631000
+      ],
+      "wgs84_bbox": [
+        34.650746,
+        31.761451,
+        34.661249,
+        31.770514
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        165492.15,
+        629242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "168_630",
+      "tile_e_km": 168,
+      "tile_n_km": 630,
+      "itm_bbox_m": [
+        168000,
+        630000,
+        169000,
+        631000
+      ],
+      "wgs84_bbox": [
+        34.661301,
+        31.761496,
+        34.671805,
+        31.770559
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        166492.15,
+        629242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "168_631",
+      "tile_e_km": 168,
+      "tile_n_km": 631,
+      "itm_bbox_m": [
+        168000,
+        631000,
+        169000,
+        632000
+      ],
+      "wgs84_bbox": [
+        34.661249,
+        31.770514,
+        34.671753,
+        31.779577
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        166492.15,
+        630242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4",
+        "corridor_ashdod_ashkelon_rail",
+        "ashkelon_cluster_b102"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [
+        "ASH-TR-01"
+      ],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "168_632",
+      "tile_e_km": 168,
+      "tile_n_km": 632,
+      "itm_bbox_m": [
+        168000,
+        632000,
+        169000,
+        633000
+      ],
+      "wgs84_bbox": [
+        34.661196,
+        31.779532,
+        34.671701,
+        31.788595
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        166492.15,
+        631242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "169_632",
+      "tile_e_km": 169,
+      "tile_n_km": 632,
+      "itm_bbox_m": [
+        169000,
+        632000,
+        170000,
+        633000
+      ],
+      "wgs84_bbox": [
+        34.671753,
+        31.779577,
+        34.682259,
+        31.788638
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        167492.15,
+        631242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "169_633",
+      "tile_e_km": 169,
+      "tile_n_km": 633,
+      "itm_bbox_m": [
+        169000,
+        633000,
+        170000,
+        634000
+      ],
+      "wgs84_bbox": [
+        34.671701,
+        31.788595,
+        34.682209,
+        31.797656
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        167492.15,
+        632242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "170_634",
+      "tile_e_km": 170,
+      "tile_n_km": 634,
+      "itm_bbox_m": [
+        170000,
+        634000,
+        171000,
+        635000
+      ],
+      "wgs84_bbox": [
+        34.682209,
+        31.797656,
+        34.692718,
+        31.806717
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        168492.15,
+        633242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "170_635",
+      "tile_e_km": 170,
+      "tile_n_km": 635,
+      "itm_bbox_m": [
+        170000,
+        635000,
+        171000,
+        636000
+      ],
+      "wgs84_bbox": [
+        34.682158,
+        31.806674,
+        34.692668,
+        31.815735
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        168492.15,
+        634242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "171_635",
+      "tile_e_km": 171,
+      "tile_n_km": 635,
+      "itm_bbox_m": [
+        171000,
+        635000,
+        172000,
+        636000
+      ],
+      "wgs84_bbox": [
+        34.692718,
+        31.806717,
+        34.70323,
+        31.815777
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        169492.15,
+        634242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "171_636",
+      "tile_e_km": 171,
+      "tile_n_km": 636,
+      "itm_bbox_m": [
+        171000,
+        636000,
+        172000,
+        637000
+      ],
+      "wgs84_bbox": [
+        34.692668,
+        31.815735,
+        34.703181,
+        31.824795
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        169492.15,
+        635242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    },
+    {
+      "tile_id": "171_637",
+      "tile_e_km": 171,
+      "tile_n_km": 637,
+      "itm_bbox_m": [
+        171000,
+        637000,
+        172000,
+        638000
+      ],
+      "wgs84_bbox": [
+        34.692619,
+        31.824753,
+        34.703132,
+        31.833813
+      ],
+      "world_sample_realdata_v2_origin_m": [
+        169492.15,
+        636242.25
+      ],
+      "zones": [
+        "corridor_ashdod_ashkelon_hw4"
+      ],
+      "biome": "coastal_kurkar_and_nitzanim_dunes",
+      "terrain_grid": "41x41_float32_le",
+      "elevation_band_m_asl": [
+        8.0,
+        48.0
+      ],
+      "landmark_ids": [],
+      "source_url": "https://he.wikipedia.org/wiki/%D7%9B%D7%91%D7%99%D7%A9_4",
+      "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)"
+    }
+  ]
+}

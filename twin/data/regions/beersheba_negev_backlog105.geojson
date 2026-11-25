@@ -1,0 +1,795 @@
+{
+  "type": "FeatureCollection",
+  "name": "beersheba_and_negev_backlog105",
+  "metadata": {
+    "backlog_id": 105,
+    "title_he": "באר שבע ופני השטח המדבריים בנגב",
+    "crs_primary": "EPSG:4326",
+    "crs_itm": "EPSG:2039",
+    "biome_profile": "negev_desert_v1 (biome/look_negev.json)",
+    "topographic_basin_elevation_m": {
+      "min": 255.0,
+      "mean": 291.0,
+      "max": 325.0
+    },
+    "unified_world_sample_offsets": {
+      "realdata_v2": {
+        "dE_m": -1507.85,
+        "dN_m": -757.75
+      },
+      "legacy_v1": {"dE_m": -1524.6, "dN_m": -753.6}
+    },
+    "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+    "osm_license_url": "https://www.openstreetmap.org/copyright",
+    "generated_at_utc": "2026-11-23T03:00:24Z"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "BSV-LM-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.801389,
+          31.258889
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-01",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "המרכז הרפואי האוניברסיטאי סורוקה",
+        "name_en": "Soroka University Medical Center",
+        "category": "medical_center",
+        "wgs84_lat": 31.258889,
+        "wgs84_lon": 34.801389,
+        "itm_epsg2039": {
+          "easting_m": 181066.967,
+          "northing_m": 574212.811
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            179559.117,
+            573455.061
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            179542.367,
+            573459.211
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "181_574",
+          "tile_e_km": 181,
+          "tile_n_km": 574,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 288.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 9,
+        "height_agl_m": 34.0,
+        "provenance": "estimated",
+        "estimation_rule": "קמפוס אשפוז מרכזי ומגדלי אשפוז כירורגי/פנימי (~8–10 קומות -> ~34.0 מ'); גובה ממוצע באר שבע 291 מ' מאומת",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "בית החולים המרכזי של הנגב (1,221 מיטות, שדרות יצחק רגר, צמוד לאוניברסיטת בן-גוריון).",
+        "source_title": "המרכז הרפואי האוניברסיטאי סורוקה – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%94%D7%9E%D7%A8%D7%9B%D7%96_%D7%94%D7%A8%D7%A4%D7%95%D7%90%D7%99_%D7%94%D7%90%D7%95%D7%A0%D7%99%D7%91%D7%A8%D7%A1%D7%99%D7%98%D7%90%D7%99_%D7%A1%D7%95%D7%A8%D7%95%D7%A7%D7%94",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-02",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.801511,
+          31.262192
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-02",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "אוניברסיטת בן-גוריון בנגב (קמפוס מרקוס)",
+        "name_en": "Ben-Gurion University of the Negev",
+        "category": "university_campus",
+        "wgs84_lat": 31.262192,
+        "wgs84_lon": 34.801511,
+        "itm_epsg2039": {
+          "easting_m": 181079.923,
+          "northing_m": 574578.994
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            179572.073,
+            573821.244
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            179555.323,
+            573825.394
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "181_574",
+          "tile_e_km": 181,
+          "tile_n_km": 574,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 292.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 6,
+        "height_agl_m": 22.0,
+        "provenance": "estimated",
+        "estimation_rule": "מבני פקולטות וספריית ארן ברוטליסטיים ומודרניים (4–7 קומות -> אומדן קמפוס ממוצע ~22.0 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "הקמפוס הראשי של אוניברסיטת בן-גוריון בצפון העיר, מחובר בגשר הולכי רגל לתחנת הרכבת צפון ולפארק גב-ים.",
+        "source_title": "אוניברסיטת בן-גוריון בנגב – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%90%D7%95%D7%A0%D7%99%D7%91%D7%A8%D7%A1%D7%99%D7%98%D7%AA_%D7%91%D7%9F-%D7%92%D7%95%D7%A8%D7%99%D7%95%D7%9F_%D7%91%D7%A0%D7%92%D7%91",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-03",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.811111,
+          31.263611
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-03",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "פארק ההיי-טק גב-ים נגב וגשר הסליל הכפול",
+        "name_en": "Gav-Yam Negev Hi-Tech Park & Double Helix Bridge",
+        "category": "hitech_park_campus",
+        "wgs84_lat": 31.263611,
+        "wgs84_lon": 34.811111,
+        "itm_epsg2039": {
+          "easting_m": 181994.828,
+          "northing_m": 574733.031
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            180486.978,
+            573975.281
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            180470.228,
+            573979.431
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "181_574",
+          "tile_e_km": 181,
+          "tile_n_km": 574,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 296.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 7,
+        "height_agl_m": 27.5,
+        "provenance": "estimated",
+        "estimation_rule": "בנייני היי-טק בני 5–8 קומות משרדים גבוהות (בניין גב-ים 5 מתועד עם 5 קומות גבוהות; 7×3.8+0.9=27.5 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "מתחם ההיי-טק והסייבר הצפוני-מזרחי (93 דונם) המחובר לתחנת הרכבת באר שבע צפון דרך גשר הסליל הכפול (אורך 180 מ').",
+        "source_title": "פארק גב ים נגב – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%A4%D7%90%D7%A8%D7%A7_%D7%92%D7%91_%D7%99%D7%9D_%D7%A0%D7%92%D7%91",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%92%D7%A9%D7%A8_%D7%94%D7%A1%D7%9C%D7%99%D7%9C_%D7%94%D7%9B%D7%A4%D7%95%D7%9C",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-04",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.784879,
+          31.24537
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-04",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "תחנת הרכבת הטורקית ומתחם הקטר 70414",
+        "name_en": "Turkish Railway Station & Engine 70414 Complex",
+        "category": "heritage_landmark",
+        "wgs84_lat": 31.24537,
+        "wgs84_lon": 34.784879,
+        "itm_epsg2039": {
+          "easting_m": 179488.736,
+          "northing_m": 572719.728
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            177980.886,
+            571961.978
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            177964.136,
+            571966.128
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "179_572",
+          "tile_e_km": 179,
+          "tile_n_km": 572,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 274.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 2,
+        "height_agl_m": 8.5,
+        "provenance": "estimated",
+        "estimation_rule": "מבני אבן עות'מאניים לשימור מ-1915 ומגדל המים ההיסטורי (~8.5 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "תחנת הרכבת העות'מאנית ההיסטורית (נחנכה אוקטובר 1915, שוקמה ב-2013 כמתחם מורשת ותרבות על 7.5 דונם).",
+        "source_title": "תחנת הרכבת הטורקית בבאר שבע – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%A8%D7%9B%D7%91%D7%AA_%D7%94%D7%98%D7%95%D7%A8%D7%A7%D7%99%D7%AA_%D7%91%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-05",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.787843,
+          31.240701
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-05",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "העיר העתיקה של באר שבע (רשת שתי וערב עות'מאנית)",
+        "name_en": "Beersheba Old City",
+        "category": "historic_district",
+        "wgs84_lat": 31.240701,
+        "wgs84_lon": 34.787843,
+        "itm_epsg2039": {
+          "easting_m": 179769.138,
+          "northing_m": 572200.977
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            178261.288,
+            571443.227
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            178244.538,
+            571447.377
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "179_572",
+          "tile_e_km": 179,
+          "tile_n_km": 572,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 270.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 2,
+        "height_agl_m": 7.5,
+        "provenance": "estimated",
+        "estimation_rule": "מרקם בנייה היסטורי מאבן גיר בהירה בן 1–3 קומות (1900 ואילך; גובה אופייני ~7.5 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "הגרעין העירוני ההיסטורי משנת 1900 המתוכנן ברשת רחובות אורתוגונלית מצפון לנחל באר שבע ובאר אברהם.",
+        "source_title": "העיר העתיקה (באר שבע) – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%94%D7%A2%D7%99%D7%A8_%D7%94%D7%A2%D7%AA%D7%99%D7%A7%D7%94_(%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2)",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-06",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.808333,
+          31.235556
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-06",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "פארק נחל באר שבע, האגם המלאכותי ואמפיפארק",
+        "name_en": "Beersheba River Park, Lake & Amphipark",
+        "category": "wadi_park_waterbody",
+        "wgs84_lat": 31.235556,
+        "wgs84_lon": 34.808333,
+        "itm_epsg2039": {
+          "easting_m": 181719.089,
+          "northing_m": 571623.341
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            180211.239,
+            570865.591
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            180194.489,
+            570869.741
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "181_571",
+          "tile_e_km": 181,
+          "tile_n_km": 571,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 263.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 1,
+        "height_agl_m": 14.0,
+        "provenance": "estimated",
+        "estimation_rule": "ערוץ נחל באר שבע המנקז את הבקעה (~260–268 מ' מעל פני הים), סוללת האמפיפארק (12,000 צופים) וגשר הרכבת הטורקי (190 מ' אורך)",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "פארק מטרופוליני לאורך 8 ק\"מ בתוואי נחל באר שבע (5,300 דונם), כולל אגם באר שבע, גשר הצינורות וגשר הקשתות הטורקי.",
+        "source_title": "פארק נחל באר שבע – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%A4%D7%90%D7%A8%D7%A7_%D7%A0%D7%97%D7%9C_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%90%D7%9E%D7%A4%D7%99%D7%A4%D7%90%D7%A8%D7%A7_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-07",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.8206,
+          31.26666
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-07",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע – רכס מזרחי",
+        "name_he": "אנדרטת חטיבת הנגב (דני קרוון)",
+        "name_en": "Monument to the Negev Brigade (Dani Karavan)",
+        "category": "monument_national_park",
+        "wgs84_lat": 31.26666,
+        "wgs84_lon": 34.8206,
+        "itm_epsg2039": {
+          "easting_m": 182899.761,
+          "northing_m": 575067.913
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            181391.911,
+            574310.163
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            181375.161,
+            574314.313
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "182_575",
+          "tile_e_km": 182,
+          "tile_n_km": 575,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 315.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 1,
+        "height_agl_m": 20.0,
+        "provenance": "estimated",
+        "estimation_rule": "מגדל המצפה המחורר מבטון חשוף של דני קרוון בראש גבעת הגיר המזרחית (~20.0 מ' מעל פני הגבעה, ~315 מ' מעל פני הים)",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "אנדרטת בטון חשוף מונומנטלית (1968) וגן לאומי של 295 דונם המשמר צומח ערבתי-מדברי וצופה על בקעת באר שבע.",
+        "source_title": "אנדרטת חטיבת הנגב – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%90%D7%A0%D7%93%D7%A8%D7%98%D7%AA_%D7%97%D7%98%D7%99%D7%91%D7%AA_%D7%94%D7%A0%D7%92%D7%91",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-LM-08",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.799667,
+          31.249639
+        ]
+      },
+      "properties": {
+        "id": "BSV-LM-08",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "בניין עיריית באר שבע והמרכז האזרחי (שדרות רגר)",
+        "name_en": "Beersheba City Hall",
+        "category": "civic_brutalist_landmark",
+        "wgs84_lat": 31.249639,
+        "wgs84_lon": 34.799667,
+        "itm_epsg2039": {
+          "easting_m": 180899.192,
+          "northing_m": 573187.803
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            179391.342,
+            572430.053
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            179374.592,
+            572434.203
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "180_573",
+          "tile_e_km": 180,
+          "tile_n_km": 573,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 282.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 3,
+        "height_agl_m": 13.5,
+        "provenance": "estimated",
+        "estimation_rule": "מספר קומות מתועד בוויקיפדיה (3 קומות בסגנון ברוטליסטי עם אגף מועצה מוגבה -> ~13.5 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "משכן העירייה בכיכר מנחם בגין 1 / צומת שדרות יצחק רגר ושדרות שז\"ר (תכנון נדלר-נדלר-ביקסון, נחנך 1972).",
+        "source_title": "בניין עיריית באר שבע – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%91%D7%A0%D7%99%D7%99%D7%9F_%D7%A2%D7%99%D7%A8%D7%99%D7%99%D7%AA_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-TW-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7635,
+          31.2458
+        ]
+      },
+      "properties": {
+        "id": "BSV-TW-01",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "מגדל אום טאוור (OM Tower – הבניין הגבוה בבאר שבע)",
+        "name_en": "OM Tower Beersheba",
+        "category": "residential_skyscraper",
+        "wgs84_lat": 31.2458,
+        "wgs84_lon": 34.7635,
+        "itm_epsg2039": {
+          "easting_m": 177452.335,
+          "northing_m": 572775.336
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            175944.485,
+            572017.586
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            175927.735,
+            572021.736
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "177_572",
+          "tile_e_km": 177,
+          "tile_n_km": 572,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 276.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 33,
+        "height_agl_m": 120.0,
+        "provenance": "verified_public",
+        "estimation_rule": null,
+        "neutral_geographic_pin_only": false,
+        "notes_he": "המגדל הגבוה ביותר בבאר שבע: 33 קומות וגובה רשמי מתועד של 120.0 מטרים בשכונת פלח 5 / נווה זאב (רחוב יוסף בורג 90).",
+        "source_title": "גורדי השחקים הגבוהים בישראל – ויקיפדיה (באר שבע: אום טאוור, 33 קומות, 120 מ')",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%92%D7%95%D7%A8%D7%93%D7%99_%D7%94%D7%A9%D7%97%D7%A7%D7%99%D7%9D_%D7%94%D7%92%D7%91%D7%95%D7%94%D7%99%D7%9D_%D7%91%D7%99%D7%A9%D7%A8%D7%90%D7%9C",
+        "secondary_source_url": "https://www.niskoelec.com/items/3969374-OM-TOWER",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-TW-02",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.795011,
+          31.243811
+        ]
+      },
+      "properties": {
+        "id": "BSV-TW-02",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "מגדל M (M-Tower) וקריית העסקים עזריאלי הנגב / שדרות רגר",
+        "name_en": "M-Tower & Azrieli Negev CBD (Rager Blvd)",
+        "category": "office_highrise",
+        "wgs84_lat": 31.243811,
+        "wgs84_lon": 34.795011,
+        "itm_epsg2039": {
+          "easting_m": 180453.281,
+          "northing_m": 572543.25
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            178945.431,
+            571785.5
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            178928.681,
+            571789.65
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "180_572",
+          "tile_e_km": 180,
+          "tile_n_km": 572,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 278.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 22,
+        "height_agl_m": 67.0,
+        "provenance": "estimated",
+        "estimation_rule": "קומות מתועדות: קומה 22 במגדל M-Tower (רחה פריאר 9 סמוך לקניון הנגב ושדרות רגר); גובה לפי כלל national-v1: 22×3.0+1.0=67.0 מ' (ובהתאמת תקרת משרדים ~83.6 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "ציר המגדלים המסחרי בצומת שדרות יצחק רגר / אלי כהן / תחנת רכבת מרכז (קניון עזריאלי הנגב ומגדל המשרדים M-Tower).",
+        "source_title": "קניון עזריאלי הנגב – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%A7%D7%A0%D7%99%D7%95%D7%9F_%D7%A2%D7%96%D7%A8%D7%99%D7%90%D7%9C%D7%99_%D7%94%D7%A0%D7%92%D7%91",
+        "secondary_source_url": "https://www.clalit.co.il/he/sefersherut/pages/clinicdetails.aspx?ddeptcode=989984",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-TW-03",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.795639,
+          31.254167
+        ]
+      },
+      "properties": {
+        "id": "BSV-TW-03",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "מגדלי קרן (שדרות יצחק רגר) ובניין המגירות",
+        "name_en": "Keren Towers (Rager Blvd) & Drawer Building",
+        "category": "residential_highrise",
+        "wgs84_lat": 31.254167,
+        "wgs84_lon": 34.795639,
+        "itm_epsg2039": {
+          "easting_m": 180517.356,
+          "northing_m": 573691.265
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            179009.506,
+            572933.515
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            178992.756,
+            572937.665
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "180_573",
+          "tile_e_km": 180,
+          "tile_n_km": 573,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 284.0,
+        "ground_elevation_provenance": "verified_public",
+        "floors": 20,
+        "height_agl_m": 61.0,
+        "provenance": "estimated",
+        "estimation_rule": "3 מגדלי קרן בני 20 קומות + מגדל 19 קומות מתועדים בוויקיפדיה (20×3.0+1.0=61.0 מ'); לצד בניין המגירות ההיסטורי בן 14 קומות (43.0 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "ציר המגדלים של מרכז שדרות יצחק רגר ושכונה ב' (בניין המגירות בכתובת שמעוני 9 ומגדלי קרן על מגרש קולנוע קרן).",
+        "source_title": "בניין המגירות – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%91%D7%A0%D7%99%D7%99%D7%9F_%D7%94%D7%9E%D7%92%D7%99%D7%A8%D7%95%D7%AA",
+        "secondary_source_url": "https://he.wikipedia.org/wiki/%D7%90%D7%9C%D7%99_%D7%99%D7%A9%D7%A8%D7%90%D7%9C%D7%99_(%D7%99%D7%96%D7%9D)",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-TW-04",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7942,
+          31.2398
+        ]
+      },
+      "properties": {
+        "id": "BSV-TW-04",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "מתחם מגדלי כיכר הרמב\"ם ומגדל סוקולוב",
+        "name_en": "Rambam Square Towers & Sokolov Tower",
+        "category": "residential_highrise",
+        "wgs84_lat": 31.2398,
+        "wgs84_lon": 34.7942,
+        "itm_epsg2039": {
+          "easting_m": 180374.372,
+          "northing_m": 572098.812
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            178866.522,
+            571341.062
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            178849.772,
+            571345.212
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "180_572",
+          "tile_e_km": 180,
+          "tile_n_km": 572,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 269.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 31,
+        "height_agl_m": 94.0,
+        "provenance": "estimated",
+        "estimation_rule": "מגדל סוקולוב במרכז העיר מתועד עם 31 קומות (31×3.0+1.0=94.0 מ'); עבור מגדלי כיכר הרמב\"ם קיים תיעוד הנדסי ללא גובה מטרי פומבי – סומן כפער מידע שקוף להשלמה ממפ\"י/XPLAN",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "מוקד הבנייה לגובה בשולי העיר העתיקה וציר רמב\"ם–סוקולוב מצפון לפארק נחל באר שבע.",
+        "source_title": "מגדלי רמב\"ם באר שבע – אסף רועי הנדסה",
+        "source_url": "http://asaf-roy.co.il/Projects/fc26c282-8924-46b8-9623-cbfcfd3cac9a",
+        "secondary_source_url": "https://www.adtv.co.il/cncpt/%D7%9E%D7%92%D7%93%D7%9C-%D7%A1%D7%95%D7%A7%D7%95%D7%9C%D7%95%D7%91-%D7%91%D7%A9/",
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "BSV-TR-01",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.798443,
+          31.243288
+        ]
+      },
+      "properties": {
+        "id": "BSV-TR-01",
+        "backlog_id": 105,
+        "city_or_zone_he": "באר שבע",
+        "name_he": "תחנת הרכבת באר שבע – מרכז",
+        "name_en": "Beersheba Center Railway Station",
+        "category": "rail_transit_hub",
+        "wgs84_lat": 31.243288,
+        "wgs84_lon": 34.798443,
+        "itm_epsg2039": {
+          "easting_m": 180780.01,
+          "northing_m": 572484.055
+        },
+        "unified_world_coords": {
+          "realdata_v2_offset_m": {
+            "dE_m": -1507.85,
+            "dN_m": -757.75
+          },
+          "realdata_v2_xy_m": [
+            179272.16,
+            571726.305
+          ],
+          "legacy_v1_offset_m": {"dE_m": -1524.6, "dN_m": -753.6},
+          "legacy_v1_xy_m": [
+            179255.41,
+            571730.455
+          ]
+        },
+        "national_v1_tile": {
+          "tile_id": "180_572",
+          "tile_e_km": 180,
+          "tile_n_km": 572,
+          "terrain_grid_spec": "41x41_binary_1km"
+        },
+        "ground_elevation_asl_m": 277.0,
+        "ground_elevation_provenance": "estimated",
+        "floors": 2,
+        "height_agl_m": 10.5,
+        "provenance": "estimated",
+        "estimation_rule": "טרמינל רכבת וקירוי רציפים מחושמל (~10.5 מ')",
+        "neutral_geographic_pin_only": false,
+        "notes_he": "תחנת הקצה המרכזית של מסילת אשקלון–באר שבע ומסילת הדרום בלב המרכז האזרחי של באר שבע.",
+        "source_title": "תחנת הרכבת באר שבע – מרכז – ויקיפדיה",
+        "source_url": "https://he.wikipedia.org/wiki/%D7%AA%D7%97%D7%A0%D7%AA_%D7%94%D7%A8%D7%9B%D7%91%D7%AA_%D7%91%D7%90%D7%A8_%D7%A9%D7%91%D7%A2_%E2%80%93_%D7%9E%D7%A8%D7%9B%D7%96",
+        "secondary_source_url": null,
+        "osm_attribution": "© OpenStreetMap contributors (ODbL 1.0)",
+        "osm_license_url": "https://www.openstreetmap.org/copyright"
+      }
+    }
+  ]
+}

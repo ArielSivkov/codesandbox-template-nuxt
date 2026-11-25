@@ -1,0 +1,1606 @@
+{
+  "type": "FeatureCollection",
+  "name": "backlog_104_tlv_ashdod_corridor",
+  "crs_metadata": {
+    "geojson_coordinates": "EPSG:4326 (WGS84 [lon, lat, elev_m])",
+    "projected_twin_grid": "EPSG:2039 (Israel 1993 / Israeli Transverse Mercator [easting_m, northing_m])",
+    "epsg_source_url": "https://epsg.io/2039"
+  },
+  "attribution": {
+    "osm": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+    "license_guidelines": "https://osmfoundation.org/wiki/Licence/Attribution_Guidelines",
+    "security_policy": "מעטפת חיצונית ציבורית בלבד (Exterior Envelope Only)."
+  },
+  "data_gaps": [
+    {
+      "gap_id": "GAP-104-HIGHRISE-CONSTRUCTION-2026",
+      "region": "ציר בגין–השלום–הבורסה (תל אביב, רמת גן וגבעתיים)",
+      "severity": "low",
+      "description_he": "מגדלים חדשים בשלבי השלמת מעטפת/מסירה ב-2026 (כגון ToHa 2, מגדלי Beyond ומגדל הספירלה בעזריאלי) מופיעים בחלק משכבות OSM עדיין כ-building=construction ללא גובה סופי מעודכן; הגבהים בקובץ זה עודכנו ידנית ממקורות ציבוריים מאומתים.",
+      "reference_url": "https://en.wikipedia.org/wiki/Totzeret_HaAretz_Towers"
+    },
+    {
+      "gap_id": "GAP-104-INDUSTRIAL-ROOF-HEIGHTS",
+      "region": "אזורי תעשייה אשדוד צפון, יבנה, ראשון לציון מערב וחולון",
+      "severity": "medium",
+      "description_he": "מבני לוגיסטיקה ותעשייה לאורך כביש 4 חסרים ברובם תגית height ב-OSM (כיסוי ארצי ~3%), ודורשים אבחנה בין גובה קומת מגורים (3.0 מ') לגובה האנגר לוגיסטי (8–12 מ').",
+      "reference_url": "https://taginfo.geofabrik.de/asia:israel-and-palestine/keys/building:levels"
+    }
+  ],
+  "features": [
+    {
+      "type": "Feature",
+      "id": "corridor_hwy4_ashdod_to_dan",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.6655,
+            31.7685,
+            28.0
+          ],
+          [
+            34.65,
+            31.8,
+            24.0
+          ],
+          [
+            34.696,
+            31.8255,
+            26.0
+          ],
+          [
+            34.738,
+            31.883,
+            30.0
+          ],
+          [
+            34.7605,
+            31.9285,
+            32.0
+          ],
+          [
+            34.789,
+            31.964,
+            42.0
+          ],
+          [
+            34.808,
+            32.004,
+            36.0
+          ],
+          [
+            34.819,
+            32.0255,
+            28.0
+          ],
+          [
+            34.842,
+            32.08333,
+            45.0
+          ]
+        ]
+      },
+      "properties": {
+        "id": "corridor_hwy4_ashdod_to_dan",
+        "backlog_id": 104,
+        "name_he": "ציר כביש 4: אשדוד (עד הלום) ← יבנה ← ראשון לציון ← חולון מזרח ← גנות ← רמת גן",
+        "name_en": "Highway 4 Corridor: Ashdod to Gush Dan",
+        "category": "national_highway_corridor",
+        "wgs84": {
+          "start_lon": 34.6655,
+          "start_lat": 31.7685,
+          "end_lon": 34.842,
+          "end_lat": 32.08333
+        },
+        "itm_epsg2039": {
+          "start_easting_m": 168401.622,
+          "start_northing_m": 630774.67,
+          "end_easting_m": 185238.639,
+          "end_northing_m": 665616.254,
+          "computed_polyline_length_km": 40.9,
+          "continuous_1km_tiles_count": 50,
+          "continuous_1km_tiles": [
+            [
+              168,
+              630
+            ],
+            [
+              168,
+              631
+            ],
+            [
+              167,
+              631
+            ],
+            [
+              167,
+              632
+            ],
+            [
+              167,
+              633
+            ],
+            [
+              167,
+              634
+            ],
+            [
+              166,
+              634
+            ],
+            [
+              168,
+              635
+            ],
+            [
+              169,
+              635
+            ],
+            [
+              169,
+              636
+            ],
+            [
+              170,
+              636
+            ],
+            [
+              171,
+              636
+            ],
+            [
+              171,
+              637
+            ],
+            [
+              171,
+              638
+            ],
+            [
+              172,
+              638
+            ],
+            [
+              172,
+              639
+            ],
+            [
+              173,
+              639
+            ],
+            [
+              173,
+              640
+            ],
+            [
+              173,
+              641
+            ],
+            [
+              174,
+              641
+            ],
+            [
+              174,
+              642
+            ],
+            [
+              175,
+              643
+            ],
+            [
+              175,
+              644
+            ],
+            [
+              176,
+              645
+            ],
+            [
+              176,
+              646
+            ],
+            [
+              176,
+              647
+            ],
+            [
+              177,
+              647
+            ],
+            [
+              177,
+              648
+            ],
+            [
+              177,
+              649
+            ],
+            [
+              178,
+              649
+            ],
+            [
+              178,
+              650
+            ],
+            [
+              179,
+              650
+            ],
+            [
+              179,
+              651
+            ],
+            [
+              179,
+              652
+            ],
+            [
+              180,
+              652
+            ],
+            [
+              180,
+              653
+            ],
+            [
+              180,
+              654
+            ],
+            [
+              181,
+              654
+            ],
+            [
+              181,
+              655
+            ],
+            [
+              181,
+              656
+            ],
+            [
+              182,
+              657
+            ],
+            [
+              182,
+              658
+            ],
+            [
+              183,
+              659
+            ],
+            [
+              183,
+              660
+            ],
+            [
+              183,
+              661
+            ],
+            [
+              184,
+              662
+            ],
+            [
+              184,
+              663
+            ],
+            [
+              184,
+              664
+            ],
+            [
+              185,
+              664
+            ],
+            [
+              185,
+              665
+            ]
+          ],
+          "waypoints": [
+            {
+              "seq": 1,
+              "label_he": "מחלף עד הלום — כניסה דרומית אשדוד וחיבור לחבילת הדרום (ק\"מ 29)",
+              "lat": 31.7685,
+              "lon": 34.6655,
+              "easting_m": 168401.622,
+              "northing_m": 630774.67,
+              "tile_1km": [
+                168,
+                630
+              ],
+              "ground_elev_m": 28.0
+            },
+            {
+              "seq": 2,
+              "label_he": "אשדוד — מרכז עירוני מערבי (~24 מ')",
+              "lat": 31.8,
+              "lon": 34.65,
+              "easting_m": 166951.064,
+              "northing_m": 634274.977,
+              "tile_1km": [
+                166,
+                634
+              ],
+              "ground_elev_m": 24.0
+            },
+            {
+              "seq": 3,
+              "label_he": "מחלף אשדוד — כביש 4 / כביש 41 (ק\"מ 36)",
+              "lat": 31.8255,
+              "lon": 34.696,
+              "easting_m": 171320.521,
+              "northing_m": 637081.301,
+              "tile_1km": [
+                171,
+                637
+              ],
+              "ground_elev_m": 26.0
+            },
+            {
+              "seq": 4,
+              "label_he": "מחלף יבנה — כביש 4 / כביש 4111 (ק\"מ 44)",
+              "lat": 31.883,
+              "lon": 34.738,
+              "easting_m": 175324.236,
+              "northing_m": 643439.481,
+              "tile_1km": [
+                175,
+                643
+              ],
+              "ground_elev_m": 30.0
+            },
+            {
+              "seq": 5,
+              "label_he": "מחלף חולות — פיצול כביש 4 לנתיבי איילון כביש 20 (ק\"מ 51)",
+              "lat": 31.9285,
+              "lon": 34.7605,
+              "easting_m": 177473.743,
+              "northing_m": 648475.953,
+              "tile_1km": [
+                177,
+                648
+              ],
+              "ground_elev_m": 32.0
+            },
+            {
+              "seq": 6,
+              "label_he": "מחלף גן רווה / ראשון לציון (ק\"מ 55–57)",
+              "lat": 31.964,
+              "lon": 34.789,
+              "easting_m": 180184.053,
+              "northing_m": 652401.806,
+              "tile_1km": [
+                180,
+                652
+              ],
+              "ground_elev_m": 42.0
+            },
+            {
+              "seq": 7,
+              "label_he": "מחלף חולון מזרח (ק\"מ 60)",
+              "lat": 32.004,
+              "lon": 34.808,
+              "easting_m": 181996.42,
+              "northing_m": 656830.633,
+              "tile_1km": [
+                181,
+                656
+              ],
+              "ground_elev_m": 36.0
+            },
+            {
+              "seq": 8,
+              "label_he": "מחלף גנות — חיבור כביש 4 וכביש 1 (ק\"מ 62)",
+              "lat": 32.0255,
+              "lon": 34.819,
+              "easting_m": 183044.325,
+              "northing_m": 659210.999,
+              "tile_1km": [
+                183,
+                659
+              ],
+              "ground_elev_m": 28.0
+            },
+            {
+              "seq": 9,
+              "label_he": "ציר גהה / מזרח רמת גן (ק\"מ 68)",
+              "lat": 32.08333,
+              "lon": 34.842,
+              "easting_m": 185238.639,
+              "northing_m": 665616.254,
+              "tile_1km": [
+                185,
+                665
+              ],
+              "ground_elev_m": 45.0
+            }
+          ]
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Highway_4_(Israel)",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "ציר האורך המהיר של מישור החוף הדרומי והמרכזי המחבר ברצף אריחי ITM בני 1 ק\"מ את אשדוד (מחלף עד הלום — נקודת ההשקה לחבילת הדרום 102) ויבנה אל מחלף חולות וממשיך מזרחית לראשון לציון וחולון עד מחלף גנות ורמת גן.",
+        "highway_number": 4,
+        "total_national_length_km": 205.0,
+        "snaps_to_south_package_at": "Ad Halom Interchange"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corridor_hwy20_ayalon_holot_to_glilot",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            34.7605,
+            31.9285,
+            32.0
+          ],
+          [
+            34.7565,
+            31.9765,
+            28.0
+          ],
+          [
+            34.757,
+            31.999,
+            34.0
+          ],
+          [
+            34.7595,
+            32.0135,
+            35.0
+          ],
+          [
+            34.763,
+            32.0365,
+            24.0
+          ],
+          [
+            34.781,
+            32.049,
+            16.0
+          ],
+          [
+            34.7885,
+            32.061,
+            14.0
+          ],
+          [
+            34.7932,
+            32.0738,
+            15.0
+          ],
+          [
+            34.7995,
+            32.0825,
+            16.0
+          ],
+          [
+            34.805,
+            32.103,
+            14.0
+          ],
+          [
+            34.8065,
+            32.138,
+            22.0
+          ]
+        ]
+      },
+      "properties": {
+        "id": "corridor_hwy20_ayalon_holot_to_glilot",
+        "backlog_id": 104,
+        "name_he": "ציר נתיבי איילון (כביש 20): מחלף חולות ← ראשל\"צ מערב ← בת ים/חולון ← תל אביב ← הבורסה",
+        "name_en": "Highway 20 (Ayalon Highway): Holot Interchange to Tel Aviv & Ramat Gan Bursa",
+        "category": "metropolitan_freeway_and_rail_corridor",
+        "wgs84": {
+          "start_lon": 34.7605,
+          "start_lat": 31.9285,
+          "end_lon": 34.8065,
+          "end_lat": 32.138
+        },
+        "itm_epsg2039": {
+          "start_easting_m": 177473.743,
+          "start_northing_m": 648475.953,
+          "end_easting_m": 181909.476,
+          "end_northing_m": 671690.491,
+          "computed_polyline_length_km": 24.57,
+          "continuous_1km_tiles_count": 28,
+          "continuous_1km_tiles": [
+            [
+              177,
+              648
+            ],
+            [
+              177,
+              649
+            ],
+            [
+              177,
+              650
+            ],
+            [
+              177,
+              651
+            ],
+            [
+              177,
+              652
+            ],
+            [
+              177,
+              653
+            ],
+            [
+              177,
+              654
+            ],
+            [
+              177,
+              655
+            ],
+            [
+              177,
+              656
+            ],
+            [
+              177,
+              657
+            ],
+            [
+              177,
+              658
+            ],
+            [
+              177,
+              659
+            ],
+            [
+              177,
+              660
+            ],
+            [
+              178,
+              660
+            ],
+            [
+              178,
+              661
+            ],
+            [
+              179,
+              661
+            ],
+            [
+              179,
+              662
+            ],
+            [
+              180,
+              662
+            ],
+            [
+              180,
+              663
+            ],
+            [
+              180,
+              664
+            ],
+            [
+              180,
+              665
+            ],
+            [
+              181,
+              665
+            ],
+            [
+              181,
+              666
+            ],
+            [
+              181,
+              667
+            ],
+            [
+              181,
+              668
+            ],
+            [
+              181,
+              669
+            ],
+            [
+              181,
+              670
+            ],
+            [
+              181,
+              671
+            ]
+          ],
+          "waypoints": [
+            {
+              "seq": 1,
+              "label_he": "מחלף חולות — ק\"מ 0 (חיבור ישיר מכביש 4 מאשדוד ויבנה)",
+              "lat": 31.9285,
+              "lon": 34.7605,
+              "easting_m": 177473.743,
+              "northing_m": 648475.953,
+              "tile_1km": [
+                177,
+                648
+              ],
+              "ground_elev_m": 32.0
+            },
+            {
+              "seq": 2,
+              "label_he": "מחלף משה דיין — מערב ראשון לציון (ק\"מ 3.5)",
+              "lat": 31.9765,
+              "lon": 34.7565,
+              "easting_m": 177117.488,
+              "northing_m": 653800.174,
+              "tile_1km": [
+                177,
+                653
+              ],
+              "ground_elev_m": 28.0
+            },
+            {
+              "seq": 3,
+              "label_he": "מחלף קוממיות — גבול בת ים / חולון (ק\"מ 5)",
+              "lat": 31.999,
+              "lon": 34.757,
+              "easting_m": 177175.068,
+              "northing_m": 656294.991,
+              "tile_1km": [
+                177,
+                656
+              ],
+              "ground_elev_m": 34.0
+            },
+            {
+              "seq": 4,
+              "label_he": "מחלף יוספטל — בת ים / חולון (ק\"מ 6.5)",
+              "lat": 32.0135,
+              "lon": 34.7595,
+              "easting_m": 177417.927,
+              "northing_m": 657901.917,
+              "tile_1km": [
+                177,
+                657
+              ],
+              "ground_elev_m": 35.0
+            },
+            {
+              "seq": 5,
+              "label_he": "מחלף וולפסון — דרום תל אביב-יפו / חולון (ק\"מ 9)",
+              "lat": 32.0365,
+              "lon": 34.763,
+              "easting_m": 177759.032,
+              "northing_m": 660451.033,
+              "tile_1km": [
+                177,
+                660
+              ],
+              "ground_elev_m": 24.0
+            },
+            {
+              "seq": 6,
+              "label_he": "מחלף חולון / קיבוץ גלויות — כניסה לדרום תל אביב (ק\"מ 12–13.2)",
+              "lat": 32.049,
+              "lon": 34.781,
+              "easting_m": 179464.711,
+              "northing_m": 661830.354,
+              "tile_1km": [
+                179,
+                661
+              ],
+              "ground_elev_m": 16.0
+            },
+            {
+              "seq": 7,
+              "label_he": "מחלף לה גווארדיה (ק\"מ 14)",
+              "lat": 32.061,
+              "lon": 34.7885,
+              "easting_m": 180178.176,
+              "northing_m": 663158.286,
+              "tile_1km": [
+                180,
+                663
+              ],
+              "ground_elev_m": 14.0
+            },
+            {
+              "seq": 8,
+              "label_he": "מחלף השלום — מרכז עזריאלי ומגדלי ToHa (ק\"מ 16)",
+              "lat": 32.0738,
+              "lon": 34.7932,
+              "easting_m": 180627.419,
+              "northing_m": 664575.985,
+              "tile_1km": [
+                180,
+                664
+              ],
+              "ground_elev_m": 15.0
+            },
+            {
+              "seq": 9,
+              "label_he": "מחלף ארלוזורוב / ההלכה — מתחם הבורסה רמת גן ומגדלי Beyond (ק\"מ 17)",
+              "lat": 32.0825,
+              "lon": 34.7995,
+              "easting_m": 181225.883,
+              "northing_m": 665538.485,
+              "tile_1km": [
+                181,
+                665
+              ],
+              "ground_elev_m": 16.0
+            },
+            {
+              "seq": 10,
+              "label_he": "מחלף רוקח — פארק הירקון (ק\"מ 19)",
+              "lat": 32.103,
+              "lon": 34.805,
+              "easting_m": 181753.56,
+              "northing_m": 667809.814,
+              "tile_1km": [
+                181,
+                667
+              ],
+              "ground_elev_m": 14.0
+            },
+            {
+              "seq": 11,
+              "label_he": "מחלף גלילות (ק\"מ 23)",
+              "lat": 32.138,
+              "lon": 34.8065,
+              "easting_m": 181909.476,
+              "northing_m": 671690.491,
+              "tile_1km": [
+                181,
+                671
+              ],
+              "ground_elev_m": 22.0
+            }
+          ]
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Highway_20_(Israel)",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "עורק התחבורה והמסילה הראשי של מטרופולין גוש דן (~600,000 כלי רכב ביום), הממשיך ברצף אריחי ITM ממחלף חולות דרך מערב ראשון לציון, בת ים וחולון אל לב המע\"ר הצפוני של תל אביב ומתחם הבורסה ברמת גן.",
+        "highway_number": 20,
+        "daily_traffic_vehicles": 600000
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_beyond_south_givatayim",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7989,
+          32.08033,
+          18.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_beyond_south_givatayim",
+        "backlog_id": 104,
+        "name_he": "מגדלי Beyond גבעתיים — המגדל הדרומי (משרדים)",
+        "name_en": "Beyond Towers (South Office Tower, Givatayim)",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.7989,
+          "lat": 32.08033,
+          "ground_elev_m": 18.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 181168.332,
+          "northing_m": 665298.065,
+          "tile_1km": [
+            181,
+            665
+          ],
+          "ground_elev_m": 18.0,
+          "top_asl_m": 326.3
+        },
+        "height_m": 308.3,
+        "floors": 72,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Beyond_Towers",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "המגדל הגבוה בישראל שהושלם שלדו (משרדים ומלון, רח' אריאל שרון 1 גבעתיים, בצמוד למתחם הבורסה ותחנת סבידור מרכז): גובה רשמי 308.3 מ' ו-72 קומות עיליות (בדיווחי עיתונות כלכלית מאוחרים מופיע גם נתון 355 מ' / 78 קומות הכולל מפלסים תחתונים/אלמנט קצה — המתועד בשקיפות במטא-דאטה). לצידו המגדל הצפוני למגורים בן 50 קומות.",
+        "north_residential_tower_floors": 50,
+        "alternate_reported_metric_note": "308.3m / 72 floors (Wikipedia/CTBUH structural roof); some 2026 press reports cite up to 355m / 78 total levels"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_toha_2",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7959,
+          32.0734,
+          16.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_toha_2",
+        "backlog_id": 104,
+        "name_he": "מגדל ToHa 2 (תוצרת הארץ 2)",
+        "name_en": "ToHa 2 Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.7959,
+          "lat": 32.0734,
+          "ground_elev_m": 16.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 180882.184,
+          "northing_m": 664530.661,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 16.0,
+          "top_asl_m": 318.0
+        },
+        "height_m": 302.0,
+        "floors": 76,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Totzeret_HaAretz_Towers",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל המשרדים הענק במתחם תוצרת הארץ/יגאל אלון בצמוד לתחנת השלום (יזמים: אמות וגב-ים; אדריכלים: רון ארד וישר אדריכלים). מתנשא לגובה 302 מ' (303 מ' ברשימות משלימות), 76 קומות וכ-140,000 מ\"ר שטח בנוי.",
+        "alternate_height_m": 303.0,
+        "floor_area_m2": 140000
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_azrieli_sarona",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.78861,
+          32.07194,
+          16.5
+        ]
+      },
+      "properties": {
+        "id": "tlv_azrieli_sarona",
+        "backlog_id": 104,
+        "name_he": "מגדל עזריאלי שרונה",
+        "name_en": "Azrieli Sarona Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.78861,
+          "lat": 32.07194,
+          "ground_elev_m": 16.5
+        },
+        "itm_epsg2039": {
+          "easting_m": 180193.238,
+          "northing_m": 664371.389,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 16.5,
+          "top_asl_m": 255.0
+        },
+        "height_m": 238.5,
+        "floors": 61,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Azrieli_Sarona_Tower",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל המשרדים המפותל בדרך מנחם בגין במתחם שרונה (הושלם ב-2017): גובה מבני מעל הקרקע 238.5 מ' (255 מ' מעל פני הים) ו-61 קומות.",
+        "top_elevation_verified_asl_m": 255.0
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_moshe_aviv_ramat_gan",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.80389,
+          32.08333,
+          19.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_moshe_aviv_ramat_gan",
+        "backlog_id": 104,
+        "name_he": "מגדל משה אביב (שער העיר — הבורסה רמת גן)",
+        "name_en": "Moshe Aviv Tower (City Gate)",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.80389,
+          "lat": 32.08333,
+          "ground_elev_m": 19.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 181640.687,
+          "northing_m": 665628.977,
+          "tile_1km": [
+            181,
+            665
+          ],
+          "ground_elev_m": 19.0,
+          "top_asl_m": 254.0
+        },
+        "height_m": 235.0,
+        "floors": 68,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Moshe_Aviv_Tower",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל הדגל של מתחם הבורסה ליהלומים ברח' ז'בוטינסקי 7 ברמת גן (הושלם 2001/2003): גובה גג רשמי 235 מ' מהכניסה הראשית (244 מ' ממפלס הכניסה המשנית הנמוכה), 68 קומות עיליות ו-6 תת-קרקעיות.",
+        "secondary_entrance_height_m": 244.0,
+        "underground_floors": 6
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_midtown_office",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.79352,
+          32.07714,
+          16.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_midtown_office",
+        "backlog_id": 104,
+        "name_he": "מגדל מידטאון תל אביב (משרדים)",
+        "name_en": "Midtown Tel Aviv Office Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.79352,
+          "lat": 32.07714,
+          "ground_elev_m": 16.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 180659.043,
+          "northing_m": 664946.245,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 16.0,
+          "top_asl_m": 212.0
+        },
+        "height_m": 196.0,
+        "floors": 50,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Midtown_Tel_Aviv",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל המשרדים במתחם מידטאון (דרך מנחם בגין 144 תל אביב, הושלם ב-2017): גובה 196 מ' (197 מ' בחלק מהרישומים) ו-50 קומות עיליות.",
+        "underground_floors": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_midtown_residential",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7941,
+          32.0766,
+          16.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_midtown_residential",
+        "backlog_id": 104,
+        "name_he": "מגדל מידטאון תל אביב (מגורים)",
+        "name_en": "Midtown Tel Aviv Residential Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.7941,
+          "lat": 32.0766,
+          "ground_elev_m": 16.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 180713.577,
+          "northing_m": 664886.156,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 16.0,
+          "top_asl_m": 199.0
+        },
+        "height_m": 183.0,
+        "floors": 50,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Midtown_Tel_Aviv",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל המגורים במתחם מידטאון (דרך מנחם בגין 144 תל אביב, הושלם ב-2018): גובה 183 מ' ו-50 קומות עיליות.",
+        "underground_floors": 7
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_azrieli_circular",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.79187,
+          32.07462,
+          15.5
+        ]
+      },
+      "properties": {
+        "id": "tlv_azrieli_circular",
+        "backlog_id": 104,
+        "name_he": "מגדל עזריאלי העגול",
+        "name_en": "Azrieli Center Circular Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.79187,
+          "lat": 32.07462,
+          "ground_elev_m": 15.5
+        },
+        "itm_epsg2039": {
+          "easting_m": 180502.188,
+          "northing_m": 664667.395,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 15.5,
+          "top_asl_m": 202.5
+        },
+        "height_m": 187.0,
+        "floors": 49,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Azrieli_Center",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "המגדל העגול במרכז עזריאלי (דרך בגין 132, נפתח ב-1999): גובה 187 מ' ו-49 קומות. במתחם מוקם גם מגדל הספירלה העתידי (מתוכנן ל-323–350 מ' ו-88–91 קומות).",
+        "spiral_tower_under_construction_note": "323–350 m, 88–91 floors (under construction)"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_azrieli_triangular",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7924,
+          32.0741,
+          15.5
+        ]
+      },
+      "properties": {
+        "id": "tlv_azrieli_triangular",
+        "backlog_id": 104,
+        "name_he": "מגדל עזריאלי המשולש",
+        "name_en": "Azrieli Center Triangular Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.7924,
+          "lat": 32.0741,
+          "ground_elev_m": 15.5
+        },
+        "itm_epsg2039": {
+          "easting_m": 180552.01,
+          "northing_m": 664609.541,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 15.5,
+          "top_asl_m": 184.5
+        },
+        "height_m": 169.0,
+        "floors": 46,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Azrieli_Center",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "המגדל המשולש במרכז עזריאלי (נפתח ב-1999): גובה 169 מ' ו-46 קומות."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_azrieli_square",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.7915,
+          32.0736,
+          15.5
+        ]
+      },
+      "properties": {
+        "id": "tlv_azrieli_square",
+        "backlog_id": 104,
+        "name_he": "מגדל עזריאלי המרובע",
+        "name_en": "Azrieli Center Square Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.7915,
+          "lat": 32.0736,
+          "ground_elev_m": 15.5
+        },
+        "itm_epsg2039": {
+          "easting_m": 180466.82,
+          "northing_m": 664554.42,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 15.5,
+          "top_asl_m": 169.5
+        },
+        "height_m": 154.0,
+        "floors": 42,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Azrieli_Center",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "המגדל המרובע במרכז עזריאלי (הושלם ב-2007): גובה 154 מ' ו-42 קומות."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_electra_tower",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.79417,
+          32.07028,
+          16.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_electra_tower",
+        "backlog_id": 104,
+        "name_he": "מגדל אלקטרה",
+        "name_en": "Electra Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.79417,
+          "lat": 32.07028,
+          "ground_elev_m": 16.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 180717.522,
+          "northing_m": 664185.301,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 16.0,
+          "top_asl_m": 181.0
+        },
+        "height_m": 165.0,
+        "floors": 45,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Electra_Tower",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "מגדל משרדים ברח' יגאל אלון בתל אביב (הושלם ב-2011): גובה 165 מ', 45 קומות ו-60,000 מ\"ר שטח בנוי.",
+        "floor_area_m2": 60000
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_shalom_meir_tower",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.769772,
+          32.064019,
+          20.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_shalom_meir_tower",
+        "backlog_id": 104,
+        "name_he": "מגדל שלום מאיר (כלבו שלום)",
+        "name_en": "Shalom Meir Tower",
+        "category": "skyscraper_historic",
+        "wgs84": {
+          "lon": 34.769772,
+          "lat": 32.064019,
+          "ground_elev_m": 20.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 178410.986,
+          "northing_m": 663500.033,
+          "tile_1km": [
+            178,
+            663
+          ],
+          "ground_elev_m": 20.0,
+          "top_asl_m": 149.0
+        },
+        "height_m": 129.0,
+        "floors": 34,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Shalom_Meir_Tower",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "גורד השחקים הראשון בישראל בקצה רחוב הרצל בתל אביב (נפתח ב-1965): גובה 129 מ' ו-34 קומות."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_toha_1",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.79569,
+          32.0729,
+          16.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_toha_1",
+        "backlog_id": 104,
+        "name_he": "מגדל ToHa 1 (תוצרת הארץ 1)",
+        "name_en": "ToHa 1 Tower",
+        "category": "skyscraper",
+        "wgs84": {
+          "lon": 34.79569,
+          "lat": 32.0729,
+          "ground_elev_m": 16.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 180862.145,
+          "northing_m": 664475.29,
+          "tile_1km": [
+            180,
+            664
+          ],
+          "ground_elev_m": 16.0,
+          "top_asl_m": 126.3
+        },
+        "height_m": 110.3,
+        "floors": 30,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Totzeret_HaAretz_Towers",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "המגדל הראשון במתחם תוצרת הארץ בעיצוב גיאומטרי דמוי קרחון (נחנך בפברואר 2019): גובה 110.3 מ' בטבלת המפרט (125 מ' בגוף התיעוד המשלים) ו-30 קומות (27–30 קומות בהתאם לספירת קומות טכניות).",
+        "alternate_height_m": 125.0
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_promenade_beach",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.765956,
+          32.076847,
+          4.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_promenade_beach",
+        "backlog_id": 104,
+        "name_he": "חוף וטיילת תל אביב-יפו (להט)",
+        "name_en": "Tel Aviv Promenade and Beachfront",
+        "category": "coastal_landmark",
+        "wgs84": {
+          "lon": 34.765956,
+          "lat": 32.076847,
+          "ground_elev_m": 4.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 178056.422,
+          "northing_m": 664923.998,
+          "tile_1km": [
+            178,
+            664
+          ],
+          "ground_elev_m": 4.0,
+          "top_asl_m": 4.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Tel_Aviv_Promenade",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "רצועת החוף והטיילת המערבית של תל אביב לאורך הים התיכון (רום ~0–6 מ' מעל פני הים), המחברת ברצף מנמל תל אביב בצפון ועד נמל יפו בדרום."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_port_namal",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.773253,
+          32.096483,
+          3.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_port_namal",
+        "backlog_id": 104,
+        "name_he": "נמל תל אביב",
+        "name_en": "Tel Aviv Port",
+        "category": "coastal_landmark",
+        "wgs84": {
+          "lon": 34.773253,
+          "lat": 32.096483,
+          "ground_elev_m": 3.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 178754.084,
+          "northing_m": 667098.678,
+          "tile_1km": [
+            178,
+            667
+          ],
+          "ground_elev_m": 3.0,
+          "top_asl_m": 12.0
+        },
+        "height_m": 9.0,
+        "floors": 2,
+        "height_source": "estimated",
+        "source_url": "https://en.wikipedia.org/wiki/Tel_Aviv_Port",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "נמל תל אביב ההיסטורי בסמוך לשפך הירקון (נפתח ב-1938, נסגר כנמל מסחרי ב-1965 עם פתיחת נמל אשדוד, וחודש כמרחב דק עץ והאנגרים בשנים 2002–2008 ברום ~3 מ' מעל פני הים).",
+        "commercial_closure_year": 1965
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "tlv_old_jaffa",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.753039,
+          32.054481,
+          28.0
+        ]
+      },
+      "properties": {
+        "id": "tlv_old_jaffa",
+        "backlog_id": 104,
+        "name_he": "יפו העתיקה ונמל יפו",
+        "name_en": "Old Jaffa",
+        "category": "historic_coastal_hill",
+        "wgs84": {
+          "lon": 34.753039,
+          "lat": 32.054481,
+          "ground_elev_m": 28.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 176826.47,
+          "northing_m": 662448.843,
+          "tile_1km": [
+            176,
+            662
+          ],
+          "ground_elev_m": 28.0,
+          "top_asl_m": 43.0
+        },
+        "height_m": 15.0,
+        "floors": 3,
+        "height_source": "estimated",
+        "source_url": "https://en.wikipedia.org/wiki/Old_Jaffa",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "גבעת הכורכר ההיסטורית והנמל העתיק של יפו בדרום-מערב תל אביב–יפו, המתנשאת מקו המים (0 מ') עד ~35 מ' מעל פני הים בגן הפסגה.",
+        "hill_crest_asl_m": 35.0
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corridor_city_ashdod",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.65,
+          31.8,
+          24.0
+        ]
+      },
+      "properties": {
+        "id": "corridor_city_ashdod",
+        "backlog_id": 104,
+        "name_he": "אשדוד (נקודת המוצא הדרומית של המסדרון)",
+        "name_en": "Ashdod",
+        "category": "corridor_anchor_city",
+        "wgs84": {
+          "lon": 34.65,
+          "lat": 31.8,
+          "ground_elev_m": 24.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 166951.064,
+          "northing_m": 634274.977,
+          "tile_1km": [
+            166,
+            634
+          ],
+          "ground_elev_m": 24.0,
+          "top_asl_m": 24.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Ashdod",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "עיר הנמל והתעשייה במישור החוף הדרומי (רום ממוצע ~24 מ', גבעת יונה ומגדלור אשדוד ברום 53 מ' מעל פני הים; אוכלוסייה 228,562 ושטח שיפוט 47.242 קמ\"ר). מהווה את עוגן המוצא של מסדרון החוף צפונה לתל אביב.",
+        "givat_yona_elev_m": 53.0,
+        "ashdod_light_url": "https://en.wikipedia.org/wiki/Ashdod_Light"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corridor_city_yavne",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.733,
+          31.883,
+          30.0
+        ]
+      },
+      "properties": {
+        "id": "corridor_city_yavne",
+        "backlog_id": 104,
+        "name_he": "יבנה",
+        "name_en": "Yavne",
+        "category": "corridor_city",
+        "wgs84": {
+          "lon": 34.733,
+          "lat": 31.883,
+          "ground_elev_m": 30.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 174851.158,
+          "northing_m": 643441.526,
+          "tile_1km": [
+            174,
+            643
+          ],
+          "ground_elev_m": 30.0,
+          "top_asl_m": 30.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Yavne",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "חוליית החיבור בין אשדוד לראשון לציון לאורך כביש 4 ומסילת החוף (כ-15 ק\"מ צפונית לאשדוד וכ-20 ק\"מ דרומית ליפו; אוכלוסייה 58,090)."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corridor_city_rishon_lezion",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.8,
+          31.95,
+          40.0
+        ]
+      },
+      "properties": {
+        "id": "corridor_city_rishon_lezion",
+        "backlog_id": 104,
+        "name_he": "ראשון לציון",
+        "name_en": "Rishon LeZion",
+        "category": "corridor_city",
+        "wgs84": {
+          "lon": 34.8,
+          "lat": 31.95,
+          "ground_elev_m": 40.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 181218.108,
+          "northing_m": 650845.427,
+          "tile_1km": [
+            181,
+            650
+          ],
+          "ground_elev_m": 40.0,
+          "top_asl_m": 40.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Rishon_LeZion",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "העיר הרביעית בגודלה בישראל (אוכלוסייה 259,275, שטח 61.91 קמ\"ר), שבתחומה מתפצל מסדרון התנועה במחלף חולות בין כביש 4 במזרח לנתיבי איילון (כביש 20) במערב."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corridor_city_holon",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.767,
+          32.017,
+          34.0
+        ]
+      },
+      "properties": {
+        "id": "corridor_city_holon",
+        "backlog_id": 104,
+        "name_he": "חולון",
+        "name_en": "Holon",
+        "category": "corridor_city",
+        "wgs84": {
+          "lon": 34.767,
+          "lat": 32.017,
+          "ground_elev_m": 34.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 178128.11,
+          "northing_m": 658287.14,
+          "tile_1km": [
+            178,
+            658
+          ],
+          "ground_elev_m": 34.0,
+          "top_asl_m": 34.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Holon",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "עיר ליבה בדרום מטרופולין גוש דן (אוכלוסייה 191,829, שטח 18.927 קמ\"ר), המוגדרת בין נתיבי איילון (כביש 20) במערב לכביש 4 במזרח וגובלת ישירות בדרום תל אביב."
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "corridor_city_bat_yam",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          34.75,
+          32.017,
+          37.0
+        ]
+      },
+      "properties": {
+        "id": "corridor_city_bat_yam",
+        "backlog_id": 104,
+        "name_he": "בת ים",
+        "name_en": "Bat Yam",
+        "category": "corridor_city",
+        "wgs84": {
+          "lon": 34.75,
+          "lat": 32.017,
+          "ground_elev_m": 37.0
+        },
+        "itm_epsg2039": {
+          "easting_m": 176521.982,
+          "northing_m": 658293.767,
+          "tile_1km": [
+            176,
+            658
+          ],
+          "ground_elev_m": 37.0,
+          "top_asl_m": 37.0
+        },
+        "height_m": 0.0,
+        "floors": null,
+        "height_source": "verified_public",
+        "source_url": "https://en.wikipedia.org/wiki/Bat_Yam",
+        "osm_attribution": "© OpenStreetMap contributors (Open Database License ODbL 1.0) — https://www.openstreetmap.org/copyright",
+        "description_he": "עיר החוף הדרומית הצמודה ליפו–תל אביב (רום רשמי 37 מ', אוכלוסייה 129,494, שטח 8.16 קמ\"ר), עם טיילת חוף באורך 3.2 ק\"מ וציר נתיבי איילון והקו האדום בגבולה המזרחי.",
+        "promenade_length_km": 3.2
+      }
+    }
+  ]
+}

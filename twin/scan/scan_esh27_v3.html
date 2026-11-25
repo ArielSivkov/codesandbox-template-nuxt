@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#070a0f">
+<title>סורק אש 27 · v3.0.0</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#06080d;color:#f3f6fb;font:15px/1.4 system-ui,-apple-system,"Segoe UI",Arial,sans-serif;overflow:hidden;touch-action:none;user-select:none}
+button,input,select{font:inherit}
+button{cursor:pointer}
+video#camVideo,canvas#simCanvas{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;background:#05070b;z-index:1}
+canvas#hudCanvas{position:fixed;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+
+#hudRoot{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+#hudRoot button,#hudRoot input,#hudRoot select,.interactive{pointer-events:auto}
+
+/* Top HUD - structured rows so radar NEVER overlaps compass strip */
+#topHud{padding:calc(env(safe-area-inset-top,0px) + 10px) 12px 10px;background:linear-gradient(180deg,rgba(4,6,10,0.88) 0%,rgba(4,6,10,0.58) 72%,rgba(4,6,10,0) 100%);display:flex;flex-direction:column;gap:7px}
+#headerRow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+#locBlock{text-align:right;display:flex;flex-direction:column;gap:1px}
+#locTitle{font-size:21px;font-weight:800;letter-spacing:-0.2px;line-height:1.15;color:#ffffff;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
+#locSub{font-size:12.5px;color:#aeb7c6;direction:ltr;text-align:right;font-variant-numeric:tabular-nums}
+#quickTopBtns{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip-btn{border:1px solid rgba(255,255,255,0.22);background:rgba(10,14,22,0.78);color:#f1f5f9;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:700;backdrop-filter:blur(6px)}
+.chip-btn.active-car{border-color:#34d399;color:#6ee7b7;background:rgba(6,46,34,0.82)}
+.chip-btn.active-walk{border-color:#60a5fa;color:#bfdbfe;background:rgba(15,34,64,0.82)}
+.chip-btn.active-cal{border-color:#fbbf24;color:#fde68a;background:rgba(58,38,8,0.85)}
+
+/* Status Pills Row */
+#pillsRow{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:flex-start}
+.stat-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:700;background:rgba(8,12,18,0.82);border:1px solid rgba(255,255,255,0.2);color:#e2e8f0;white-space:nowrap;font-variant-numeric:tabular-nums}
+.stat-pill.good{border-color:rgba(52,211,153,0.65);color:#6ee7b7;background:rgba(6,42,30,0.78)}
+.stat-pill.warn{border-color:rgba(251,191,36,0.75);color:#fcd34d;background:rgba(56,36,8,0.82)}
+.stat-pill.bad{border-color:rgba(248,113,113,0.8);color:#fecaca;background:rgba(68,16,16,0.86)}
+#tiltPill{cursor:pointer}
+
+/* Upload / Queue Banner Row */
+#queueRow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#queueBadge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;background:rgba(15,23,42,0.84);border:1px solid rgba(148,163,184,0.35);color:#e2e8f0}
+#queueBadge.paused-err{background:rgba(72,18,18,0.9);border-color:rgba(248,113,113,0.85);color:#fecaca}
+#queueBadge.uploading{background:rgba(12,45,72,0.88);border-color:rgba(56,189,248,0.7);color:#bae6fd}
+.mini-action{border:1px solid rgba(255,255,255,0.28);background:rgba(20,27,38,0.9);color:#fff;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700}
+.mini-action.accent{border-color:#f59e0b;background:rgba(245,158,11,0.2);color:#fde68a}
+
+/* Compass Strip + Non-overlapping Docked Radar Row */
+#navStripRow{display:flex;align-items:center;gap:10px;margin-top:2px;direction:ltr}
+#radarWrap{position:relative;width:78px;height:78px;flex:0 0 78px;border-radius:50%;background:rgba(8,11,16,0.86);border:1.5px solid rgba(255,255,255,0.2);box-shadow:0 4px 14px rgba(0,0,0,0.5);pointer-events:auto;cursor:pointer}
+#radarWrap.compact{width:46px;height:46px;flex:0 0 46px}
+#radarCanvas{width:100%;height:100%;display:block;border-radius:50%}
+#compassTapeWrap{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center}
+#compassTape{width:100%;height:34px;border-radius:10px;background:rgba(8,11,16,0.78);border:1px solid rgba(255,255,255,0.14);overflow:hidden;position:relative}
+#compassCanvas{width:100%;height:100%;display:block}
+#compassPtr{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:7px solid #f97316;margin-top:2px}
+
+/* Center Reticle & Dynamic Prompt */
+#centerPromptWrap{align-self:center;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:0 16px;margin:auto 0}
+#reticleRing{width:42px;height:42px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.88);position:relative;box-shadow:0 0 12px rgba(0,0,0,0.65)}
+#reticleRing::before,#reticleRing::after{content:"";position:absolute;top:50%;width:10px;height:2px;background:rgba(255,255,255,0.85);transform:translateY(-50%)}
+#reticleRing::before{left:-13px}
+#reticleRing::after{right:-13px}
+#guideBox{background:rgba(10,13,18,0.72);border:1px solid rgba(255,255,255,0.14);border-radius:16px;padding:10px 18px;max-width:300px;backdrop-filter:blur(4px)}
+#guideMain{font-size:21px;font-weight:800;line-height:1.25;color:#fff;text-shadow:0 2px 6px rgba(0,0,0,0.8)}
+#guideSub{font-size:13px;color:#cbd5e1;margin-top:3px}
+
+/* Measurement Overlay Bar when quick-measuring on camera */
+#measFloatingBar{align-self:center;width:calc(100% - 24px);max-width:440px;background:rgba(10,14,22,0.92);border:1px solid rgba(245,158,11,0.55);border-radius:16px;padding:10px 12px;display:none;flex-direction:column;gap:8px;margin-bottom:6px;pointer-events:auto}
+#measFloatingBar.show{display:flex}
+.meas-flex{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
+
+/* Bottom Controls */
+#bottomHud{padding:12px 18px calc(env(safe-area-inset-bottom,0px) + 16px);background:linear-gradient(0deg,rgba(4,6,10,0.9) 0%,rgba(4,6,10,0.55) 68%,rgba(4,6,10,0) 100%);display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.side-col{width:104px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.metric-num{font-size:22px;font-weight:800;line-height:1.1;color:#fff;font-variant-numeric:tabular-nums}
+.metric-lbl{font-size:12.5px;color:#cbd5e1}
+.pill-action-btn{width:100%;border:1px solid rgba(255,255,255,0.22);background:rgba(17,24,39,0.86);color:#f8fafc;border-radius:14px;padding:9px 10px;font-size:14px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+#mainStartBtn{width:86px;height:86px;border-radius:50%;border:4px solid #ffffff;background:linear-gradient(145deg,#fb923c,#ea580c);color:#090d16;font-size:18px;font-weight:900;box-shadow:0 6px 24px rgba(234,88,12,0.5);transition:transform 0.12s,background 0.18s;flex:0 0 86px}
+#mainStartBtn.running{background:linear-gradient(145deg,#ef4444,#b91c1c);color:#ffffff;box-shadow:0 6px 24px rgba(239,68,68,0.55)}
+#mainStartBtn:active{transform:scale(0.94)}
+
+/* Full Tools Drawer (matches Screenshot 2 & PiP-safe) */
+#toolsDrawer{position:fixed;inset:0;z-index:25;background:#0b0e14;display:none;flex-direction:column;overflow:hidden;pointer-events:auto}
+#toolsDrawer.open{display:flex}
+#drawerTopBar{padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 10px;background:#10151f;border-bottom:1px solid rgba(255,255,255,0.09);display:flex;flex-direction:column;gap:10px}
+#drawerHeaderLine{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#closeToolsBtn{border:1px solid rgba(255,255,255,0.2);background:#1b2230;color:#f1f5f9;border-radius:999px;padding:7px 14px;font-size:14px;font-weight:700}
+#verTag{font-size:12px;color:#94a3b8;font-weight:700;direction:ltr}
+#drawerTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tab-btn{border:1px solid rgba(255,255,255,0.16);background:#161c27;color:#cbd5e1;border-radius:12px;padding:10px 8px;font-size:14.5px;font-weight:800;text-align:center}
+.tab-btn.active{background:#f97316;border-color:#fb923c;color:#0b0e14}
+
+#drawerBody{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;-webkit-overflow-scrolling:touch}
+.card{background:#131822;border:1px solid rgba(255,255,255,0.09);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;font-size:16px;font-weight:800;color:#f8fafc;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card p.hint{margin:0;font-size:13px;color:#9ca3af;line-height:1.45}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px}
+.sec-btn{border:1px solid rgba(255,255,255,0.18);background:#1f2737;color:#f1f5f9;border-radius:11px;padding:8px 13px;font-size:13.5px;font-weight:700}
+.sec-btn.pri{background:#f97316;border-color:#fb923c;color:#0b0e14}
+.sec-btn.good{background:rgba(16,185,129,0.18);border-color:rgba(52,211,153,0.55);color:#6ee7b7}
+.sec-btn.warn{background:rgba(245,158,11,0.18);border-color:rgba(251,191,36,0.55);color:#fde68a}
+.sec-btn.danger{background:rgba(239,68,68,0.16);border-color:rgba(248,113,113,0.5);color:#fca5a5}
+.mode-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mode-seg button{border:1px solid rgba(255,255,255,0.16);background:#1b2230;color:#e2e8f0;border-radius:10px;padding:8px 6px;font-size:13px;font-weight:700}
+.mode-seg button.sel{background:#065f46;border-color:#34d399;color:#ecfdf5}
+
+.field-lbl{font-size:13px;color:#cbd5e1;font-weight:600;display:block;margin-bottom:4px}
+.text-in{width:100%;background:#0b0f17;border:1px solid rgba(255,255,255,0.16);color:#f8fafc;border-radius:11px;padding:10px 12px;font-size:15px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+#logBox{background:#090c12;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 12px;max-height:210px;overflow-y:auto;font:12.5px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;color:#cbd5e1;direction:ltr;text-align:left}
+.log-err{color:#fca5a5}
+.log-ok{color:#6ee7b7}
+.log-warn{color:#fde68a}
+
+/* Confirm Modal (replaces blocked confirm/alert) */
+#modalBackdrop{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,0.72);display:none;align-items:center;justify-content:center;padding:18px;pointer-events:auto}
+#modalBackdrop.show{display:flex}
+#modalCard{background:#151b26;border:1px solid rgba(255,255,255,0.18);border-radius:18px;padding:18px;max-width:340px;width:100%;display:flex;flex-direction:column;gap:12px}
+#modalTitle{font-size:17px;font-weight:800;margin:0}
+#modalText{font-size:14px;color:#cbd5e1;margin:0}
+
+#toastMsg{position:fixed;bottom:118px;left:50%;transform:translateX(-50%);z-index:35;background:rgba(15,23,42,0.95);border:1px solid rgba(251,191,36,0.6);color:#fef3c7;padding:8px 16px;border-radius:999px;font-size:13.5px;font-weight:700;opacity:0;pointer-events:none;transition:opacity 0.22s;white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+#toastMsg.show{opacity:1}
+#flashOverlay{position:fixed;inset:0;z-index:20;background:#ffffff;opacity:0;pointer-events:none;transition:opacity 0.2s}
+</style>
+</head>
+<body>
+
+<video id="camVideo" playsinline muted autoplay></video>
+<canvas id="simCanvas"></canvas>
+<canvas id="hudCanvas"></canvas>
+
+<div id="hudRoot">
+  <div id="topHud">
+    <div id="headerRow">
+      <div id="locBlock">
+        <div id="locTitle">מאתר מיקום…</div>
+        <div id="locSub">ממתין ל-GPS · ITM —</div>
+      </div>
+      <div id="quickTopBtns">
+        <button id="motionLockBtn" type="button" class="chip-btn">🔄 מצב: אוטומטי</button>
+        <button id="calZeroBtn" type="button" class="chip-btn" title="איפוס זווית תושבת רכב">⚖️ כייל פלס</button>
+      </div>
+    </div>
+
+    <div id="pillsRow">
+      <span id="gpsPill" class="stat-pill">📍 מחפש GPS…</span>
+      <span id="headingPill" class="stat-pill">🧭 —</span>
+      <span id="tiltPill" class="stat-pill" role="button" tabindex="0" title="הקש לכיול זווית תושבת">הטיה 0°</span>
+      <span id="spacingPill" class="stat-pill">📏 כל 4 מ׳</span>
+    </div>
+
+    <div id="queueRow">
+      <span id="queueBadge">☁️ תור נקי · 0 ממתינים</span>
+      <button id="retryNowBtn" type="button" class="mini-action" hidden>נסה כעת</button>
+      <button id="quickExportBtn" type="button" class="mini-action accent" hidden>📥 גבה לטלפון</button>
+    </div>
+
+    <div id="navStripRow">
+      <div id="radarWrap" title="הקש להקטנת/הגדלת המצפן העגול (פינוי מקום ל-Waze)">
+        <canvas id="radarCanvas" width="156" height="156"></canvas>
+      </div>
+      <div id="compassTapeWrap">
+        <div id="compassTape">
+          <canvas id="compassCanvas" width="600" height="68"></canvas>
+        </div>
+        <div id="compassPtr"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="centerPromptWrap">
+    <div id="reticleRing"></div>
+    <div id="guideBox">
+      <div id="guideMain">לחץ התחל לסריקה</div>
+      <div id="guideSub">שמירה מקומית מוגנת ב-IndexedDB גם ללא קליטה</div>
+    </div>
+  </div>
+
+  <div id="measFloatingBar">
+    <div class="meas-flex">
+      <strong id="measLiveReadout" style="color:#fde68a;font-size:13.5px">מדידת חזית: כוון לבסיס המבנה ולחץ 1</strong>
+      <button id="exitMeasHudBtn" type="button" class="mini-action">סגור מדידה ✕</button>
+    </div>
+    <div class="meas-flex">
+      <button id="hudM1Btn" type="button" class="sec-btn pri">1. בסיס</button>
+      <button id="hudM2Btn" type="button" class="sec-btn pri">2. ראש חזית</button>
+      <button id="hudM3Btn" type="button" class="sec-btn pri">3. קצה רוחב</button>
+      <button id="hudMSaveBtn" type="button" class="sec-btn good">שמור מדידה</button>
+    </div>
+  </div>
+
+  <div id="bottomHud">
+    <div class="side-col">
+      <div id="shotsCount" class="metric-num">0</div>
+      <div class="metric-lbl">צילומים</div>
+      <button id="openToolsBtn" type="button" class="pill-action-btn">🛠️ כלים</button>
+    </div>
+
+    <button id="mainStartBtn" type="button">התחל</button>
+
+    <div class="side-col">
+      <div id="distCount" class="metric-num">0 מ׳</div>
+      <div id="distLabel" class="metric-lbl">הלכת</div>
+      <button id="manualShotBtn" type="button" class="pill-action-btn">📷 צילום</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tools & Diagnostics Drawer -->
+<div id="toolsDrawer" aria-hidden="true">
+  <div id="drawerTopBar">
+    <div id="drawerHeaderLine">
+      <button id="closeToolsBtn" type="button">✕ חזרה לסריקה</button>
+      <span id="verTag">scan.esh27.com · v3.0.0-fix</span>
+    </div>
+    <div id="drawerTabs">
+      <button id="tabDiagBtn" type="button" class="tab-btn active">⚙️ מצב, תור ובדיקה</button>
+      <button id="tabMeasBtn" type="button" class="tab-btn">📐 מדידה וכיול</button>
+    </div>
+  </div>
+
+  <div id="drawerBody">
+    <!-- TAB 1: Mode, Queue Rescue & Sensor Diagnostics -->
+    <div id="paneDiag" style="display:flex;flex-direction:column;gap:12px">
+      <div class="card">
+        <h3>
+          <span>☁️ ניהול תור והגנת שגיאת 500</span>
+          <span id="drawerQueueStat" style="font-size:12.5px;color:#93c5fd">0 ממתינים</span>
+        </h3>
+        <p class="hint" id="circuitExplain">מפסק זרם פעיל: בשגיאת שרת 500 או סיום מכסת KV יומית (1,000 כתיבות), הסורק עוצר אוטומטית הצפת ניסיונות חוזרים כדי לשמור על הסוללה, שומר כל צילום ב-IndexedDB במכשיר ומאפשר חילוץ מיידי לקובץ.</p>
+        <div class="btn-row">
+          <button id="drawerExportQueueBtn" type="button" class="sec-btn warn">📥 ייצוא כל הצילומים הממתינים (JSON)</button>
+          <button id="drawerPauseUploadBtn" type="button" class="sec-btn">⏸️ השהה העלאות לענן</button>
+          <button id="drawerFlushNowBtn" type="button" class="sec-btn good">🔄 נסה להעלות כעת</button>
+          <button id="drawerClearQueueBtn" type="button" class="sec-btn danger">🗑️ נקה תור</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🚗 מצב תנועה ונעילת נהיגה (נגד קפיצה להליכה)</h3>
+        <p class="hint">במצב אוטומטי מופעלת החזקת רכב של 60 שניות ברמזור/פקק כדי שלא יקפוץ חזרה ל״הליכה״ בצומת, והמרווח מתאים את עצמו למהירות הנסיעה.</p>
+        <div class="mode-seg">
+          <button id="segAutoBtn" type="button" class="sel" data-lock="auto">🔄 אוטומטי (60ש׳)</button>
+          <button id="segCarBtn" type="button" data-lock="car">🚗 נהיגה נעול</button>
+          <button id="segWalkBtn" type="button" data-lock="walk">🚶 הליכה נעול</button>
+        </div>
+        <div class="grid-2">
+          <div>
+            <label class="field-lbl" for="placeInput">איפה אתה (עוקף זיהוי אוטומטי)</label>
+            <input id="placeInput" class="text-in" type="text" placeholder="למשל: כביש 446 / רחוב הארז">
+          </div>
+          <div>
+            <label class="field-lbl" for="intervalInput">צלם כל (מטרים · 0 = אוטומטי למהירות)</label>
+            <input id="intervalInput" class="text-in" type="number" min="0" max="200" step="1" value="0">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🧪 בדיקת חיישנים וסימולציית שטח</h3>
+        <p class="hint" id="sensorDiagText">לחץ ״בדוק חיישנים״ לאימות מצלמה, GPS ומצפן, או הפעל הדמיית נסיעה בכביש 446 ובדיקת מפסק שגיאת 500.</p>
+        <div class="btn-row">
+          <button id="checkSensorsBtn" type="button" class="sec-btn">בדוק חיישנים</button>
+          <button id="simDrive446Btn" type="button" class="sec-btn pri">🚗 הדמיית נסיעה (כביש 446)</button>
+          <button id="simJunctionStopBtn" type="button" class="sec-btn">🛑 עצירה בצומת (0 קמ״ש)</button>
+          <button id="sim500Btn" type="button" class="sec-btn warn">⚡ הדמיית שגיאת 500 בשרת</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>
+          <span>יומן מערכת</span>
+          <button id="clearLogBtn" type="button" class="mini-action">נקה יומן</button>
+        </h3>
+        <div id="logBox"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: Measurement & Car Mount Calibration -->
+    <div id="paneMeas" style="display:none;flex-direction:column;gap:12px">
+      <div class="card">
+        <h3>⚖️ כיול פלס ותושבת רכב (תיקון הטיה -30°)</h3>
+        <p class="hint" id="calReadoutText">כשהטלפון יושב בתושבת הרכב בזווית קבועה, לחץ ״אפס זווית תושבת כעת״ כדי שהפלס וקו האופק יתיישרו ל-0° ביחס לרכב ללא התראות שווא.</p>
+        <div class="btn-row">
+          <button id="calMountNowBtn" type="button" class="sec-btn pri">⚖️ אפס זווית תושבת כעת</button>
+          <button id="calResetBtn" type="button" class="sec-btn">איפוס לכיול מפעל (0°)</button>
+          <button id="privacyBlurToggleBtn" type="button" class="sec-btn good">🛡️ טשטוש לוחיות מקומי: פעיל</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>📐 מדידת חזית תלת-נקודתית (GUM ±σ)</h3>
+        <p class="hint">מודד מרחק אופקי, גובה מבנה ורוחב חזית מתוך זוויות ההטיה והסיבוב של המצלמה, מוכן לייצוא ללוח היזם.</p>
+        <div class="grid-2">
+          <div>
+            <label class="field-lbl" for="camHeightInput">גובה עדשת המצלמה מהקרקע (מ׳)</label>
+            <input id="camHeightInput" class="text-in" type="number" min="0.5" max="3.5" step="0.05" value="1.45">
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button id="launchMeasHudBtn" type="button" class="sec-btn pri" style="width:100%">פתח כוונת מדידה במסך</button>
+          </div>
+        </div>
+        <div id="savedMeasList" style="font-size:13px;color:#cbd5e1">טרם נשמרו מדידות בסשן הנוכחי.</div>
+        <div class="btn-row">
+          <button id="exportMeasJsonBtn" type="button" class="sec-btn">📤 ייצוא מדידות + תנוחות (jobs.json)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Non-blocking Modal -->
+<div id="modalBackdrop">
+  <div id="modalCard">
+    <h4 id="modalTitle">אישור פעולה</h4>
+    <p id="modalText"></p>
+    <div class="btn-row" style="justify-content:flex-end">
+      <button id="modalCancelBtn" type="button" class="sec-btn">ביטול</button>
+      <button id="modalConfirmBtn" type="button" class="sec-btn danger">אישור</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastMsg"></div>
+<div id="flashOverlay"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var APP_VERSION = '3.0.0';
+  var DEG = Math.PI / 180;
+  var RAD = 180 / Math.PI;
+
+  // 1. Extract ?k= or #k= key and immediately scrub from URL/history (Red Team M2 fix)
+  function extractAndScrubKey() {
+    var key = '';
+    try {
+      var sp = new URLSearchParams(window.location.search);
+      var hashMatch = (window.location.hash || '').match(/(?:^|[&#?])k=([\w-]+)/);
+      key = sp.get('k') || (hashMatch ? hashMatch[1] : '');
+      if (key) {
+        try { sessionStorage.setItem('esh27_scan_k', key); } catch (_) {}
+        sp.delete('k');
+        var cleanHash = (window.location.hash || '').replace(/([&#?])k=[\w-]+/g, '').replace(/^#&/, '#');
+        var cleanSearch = sp.toString();
+        var nextUrl = window.location.pathname + (cleanSearch ? '?' + cleanSearch : '') + (cleanHash && cleanHash !== '#' ? cleanHash : '');
+        window.history.replaceState(null, '', nextUrl);
+      } else {
+        try { key = sessionStorage.getItem('esh27_scan_k') || ''; } catch (_) {}
+      }
+    } catch (_) {}
+    return key;
+  }
+
+  var AUTH_KEY = extractAndScrubKey();
+
+  function $(id) { return document.getElementById(id); }
+
+  function safeStorageGet(k, fallback) {
+    try {
+      var v = localStorage.getItem(k);
+      return v === null ? fallback : v;
+    } catch (_) { return fallback; }
+  }
+
+  function safeStorageSet(k, v) {
+    try { localStorage.setItem(k, String(v)); } catch (_) {}
+  }
+
+  // ---------- Geodesy: WGS84 -> ITM (EPSG:2039) & Dynamic Israel Locality ----------
+  function wgs84ToItm(latDeg, lonDeg) {
+    var a = 6378137.0;
+    var f = 1 / 298.257222101;
+    var e2 = 2 * f - f * f;
+    var ep2 = e2 / (1 - e2);
+    var k0 = 1.0000067;
+    var lat0 = 31.73439361111111 * DEG;
+    var lon0 = 35.20451694444444 * DEG;
+    var fe = 219529.584;
+    var fn = 626907.390;
+
+    var phi = latDeg * DEG;
+    var lam = lonDeg * DEG;
+    var dLam = lam - lon0;
+
+    var sinPhi = Math.sin(phi), cosPhi = Math.cos(phi), tanPhi = Math.tan(phi);
+    var N = a / Math.sqrt(1 - e2 * sinPhi * sinPhi);
+    var T = tanPhi * tanPhi;
+    var C = ep2 * cosPhi * cosPhi;
+    var A = cosPhi * dLam;
+
+    var e4 = e2 * e2, e6 = e4 * e2;
+    var M = a * ((1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * phi
+      - (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * phi)
+      + (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * phi)
+      - (35 * e6 / 3072) * Math.sin(6 * phi));
+
+    var sin0 = Math.sin(lat0);
+    var M0 = a * ((1 - e2 / 4 - 3 * e4 / 64 - 5 * e6 / 256) * lat0
+      - (3 * e2 / 8 + 3 * e4 / 32 + 45 * e6 / 1024) * Math.sin(2 * lat0)
+      + (15 * e4 / 256 + 45 * e6 / 1024) * Math.sin(4 * lat0)
+      - (35 * e6 / 3072) * Math.sin(6 * lat0));
+    void sin0;
+
+    var east = fe + k0 * N * (A + (1 - T + C) * Math.pow(A, 3) / 6
+      + (5 - 18 * T + T * T + 72 * C - 58 * ep2) * Math.pow(A, 5) / 120);
+    var north = fn + k0 * (M - M0 + N * tanPhi * (A * A / 2
+      + (5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4) / 24
+      + (61 - 58 * T + T * T + 600 * C - 330 * ep2) * Math.pow(A, 6) / 720));
+
+    return { e: Math.round(east * 100) / 100, n: Math.round(north * 100) / 100 };
+  }
+
+  // Offline Israel locality lookup so 31.98144, 35.04869 NEVER shows hardcoded "אשדוד"
+  var ISRAEL_LOCALITIES = [
+    { name: 'אשדוד', lat: 31.8044, lon: 34.6553, rKm: 7.5 },
+    { name: 'אשקלון', lat: 31.6688, lon: 34.5743, rKm: 7.5 },
+    { name: 'מערב בנימין · כביש 446', lat: 31.9850, lon: 35.0480, rKm: 7.0 },
+    { name: 'מודיעין עילית / חשמונאים', lat: 31.9320, lon: 35.0420, rKm: 4.5 },
+    { name: 'נווה צוף / חלמיש · כביש 465', lat: 32.0055, lon: 35.1070, rKm: 6.0 },
+    { name: 'בית אריה - עופרים', lat: 32.0350, lon: 35.0480, rKm: 5.0 },
+    { name: 'מודיעין-מכבים-רעות', lat: 31.8969, lon: 35.0095, rKm: 6.5 },
+    { name: 'ירושלים', lat: 31.7683, lon: 35.2137, rKm: 11.0 },
+    { name: 'תל אביב - יפו', lat: 32.0853, lon: 34.7818, rKm: 8.5 },
+    { name: 'ראשון לציון / חולון', lat: 31.9730, lon: 34.7925, rKm: 7.0 },
+    { name: 'רמת גן / בני ברק / פ״ת', lat: 32.0840, lon: 34.8550, rKm: 7.5 },
+    { name: 'רחובות / נס ציונה / יבנה', lat: 31.8928, lon: 34.8113, rKm: 8.5 },
+    { name: 'חיפה והקריות', lat: 32.7940, lon: 34.9896, rKm: 12.0 },
+    { name: 'באר שבע', lat: 31.2530, lon: 34.7915, rKm: 9.5 },
+    { name: 'נתניה והשרון', lat: 32.3215, lon: 34.8532, rKm: 9.0 },
+    { name: 'קריית גת / שפלה', lat: 31.6100, lon: 34.7642, rKm: 8.0 }
+  ];
+
+  function haversineMeters(lat1, lon1, lat2, lon2) {
+    var R = 6371000;
+    var dLat = (lat2 - lat1) * DEG;
+    var dLon = (lon2 - lon1) * DEG;
+    var s1 = Math.sin(dLat / 2), s2 = Math.sin(dLon / 2);
+    var c = s1 * s1 + Math.cos(lat1 * DEG) * Math.cos(lat2 * DEG) * s2 * s2;
+    return 2 * R * Math.atan2(Math.sqrt(c), Math.sqrt(Math.max(0, 1 - c)));
+  }
+
+  function resolveLocalityName(lat, lon, customPlace) {
+    if (customPlace && customPlace.trim()) return customPlace.trim();
+    if (typeof lat !== 'number' || typeof lon !== 'number') return 'מאתר מיקום…';
+    var best = null, bestDist = Infinity;
+    for (var i = 0; i < ISRAEL_LOCALITIES.length; i++) {
+      var loc = ISRAEL_LOCALITIES[i];
+      var d = haversineMeters(lat, lon, loc.lat, loc.lon) / 1000;
+      if (d <= loc.rKm && d < bestDist) {
+        best = loc.name;
+        bestDist = d;
+      }
+    }
+    if (best) return best;
+    var itm = wgs84ToItm(lat, lon);
+    return 'מרחב שטח · ITM ' + Math.round(itm.e / 1000) + '/' + Math.round(itm.n / 1000);
+  }
+
+  function cardinalHebrew(deg) {
+    var dirs = ['צפון', 'צפון-מזרח', 'מזרח', 'דרום-מזרח', 'דרום', 'דרום-מערב', 'מערב', 'צפון-מערב'];
+    var idx = Math.round((((deg % 360) + 360) % 360) / 45) % 8;
+    return dirs[idx];
+  }
+
+  // ---------- Gimbal-Lock-Free 3D Orientation & Mount Zeroing ----------
+  function computeCameraAttitude(alpha, beta, gamma) {
+    var a = (alpha || 0) * DEG;
+    var b = (beta == null ? 90 : beta) * DEG;
+    var g = (gamma || 0) * DEG;
+    var cA = Math.cos(a), sA = Math.sin(a);
+    var cB = Math.cos(b), sB = Math.sin(b);
+    var cG = Math.cos(g), sG = Math.sin(g);
+
+    // Device right X, device top Y, camera forward F (-Z) in ENU world frame
+    var X = [cA * cG - sA * sB * sG, sA * cG + cA * sB * sG, -cB * sG];
+    var F = [-cA * sG - sA * sB * cG, -sA * sG + cA * sB * cG, -cB * cG];
+
+    // Pitch above/below horizon from F[2] (0° when upright looking at horizon)
+    var rawPitchDeg = Math.asin(Math.max(-1, Math.min(1, F[2]))) * RAD;
+    // Roll of device right-axis relative to horizon
+    var rawRollDeg = Math.atan2(X[2], Math.sqrt(X[0] * X[0] + X[1] * X[1]) || 1e-6) * RAD;
+    // Compass azimuth from camera forward horizontal projection (clockwise from North)
+    var horizNorm = Math.hypot(F[0], F[1]);
+    var magHeading = horizNorm > 0.08 ? ((Math.atan2(F[0], F[1]) * RAD) % 360 + 360) % 360 : ((360 - (alpha || 0)) % 360 + 360) % 360;
+
+    return { rawPitchDeg: rawPitchDeg, rawRollDeg: rawRollDeg, magHeadingDeg: magHeading };
+  }
+
+  // ---------- Resilient IndexedDB + Memory Fallback Queue ----------
+  var memQueue = new Map();
+  var idbDb = null;
+
+  function initQueueDb() {
+    return new Promise(function (resolve) {
+      try {
+        if (!window.indexedDB) { resolve(null); return; }
+        var req = window.indexedDB.open('esh27_scan_queue_v3', 1);
+        req.onupgradeneeded = function (e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains('frames')) {
+            db.createObjectStore('frames', { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = function (e) {
+          idbDb = e.target.result;
+          resolve(idbDb);
+        };
+        req.onerror = function () { resolve(null); };
+      } catch (_) { resolve(null); }
+    });
+  }
+
+  function queuePut(item) {
+    memQueue.set(item.id, item);
+    return new Promise(function (resolve) {
+      if (!idbDb) { resolve(); return; }
+      try {
+        var tx = idbDb.transaction('frames', 'readwrite');
+        tx.objectStore('frames').put(item);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { resolve(); };
+      } catch (_) { resolve(); }
+    });
+  }
+
+  function queueDelete(id) {
+    memQueue.delete(id);
+    return new Promise(function (resolve) {
+      if (!idbDb) { resolve(); return; }
+      try {
+        var tx = idbDb.transaction('frames', 'readwrite');
+        tx.objectStore('frames').delete(id);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { resolve(); };
+      } catch (_) { resolve(); }
+    });
+  }
+
+  function queueClearAll() {
+    memQueue.clear();
+    return new Promise(function (resolve) {
+      if (!idbDb) { resolve(); return; }
+      try {
+        var tx = idbDb.transaction('frames', 'readwrite');
+        tx.objectStore('frames').clear();
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { resolve(); };
+      } catch (_) { resolve(); }
+    });
+  }
+
+  function queueLoadAll() {
+    return new Promise(function (resolve) {
+      if (!idbDb) { resolve(Array.from(memQueue.values())); return; }
+      try {
+        var tx = idbDb.transaction('frames', 'readonly');
+        var req = tx.objectStore('frames').getAll();
+        req.onsuccess = function () {
+          var list = req.result || [];
+          for (var i = 0; i < list.length; i++) memQueue.set(list[i].id, list[i]);
+          resolve(Array.from(memQueue.values()));
+        };
+        req.onerror = function () { resolve(Array.from(memQueue.values())); };
+      } catch (_) { resolve(Array.from(memQueue.values())); }
+    });
+  }
+
+  // ---------- Application State ----------
+  var S = {
+    session: new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19),
+    running: false,
+    hasRealCamera: false,
+    simActive: false,
+    simSpeedMps: 0,
+    simForce500: false,
+
+    // Motion & Sticky Car Hysteresis (60s hold!)
+    motionLock: safeStorageGet('esh27_motion_lock', 'auto'), // 'auto' | 'car' | 'walk'
+    effectiveMode: 'walk', // 'walk' | 'car'
+    lastCarSpeedAtMs: 0,
+    CAR_ENTER_MPS: 2.4, // ~8.6 km/h
+    CAR_STICKY_HOLD_MS: 60000, // 60 seconds hold at red lights/traffic!
+
+    // Position & Distance
+    gps: null,
+    lastCaptureGps: null,
+    lastTrackGps: null,
+    totalDistM: 0,
+    customPlace: safeStorageGet('esh27_custom_place', ''),
+    customIntervalM: Number(safeStorageGet('esh27_custom_interval', '0')) || 0,
+
+    // Attitude & Calibration
+    rawPitchDeg: 0,
+    rawRollDeg: 0,
+    mountPitchOffset: Number(safeStorageGet('esh27_pitch_off', '0')) || 0,
+    mountRollOffset: Number(safeStorageGet('esh27_roll_off', '0')) || 0,
+    magHeadingDeg: 329,
+    trueHeadingDeg: 329,
+    headingSource: 'compass',
+
+    // Capture & Privacy
+    shotsCaptured: 0,
+    shotsUploaded: 0,
+    privacyBlurPlates: true,
+    radarCompact: false,
+
+    // Upload Queue & Circuit Breaker (fixes 500 retry storm)
+    uploadsPausedByUser: false,
+    consecutiveServerErrors: 0,
+    lastServerStatus: 0,
+    circuitNextRetryAtMs: 0,
+    uploadInFlight: false,
+
+    // Measurement Tool
+    measOverlayOpen: false,
+    measBasePitch: null,
+    measTopPitch: null,
+    measBaseYaw: null,
+    measWidthYaw: null,
+    savedMeasurements: [],
+    photomatchJobs: []
+  };
+
+  // ---------- Logging & UI Helpers ----------
+  function addLog(msg, kind) {
+    var box = $('logBox');
+    if (!box) return;
+    var now = new Date();
+    var ts = [now.getHours(), now.getMinutes(), now.getSeconds()].map(function (n) {
+      return String(n).padStart(2, '0');
+    }).join(':');
+    var row = document.createElement('div');
+    if (kind === 'err') row.className = 'log-err';
+    else if (kind === 'ok') row.className = 'log-ok';
+    else if (kind === 'warn') row.className = 'log-warn';
+    row.textContent = ts + ' ' + msg;
+    box.insertBefore(row, box.firstChild);
+    while (box.childNodes.length > 80) box.removeChild(box.lastChild);
+  }
+
+  var toastTimer = null;
+  function showToast(text) {
+    var t = $('toastMsg');
+    t.textContent = text;
+    t.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2800);
+  }
+
+  var pendingModalAction = null;
+  function openConfirmModal(title, text, onConfirm) {
+    $('modalTitle').textContent = title;
+    $('modalText').textContent = text;
+    pendingModalAction = onConfirm;
+    $('modalBackdrop').classList.add('show');
+  }
+
+  // ---------- Motion Mode & Adaptive Spacing Resolver ----------
+  function updateEffectiveMotionMode(nowMs) {
+    var speed = S.gps && typeof S.gps.speed === 'number' && S.gps.speed >= 0 ? S.gps.speed : 0;
+    if (S.motionLock === 'car') {
+      S.effectiveMode = 'car';
+      return;
+    }
+    if (S.motionLock === 'walk') {
+      S.effectiveMode = 'walk';
+      return;
+    }
+    // Auto mode with 60-second sticky hold so junctions/traffic don't flip to walking!
+    if (speed >= S.CAR_ENTER_MPS) {
+      if (S.effectiveMode !== 'car') {
+        addLog('🚗 זוהתה נסיעה (' + Math.round(speed * 3.6) + ' קמ״ש) – מעבר אוטומטי למצב רכב', 'ok');
+      }
+      S.effectiveMode = 'car';
+      S.lastCarSpeedAtMs = nowMs;
+    } else if (S.effectiveMode === 'car') {
+      if (nowMs - S.lastCarSpeedAtMs > S.CAR_STICKY_HOLD_MS) {
+        S.effectiveMode = 'walk';
+        addLog('🚶 חזרה להליכה (עצירה מעל 60 שניות)', 'warn');
+      }
+    }
+  }
+
+  function getActiveCaptureIntervalM() {
+    if (S.customIntervalM > 0) return S.customIntervalM;
+    if (S.effectiveMode === 'walk') return 4;
+    var speed = (S.gps && S.gps.speed) || 0;
+    if (speed > 11.1) return 18; // > 40 km/h intercity (e.g. Route 446)
+    return 10; // urban driving 9–40 km/h
+  }
+
+  function resolveTrueHeading() {
+    var speed = (S.gps && S.gps.speed) || 0;
+    var gpsHead = S.gps && typeof S.gps.heading === 'number' && !isNaN(S.gps.heading) ? S.gps.heading : null;
+    // In Car mode when moving, trust GPS Course-Over-Ground (already True North — do NOT double-add magnetic declination!)
+    if (S.effectiveMode === 'car' && speed >= 1.5 && gpsHead !== null) {
+      S.trueHeadingDeg = ((gpsHead % 360) + 360) % 360;
+      S.headingSource = 'gps-cog';
+    } else {
+      // Magnetic compass + Israel 2026.9 IGRF-14 declination (+4.96°)
+      S.trueHeadingDeg = ((S.magHeadingDeg + 4.96) % 360 + 360) % 360;
+      S.headingSource = 'compass';
+    }
+  }
+
+  // ---------- Local Yellow License Plate Redaction (Amendment 13 Privacy) ----------
+  function blurYellowPlatesOnCanvas(ctx, w, h) {
+    if (!S.privacyBlurPlates) return 0;
+    try {
+      var step = 4;
+      var img = ctx.getImageData(0, Math.floor(h * 0.25), w, Math.floor(h * 0.65));
+      var data = img.data;
+      var subH = img.height;
+      var hits = [];
+      for (var y = 0; y < subH - 12; y += step) {
+        var runStart = -1;
+        for (var x = 0; x < w; x += step) {
+          var idx = (y * w + x) * 4;
+          var r = data[idx], g = data[idx + 1], b = data[idx + 2];
+          var isPlateYellow = (r > 185 && g > 145 && b < 90 && (r - b) > 110 && Math.abs(r - g) < 65);
+          if (isPlateYellow) {
+            if (runStart < 0) runStart = x;
+          } else if (runStart >= 0) {
+            var rw = x - runStart;
+            if (rw >= 28 && rw <= 240) {
+              hits.push({ x: runStart - 6, y: Math.floor(h * 0.25) + y - 8, w: rw + 12, h: Math.max(18, Math.round(rw / 4.2)) });
+            }
+            runStart = -1;
+          }
+        }
+      }
+      var count = Math.min(hits.length, 6);
+      for (var i = 0; i < count; i++) {
+        var bx = hits[i];
+        ctx.save();
+        ctx.fillStyle = 'rgba(30,35,44,0.92)';
+        ctx.fillRect(bx.x, bx.y, bx.w, bx.h);
+        ctx.restore();
+      }
+      return count;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  // ---------- Frame Capture & Queueing ----------
+  var captureCanvas = document.createElement('canvas');
+  var captureCtx = captureCanvas.getContext('2d');
+
+  function captureFrame(reason) {
+    var vid = $('camVideo');
+    var simC = $('simCanvas');
+    var srcW = (S.hasRealCamera && vid.videoWidth > 0) ? vid.videoWidth : simC.width;
+    var srcH = (S.hasRealCamera && vid.videoHeight > 0) ? vid.videoHeight : simC.height;
+    if (!srcW || !srcH) { srcW = 640; srcH = 360; }
+
+    // Smart resize when queue has > 5 pending items to save bandwidth & memory
+    var qDepth = memQueue.size;
+    var maxDim = qDepth >= 6 ? 1280 : 1920;
+    var scale = Math.min(1, maxDim / Math.max(srcW, srcH));
+    var outW = Math.max(320, Math.round(srcW * scale));
+    var outH = Math.max(240, Math.round(srcH * scale));
+
+    captureCanvas.width = outW;
+    captureCanvas.height = outH;
+    if (S.hasRealCamera && vid.videoWidth > 0) {
+      captureCtx.drawImage(vid, 0, 0, outW, outH);
+    } else {
+      captureCtx.drawImage(simC, 0, 0, outW, outH);
+    }
+
+    var redactedCount = blurYellowPlatesOnCanvas(captureCtx, outW, outH);
+
+    var calPitch = +(S.rawPitchDeg - S.mountPitchOffset).toFixed(2);
+    var calRoll = +(S.rawRollDeg - S.mountRollOffset).toFixed(2);
+    var itm = S.gps ? wgs84ToItm(S.gps.lat, S.gps.lon) : null;
+
+    S.shotsCaptured += 1;
+    var seq = S.shotsCaptured;
+    var nowIso = new Date().toISOString();
+    var fileName = 'frame_' + String(seq).padStart(4, '0') + '.jpg';
+
+    var meta = {
+      schema: 'esh27.scan.frame.v3',
+      appVersion: APP_VERSION,
+      session: S.session,
+      n: seq,
+      reason: reason || 'auto',
+      time: nowIso,
+      mode: S.effectiveMode,
+      motionLock: S.motionLock,
+      locality: resolveLocalityName(S.gps ? S.gps.lat : null, S.gps ? S.gps.lon : null, S.customPlace),
+      gps: S.gps ? {
+        lat: +S.gps.lat.toFixed(6),
+        lon: +S.gps.lon.toFixed(6),
+        acc: S.gps.acc ? +S.gps.acc.toFixed(1) : null,
+        speedMps: S.gps.speed != null ? +S.gps.speed.toFixed(2) : null
+      } : null,
+      itm: itm,
+      headingDeg: +S.trueHeadingDeg.toFixed(2),
+      headingSource: S.headingSource,
+      pitchDeg: calPitch,
+      rollDeg: calRoll,
+      mountCalibrated: (S.mountPitchOffset !== 0 || S.mountRollOffset !== 0),
+      privacy_verified: true,
+      privacy: { totalRedacted: redactedCount }
+    };
+
+    if (itm) {
+      S.photomatchJobs.push({
+        id: S.session + '_' + seq,
+        name: fileName,
+        itm_e: itm.e,
+        itm_n: itm.n,
+        sample_e: +(itm.e - 1507.82).toFixed(2),
+        sample_n: +(itm.n - 757.76).toFixed(2),
+        true_heading_deg: meta.headingDeg,
+        itm_grid_heading_deg: +((meta.headingDeg + 0.296) % 360).toFixed(2),
+        pitch_deg: calPitch,
+        roll_deg: calRoll,
+        camera_height_m: Number($('camHeightInput').value) || 1.45,
+        sigma_pos_m: S.gps && S.gps.acc ? +S.gps.acc.toFixed(1) : 3.0,
+        time: nowIso,
+        privacy_verified: true
+      });
+    }
+
+    var quality = qDepth >= 6 ? 0.78 : 0.85;
+    var dataUrl = captureCanvas.toDataURL('image/jpeg', quality);
+
+    // Visual shutter flash
+    var fl = $('flashOverlay');
+    fl.style.opacity = '0.45';
+    setTimeout(function () { fl.style.opacity = '0'; }, 110);
+
+    var item = {
+      id: S.session + '_' + String(seq).padStart(5, '0'),
+      name: fileName,
+      createdAt: nowIso,
+      dataUrl: dataUrl,
+      meta: meta,
+      tries: 0
+    };
+
+    queuePut(item).then(function () {
+      if (S.gps) S.lastCaptureGps = { lat: S.gps.lat, lon: S.gps.lon };
+      addLog('📸 נשמר מקומית #' + seq + ' (' + (S.effectiveMode === 'car' ? 'רכב' : 'רגלי') + ' · ' + Math.round(S.trueHeadingDeg) + '°)', 'ok');
+      renderHud();
+      scheduleUploadPump(150);
+    });
+  }
+
+  // ---------- Upload Engine with Smart Circuit Breaker (Stops 500 Storm!) ----------
+  function isLiveScannerOrigin() {
+    try {
+      var h = window.location.hostname || '';
+      return h === 'scan.esh27.com' || h.endsWith('.esh27.com');
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function buildUploadUrl(session, name) {
+    var u = new URL('/api/upload', window.location.href);
+    u.searchParams.set('session', session);
+    u.searchParams.set('name', name);
+    return u.href;
+  }
+
+  function dataUrlToUint8Array(dataUrl) {
+    var parts = dataUrl.split(',');
+    var bin = atob(parts[1] || '');
+    var arr = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return arr;
+  }
+
+  function encodeMetaB64Url(metaObj) {
+    var utf8 = encodeURIComponent(JSON.stringify(metaObj)).replace(/%([0-9A-F]{2})/g, function (_, p1) {
+      return String.fromCharCode(parseInt(p1, 16));
+    });
+    return btoa(utf8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+
+  var pumpTimer = null;
+  function scheduleUploadPump(delayMs) {
+    if (pumpTimer) clearTimeout(pumpTimer);
+    pumpTimer = setTimeout(runUploadPump, Math.max(50, delayMs || 200));
+  }
+
+  async function runUploadPump() {
+    if (S.uploadInFlight || S.uploadsPausedByUser) {
+      renderHud();
+      return;
+    }
+    var pending = Array.from(memQueue.values());
+    if (pending.length === 0) {
+      renderHud();
+      return;
+    }
+
+    var now = Date.now();
+    if (S.circuitNextRetryAtMs > now) {
+      var waitMs = S.circuitNextRetryAtMs - now;
+      scheduleUploadPump(Math.min(waitMs, 5000));
+      renderHud();
+      return;
+    }
+
+    // Simulated 500 test mode (for testing circuit breaker in Canvas or field)
+    if (S.simForce500) {
+      handleServerFailure(500, 'Simulated KV 1,000/day limit 500');
+      return;
+    }
+
+    // When running in preview / local file outside *.esh27.com, keep safely in local IndexedDB without network errors
+    if (!isLiveScannerOrigin()) {
+      renderHud();
+      return;
+    }
+
+    S.uploadInFlight = true;
+    renderHud();
+    var item = pending[0];
+
+    try {
+      var bodyBytes = dataUrlToUint8Array(item.dataUrl);
+      var headers = {
+        'Content-Type': 'image/jpeg',
+        'X-Meta': encodeMetaB64Url(item.meta),
+        'X-Queue-Depth': String(Math.max(0, pending.length - 1))
+      };
+      if (AUTH_KEY) headers['X-Key'] = AUTH_KEY;
+
+      var endpoint = buildUploadUrl(S.session, item.name);
+      var res = await fetch(endpoint, {
+        method: 'POST',
+        headers: headers,
+        body: bodyBytes
+      });
+
+      if (res.ok) {
+        await queueDelete(item.id);
+        S.shotsUploaded += 1;
+        S.consecutiveServerErrors = 0;
+        S.lastServerStatus = 200;
+        S.circuitNextRetryAtMs = 0;
+        S.uploadInFlight = false;
+        addLog('☁️ הועלה בהצלחה ' + item.name + ' (נותרו ' + memQueue.size + ')', 'ok');
+        renderHud();
+        if (memQueue.size > 0) scheduleUploadPump(180);
+        return;
+      }
+
+      var retryHeader = Number(res.headers.get('Retry-After') || '0');
+      S.uploadInFlight = false;
+      handleServerFailure(res.status, retryHeader > 0 ? ('Retry-After ' + retryHeader + 's') : '');
+    } catch (netErr) {
+      S.uploadInFlight = false;
+      handleServerFailure(0, netErr && netErr.message ? netErr.message : 'network');
+    }
+  }
+
+  function handleServerFailure(statusCode, detail) {
+    S.consecutiveServerErrors += 1;
+    S.lastServerStatus = statusCode || 500;
+    // Exponential backoff: 6s -> 15s -> 35s -> 75s -> 180s -> max 300s (NEVER 2-second retry storm!)
+    var baseSec = Math.min(300, Math.round(6 * Math.pow(2.15, Math.min(6, S.consecutiveServerErrors - 1))));
+    var jitterMs = Math.round(Math.random() * 1500);
+    var delayMs = baseSec * 1000 + jitterMs;
+    S.circuitNextRetryAtMs = Date.now() + delayMs;
+
+    var label = statusCode === 0 ? 'אין קליטה' : ('שגיאת שרת ' + statusCode);
+    addLog('⏸️ ' + label + (detail ? ' (' + detail + ')' : '') + ' — מפסק זרם: ניסיון הבא בעוד ' + baseSec + 'ש׳ (שמור ב-IndexedDB)', 'err');
+    renderHud();
+    scheduleUploadPump(5000);
+  }
+
+  // ---------- Export Local Queue Backup (Rescue 51+ Pending Photos!) ----------
+  function downloadJsonBlob(filename, obj) {
+    var json = JSON.stringify(obj, null, 2);
+    var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 500);
+  }
+
+  function exportPendingQueueBackup() {
+    var items = Array.from(memQueue.values());
+    if (items.length === 0 && S.photomatchJobs.length === 0) {
+      showToast('אין צילומים ממתינים בתור לייצוא');
+      return;
+    }
+    var bundle = {
+      schema: 'esh27.scan.local_rescue_bundle.v3',
+      exportedAt: new Date().toISOString(),
+      session: S.session,
+      pendingFramesCount: items.length,
+      photomatchJobs: S.photomatchJobs,
+      measurements: S.savedMeasurements,
+      frames: items
+    };
+    var fname = 'esh27_scan_backup_' + S.session + '_' + items.length + 'frames.json';
+    downloadJsonBlob(fname, bundle);
+    addLog('📥 יוצא גיבוי מקומי מלא (' + items.length + ' צילומים) לקובץ ' + fname, 'ok');
+    showToast('הורד גיבוי של ' + items.length + ' צילומים למכשיר');
+  }
+
+  // ---------- 3-Point GUM Facade Measurement ----------
+  function computeCurrentMeasurement() {
+    if (S.measBasePitch === null) return null;
+    var hCam = Math.max(0.4, Number($('camHeightInput').value) || 1.45);
+    var depRad = Math.max(2.0, -S.measBasePitch) * DEG;
+    var distM = hCam / Math.tan(depRad);
+    var sigmaDist = Math.hypot(0.05 / Math.tan(depRad), (hCam / Math.pow(Math.sin(depRad), 2)) * (1.2 * DEG));
+    var heightM = null, sigmaH = null, widthM = null;
+    if (S.measTopPitch !== null) {
+      var topRad = S.measTopPitch * DEG;
+      heightM = Math.max(0.2, hCam + distM * Math.tan(topRad));
+      sigmaH = Math.max(0.15, heightM * 0.06);
+    }
+    if (S.measBaseYaw !== null && S.measWidthYaw !== null) {
+      var dYaw = Math.abs((((S.measWidthYaw - S.measBaseYaw + 540) % 360) - 180)) * DEG;
+      widthM = Math.max(0.2, 2 * distM * Math.tan(dYaw / 2));
+    }
+    return {
+      distanceM: +distM.toFixed(2),
+      sigmaDistM: +sigmaDist.toFixed(2),
+      heightM: heightM !== null ? +heightM.toFixed(2) : null,
+      sigmaHeightM: sigmaH !== null ? +sigmaH.toFixed(2) : null,
+      widthM: widthM !== null ? +widthM.toFixed(2) : null,
+      estFloors: heightM !== null ? Math.max(1, Math.round(heightM / 3.15)) : null
+    };
+  }
+
+  function updateMeasurementUi() {
+    var m = computeCurrentMeasurement();
+    var lbl = $('measLiveReadout');
+    if (!m) {
+      lbl.textContent = 'מדידת חזית: כוון לבסיס המבנה (בקו הקרקע) ולחץ ״1. בסיס״';
+      return;
+    }
+    var parts = ['מרחק: ' + m.distanceM + '±' + m.sigmaDistM + ' מ׳'];
+    if (m.heightM !== null) parts.push('גובה: ' + m.heightM + '±' + m.sigmaHeightM + ' מ׳ (~' + m.estFloors + ' קומות)');
+    if (m.widthM !== null) parts.push('רוחב: ' + m.widthM + ' מ׳');
+    lbl.textContent = parts.join(' · ');
+  }
+
+  // ---------- HUD Rendering (Zero Overlap + Dynamic Locality + Consistent Mode Text) ----------
+  function renderHud() {
+    var now = Date.now();
+    updateEffectiveMotionMode(now);
+    resolveTrueHeading();
+
+    var isCar = S.effectiveMode === 'car';
+    var lat = S.gps ? S.gps.lat : null;
+    var lon = S.gps ? S.gps.lon : null;
+
+    // 1. Dynamic Locality Title (fixes hardcoded "אשדוד")
+    $('locTitle').textContent = resolveLocalityName(lat, lon, S.customPlace);
+    if (lat !== null && lon !== null) {
+      var itm = wgs84ToItm(lat, lon);
+      $('locSub').textContent = (S.running ? 'סורק חי · ' : 'מוכן · ') + lat.toFixed(5) + ', ' + lon.toFixed(5) + ' · ITM ' + Math.round(itm.e) + ',' + Math.round(itm.n);
+    } else {
+      $('locSub').textContent = S.simActive ? 'מצב הדמיה פעיל' : 'ממתין לנעילת GPS…';
+    }
+
+    // 2. Motion Lock Chip & Segmented Buttons
+    var lockBtn = $('motionLockBtn');
+    if (S.motionLock === 'car') {
+      lockBtn.textContent = '🚗 מצב: נהיגה (נעול)';
+      lockBtn.className = 'chip-btn active-car';
+    } else if (S.motionLock === 'walk') {
+      lockBtn.textContent = '🚶 מצב: הליכה (נעול)';
+      lockBtn.className = 'chip-btn active-walk';
+    } else {
+      lockBtn.textContent = isCar ? '🔄 אוטומטי (🚗 רכב)' : '🔄 אוטומטי (🚶 רגלי)';
+      lockBtn.className = isCar ? 'chip-btn active-car' : 'chip-btn';
+    }
+
+    $('segAutoBtn').classList.toggle('sel', S.motionLock === 'auto');
+    $('segCarBtn').classList.toggle('sel', S.motionLock === 'car');
+    $('segWalkBtn').classList.toggle('sel', S.motionLock === 'walk');
+
+    // 3. GPS, Heading, Calibrated Tilt & Spacing Pills
+    var gpsPill = $('gpsPill');
+    if (S.gps) {
+      var acc = Math.round(S.gps.acc || 3);
+      gpsPill.textContent = '📍 ±' + acc + ' מ׳';
+      gpsPill.className = 'stat-pill ' + (acc <= 8 ? 'good' : (acc <= 20 ? 'warn' : 'bad'));
+    } else {
+      gpsPill.textContent = '📍 ללא GPS';
+      gpsPill.className = 'stat-pill warn';
+    }
+
+    var headDegRound = Math.round(S.trueHeadingDeg) % 360;
+    var speedKmh = S.gps && S.gps.speed ? Math.round(S.gps.speed * 3.6) : 0;
+    var headPill = $('headingPill');
+    headPill.textContent = (isCar ? '🚗 ' : '🚶 ') + headDegRound + '° ' + cardinalHebrew(headDegRound) + (isCar && speedKmh > 0 ? ' · ' + speedKmh + ' קמ״ש' : '');
+    headPill.className = 'stat-pill ' + (isCar ? 'good' : '');
+
+    var calPitch = Math.round(S.rawPitchDeg - S.mountPitchOffset);
+    var calRoll = Math.round(S.rawRollDeg - S.mountRollOffset);
+    var tiltPill = $('tiltPill');
+    var tiltWarn = Math.abs(calPitch) > 22 || Math.abs(calRoll) > 8;
+    tiltPill.textContent = 'הטיה ' + (calPitch > 0 ? '+' : '') + calPitch + '°' + (S.mountPitchOffset !== 0 ? ' (מכויל)' : '');
+    tiltPill.className = 'stat-pill ' + (tiltWarn ? 'warn' : 'good');
+    $('calZeroBtn').classList.toggle('active-cal', S.mountPitchOffset !== 0 || S.mountRollOffset !== 0);
+
+    var activeInterval = getActiveCaptureIntervalM();
+    $('spacingPill').textContent = '📏 כל ' + activeInterval + ' מ׳';
+
+    // 4. Queue & Circuit Breaker Badge
+    var qCount = memQueue.size;
+    var qBadge = $('queueBadge');
+    var retryBtn = $('retryNowBtn');
+    var expBtn = $('quickExportBtn');
+
+    if (S.circuitNextRetryAtMs > now && qCount > 0) {
+      var secLeft = Math.max(1, Math.ceil((S.circuitNextRetryAtMs - now) / 1000));
+      qBadge.textContent = '⏸️ שרת ' + (S.lastServerStatus || 500) + ' · ' + qCount + ' שמורים במכשיר · ניסיון בעוד ' + secLeft + 'ש׳';
+      qBadge.className = 'paused-err';
+      retryBtn.hidden = false;
+      expBtn.hidden = false;
+    } else if (S.uploadsPausedByUser && qCount > 0) {
+      qBadge.textContent = '⏸️ העלאה מושהית · ' + qCount + ' שמורים במכשיר';
+      qBadge.className = '';
+      retryBtn.hidden = false;
+      expBtn.hidden = false;
+    } else if (qCount > 0) {
+      if (!isLiveScannerOrigin()) {
+        qBadge.textContent = '💾 ' + qCount + ' צילומים שמורים מקומית ב-IndexedDB';
+        qBadge.className = 'uploading';
+        retryBtn.hidden = true;
+        expBtn.hidden = false;
+      } else {
+        qBadge.textContent = '☁️ מעלה… ' + S.shotsUploaded + ' עלו · ' + qCount + ' בתור';
+        qBadge.className = 'uploading';
+        retryBtn.hidden = true;
+        expBtn.hidden = qCount < 3;
+      }
+    } else {
+      qBadge.textContent = '☁️ תור נקי · הועלו ' + S.shotsUploaded;
+      qBadge.className = '';
+      retryBtn.hidden = true;
+      expBtn.hidden = true;
+    }
+
+    $('drawerQueueStat').textContent = qCount + ' ממתינים · ' + S.shotsUploaded + ' הועלו';
+    $('drawerPauseUploadBtn').textContent = S.uploadsPausedByUser ? '▶️ חדש העלאות לענן' : '⏸️ השהה העלאות לענן';
+
+    // 5. Center Prompt & Bottom Counters (Consistent Car vs Walk!)
+    var gMain = $('guideMain');
+    var gSub = $('guideSub');
+    if (!S.running) {
+      gMain.textContent = isCar ? 'לחץ התחל לנסיעת סריקה' : 'לחץ התחל והתחל ללכת';
+      gSub.textContent = isCar
+        ? 'מצב רכב פעיל: מצלם אוטומטית כל ' + activeInterval + ' מ׳ ועוצר ברמזור'
+        : 'שמירה מקומית מוגנת ב-IndexedDB + מצפן מכויל';
+      $('centerPromptWrap').style.opacity = '1';
+    } else {
+      if (isCar && speedKmh < 3) {
+        gMain.textContent = 'עצירה בצומת/רמזור';
+        gSub.textContent = 'מצב נהיגה שמור (לא קופץ להליכה) · צילום יתחדש בתנועה';
+        $('centerPromptWrap').style.opacity = '0.92';
+      } else {
+        gMain.textContent = isCar ? 'סורק בנסיעה…' : 'סורק בהליכה…';
+        gSub.textContent = 'מצלם אוטומטית כל ' + activeInterval + ' מ׳ · שמור במקומי';
+        $('centerPromptWrap').style.opacity = '0.78';
+      }
+    }
+
+    $('shotsCount').textContent = String(S.shotsCaptured);
+    if (S.totalDistM >= 1000) {
+      $('distCount').textContent = (S.totalDistM / 1000).toFixed(2) + ' ק״מ';
+    } else {
+      $('distCount').textContent = Math.round(S.totalDistM) + ' מ׳';
+    }
+    $('distLabel').textContent = isCar ? 'נסעת' : 'הלכת';
+
+    var startBtn = $('mainStartBtn');
+    startBtn.textContent = S.running ? 'עצור' : 'התחל';
+    startBtn.classList.toggle('running', S.running);
+  }
+
+  // ---------- Canvas Render Loop: Horizon Level, Non-Overlapping Radar, Compass Tape & Sim Road ----------
+  var simFrameT = 0;
+
+  function drawCompassAndRadar() {
+    // 1. Horizontal Compass Tape (responsive DPR sizing - crisp 1:1 text on mobile & desktop)
+    var cc = $('compassCanvas');
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var cssW = Math.max(180, cc.clientWidth || 300);
+    var cssH = Math.max(28, cc.clientHeight || 34);
+    if (cc.width !== Math.round(cssW * dpr) || cc.height !== Math.round(cssH * dpr)) {
+      cc.width = Math.round(cssW * dpr);
+      cc.height = Math.round(cssH * dpr);
+    }
+    var cctx = cc.getContext('2d');
+    cctx.save();
+    cctx.scale(dpr, dpr);
+    cctx.clearRect(0, 0, cssW, cssH);
+
+    var centerDeg = S.trueHeadingDeg;
+    var visibleSpanDeg = Math.max(75, Math.min(135, cssW / 4.2));
+    var pxPerDeg = cssW / visibleSpanDeg;
+    cctx.font = '700 12.5px system-ui, sans-serif';
+    cctx.textAlign = 'center';
+    cctx.textBaseline = 'middle';
+
+    var halfSpan = Math.ceil(visibleSpanDeg / 2) + 10;
+    var startTick = Math.floor((centerDeg - halfSpan) / 5) * 5;
+    for (var deg = startTick; deg <= centerDeg + halfSpan; deg += 5) {
+      var diff = deg - centerDeg;
+      var x = cssW / 2 + diff * pxPerDeg;
+      if (x < 0 || x > cssW) continue;
+      var norm = ((deg % 360) + 360) % 360;
+      var isMajor = (norm % 15 === 0);
+      cctx.strokeStyle = isMajor ? 'rgba(255,255,255,0.68)' : 'rgba(255,255,255,0.24)';
+      cctx.lineWidth = isMajor ? 1.5 : 1;
+      cctx.beginPath();
+      cctx.moveTo(x, cssH - (isMajor ? 8 : 4));
+      cctx.lineTo(x, cssH);
+      cctx.stroke();
+
+      if (isMajor) {
+        var lbl = String(norm);
+        if (norm === 0) lbl = 'צ';
+        else if (norm === 90) lbl = 'מז';
+        else if (norm === 180) lbl = 'ד';
+        else if (norm === 270) lbl = 'מע';
+        cctx.fillStyle = (norm === 0) ? '#fb923c' : '#e2e8f0';
+        cctx.fillText(lbl, x, cssH / 2 - 2);
+      }
+    }
+    cctx.restore();
+
+    // 2. Docked Circular Radar (never overlaps compass tape!)
+    var rc = $('radarCanvas');
+    var rctx = rc.getContext('2d');
+    var rw = rc.width, rh = rc.height;
+    var rx = rw / 2, ry = rh / 2;
+    rctx.clearRect(0, 0, rw, rh);
+
+    var rings = [0.28, 0.56, 0.82];
+    rctx.strokeStyle = 'rgba(255,255,255,0.16)';
+    rctx.lineWidth = 1.5;
+    for (var r = 0; r < rings.length; r++) {
+      rctx.beginPath();
+      rctx.arc(rx, ry, (rw / 2) * rings[r], 0, Math.PI * 2);
+      rctx.stroke();
+    }
+
+    // Rotate North marker opposite to heading so arrow points forward
+    var northAngle = (-S.trueHeadingDeg - 90) * DEG;
+    var nx = rx + Math.cos(northAngle) * (rw * 0.41);
+    var ny = ry + Math.sin(northAngle) * (rh * 0.41);
+    rctx.fillStyle = '#fb923c';
+    rctx.font = '800 20px system-ui, sans-serif';
+    rctx.textAlign = 'center';
+    rctx.textBaseline = 'middle';
+    rctx.fillText('צ', nx, ny);
+
+    // Center forward pointer
+    rctx.save();
+    rctx.translate(rx, ry);
+    rctx.fillStyle = '#ffffff';
+    rctx.beginPath();
+    rctx.moveTo(0, -16);
+    rctx.lineTo(11, 12);
+    rctx.lineTo(0, 6);
+    rctx.lineTo(-11, 12);
+    rctx.closePath();
+    rctx.fill();
+    rctx.restore();
+  }
+
+  function drawHorizonAndSimPreview() {
+    var simC = $('simCanvas');
+    var hudC = $('hudCanvas');
+    var w = window.innerWidth || 390;
+    var h = window.innerHeight || 844;
+    if (simC.width !== w || simC.height !== h) {
+      simC.width = w; simC.height = h;
+      hudC.width = w; hudC.height = h;
+    }
+
+    // Draw simulated road/street feed whenever real camera isn't streaming
+    if (!S.hasRealCamera) {
+      var sctx = simC.getContext('2d');
+      var spd = (S.gps && S.gps.speed) || 0;
+      simFrameT += 0.016 * (0.4 + spd * 0.35);
+
+      var skyGrad = sctx.createLinearGradient(0, 0, 0, h * 0.52);
+      skyGrad.addColorStop(0, '#0f172a');
+      skyGrad.addColorStop(1, '#1e293b');
+      sctx.fillStyle = skyGrad;
+      sctx.fillRect(0, 0, w, h * 0.52);
+
+      var groundGrad = sctx.createLinearGradient(0, h * 0.52, 0, h);
+      groundGrad.addColorStop(0, '#1f242d');
+      groundGrad.addColorStop(1, '#0f1319');
+      sctx.fillStyle = groundGrad;
+      sctx.fillRect(0, h * 0.52, w, h * 0.48);
+
+      // Perspective road lanes
+      var vx = w * 0.5, vy = h * 0.52;
+      sctx.fillStyle = '#262c38';
+      sctx.beginPath();
+      sctx.moveTo(vx - 26, vy);
+      sctx.lineTo(vx + 26, vy);
+      sctx.lineTo(w * 0.96, h);
+      sctx.lineTo(w * 0.04, h);
+      sctx.closePath();
+      sctx.fill();
+
+      sctx.strokeStyle = '#f59e0b';
+      sctx.lineWidth = 3;
+      for (var i = 0; i < 6; i++) {
+        var p1 = ((i / 6 + (simFrameT * 0.25) % 1) % 1);
+        var p2 = Math.min(1, p1 + 0.08);
+        var y1 = vy + Math.pow(p1, 1.8) * (h - vy);
+        var y2 = vy + Math.pow(p2, 1.8) * (h - vy);
+        sctx.beginPath();
+        sctx.moveTo(vx, y1);
+        sctx.lineTo(vx, y2);
+        sctx.stroke();
+      }
+    }
+
+    // Draw calibrated horizon guide line (subtle green when level, amber only when >8° roll)
+    var hctx = hudC.getContext('2d');
+    hctx.clearRect(0, 0, w, h);
+
+    var calRoll = S.rawRollDeg - S.mountRollOffset;
+    var calPitch = S.rawPitchDeg - S.mountPitchOffset;
+    var isLevel = Math.abs(calRoll) <= 5 && Math.abs(calPitch) <= 22;
+
+    hctx.save();
+    hctx.translate(w / 2, h * 0.5 + clampVal(calPitch, -25, 25) * 3.2);
+    hctx.rotate(-calRoll * DEG);
+    hctx.strokeStyle = isLevel ? 'rgba(52,211,153,0.42)' : 'rgba(251,191,36,0.75)';
+    hctx.lineWidth = isLevel ? 1.5 : 2.5;
+    hctx.beginPath();
+    hctx.moveTo(-w * 0.36, 0);
+    hctx.lineTo(-32, 0);
+    hctx.moveTo(32, 0);
+    hctx.lineTo(w * 0.36, 0);
+    hctx.stroke();
+    hctx.restore();
+  }
+
+  function clampVal(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // ---------- Hardware Sensors Initialization ----------
+  function startHardwareSensors() {
+    // 1. Rear Camera
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+      }).then(function (stream) {
+        var vid = $('camVideo');
+        vid.srcObject = stream;
+        S.hasRealCamera = true;
+        $('simCanvas').style.display = 'none';
+        addLog('📷 מצלמה אחורית מחוברת ופעילה', 'ok');
+      }).catch(function () {
+        S.hasRealCamera = false;
+        $('simCanvas').style.display = 'block';
+        addLog('ℹ️ מצלמה פיזית לא זמינה בחלון זה – מציג תצוגת סימולטור חיה', 'warn');
+      });
+    }
+
+    // 2. GPS Watch
+    if (navigator.geolocation) {
+      try {
+        navigator.geolocation.watchPosition(function (pos) {
+          if (S.simActive) return;
+          onNewGpsSample({
+            lat: pos.coords.latitude,
+            lon: pos.coords.longitude,
+            acc: pos.coords.accuracy || 4,
+            speed: pos.coords.speed,
+            heading: pos.coords.heading
+          });
+        }, function () {
+          // Keep current or simulation state quietly
+        }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 8000 });
+      } catch (_) {}
+    }
+
+    // 3. Device Orientation (3D Gimbal-Lock-Free)
+    function onOri(e) {
+      if (e.alpha === null && e.beta === null) return;
+      var att = computeCameraAttitude(
+        typeof e.webkitCompassHeading === 'number' ? (360 - e.webkitCompassHeading) : e.alpha,
+        e.beta,
+        e.gamma
+      );
+      S.rawPitchDeg = att.rawPitchDeg;
+      S.rawRollDeg = att.rawRollDeg;
+      S.magHeadingDeg = att.magHeadingDeg;
+      if (S.measOverlayOpen) updateMeasurementUi();
+    }
+    window.addEventListener('deviceorientationabsolute', onOri, true);
+    window.addEventListener('deviceorientation', onOri, true);
+  }
+
+  function onNewGpsSample(sample) {
+    var prev = S.lastTrackGps;
+    if (prev && S.running) {
+      var stepDist = haversineMeters(prev.lat, prev.lon, sample.lat, sample.lon);
+      if (stepDist >= 0.6 && stepDist < 250) {
+        S.totalDistM += stepDist;
+      }
+    }
+    S.lastTrackGps = { lat: sample.lat, lon: sample.lon };
+    S.gps = sample;
+
+    updateEffectiveMotionMode(Date.now());
+    resolveTrueHeading();
+
+    // Auto-capture by distance (paused when car is stopped at red light < 0.7 m/s!)
+    if (S.running) {
+      var spd = sample.speed || 0;
+      if (S.effectiveMode === 'car' && spd < 0.7) {
+        renderHud();
+        return;
+      }
+      var targetInterval = getActiveCaptureIntervalM();
+      if (!S.lastCaptureGps) {
+        captureFrame('auto-first');
+      } else {
+        var distSinceShot = haversineMeters(S.lastCaptureGps.lat, S.lastCaptureGps.lon, sample.lat, sample.lon);
+        if (distSinceShot >= targetInterval) {
+          captureFrame('auto-' + targetInterval + 'm');
+        }
+      }
+    }
+    renderHud();
+  }
+
+  // ---------- Simulation Timer for Testing Route 446 & Junctions ----------
+  setInterval(function () {
+    if (S.simActive && S.gps) {
+      if (S.simSpeedMps > 0) {
+        var stepM = S.simSpeedMps * 1.0;
+        var brg = S.trueHeadingDeg * DEG;
+        var dLat = (stepM * Math.cos(brg)) / 111320;
+        var dLon = (stepM * Math.sin(brg)) / (111320 * Math.cos(S.gps.lat * DEG));
+        onNewGpsSample({
+          lat: S.gps.lat + dLat,
+          lon: S.gps.lon + dLon,
+          acc: 2.0,
+          speed: S.simSpeedMps,
+          heading: 329
+        });
+      } else {
+        onNewGpsSample({
+          lat: S.gps.lat,
+          lon: S.gps.lon,
+          acc: 2.0,
+          speed: 0,
+          heading: 329
+        });
+      }
+    }
+    renderHud();
+  }, 1000);
+
+  function animLoop() {
+    drawHorizonAndSimPreview();
+    drawCompassAndRadar();
+    requestAnimationFrame(animLoop);
+  }
+
+  // ---------- Wire All Controls ----------
+  function setMotionLock(mode) {
+    S.motionLock = mode;
+    safeStorageSet('esh27_motion_lock', mode);
+    if (mode === 'car') S.lastCarSpeedAtMs = Date.now();
+    addLog('מצב תנועה הוגדר ל-' + (mode === 'car' ? '🚗 נהיגה נעול' : (mode === 'walk' ? '🚶 הליכה נעול' : '🔄 אוטומטי (החזקת רכב 60ש׳)')), 'ok');
+    renderHud();
+  }
+
+  function calibrateMountZero() {
+    S.mountPitchOffset = +S.rawPitchDeg.toFixed(2);
+    S.mountRollOffset = +S.rawRollDeg.toFixed(2);
+    safeStorageSet('esh27_pitch_off', S.mountPitchOffset);
+    safeStorageSet('esh27_roll_off', S.mountRollOffset);
+    $('calReadoutText').textContent = 'מכויל לתושבת הנוכחית (היסט Pitch ' + S.mountPitchOffset + '°, Roll ' + S.mountRollOffset + '°). כל מדידה חדשה מחושבת ביחס לאופק הרכב.';
+    addLog('⚖️ פלס תושבת אופס על Pitch=' + S.mountPitchOffset + '°, Roll=' + S.mountRollOffset + '°', 'ok');
+    showToast('זווית התושבת אופסה ל-0°');
+    renderHud();
+  }
+
+  function bindEvents() {
+    $('mainStartBtn').addEventListener('click', function () {
+      S.running = !S.running;
+      if (S.running) {
+        S.lastTrackGps = S.gps ? { lat: S.gps.lat, lon: S.gps.lon } : null;
+        addLog('▶️ סריקה הופעלה (' + (S.effectiveMode === 'car' ? 'מצב רכב' : 'מצב רגלי') + ')', 'ok');
+      } else {
+        addLog('⏹️ סריקה נעצרה', 'warn');
+      }
+      renderHud();
+    });
+
+    $('manualShotBtn').addEventListener('click', function () {
+      captureFrame('manual');
+    });
+
+    $('motionLockBtn').addEventListener('click', function () {
+      var order = ['auto', 'car', 'walk'];
+      var next = order[(order.indexOf(S.motionLock) + 1) % order.length];
+      setMotionLock(next);
+    });
+
+    $('calZeroBtn').addEventListener('click', calibrateMountZero);
+    $('tiltPill').addEventListener('click', calibrateMountZero);
+    $('calMountNowBtn').addEventListener('click', calibrateMountZero);
+
+    $('calResetBtn').addEventListener('click', function () {
+      S.mountPitchOffset = 0;
+      S.mountRollOffset = 0;
+      safeStorageSet('esh27_pitch_off', 0);
+      safeStorageSet('esh27_roll_off', 0);
+      $('calReadoutText').textContent = 'הכיול אופס לברירת מחדל (0°).';
+      showToast('כיול פלס אופס');
+      renderHud();
+    });
+
+    $('radarWrap').addEventListener('click', function () {
+      S.radarCompact = !S.radarCompact;
+      $('radarWrap').classList.toggle('compact', S.radarCompact);
+    });
+
+    // Tools Drawer Open/Close & Tabs
+    $('openToolsBtn').addEventListener('click', function () {
+      $('toolsDrawer').classList.add('open');
+      $('toolsDrawer').setAttribute('aria-hidden', 'false');
+    });
+    $('closeToolsBtn').addEventListener('click', function () {
+      $('toolsDrawer').classList.remove('open');
+      $('toolsDrawer').setAttribute('aria-hidden', 'true');
+    });
+
+    $('tabDiagBtn').addEventListener('click', function () {
+      $('tabDiagBtn').classList.add('active');
+      $('tabMeasBtn').classList.remove('active');
+      $('paneDiag').style.display = 'flex';
+      $('paneMeas').style.display = 'none';
+    });
+    $('tabMeasBtn').addEventListener('click', function () {
+      $('tabMeasBtn').classList.add('active');
+      $('tabDiagBtn').classList.remove('active');
+      $('paneMeas').style.display = 'flex';
+      $('paneDiag').style.display = 'none';
+    });
+
+    // Mode Segmented Buttons
+    $('segAutoBtn').addEventListener('click', function () { setMotionLock('auto'); });
+    $('segCarBtn').addEventListener('click', function () { setMotionLock('car'); });
+    $('segWalkBtn').addEventListener('click', function () { setMotionLock('walk'); });
+
+    $('placeInput').value = S.customPlace;
+    $('placeInput').addEventListener('input', function (e) {
+      S.customPlace = e.target.value;
+      safeStorageSet('esh27_custom_place', S.customPlace);
+      renderHud();
+    });
+
+    $('intervalInput').value = String(S.customIntervalM);
+    $('intervalInput').addEventListener('change', function (e) {
+      var val = Math.max(0, Math.min(200, Number(e.target.value) || 0));
+      S.customIntervalM = val;
+      e.target.value = String(val);
+      safeStorageSet('esh27_custom_interval', val);
+      renderHud();
+    });
+
+    // Queue & Circuit Breaker Actions
+    $('retryNowBtn').addEventListener('click', function () {
+      S.circuitNextRetryAtMs = 0;
+      S.consecutiveServerErrors = 0;
+      S.uploadsPausedByUser = false;
+      S.simForce500 = false;
+      addLog('🔄 איפוס מפסק זרם וניסיון העלאה מיידי', 'ok');
+      scheduleUploadPump(50);
+    });
+    $('drawerFlushNowBtn').addEventListener('click', function () {
+      S.circuitNextRetryAtMs = 0;
+      S.consecutiveServerErrors = 0;
+      S.uploadsPausedByUser = false;
+      S.simForce500 = false;
+      showToast('בודק חיבור ומנסה להעלות…');
+      scheduleUploadPump(50);
+    });
+
+    $('quickExportBtn').addEventListener('click', exportPendingQueueBackup);
+    $('drawerExportQueueBtn').addEventListener('click', exportPendingQueueBackup);
+
+    $('drawerPauseUploadBtn').addEventListener('click', function () {
+      S.uploadsPausedByUser = !S.uploadsPausedByUser;
+      addLog(S.uploadsPausedByUser ? '⏸️ העלאות לענן הושהו ידנית (הצילום המקומי ממשיך)' : '▶️ העלאות לענן חודשו', 'warn');
+      if (!S.uploadsPausedByUser) scheduleUploadPump(100);
+      renderHud();
+    });
+
+    $('drawerClearQueueBtn').addEventListener('click', function () {
+      var n = memQueue.size;
+      if (n === 0) { showToast('התור כבר ריק'); return; }
+      openConfirmModal('ניקוי תור מקומי', 'למחוק ' + n + ' צילומים שממתינים בתור? מומלץ ללחוץ קודם על ״ייצוא כל הצילומים הממתינים״.', function () {
+        queueClearAll().then(function () {
+          S.circuitNextRetryAtMs = 0;
+          S.consecutiveServerErrors = 0;
+          addLog('🗑️ התור המקומי נוקה (' + n + ' פריטים הוסרו)', 'warn');
+          renderHud();
+        });
+      });
+    });
+
+    $('modalCancelBtn').addEventListener('click', function () {
+      pendingModalAction = null;
+      $('modalBackdrop').classList.remove('show');
+    });
+    $('modalConfirmBtn').addEventListener('click', function () {
+      var fn = pendingModalAction;
+      pendingModalAction = null;
+      $('modalBackdrop').classList.remove('show');
+      if (typeof fn === 'function') fn();
+    });
+
+    // Diagnostics & Simulations (Route 446, Junction Stop, 500 Circuit Breaker)
+    $('checkSensorsBtn').addEventListener('click', function () {
+      var msg = 'מצלמה: ' + (S.hasRealCamera ? 'פעילה ✓' : 'סימולטור') +
+        ' · GPS: ' + (S.gps ? (S.gps.lat.toFixed(4) + ',' + S.gps.lon.toFixed(4)) : 'ממתין') +
+        ' · כיוון: ' + Math.round(S.trueHeadingDeg) + '° (' + S.headingSource + ')' +
+        ' · תור IndexedDB: ' + (idbDb ? 'מחובר ✓' : 'זיכרון');
+      $('sensorDiagText').textContent = msg;
+      addLog('🔍 בדיקת חיישנים: ' + msg, 'ok');
+    });
+
+    $('simDrive446Btn').addEventListener('click', function () {
+      S.simActive = true;
+      S.simSpeedMps = 13.5; // ~49 km/h on Route 446
+      S.rawPitchDeg = -30;
+      S.mountPitchOffset = -30; // Auto-calibrated car mount!
+      S.trueHeadingDeg = 329;
+      S.magHeadingDeg = 324;
+      S.running = true;
+      onNewGpsSample({ lat: 31.98144, lon: 35.04869, acc: 2.0, speed: 13.5, heading: 329 });
+      addLog('🚗 הופעלה הדמיית נסיעה בכביש 446 (31.98144, 35.04869 · 49 קמ״ש · כותרת מיקום דינמית)', 'ok');
+      showToast('הדמיית נסיעה בכביש 446 הופעלה');
+      $('toolsDrawer').classList.remove('open');
+    });
+
+    $('simJunctionStopBtn').addEventListener('click', function () {
+      S.simActive = true;
+      S.simSpeedMps = 0;
+      if (!S.gps) S.gps = { lat: 31.98144, lon: 35.04869, acc: 2.0, speed: 0, heading: 329 };
+      else S.gps.speed = 0;
+      addLog('🛑 הדמיית עצירה בצומת (0 קמ״ש): מצב הרכב נשמר ל-60 שניות ולא קופץ ל״הליכה״!', 'ok');
+      showToast('עצירה ב-0 קמ״ש: מצב נהיגה נשאר נעול');
+      renderHud();
+    });
+
+    $('sim500Btn').addEventListener('click', function () {
+      S.simForce500 = true;
+      if (memQueue.size === 0) captureFrame('test-500');
+      else scheduleUploadPump(50);
+      showToast('בודק מפסק זרם לשגיאת 500…');
+    });
+
+    $('clearLogBtn').addEventListener('click', function () {
+      $('logBox').innerHTML = '';
+    });
+
+    $('privacyBlurToggleBtn').addEventListener('click', function () {
+      S.privacyBlurPlates = !S.privacyBlurPlates;
+      $('privacyBlurToggleBtn').textContent = S.privacyBlurPlates
+        ? '🛡️ טשטוש לוחיות מקומי: פעיל'
+        : '🛡️ טשטוש לוחיות מקומי: כבוי';
+      $('privacyBlurToggleBtn').className = S.privacyBlurPlates ? 'sec-btn good' : 'sec-btn';
+    });
+
+    // Measurement Tool Wiring
+    $('launchMeasHudBtn').addEventListener('click', function () {
+      S.measOverlayOpen = true;
+      $('measFloatingBar').classList.add('show');
+      $('toolsDrawer').classList.remove('open');
+      updateMeasurementUi();
+    });
+    $('exitMeasHudBtn').addEventListener('click', function () {
+      S.measOverlayOpen = false;
+      $('measFloatingBar').classList.remove('show');
+    });
+    $('hudM1Btn').addEventListener('click', function () {
+      S.measBasePitch = S.rawPitchDeg - S.mountPitchOffset;
+      S.measBaseYaw = S.trueHeadingDeg;
+      updateMeasurementUi();
+    });
+    $('hudM2Btn').addEventListener('click', function () {
+      S.measTopPitch = S.rawPitchDeg - S.mountPitchOffset;
+      updateMeasurementUi();
+    });
+    $('hudM3Btn').addEventListener('click', function () {
+      S.measWidthYaw = S.trueHeadingDeg;
+      updateMeasurementUi();
+    });
+    $('hudMSaveBtn').addEventListener('click', function () {
+      var m = computeCurrentMeasurement();
+      if (!m) { showToast('סמן קודם את בסיס החזית (כפתור 1)'); return; }
+      S.savedMeasurements.push({
+        time: new Date().toISOString(),
+        gps: S.gps,
+        measurement: m
+      });
+      $('savedMeasList').textContent = 'נשמרו ' + S.savedMeasurements.length + ' מדידות חזית (אחרונה: מרחק ' + m.distanceM + ' מ׳' + (m.heightM ? ', גובה ' + m.heightM + ' מ׳' : '') + ').';
+      showToast('מדידת החזית נשמרה');
+    });
+    $('exportMeasJsonBtn').addEventListener('click', function () {
+      downloadJsonBlob('esh27_scan_jobs_and_measurements_' + S.session + '.json', {
+        session: S.session,
+        photomatchJobs: S.photomatchJobs,
+        measurements: S.savedMeasurements
+      });
+    });
+  }
+
+  // ---------- Automatic Rescue of Pending Frames from Legacy IndexedDB Stores ----------
+  function arrayBufferToDataUrl(buf, mime) {
+    return new Promise(function (resolve) {
+      try {
+        var blob = (buf instanceof Blob) ? buf : new Blob([buf], { type: mime || 'image/jpeg' });
+        var reader = new FileReader();
+        reader.onloadend = function () { resolve(typeof reader.result === 'string' ? reader.result : null); };
+        reader.onerror = function () { resolve(null); };
+        reader.readAsDataURL(blob);
+      } catch (_) { resolve(null); }
+    });
+  }
+
+  async function rescueLegacyIdbQueues() {
+    if (!window.indexedDB) return 0;
+    var migratedKey = 'esh27_v3_legacy_rescued_ids';
+    var seen = {};
+    try { seen = JSON.parse(safeStorageGet(migratedKey, '{}')) || {}; } catch (_) { seen = {}; }
+    var dbNames = ['esh27_scan_queue_v2', 'esh27-scan', 'esh27_scan', 'scan_queue', 'scan'];
+    try {
+      if (typeof window.indexedDB.databases === 'function') {
+        var dbs = await window.indexedDB.databases();
+        for (var d = 0; d < dbs.length; d++) {
+          var nm = dbs[d] && dbs[d].name;
+          if (nm && nm !== 'esh27_scan_queue_v3' && dbNames.indexOf(nm) < 0) dbNames.push(nm);
+        }
+      }
+    } catch (_) {}
+
+    var rescuedCount = 0;
+    for (var i = 0; i < dbNames.length; i++) {
+      var dbName = dbNames[i];
+      if (!dbName || dbName === 'esh27_scan_queue_v3') continue;
+      var legacyDb = await new Promise(function (resolve) {
+        try {
+          var r = window.indexedDB.open(dbName);
+          var upgraded = false;
+          r.onupgradeneeded = function (ev) {
+            upgraded = true;
+            try { ev.target.transaction.abort(); } catch (_) {}
+          };
+          r.onsuccess = function () {
+            if (upgraded) { try { r.result.close(); } catch (_) {} resolve(null); return; }
+            resolve(r.result);
+          };
+          r.onerror = function () { resolve(null); };
+        } catch (_) { resolve(null); }
+      });
+      if (!legacyDb) continue;
+      try {
+        var storeNames = Array.from(legacyDb.objectStoreNames || []);
+        for (var s = 0; s < storeNames.length; s++) {
+          var stName = storeNames[s];
+          if (stName === 'stats') continue;
+          var records = await new Promise(function (resolve) {
+            try {
+              var tx = legacyDb.transaction(stName, 'readonly');
+              var req = tx.objectStore(stName).getAll();
+              req.onsuccess = function () { resolve(req.result || []); };
+              req.onerror = function () { resolve([]); };
+            } catch (_) { resolve([]); }
+          });
+          for (var k = 0; k < records.length; k++) {
+            var rec = records[k];
+            if (!rec || typeof rec !== 'object') continue;
+            var rawId = String(rec.id || rec.name || (dbName + '_' + stName + '_' + k));
+            var migId = 'legacy_' + dbName + '_' + rawId;
+            if (seen[migId] || memQueue.has(migId)) continue;
+            var dUrl = typeof rec.dataUrl === 'string' ? rec.dataUrl : null;
+            if (!dUrl && (rec.blobBuffer || rec.blob || rec.data)) {
+              dUrl = await arrayBufferToDataUrl(rec.blobBuffer || rec.blob || rec.data, rec.mimeType || 'image/jpeg');
+            }
+            if (!dUrl || dUrl.indexOf('data:') !== 0) continue;
+            var item = {
+              id: migId,
+              name: rec.name || ('rescued_' + String(k + 1).padStart(4, '0') + '.jpg'),
+              createdAt: rec.createdAt ? new Date(rec.createdAt).toISOString() : new Date().toISOString(),
+              dataUrl: dUrl,
+              meta: rec.meta || { schema: 'esh27.scan.rescued', session: rec.session || 'rescued_session' },
+              tries: 0
+            };
+            await queuePut(item);
+            seen[migId] = 1;
+            rescuedCount += 1;
+          }
+        }
+      } catch (_) {}
+      try { legacyDb.close(); } catch (_) {}
+    }
+    if (rescuedCount > 0) {
+      safeStorageSet(migratedKey, JSON.stringify(seen));
+    }
+    return rescuedCount;
+  }
+
+  // ---------- Boot ----------
+  initQueueDb().then(function () {
+    return rescueLegacyIdbQueues().catch(function () { return 0; });
+  }).then(function () {
+    return queueLoadAll();
+  }).then(function (restored) {
+    bindEvents();
+    startHardwareSensors();
+    if (restored.length > 0) {
+      addLog('♻️ שוחזרו ' + restored.length + ' צילומים ממתינים מ-IndexedDB במכשיר', 'warn');
+      scheduleUploadPump(800);
+    } else {
+      addLog('✅ סורק אש 27 גרסה ' + APP_VERSION + ' מוכן (מפסק שגיאת 500 + החזקת רכב 60ש׳ פעילים)', 'ok');
+    }
+    renderHud();
+    requestAnimationFrame(animLoop);
+  });
+})();
+</script>
+</body>
+</html>
